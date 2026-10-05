@@ -1,42 +1,513 @@
-/*
+<!DOCTYPE html>
+<!--
 * ══════════════════════════════════════════════════════════════
-* ARCHIVO:         sw.js (service worker del envoltorio GitHub Pages)
+* ARCHIVO:         Index_GitHub.html (subir a GitHub Pages como index.html;
+*                  este paquete ya trae la copia index.html lista)
 * PROYECTO:        ServyCloud | Envoltorio de app única (GitHub Pages)
-* RESPONSABILIDAD: Service worker mínimo de PASO PURO: solo registra
-*                  los listeners que Chrome exige para considerar la
-*                  página INSTALABLE (botón "Instalar app" del
-*                  envoltorio). NO guarda nada en caché: todas las
-*                  peticiones siguen su curso normal, así la app de
-*                  GAS (ServyCloud) y sus actualizaciones nunca
-*                  quedan viejas.
-* VERSIÓN:         1.1
-* CAMBIOS:         R63 (el envoltorio pasa a APP ÚNICA: ServyCloud.
-*                  Este worker NO cambia su lógica: sigue siendo paso
-*                  puro; solo se actualiza el encabezado a la
-*                  identidad ServyCloud).
-*                  R59 (nace con el botón "Instalar app" del
-*                  envoltorio v1.5).
-* DEPENDENCIAS:    Vive en la MISMA carpeta del repositorio que
-*                  index.html, manifest.json, icon-192.png e
-*                  icon-512.png. Se registra desde el envoltorio con
-*                  navigator.serviceWorker.register('./sw.js').
+* RESPONSABILIDAD: Página envoltorio de APP ÚNICA: carga el código GAS
+*                  de ServyCloud en el iframe, muestra el preloader
+*                  orbital mientras carga y luego lo oculta. Ya NO lee
+*                  el parámetro ?id=: cualquier enlace viejo con ?id=
+*                  carga ServyCloud igual, y la pantalla 404 se retiró.
+* VERSIÓN:         2.0
+* CAMBIOS:         R63 (APP ÚNICA: el envoltorio ya no elige entre
+*                  varias apps por ?id=; ahora SOLO ejecuta el código
+*                  GAS de ServyCloud. La URL vive en UNA sola constante
+*                  editable al inicio del script: URL_SERVYCLOUD. Se
+*                  retiró el registro de apps, los mapas por app y la
+*                  pantalla 404. Título de pestaña e ícono de pestaña
+*                  pasan a la identidad ServyCloud: el favicon ahora
+*                  es el icon-192.png real del repositorio. Los textos
+*                  del preloader ("Servy" / "Cargando catálogo") y el
+*                  color de barras (#f8fafc) son los que esta app ya
+*                  tenía en la copia del dueño. Nombres de instalación
+*                  exclusivos: ServyCloud / Servy. Iconos PWA nuevos:
+*                  S blanca sobre azul que rompe el borde inferior).
+*                  R59 (botón "Instalar app" · PWA SOLO ANDROID: píldora
+*                  abajo a la izquierda que abre el diálogo nativo de
+*                  instalación de Chrome. Aparece SOLO si se cumplen
+*                  TODAS estas condiciones: el teléfono es Android,
+*                  Chrome entregó beforeinstallprompt, la app NO está
+*                  ya instalada, el preloader ya se retiró y pasaron
+*                  2.5 seg, y es la 2ª visita o posterior. Si el usuario
+*                  la cierra, calla 3 días; si instala, desaparece para
+*                  siempre. En iPhone NO aparece: Safari no permite
+*                  instalar por código y el dueño lo descartó).
+*                  R57 (el preloader ya no se retira al `iframe.load`,
+*                  sino cuando la app emite postMessage('app-lista').
+*                  Esto garantiza que el usuario no vea un flash
+*                  blanco entre que el iframe carga y la app pinta.
+*                  Fallback: si la app no avisa en 5 seg tras load,
+*                  el preloader se retira igual).
+* DEPENDENCIAS:    Despliegue: GitHub Pages (HTTPS). App única: la
+*                  constante URL_SERVYCLOUD (inicio del script). La app
+*                  debe emitir postMessage({tipo:'app-lista'}) para
+*                  retirar el preloader (fallback: 5 seg tras load).
+*                  Instalación PWA: manifest.json + sw.js + icon-192.png
+*                  + icon-512.png en la MISMA carpeta del repositorio.
 * ══════════════════════════════════════════════════════════════
-*/
+-->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-// Al instalarme, tomo el control de la página enseguida (sin esperar
-// a que el usuario cierre y reabra la pestaña).
-self.addEventListener('install', function () {
-    self.skipWaiting();
-});
+    <!-- ═══ COLOR DE LAS BARRAS DEL TELÉFONO ═══
+         Esta meta theme-color tiñe las barras en los navegadores de
+         Android (Chrome/Samsung). En iPhone las barras se tiñen con el
+         FONDO de esta página, así que el color de la app (la constante
+         COLOR_BARRAS_APP del script) pinta AMBOS: el fondo de la
+         página y esta meta. Valor inicial: el fondo de siempre
+         (#050505), reemplazado enseguida por el color de la app. -->
+    <meta name="theme-color" content="#050505">
 
-self.addEventListener('activate', function (evento) {
-    evento.waitUntil(self.clients.claim());
-});
+    <!-- ═══ MANIFIESTO PWA ═══
+         Chrome de Android solo ofrece instalar una página que declara
+         un manifiesto. Va acompañado de sw.js, icon-192.png e
+         icon-512.png en la MISMA carpeta del repositorio. Nombres de
+         instalación exclusivos (R63): ServyCloud / Servy. -->
+    <link rel="manifest" href="./manifest.json">
 
-// Listener de fetch requerido por Chrome para la instalabilidad.
-// Deliberadamente NO llama a respondWith ni usa caches: cada petición
-// (incluido el iframe de GAS) va a la red tal cual, sin
-// interferencias. Sin este listener, Chrome no ofrecería instalar.
-self.addEventListener('fetch', function () {
-    // Paso puro: sin caché, sin intercepción.
-});
+    <!-- ═══ FAVICON ═══
+         Usa el icono real del repositorio (la S de ServyCloud): la
+         pestaña muestra la misma marca que el icono instalado. -->
+    <link id="pagina-icono" rel="icon" href="./icon-192.png">
+
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #050505;
+        color: #f8fafc;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+      }
+
+      .contenedor {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        position: relative;
+      }
+
+      #webApp {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* ═══════════════════════════════════════════════════════
+         PRELOADER ORBITAL · overlay sobre el contenedor
+         ═══════════════════════════════════════════════════════ */
+      .preloader-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        opacity: 1;
+        transition: opacity 0.32s ease;
+        pointer-events: none;
+      }
+      .preloader-overlay.saliendo { opacity: 0; }
+      .preloader-overlay[hidden]  { display: none; }
+
+      .carga-preloader {
+        --text-primary: #0f172a;
+        --text-muted: #64748b;
+        --border-input: #cbd5e1;
+        --logo-primario: #00A3E0;
+        --logo-secundario: #0EA5E9;
+
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      @keyframes rot { to { transform: rotate(360deg); } }
+
+      .carga-loader {
+        position: relative;
+        width: 100px;
+        height: 100px;
+      }
+
+      .carga-orbital {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--border-input) 80%, transparent);
+      }
+
+      .carga-orbital-1 {
+        inset: 0;
+        border-top-color: var(--logo-primario);
+        border-right-color: var(--logo-primario);
+        animation: rot 1.6s linear infinite;
+      }
+
+      .carga-orbital-2 {
+        inset: 12px;
+        border-bottom-color: var(--logo-secundario);
+        border-left-color: var(--logo-secundario);
+        animation: rot 1.2s linear infinite reverse;
+      }
+
+      .carga-core {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .carga-core span {
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: -0.5px;
+        color: var(--logo-primario);
+        animation: cargaPulso 2s ease-in-out infinite;
+      }
+
+      .carga-brand {
+        margin-top: 25px;
+        font-size: 21px;
+        letter-spacing: -0.6px;
+        color: var(--text-primary);
+        display: inline-flex;
+        align-items: baseline;
+      }
+
+      .carga-brand-in     { color: var(--logo-primario);   font-weight: 900; }
+      .carga-brand-genius { color: var(--text-primary);    font-weight: 700; }
+      .carga-brand-cloud  { color: var(--logo-secundario); font-weight: 300; letter-spacing: 1px; margin-left: 1px; }
+
+      .carga-status {
+        margin-top: 9px;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+      }
+
+      .carga-puntos {
+        display: inline-flex;
+        gap: 4px;
+        margin-left: 6px;
+      }
+
+      .carga-puntos span {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--logo-primario);
+        animation: cargaPunto 1.4s infinite;
+      }
+      .carga-puntos span:nth-child(2) { animation-delay: 0.2s; }
+      .carga-puntos span:nth-child(3) { animation-delay: 0.4s; }
+
+      @keyframes cargaPunto {
+        0%, 100% { opacity: 0.2; transform: translateY(0); }
+        50%      { opacity: 1;   transform: translateY(-3px); }
+      }
+      @keyframes cargaPulso {
+        0%, 100% { transform: scale(0.92); opacity: 0.65; }
+        50%      { transform: scale(1);    opacity: 1; }
+      }
+
+      /* ═══════════════════════════════════════════════════════
+         BOTÓN INSTALAR APP (PWA · solo Android)
+         Píldora abajo a la IZQUIERDA: el botón de subir de la
+         landing vive abajo a la DERECHA, dentro del iframe, y esta
+         píldora no debe taparlo. El atributo hidden se declara otra
+         vez aquí porque el display:inline-flex lo pisaría.
+         ═══════════════════════════════════════════════════════ */
+      #zona-instalar {
+        position: fixed;
+        left: 14px;
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        z-index: 9000;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px 6px 14px;
+        border-radius: 999px;
+        background: #00A3E0;
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        animation: instalar-entrada 0.35s ease;
+      }
+      #zona-instalar[hidden] { display: none; }
+
+      #btn-instalar {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: none;
+        border: none;
+        color: inherit;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        padding: 6px 0;
+        cursor: pointer;
+      }
+
+      .zona-instalar-divisor {
+        width: 1px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      #btn-instalar-cerrar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      @keyframes instalar-entrada {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+
+    <title id="pagina-titulo">ServyCloud</title>
+</head>
+<body>
+    <div class="contenedor" id="contenedor-principal"></div>
+
+    <!-- ═══ BOTÓN INSTALAR APP (solo Android; se muestra y se oculta solo) ═══ -->
+    <div id="zona-instalar" hidden role="group" aria-label="Instalar aplicación">
+        <button id="btn-instalar" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span>Instalar app</span>
+        </button>
+        <span class="zona-instalar-divisor" aria-hidden="true"></span>
+        <button id="btn-instalar-cerrar" type="button" aria-label="Cerrar sin instalar">✕</button>
+    </div>
+
+    <script>
+        // ═══ APP ÚNICA: SERVYCLOUD (R63) ═══
+        // Este envoltorio ya no elige entre varias apps por ?id=: SOLO
+        // ejecuta el código GAS de ServyCloud. Cualquier enlace viejo
+        // con ?id= se ignora y carga ServyCloud igual.
+        //
+        // PARA CAMBIAR LA URL A FUTURO (si renuevas el despliegue de
+        // ServyCloud): edita SOLO la constante URL_SERVYCLOUD.
+        const URL_SERVYCLOUD = "https://script.google.com/macros/s/AKfycbxnRxhoSY2LUpXBX5AT5ABplXvG46CgYm8zeHAXSOFRGw-AYEN65F3_xfe833Gaw2E5WQ/exec";
+
+        // Identidad exclusiva de la app (R63): el nombre largo del
+        // manifiesto, también usado como título de la pestaña.
+        const TITULO_APP = "ServyCloud";
+
+        // Textos del preloader y color de barras: los mismos que esta
+        // app tenía en la copia del dueño (texto central "Servy",
+        // estado "Cargando catálogo" y barras claras para acompañar el
+        // fondo blanco de la app). PARA CAMBIARLOS A FUTURO: edita las
+        // tres constantes de abajo.
+        const TEXTO_CENTRAL_PRELOADER = "Servy";
+        const ESTADO_PRELOADER = "Cargando catálogo";
+        const COLOR_BARRAS_APP = "#f8fafc";
+
+        const contenedor = document.getElementById('contenedor-principal');
+        const elementoTitulo = document.getElementById('pagina-titulo');
+
+        // Devuelve el nodo del preloader orbital con el texto central y
+        // el estado ya inyectados.
+        function crearPreloader(textoCentralTxt, textoEstado) {
+            var wrap = document.createElement('div');
+            wrap.className = 'preloader-overlay';
+            wrap.innerHTML =
+                '<div class="carga-preloader" role="status" aria-live="polite">' +
+                    '<div class="carga-loader">' +
+                        '<div class="carga-orbital carga-orbital-1"></div>' +
+                        '<div class="carga-orbital carga-orbital-2"></div>' +
+                        '<div class="carga-core"><span></span></div>' +
+                    '</div>' +
+                    '<div class="carga-brand">' +
+                        '<span class="carga-brand-in">IN</span>' +
+                        '<span class="carga-brand-genius">Genius</span>' +
+                        '<span class="carga-brand-cloud">Cloud</span>' +
+                    '</div>' +
+                    '<div class="carga-status">' +
+                        '<span class="carga-status-texto"></span>' +
+                        '<span class="carga-puntos"><span></span><span></span><span></span></span>' +
+                    '</div>' +
+                '</div>';
+
+            wrap.querySelector('.carga-core span').textContent = textoCentralTxt || 'Ceicca';
+            wrap.querySelector('.carga-status-texto').textContent = textoEstado || 'Cargando';
+
+            return wrap;
+        }
+
+        // 1. Preloader + iframe apilados dentro del contenedor
+        const preloader = crearPreloader(TEXTO_CENTRAL_PRELOADER, ESTADO_PRELOADER);
+
+        contenedor.innerHTML = `<iframe
+            id="webApp"
+            src="${URL_SERVYCLOUD}"
+            allow="web-share; clipboard-write; clipboard-read; vibrate; autoplay; fullscreen; geolocation"
+            referrerpolicy="no-referrer-when-downgrade"
+            loading="eager"
+            style="opacity:0; transition:opacity 0.3s ease;"
+        ></iframe>`;
+
+        contenedor.appendChild(preloader);
+
+        // 2. Identidad de la app (R63: ServyCloud)
+        elementoTitulo.innerText = TITULO_APP;
+
+        // 3. Color de barras (fondo + theme-color): el mismo doble
+        //    camino de siempre (Android lee la meta, iPhone el fondo),
+        //    ahora con el color único de la app.
+        (function () {
+            document.documentElement.style.backgroundColor = COLOR_BARRAS_APP;
+            document.body.style.backgroundColor = COLOR_BARRAS_APP;
+            const metaColor = document.querySelector('meta[name="theme-color"]');
+            if (metaColor) { metaColor.content = COLOR_BARRAS_APP; }
+        })();
+
+        // 4. Retiro del preloader · espera el aviso de la app
+        const iframe = document.getElementById('webApp');
+        let preloaderRetirado = false;
+
+        function retirarPreloader() {
+            if (preloaderRetirado) return;
+            preloaderRetirado = true;
+
+            // Aviso para el botón "Instalar app" (R59): aquí arranca
+            // su cuenta de 2.5 seg antes de evaluarse.
+            document.dispatchEvent(new Event('preloader-retirado'));
+
+            // Mostrar el iframe con fade
+            iframe.style.opacity = '1';
+
+            // Retirar el preloader con fade
+            preloader.classList.add('saliendo');
+            setTimeout(function () {
+                if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+            }, 340);
+        }
+
+        // Ruta normal: la app avisa cuando terminó de pintar
+        window.addEventListener('message', function (e) {
+            if (e.data && e.data.tipo === 'app-lista') {
+                retirarPreloader();
+            }
+        });
+
+        // Fallback de seguridad: si la app no avisa en 5 seg tras el
+        // evento load, se retira igual para no dejar el preloader fijo.
+        iframe.addEventListener('load', function () {
+            setTimeout(retirarPreloader, 5000);
+        });
+
+        // ═══ BOTÓN "INSTALAR APP" (PWA · SOLO ANDROID) ═══
+        // Chrome de Android avisa con beforeinstallprompt cuando la
+        // página es instalable (para eso existen manifest.json, sw.js y
+        // los iconos en el repositorio). La píldora aparece SOLO cuando
+        // se cumplen TODAS estas condiciones a la vez:
+        //   1. Navegador de Android (iPhone no dispara el aviso y no
+        //      muestra nada, tal como pidió el dueño).
+        //   2. Chrome entregó beforeinstallprompt (página instalable).
+        //   3. La app NO está ya instalada (modo standalone).
+        //   4. El preloader ya se retiró y pasaron 2.5 seg: no molesta
+        //      durante la carga ni compite con la entrada de la app.
+        //   5. Es la 2ª visita o posterior (la 1ª visita solo cuenta).
+        // Si el usuario cierra la píldora, no vuelve por 3 días. Si
+        // instala la app, desaparece y no vuelve en ninguna visita.
+        (function () {
+            const zonaInstalar = document.getElementById('zona-instalar');
+            if (!zonaInstalar) return;
+
+            let eventoInstalacion = null;   // beforeinstallprompt capturado
+            let preloaderCerro = false;     // la app ya terminó de cargar
+            const esAndroid = /android/i.test(navigator.userAgent);
+            let yaInstalada = window.matchMedia('(display-mode: standalone)').matches;
+
+            // Contador de visitas: la 1ª solo cuenta, desde la 2ª se
+            // ofrece la instalación.
+            const visitas = parseInt(localStorage.getItem('ingc_visitas') || '0', 10) + 1;
+            localStorage.setItem('ingc_visitas', String(visitas));
+
+            // Si cerraron la píldora, guarda la fecha y calla 3 días.
+            const descarte = parseInt(localStorage.getItem('ingc_descarte') || '0', 10);
+            const descartadoReciente = descarte && (Date.now() - descarte) < 3 * 24 * 60 * 60 * 1000;
+
+            function decidirSiMostrar() {
+                if (yaInstalada || !esAndroid || !eventoInstalacion || !preloaderCerro) return;
+                if (descartadoReciente || visitas < 2) return;
+                zonaInstalar.hidden = false;   // el CSS anima la entrada
+            }
+
+            window.addEventListener('beforeinstallprompt', function (e) {
+                e.preventDefault();            // calla el aviso nativo de Chrome
+                eventoInstalacion = e;         // se guarda para el clic
+                decidirSiMostrar();
+            });
+
+            // El preloader avisa al retirarse (R59); 2.5 seg de cortesía
+            // para que la app termine su entrada antes de mostrar nada.
+            document.addEventListener('preloader-retirado', function () {
+                preloaderCerro = true;
+                setTimeout(decidirSiMostrar, 2500);
+            });
+
+            document.getElementById('btn-instalar').addEventListener('click', function () {
+                if (!eventoInstalacion) return;
+                zonaInstalar.hidden = true;
+                eventoInstalacion.prompt();    // abre el diálogo nativo de Android
+                eventoInstalacion.userChoice.then(function () { eventoInstalacion = null; });
+            });
+
+            document.getElementById('btn-instalar-cerrar').addEventListener('click', function () {
+                zonaInstalar.hidden = true;
+                localStorage.setItem('ingc_descarte', String(Date.now()));
+            });
+
+            // Si ya se instaló (por la píldora o por el menú de Chrome),
+            // la píldora desaparece y no vuelve en las próximas visitas.
+            window.addEventListener('appinstalled', function () {
+                zonaInstalar.hidden = true;
+                yaInstalada = true;
+            });
+
+            // Registro del service worker: Chrome solo considera
+            // instalable una página controlada por uno. Este es de paso
+            // puro (no guarda caché) para no interferir con las apps de
+            // GAS ni con sus actualizaciones.
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('./sw.js').catch(function () {});
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
