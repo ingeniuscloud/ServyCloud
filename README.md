@@ -15,8 +15,8 @@ mientras entra y ofrece el botón **"Instalar app"** en Android.
 | `index.html`    | El envoltorio (app única + preloader + botón instalar) |
 | `manifest.json` | Identidad de instalación: **ServyCloud / Servy** |
 | `sw.js`         | Service worker de paso puro (hace la página instalable, no guarda caché) |
-| `icon-192.png`  | Icono PWA 192×192 (S blanca sobre azul, rompe el borde inferior) |
-| `icon-512.png`  | Icono PWA 512×512 (mismo diseño) |
+| `icon-192.png`  | Icono PWA 192×192 (SERVY CLOUDE: S blanca + texto sobre naranja, CLOUDE en azul marino · esquinas transparentes) |
+| `icon-512.png`  | Icono PWA 512×512 (mismo arte) |
 | `README.md`     | Este archivo |
 
 ---
