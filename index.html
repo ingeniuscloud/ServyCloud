@@ -9,8 +9,29 @@
 *                  orbital mientras carga y luego lo oculta. Ya NO lee
 *                  el parámetro ?id=: cualquier enlace viejo con ?id=
 *                  carga ServyCloud igual, y la pantalla 404 se retiró.
-* VERSIÓN:         2.0
-* CAMBIOS:         R63 (APP ÚNICA: el envoltorio ya no elige entre
+*                  PUENTE DE PERSISTENCIA (R10): guarda ciudad/vista en
+*                  ESTE origen (github.io, estable) y las devuelve a la
+*                  app por postMessage (estado-pedir/estado-aplicar/
+*                  estado-guardar). Resuelve la pérdida de localStorage
+*                  del sandbox de GAS (diagnóstico F del informe R8).
+* VERSIÓN:         2.1
+* CAMBIOS:         R10 (puente de persistencia + blindaje): (a) la app
+*                  pide su estado con estado-pedir y este envoltorio
+*                  responde estado-aplicar con lo guardado en
+*                  localStorage (clave ingc_estado_v1, SOLO en este
+*                  origen github.io, que no se borra al cerrar el
+*                  navegador); cuando la app cambia ciudad/vista emite
+*                  estado-guardar y aquí se valida y fusiona. (b) Los
+*                  mensajes del iframe se aceptan SOLO si e.source es
+*                  nuestra ventana embebida (guardia e.source que
+*                  cubre también a app-lista). (c) El iframe recibe la
+*                  firma #puente=<origen> para que la app responda
+*                  SOLO a este origen. (g) El atributo allow se recorta
+*                  a web-share; vibrate (lo único que la app usa);
+*                  fuera clipboard-read, geolocation, autoplay,
+*                  fullscreen y clipboard-write (superficie de menos).
+*                  (Icono PWA: art SERVY CLOUDE naranja, v1).
+*                  R63 (APP ÚNICA: el envoltorio ya no elige entre
 *                  varias apps por ?id=; ahora SOLO ejecuta el código
 *                  GAS de ServyCloud. La URL vive en UNA sola constante
 *                  editable al inicio del script: URL_SERVYCLOUD. Se
@@ -43,8 +64,11 @@
 *                  constante URL_SERVYCLOUD (inicio del script). La app
 *                  debe emitir postMessage({tipo:'app-lista'}) para
 *                  retirar el preloader (fallback: 5 seg tras load).
-*                  Instalación PWA: manifest.json + sw.js + icon-192.png
-*                  + icon-512.png en la MISMA carpeta del repositorio.
+*                  Puente R10: la app (Core_Script.html) emite
+*                  estado-pedir/estado-guardar; este envoltorio
+*                  responde estado-aplicar. Instalación PWA:
+*                  manifest.json + sw.js + icon-192.png + icon-512.png
+*                  en la MISMA carpeta del repositorio.
 * ══════════════════════════════════════════════════════════════
 -->
 <html lang="es">
@@ -371,8 +395,8 @@
 
         contenedor.innerHTML = `<iframe
             id="webApp"
-            src="${URL_SERVYCLOUD}"
-            allow="web-share; clipboard-write; clipboard-read; vibrate; autoplay; fullscreen; geolocation"
+            src="${URL_SERVYCLOUD}#puente=${encodeURIComponent(location.origin)}"
+            allow="web-share; vibrate"
             referrerpolicy="no-referrer-when-downgrade"
             loading="eager"
             style="opacity:0; transition:opacity 0.3s ease;"
@@ -416,9 +440,65 @@
         }
 
         // Ruta normal: la app avisa cuando terminó de pintar
+        // ═══ PUENTE DE PERSISTENCIA (R10) ═══
+        // La app vive en un iframe de GAS con storage efímero
+        // (sandbox + ITP). Este envoltorio SÍ es primera parte en
+        // github.io: su localStorage no se borra al cerrar el
+        // navegador. Protocolo:
+        //   app → estado-pedir    · responde estado-aplicar {estado}
+        //   app → estado-guardar  · {ciudad, vista} validado y fusionado
+        // Guardia: SOLO mensajes de nuestra propia ventana embebida.
+        const CLAVE_ESTADO = 'ingc_estado_v1';
+
+        function estadoValido(bruto) {
+            if (!bruto || typeof bruto !== 'object') return null;
+            var limpio = {};
+            if (typeof bruto.ciudad === 'string' && bruto.ciudad.length <= 64 &&
+                !/[<>"'&]/.test(bruto.ciudad)) limpio.ciudad = bruto.ciudad;
+            if (typeof bruto.vista === 'string' && bruto.vista.length <= 64 &&
+                !/[<>"'&]/.test(bruto.vista)) limpio.vista = bruto.vista;
+            return (limpio.ciudad || limpio.vista) ? limpio : null;
+        }
+
+        function leerEstado() {
+            try {
+                var raw = localStorage.getItem(CLAVE_ESTADO);
+                if (!raw) return null;
+                return estadoValido(JSON.parse(raw));
+            } catch (_) { return null; }
+        }
+
         window.addEventListener('message', function (e) {
-            if (e.data && e.data.tipo === 'app-lista') {
+            // Guardia dura (R10): solo nuestra ventana embebida.
+            if (!iframe || e.source !== iframe.contentWindow) return;
+
+            var tipo = e.data && e.data.tipo;
+
+            if (tipo === 'app-lista') {
                 retirarPreloader();
+                return;
+            }
+
+            if (tipo === 'estado-pedir') {
+                try {
+                    e.source.postMessage(
+                        { tipo: 'estado-aplicar', estado: leerEstado() },
+                        e.origin
+                    );
+                } catch (_) {}
+                return;
+            }
+
+            if (tipo === 'estado-guardar') {
+                var nuevo = estadoValido(e.data.estado);
+                if (nuevo) {
+                    // Fusión: si la app manda un campo vacío (aún sin
+                    // elegir ciudad), no se pierde el valor guardado.
+                    var previo = leerEstado() || {};
+                    var fusion = Object.assign({}, previo, nuevo);
+                    try { localStorage.setItem(CLAVE_ESTADO, JSON.stringify(fusion)); } catch (_) {}
+                }
+                return;
             }
         });
 
