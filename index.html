@@ -14,8 +14,16 @@
 *                  app por postMessage (estado-pedir/estado-aplicar/
 *                  estado-guardar). Resuelve la pérdida de localStorage
 *                  del sandbox de GAS (diagnóstico F del informe R8).
-* VERSIÓN:         3.0
-* CAMBIOS:         R12: Capa 1 GA4. (a) gtag.js (G-TZKFT0RD54) se
+* VERSIÓN:         3.1
+* CAMBIOS:         R14: (1) URL_SERVYCLOUD actualizada al despliegue
+*                  vigente del dueño (la que ya está puesta en su
+*                  index de producción) para que este archivo se pueda
+*                  copiar ENTERO sin editar nada a mano. (2) Nota:
+*                  si su index de github.io es anterior a R10, el
+*                  puente de persistencia no existe ahí y la ciudad
+*                  se pregunta en cada visita; reemplazar el archivo
+*                  COMPLETO con este (no editar el viejo) lo resuelve.
+*                  R12: Capa 1 GA4. (a) gtag.js (G-TZKFT0RD54) se
 *                  carga AQUÍ (contenedor github.io, fuera del
 *                  iframe: 0 impacto en la app), respetando Do Not
 *                  Track. (b) deviceid estable ingc_deviceid_v1 en
