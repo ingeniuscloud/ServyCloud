@@ -14,8 +14,21 @@
 *                  app por postMessage (estado-pedir/estado-aplicar/
 *                  estado-guardar). Resuelve la pérdida de localStorage
 *                  del sandbox de GAS (diagnóstico F del informe R8).
-* VERSIÓN:         2.1
-* CAMBIOS:         R10 (puente de persistencia + blindaje): (a) la app
+* VERSIÓN:         3.0
+* CAMBIOS:         R12: Capa 1 GA4. (a) gtag.js (G-TZKFT0RD54) se
+*                  carga AQUÍ (contenedor github.io, fuera del
+*                  iframe: 0 impacto en la app), respetando Do Not
+*                  Track. (b) deviceid estable ingc_deviceid_v1 en
+*                  ESTE origen (el storage de github.io no se purga)
+*                  como user_id de GA4 y prestado a la app dentro
+*                  de estado-aplicar (unifica identidad frontend/
+*                  backend en GA4). (c) Nuevo caso 'ga-event' en el
+*                  listener EXISTENTE (misma guardia e.source): la
+*                  app emite eventos por postMessage y este
+*                  envoltorio los reenvía a GA4 tras lista blanca y
+*                  saneo de params (máx 10, sin claves reservadas).
+*                  Sin doble conteo: comment/share NO se miden aquí.
+*                  R10 (puente de persistencia + blindaje): (a) la app
 *                  pide su estado con estado-pedir y este envoltorio
 *                  responde estado-aplicar con lo guardado en
 *                  localStorage (clave ingc_estado_v1, SOLO en este
@@ -97,6 +110,42 @@
          Usa el icono real del repositorio (la S de ServyCloud): la
          pestaña muestra la misma marca que el icono instalado. -->
     <link id="pagina-icono" rel="icon" href="./icon-192.png">
+
+    <!-- ═══ GOOGLE ANALYTICS 4 (R12 · Capa 1) ═══
+         Vive SOLO en el contenedor (nunca en el iframe de GAS):
+         carga asíncrona, no bloquea nada y respeta Do Not Track.
+         user_id = deviceid estable de ESTE origen, para que el
+         mismo dispositivo sea el mismo usuario en GA4 aunque
+         cruce con los eventos del backend (Measurement Protocol). -->
+    <script>
+        (function () {
+            try {
+                var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+                if (String(dnt) === '1') return;
+
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function () { window.dataLayer.push(arguments); };
+
+                var dev = null;
+                try {
+                    dev = localStorage.getItem('ingc_deviceid_v1');
+                    if (!dev) {
+                        dev = 'web_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+                        localStorage.setItem('ingc_deviceid_v1', dev);
+                    }
+                } catch (_) { dev = 'web_anonimo'; }
+                window.__ga_device = dev;
+
+                gtag('js', new Date());
+                gtag('config', 'G-TZKFT0RD54', { user_id: dev, send_page_view: true });
+
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-TZKFT0RD54';
+                document.head.appendChild(s);
+            } catch (_) {}
+        })();
+    </script>
 
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -343,7 +392,7 @@
         //
         // PARA CAMBIAR LA URL A FUTURO (si renuevas el despliegue de
         // ServyCloud): edita SOLO la constante URL_SERVYCLOUD.
-        const URL_SERVYCLOUD = "https://script.google.com/macros/s/AKfycbw8k3rZGnWGNTNabSXh5PbjJg7OtLB8pWyX5eAukOjKqTyTwuW8MSqPUI9YW8LUyn8DtA/exec";
+        const URL_SERVYCLOUD = "https://script.google.com/macros/s/AKfycbxnRxhoSY2LUpXBX5AT5ABplXvG46CgYm8zeHAXSOFRGw-AYEN65F3_xfe833Gaw2E5WQ/exec";
 
         // Identidad exclusiva de la app (R63): el nombre largo del
         // manifiesto, también usado como título de la pestaña.
@@ -450,6 +499,45 @@
         // Guardia: SOLO mensajes de nuestra propia ventana embebida.
         const CLAVE_ESTADO = 'ingc_estado_v1';
 
+        // ═══ GA4 (R12): lista blanca de eventos Capa 1 + saneo ═══
+        // Sin doble conteo: comment/share se miden SOLO en backend.
+        var GA4_EVENTOS_OK = {
+            'app_ready': 1, 'city_change': 1, 'chip_change': 1,
+            'post_open': 1, 'post_close': 1, 'search': 1,
+            'like': 1, 'whatsapp_click': 1,
+            'promo_click': 1, 'promo_swipe': 1,
+            'reserva_start': 1, 'otp_request': 1
+        };
+        var GA4_CLAVES_PROHIBIDAS = {
+            'user_id': 1, 'client_id': 1, 'session_id': 1,
+            'engagement_time_msec': 1, 'firebase_id': 1
+        };
+
+        function gaValorSeguro(v) {
+            if (typeof v === 'number' && isFinite(v)) return v;
+            if (typeof v === 'boolean') return v ? 1 : 0;
+            if (typeof v === 'string') return v.slice(0, 64);
+            return null;
+        }
+
+        function gaReenviar(datos) {
+            if (!window.gtag) return;
+            var nombre = typeof datos.evento === 'string'
+                ? datos.evento.slice(0, 40) : '';
+            if (!GA4_EVENTOS_OK[nombre]) return;
+
+            var params = {};
+            var crudos = (datos.params && typeof datos.params === 'object') ? datos.params : {};
+            var n = 0;
+            for (var k in crudos) {
+                if (!Object.prototype.hasOwnProperty.call(crudos, k)) continue;
+                if (!k || k.length > 40 || GA4_CLAVES_PROHIBIDAS[k]) continue;
+                var v = gaValorSeguro(crudos[k]);
+                if (v !== null && n < 10) { params[k] = v; n++; }
+            }
+            try { window.gtag('event', nombre, params); } catch (_) {}
+        }
+
         function estadoValido(bruto) {
             if (!bruto || typeof bruto !== 'object') return null;
             var limpio = {};
@@ -482,10 +570,15 @@
             if (tipo === 'estado-pedir') {
                 try {
                     e.source.postMessage(
-                        { tipo: 'estado-aplicar', estado: leerEstado() },
+                        { tipo: 'estado-aplicar', estado: leerEstado(), deviceid: (window.__ga_device || null) },
                         e.origin
                     );
                 } catch (_) {}
+                return;
+            }
+
+            if (tipo === 'ga-event') {
+                gaReenviar(e.data || {});
                 return;
             }
 
