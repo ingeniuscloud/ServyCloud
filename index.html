@@ -14,8 +14,41 @@
 *                  app por postMessage (estado-pedir/estado-aplicar/
 *                  estado-guardar). Resuelve la pérdida de localStorage
 *                  del sandbox de GAS (diagnóstico F del informe R8).
-* VERSIÓN:         3.1
-* CAMBIOS:         R14: (1) URL_SERVYCLOUD actualizada al despliegue
+*                  ESCAPATORIA TOP-LEVEL (R25): si la app no confirma
+*                  vida dentro del iframe, esta página navega ella
+*                  misma a la app REAL sin iframe (vía probada que
+*                  Google atiende siempre): la pantalla cruda de
+*                  permiso queda estructuralmente imposible.
+* VERSIÓN:         3.3
+* CAMBIOS:         R25 (escapatoria top-level · pedido del dueño:
+*                  "quiero que eso se solucione"). CAUSA (probada en
+*                  R24): el muro "No cuentas con el permiso..." lo
+*                  sirve el front-end de Google DENTRO del iframe
+*                  cuando su chequeo de sesión no puede completarse
+*                  (iOS/ITP bloquea la cookie de tercero que Google
+*                  necesita para resolver quién visita); sin sesión
+*                  el mismo /exec responde 200 con la app. MÁQUINA:
+*                  (1) la carga normal es IDÉNTICA a la de siempre
+*                  (preloader hasta app-lista; 0 cambios de timing);
+*                  (2) si la app no avisa 5 s tras el load, el
+*                  preloader NO se retira a ciegas (sigue cubriendo
+*                  el iframe: el usuario jamás ve pantallas de
+*                  Google) y hay 1 reintento silencioso con URL
+*                  fresca (?r= antes del #puente) y estado
+*                  "Reconectando"; (3) si tampoco avisa 6 s tras el
+*                  reintento, ESTA página se reemplaza a sí misma por
+*                  la app real sin iframe (location.replace con URL
+*                  fresca) — el usuario solo ve el preloader y
+*                  aterriza en la app; (4) vigía de 20 s por load si
+*                  la red cuelga; (5) app-lista tardío cancela todo
+*                  y entra normal (autocuración). Nota: v3.2 (R23,
+*                  panel con botón) fue SUPERADA sin llegar a
+*                  aplicarse — la decisión del dueño fue no copiarla;
+*                  esta v3.3 nace de su v3.1 de producción.
+*                  Cosmético: se corrigió un selector CSS inválido
+*                  heredado (.preloader-overlay[hidden]); es código
+*                  muerto sin efecto en el comportamiento.
+*                  R14: (1) URL_SERVYCLOUD actualizada al despliegue
 *                  vigente del dueño (la que ya está puesta en su
 *                  index de producción) para que este archivo se pueda
 *                  copiar ENTERO sin editar nada a mano. (2) Nota:
@@ -84,7 +117,9 @@
 * DEPENDENCIAS:    Despliegue: GitHub Pages (HTTPS). App única: la
 *                  constante URL_SERVYCLOUD (inicio del script). La app
 *                  debe emitir postMessage({tipo:'app-lista'}) para
-*                  retirar el preloader (fallback: 5 seg tras load).
+*                  retirar el preloader (R25: si no avisa → 1
+*                  reintento con URL fresca y, si persiste, la página
+*                  navega a la app real sin iframe).
 *                  Puente R10: la app (Core_Script.html) emite
 *                  estado-pedir/estado-guardar; este envoltorio
 *                  responde estado-aplicar. Instalación PWA:
@@ -478,9 +513,59 @@
         const iframe = document.getElementById('webApp');
         let preloaderRetirado = false;
 
+        // ═══ ESCAPATORIA TOP-LEVEL (R25) ═══
+        // El muro "No cuentas con el permiso..." lo sirve el
+        // front-end de Google DENTRO del iframe cuando su chequeo de
+        // sesión no puede completarse (iOS/ITP bloquea la cookie de
+        // tercero que Google necesita para resolver quién visita).
+        // Probado en R24: el mismo /exec SIN iframe (ventana
+        // completa) responde 200 con la app siempre. Entonces: si la
+        // app no confirma vida, esta página navega a la app real.
+        const VENTANA_1_MS = 5000;    // tras el 1er load (misma espera del fallback de siempre)
+        const VENTANA_2_MS = 6000;    // tras el reintento
+        const VIGIA_CARGA_MS = 20000; // si el load nunca dispara (red colgada)
+        let faseCarga = 'cargando';   // 'cargando' | 'reintentando'
+        let timerVentana = null;
+        let timerVigia = null;
+        let escapando = false;
+
+        function urlFresca() {
+            const sep = URL_SERVYCLOUD.indexOf('?') >= 0 ? '&' : '?';
+            return URL_SERVYCLOUD + sep + 'r=' + Date.now();
+        }
+
+        function decirEstado(texto) {
+            try {
+                var nodo = preloader.querySelector('.carga-status-texto');
+                if (nodo) nodo.textContent = texto;
+            } catch (_) {}
+        }
+
+        function escaparATopLevel() {
+            if (escapando || preloaderRetirado) return;
+            escapando = true;
+            try { sessionStorage.setItem('sv_escape_top', String(Date.now())); } catch (_) {}
+            // Reemplaza ESTA página (el envoltorio) por la app real,
+            // sin iframe: Google atiende la visita como ventana
+            // completa y entrega la app (comportamiento probado R24).
+            window.location.replace(urlFresca());
+        }
+
+        function armarVigia() {
+            if (timerVigia) clearTimeout(timerVigia);
+            timerVigia = setTimeout(function () {
+                if (!preloaderRetirado && !escapando) escaparATopLevel();
+            }, VIGIA_CARGA_MS);
+        }
+
         function retirarPreloader() {
             if (preloaderRetirado) return;
             preloaderRetirado = true;
+
+            // R25: llegada la app, ya no hay escapatoria que
+            // ejecutar: se apagan los relojes de la máquina.
+            if (timerVentana) { clearTimeout(timerVentana); timerVentana = null; }
+            if (timerVigia) { clearTimeout(timerVigia); timerVigia = null; }
 
             // Aviso para el botón "Instalar app" (R59): aquí arranca
             // su cuenta de 2.5 seg antes de evaluarse.
@@ -603,11 +688,34 @@
             }
         });
 
-        // Fallback de seguridad: si la app no avisa en 5 seg tras el
-        // evento load, se retira igual para no dejar el preloader fijo.
+        // R25 · máquina de decisión (reemplaza el fallback de 5 s
+        // que retiraba el preloader a ciegas): si la app confirma
+        // (app-lista) todo sigue EXACTAMENTE igual que siempre. Si
+        // NO confirma:
+        //   1ª ventana (5 s tras load) → 1 reintento silencioso con
+        //   URL fresca; el preloader sigue cubriendo el iframe (el
+        //   usuario jamás ve pantallas de Google).
+        //   2ª ventana (6 s tras el reintento) → ESCAPATORIA: esta
+        //   misma página se reemplaza por la app real sin iframe.
         iframe.addEventListener('load', function () {
-            setTimeout(retirarPreloader, 5000);
+            armarVigia();
+            if (timerVentana) clearTimeout(timerVentana);
+
+            timerVentana = setTimeout(function () {
+                if (preloaderRetirado || escapando) return;
+                if (faseCarga === 'cargando') {
+                    faseCarga = 'reintentando';
+                    decirEstado('Reconectando');
+                    iframe.src = urlFresca() + '#puente=' + encodeURIComponent(location.origin);
+                } else {
+                    escaparATopLevel();
+                }
+            }, faseCarga === 'cargando' ? VENTANA_1_MS : VENTANA_2_MS);
         });
+
+        // Vigía de arranque: si el load no dispara en absoluto (red
+        // colgada, respuesta que nunca termina), escapa sin esperar.
+        armarVigia();
 
         // ═══ BOTÓN "INSTALAR APP" (PWA · SOLO ANDROID) ═══
         // Chrome de Android avisa con beforeinstallprompt cuando la
