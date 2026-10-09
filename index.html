@@ -40,7 +40,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
 <!DOCTYPE html>
 <!--
 * ══════════════════════════════════════════════════════════════
-* ARCHIVO:         Index_GitHub.html v4.0 (subir a GitHub Pages
+* ARCHIVO:         Index_GitHub.html v4.1 (subir a GitHub Pages
 *                  como index.html)
 * PROYECTO:        ServyCloud | App única en GitHub Pages
 * RESPONSABILIDAD: LA APP COMPLETA en un solo archivo estático
@@ -76,8 +76,10 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
 *                  Script ANTES de subir este archivo: la app
 *                  estática abre con abrirSesion, que nace en esa
 *                  ronda.
-* VERSIÓN:         4.0
-* CAMBIOS:         R26 (GO del dueño: "si en esta mejora viene lo
+* VERSIÓN:         4.1
+* CAMBIOS:         R27: "Servy" en Acerca de en NARANJA OFICIAL
+*                  #FA6A08 (Global_CSS 1.1, re-ensamblado).
+*                  R26 (GO del dueño: "si en esta mejora viene lo
 *                  que dices y también solucionas lo del
 *                  localstore... la seguridad y la agilidad tienen
 *                  que tener un equilibrio").
@@ -2785,8 +2787,12 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Círculos de
                  Subvista "Acerca de" con jerarquía: marca de la app
                  arriba (protagonista) y crédito INGeniusCloud abajo.
                  Ítem "asesor" destacado con borde dashed naranja.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
+VERSIÓN:         1.1
+CAMBIOS:         R27: "Servy" en Acerca de pasa de cyan a NARANJA
+                 OFICIAL #FA6A08 (mismo naranja del icono y del
+                 post). "Cloud" gris y la marca INGeniusCloud
+                 (cyan #00A3E0 de la IN) quedan intactos.
+                 R5: baseline de producción incorporado al espejo;
                  encabezado normalizado al estándar ═══ (6 campos);
                  PROYECTO unificado a "INGeniusCloud | ServyCloud".
 DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
@@ -3260,7 +3266,10 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
   .sheet-acerca-app-nombre .marca-prefijo {
     font-weight: 900;
-    color: #00A3E0;
+    /* R27: "Servy" = naranja oficial de la app (el del icono y
+       del post: #FA6A08). Antes heredaba el cyan de la marca
+       INGeniusCloud; cada marca viste su propio color. */
+    color: #FA6A08;
   }
   .sheet-acerca-app-nombre .marca-cloud {
     font-weight: 400;
