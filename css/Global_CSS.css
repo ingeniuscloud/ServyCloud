@@ -1,0 +1,666 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Global_CSS.html
+ESPEJO GITHUB:   css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: CSS del menú global (bottom sheet). Círculos de
+                 pasos PWA con borde fino, sin fondo. Título con
+                 icono separado del contenido inferior.
+                 Subvista "Acerca de" con jerarquía: marca de la app
+                 arriba (protagonista) y crédito INGeniusCloud abajo.
+                 Ítem "asesor" destacado con borde dashed naranja.
+VERSIÓN:         1.1
+CAMBIOS:         R27: "Servy" en Acerca de pasa de cyan a NARANJA
+                 OFICIAL #FA6A08 (mismo naranja del icono y del
+                 post). "Cloud" gris y la marca INGeniusCloud
+                 (cyan #00A3E0 de la IN) quedan intactos.
+                 R5: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos);
+                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
+                 Comenta_CSS.html y Reserva_CSS.html)
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     CONTENEDOR RAÍZ
+     ============================================================ */
+  .global-sheet-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 400;
+  }
+  .global-sheet-root.abierto { pointer-events: auto; }
+
+  /* ============================================================
+     BACKDROP
+     ============================================================ */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: #0f172a;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 500;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .sheet-backdrop.visible {
+    opacity: 0.45;
+    pointer-events: auto;
+  }
+
+  /* ============================================================
+     SHEET · altura fija al 90%
+     ============================================================ */
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 90%;
+    background-color: #ffffff;
+    border-radius: 22px 22px 0 0;
+    z-index: 501;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0.42s;
+    will-change: transform;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .sheet.abierto {
+    visibility: visible;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s;
+  }
+  .sheet.sin-transicion { transition: none; }
+
+  .sheet::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(to bottom,
+      rgba(15, 23, 42, 0.06),
+      rgba(15, 23, 42, 0));
+    border-radius: 22px 22px 0 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .sheet::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    background: linear-gradient(to top,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.85) 40%,
+      rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    z-index: 4;
+  }
+  .sheet.con-privacidad.scroll-mas::after { opacity: 1; }
+
+  /* ============================================================
+     BARRA DE ARRASTRE
+     ============================================================ */
+  .sheet-handle-area {
+    flex-shrink: 0;
+    padding: 10px 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+    min-height: 40px;
+    z-index: 6;
+  }
+  .sheet-handle-area:active { cursor: grabbing; }
+
+  .sheet-handle {
+    width: 38px;
+    height: 4px;
+    background-color: #cbd5e1;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, width 0.2s ease;
+  }
+  .sheet-handle-area:active .sheet-handle {
+    background-color: #94a3b8;
+    width: 46px;
+  }
+
+  /* ============================================================
+     BOTÓN CERRAR
+     ============================================================ */
+  .sheet-close {
+    position: absolute;
+    top: 4px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    touch-action: manipulation;
+    z-index: 7;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sheet-close:active {
+    color: #475569;
+    background-color: #f1f5f9;
+  }
+  .sheet-close svg { width: 18px; height: 18px; display: block; }
+
+  /* ============================================================
+     BOTÓN VOLVER
+     ============================================================ */
+  .sheet-back {
+    position: absolute;
+    top: 4px;
+    left: 10px;
+    width: 40px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    touch-action: manipulation;
+    z-index: 7;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sheet-back:active {
+    color: #1e293b;
+    background-color: #f1f5f9;
+  }
+  .sheet-back svg { width: 22px; height: 22px; display: block; }
+  .sheet.subvista .sheet-back { display: flex; }
+
+  /* ============================================================
+     TÍTULO DE SUBVISTA
+     ============================================================ */
+  .sheet-back-titulo {
+    display: none;
+    position: absolute;
+    top: 4px;
+    height: 36px;
+    left: 54px;
+    right: 54px;
+    margin: 0;
+    align-items: center;
+    line-height: 1;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: -0.1px;
+    text-align: left;
+    pointer-events: none;
+    z-index: 3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sheet.subvista .sheet-back-titulo { display: flex; }
+  .sheet.subvista .sheet-handle { opacity: 0.4; }
+
+  /* ============================================================
+     CONTENIDO
+     ============================================================ */
+  .sheet-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 22px 26px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    transition: opacity 0.14s ease;
+  }
+  .sheet-content::-webkit-scrollbar { display: none; }
+  .sheet-content.saliendo { opacity: 0; pointer-events: none; }
+  .sheet-content.entrando { opacity: 0; }
+
+  /* ============================================================
+     TÍTULOS
+     ============================================================ */
+  .sheet-titulo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #0f172a;
+    margin: 4px 0 14px;
+    text-align: center;
+  }
+
+  .sheet-titulo-con-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #0f172a;
+    margin: 4px 0 22px;
+    text-align: center;
+  }
+  .sheet-titulo-con-icono .icono {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    flex-shrink: 0;
+  }
+  .sheet-titulo-con-icono .icono svg {
+    width: 26px;
+    height: 26px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     SUBVISTA LEGAL (privacidad, cookies)
+     ============================================================ */
+  .sheet-privacidad {
+    padding: 0 0 12px;
+    color: #334155;
+  }
+  .sheet-privacidad .fecha {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    margin: 0 0 24px;
+  }
+  .sheet-privacidad h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+    margin: 20px 0 8px;
+    line-height: 1.3;
+  }
+  .sheet-privacidad h3:first-of-type { margin-top: 0; }
+  .sheet-privacidad p {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #475569;
+    margin: 0 0 8px;
+  }
+  .sheet-privacidad ul {
+    margin: 6px 0 12px;
+    padding: 0 0 0 4px;
+    list-style: none;
+  }
+  .sheet-privacidad ul li {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #475569;
+    margin: 0 0 5px;
+    position: relative;
+    padding-left: 14px;
+  }
+  .sheet-privacidad ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #94a3b8;
+  }
+
+  /* ============================================================
+     LISTA DEL MENÚ
+     ============================================================ */
+  .sheet-menu-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sheet-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: #5b6472;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    letter-spacing: -0.1px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .sheet-menu-item:active {
+    background-color: #f1f5f9;
+    color: #1e293b;
+  }
+  .sheet-menu-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #475569;
+  }
+  .sheet-menu-icon svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sheet-menu-texto { flex: 1; min-width: 0; }
+
+  .sheet-menu-titulo {
+    display: block;
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: inherit;
+    line-height: 1.2;
+    letter-spacing: -0.1px;
+  }
+  .sheet-menu-sub {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #94a3b8;
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+    margin-top: 3px;
+  }
+  .sheet-menu-item:active .sheet-menu-sub {
+    color: #64748b;
+  }
+
+  .sheet-menu-chevron {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 300;
+  }
+  .sheet-menu-sep {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 6px 12px;
+  }
+
+  /* ============================================================
+     ÍTEM DESTACADO · Ofrece tus servicios aquí
+     Variante C · borde dashed naranja + texto e icono naranja.
+     Lenguaje visual coherente con las cards dashed de Planes
+     y el link "Cómo llegar" del sheet Academia.
+     ============================================================ */
+  .sheet-menu-item[data-accion="asesor"] {
+    border: 1.5px dashed #F97316;
+    border-radius: 12px;
+    background: transparent;
+  }
+  .sheet-menu-item[data-accion="asesor"] .sheet-menu-icon {
+    color: #F97316;
+  }
+  .sheet-menu-item[data-accion="asesor"] .sheet-menu-titulo {
+    color: #9A3412;
+    font-weight: 700;
+  }
+  .sheet-menu-item[data-accion="asesor"] .sheet-menu-sub {
+    color: #C2410C;
+    opacity: 0.85;
+  }
+  .sheet-menu-item[data-accion="asesor"] .sheet-menu-chevron {
+    color: #F97316;
+  }
+  .sheet-menu-item[data-accion="asesor"]:active {
+    background-color: #FFF7ED;
+    border-color: #EA580C;
+  }
+
+  /* ============================================================
+     SUBVISTA · Acerca de
+     ============================================================ */
+  .sheet-acerca {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 0 6px;
+  }
+
+  .sheet-acerca-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .sheet-acerca-app-nombre {
+    font-size: 2.6rem;
+    line-height: 1.05;
+    letter-spacing: -1.2px;
+    margin: 0 0 10px;
+  }
+  .sheet-acerca-app-nombre .marca-prefijo {
+    font-weight: 900;
+    /* R27: "Servy" = naranja oficial de la app (el del icono y
+       del post: #FA6A08). Antes heredaba el cyan de la marca
+       INGeniusCloud; cada marca viste su propio color. */
+    color: #FA6A08;
+  }
+  .sheet-acerca-app-nombre .marca-cloud {
+    font-weight: 400;
+    color: #64748b;
+    letter-spacing: 1px;
+    margin-left: 4px;
+  }
+
+  .sheet-acerca-app-eslogan {
+    font-size: 0.86rem;
+    color: #64748b;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+    line-height: 1.4;
+    margin: 0 0 16px;
+    max-width: 280px;
+  }
+
+  .sheet-acerca-app-version {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background-color: #f1f5f9;
+  }
+
+  .sheet-acerca-divisor {
+    width: 100%;
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 26px 0 22px;
+  }
+
+  .sheet-acerca-empresa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .sheet-acerca-credito {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    text-transform: lowercase;
+    margin: 0 0 12px;
+    font-style: italic;
+  }
+
+  .carga-brand {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 34px;
+    letter-spacing: -0.6px;
+    line-height: 1;
+  }
+  .carga-brand .in {
+    color: #00A3E0;
+    font-weight: 900;
+  }
+  .carga-brand .genius {
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .carga-brand .cloud {
+    color: #64748b;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin-left: 1px;
+  }
+
+  .sheet-acerca-empresa-eslogan {
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+    line-height: 1.4;
+    margin: 10px 0 0;
+    max-width: 260px;
+  }
+
+  .sheet-acerca-footer {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    text-align: center;
+    margin: 32px 0 0;
+  }
+
+  /* ============================================================
+     SUBVISTA · PWA (Instalar la app)
+     ============================================================ */
+  .sheet-pwa {
+    padding: 0 0 12px;
+    color: #334155;
+  }
+  .sheet-pwa .pwa-sub {
+    text-align: left;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: #64748b;
+    margin: 12px 0 20px;
+  }
+  .sheet-pwa .pwa-plataforma {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin: 0 0 16px;
+  }
+  .sheet-pwa .pwa-pasos {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    counter-reset: paso;
+  }
+  .sheet-pwa .pwa-pasos li {
+    position: relative;
+    padding: 14px 0 14px 46px;
+    counter-increment: paso;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .sheet-pwa .pwa-pasos li:last-child { border-bottom: none; }
+
+  .sheet-pwa .pwa-pasos li::before {
+    content: counter(paso);
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.2px solid #475569;
+    background: transparent;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .sheet-pwa .pwa-paso-titulo {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 3px;
+    line-height: 1.3;
+  }
+  .sheet-pwa .pwa-paso-detalle {
+    display: block;
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.45;
+  }
+  .sheet-pwa .pwa-nota {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.5;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 3px solid #cbd5e1;
+    margin: 0;
+  }

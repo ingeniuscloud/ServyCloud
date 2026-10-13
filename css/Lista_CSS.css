@@ -1,0 +1,423 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Lista_CSS.html
+ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
+                 categoría, alternancia lista ↔ detalle con
+                 fade. Items transparentes con línea divisora.
+                 Badge a 11px.
+                 Skeleton del detalle (primera carga de un post).
+                 Skeleton de lista (solo si el POST inicial aún
+                 está en vuelo cuando el usuario elige ciudad).
+VERSIÓN:         1.0
+CAMBIOS:         R6: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos).
+DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
+                 Index.html; base .lista-item re-estilizada por
+                 Promo_CSS.html)
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     BOTÓN VOLVER
+     ============================================================ */
+  .btn-volver {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease;
+  }
+  .btn-volver:active { opacity: 0.5; }
+  .btn-volver svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .btn-volver[hidden] { display: none; }
+
+  /* ============================================================
+     TÍTULO DE CATEGORÍA
+     ============================================================ */
+  .titulo-categoria {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .titulo-categoria[hidden] { display: none; }
+
+  /* ============================================================
+     ALTERNANCIA LISTA ↔ DETALLE
+     ============================================================ */
+  body.modo-lista .cta-reservar,
+  body.modo-lista .botones-flotantes,
+  body.modo-lista .btn-volver,
+  body.modo-lista .titulo-categoria {
+    display: none !important;
+  }
+
+  body.modo-detalle .btn-lupa,
+  body.modo-detalle .filtros,
+  body.modo-detalle .buscar-fila {
+    display: none !important;
+  }
+
+  /* ============================================================
+     TRANSICIÓN FADE
+     ============================================================ */
+  .lista-wrap,
+  .secciones-track {
+    will-change: opacity;
+  }
+
+  .lista-wrap.fade-out {
+    animation: listaFadeOut 0.2s ease forwards;
+  }
+  .secciones-track.fade-in {
+    animation: listaFadeIn 0.2s ease forwards;
+  }
+
+  @keyframes listaFadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+  @keyframes listaFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista-wrap.fade-out,
+    .secciones-track.fade-in {
+      animation-duration: 0.01s;
+    }
+  }
+
+  /* ============================================================
+     CONTENEDORES
+     ============================================================ */
+  .lista-wrap[hidden] { display: none; }
+  .secciones-track[hidden] { display: none !important; }
+
+  /* ============================================================
+     LISTA ITEM
+     ============================================================ */
+  .lista-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: transparent;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s ease;
+  }
+  .lista-item:active { background: rgba(15, 23, 42, 0.03); }
+  .lista-item:last-child { border-bottom: 0; }
+
+  .lista-item .avatar {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+  }
+
+  .lista-item .body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lista-item .fila-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+    min-width: 0;
+  }
+
+  .lista-item .titulo {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lista-item .badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1.3px dashed currentColor;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    background: transparent;
+    white-space: nowrap;
+  }
+
+  .lista-item .tagline {
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 400;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lista-item .marca {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .lista-item .marca .check {
+    color: #059669;
+    font-weight: 700;
+  }
+  .lista-item .marca .marca-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  .lista-item .flecha {
+    flex: 0 0 auto;
+    color: #cbd5e1;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  /* ============================================================
+     SKELETON DEL DETALLE
+     ============================================================ */
+  .skeleton-detalle {
+    padding: 24px 26px 40px;
+    animation: skeletonFadeIn 0.15s ease;
+  }
+
+  @keyframes skeletonFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .skeleton-linea {
+    display: block;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+  }
+
+  @keyframes skeletonShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .skeleton-detalle .skeleton-foto {
+    width: 65%;
+    margin: 0 auto 28px;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  .skeleton-detalle .skeleton-identidad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 26px;
+  }
+
+  .skeleton-detalle .skeleton-marca {
+    width: 42%;
+    height: 14px;
+    border-radius: 4px;
+  }
+
+  .skeleton-detalle .skeleton-titulo {
+    width: 78%;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .skeleton-detalle .skeleton-tagline {
+    width: 55%;
+    height: 22px;
+    border-radius: 999px;
+  }
+
+  .skeleton-detalle .skeleton-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 60px 0 26px;
+  }
+
+  .skeleton-detalle .skeleton-desc .skeleton-linea {
+    height: 12px;
+  }
+
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(1) { width: 100%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(2) { width: 95%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(3) { width: 70%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-linea,
+    .skeleton-detalle .skeleton-foto {
+      animation: none;
+      background: rgba(15, 23, 42, 0.08);
+    }
+  }
+
+  /* ============================================================
+     SKELETON DE LISTA
+     Se muestra solo cuando el POST inicial aún no llegó y el
+     usuario ya eligió ciudad (teléfonos lentos o elección muy
+     rápida). Replica la estructura de .lista-item para que no
+     haya salto al reemplazarse.
+     ============================================================ */
+  .lista-skeleton {
+    animation: skeletonFadeIn 0.15s ease;
+  }
+
+  .lista-skeleton-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .lista-skeleton-item:last-child { border-bottom: 0; }
+
+  .lista-skeleton-avatar {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  .lista-skeleton-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lista-skeleton-line {
+    display: block;
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  .lista-skeleton-line.short  { width: 60%; height: 14px; }
+  .lista-skeleton-line.long   { width: 90%; }
+  .lista-skeleton-line.medium { width: 40%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista-skeleton-avatar,
+    .lista-skeleton-line {
+      animation: none;
+      background: rgba(15, 23, 42, 0.08);
+    }
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 360px) {
+    .lista-item { padding: 12px 14px; gap: 12px; }
+    .lista-item .avatar { width: 44px; height: 44px; font-size: 18px; border-radius: 12px; }
+    .lista-item .titulo { font-size: 14px; font-weight: 500; }
+    .lista-item .tagline { font-size: 12px; font-weight: 400; }
+    .lista-item .marca { font-size: 11px; }
+    .lista-item .badge { font-size: 10px; padding: 3px 8px; }
+    .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
+    .btn-volver svg { width: 16px; height: 16px; }
+    .titulo-categoria { font-size: 16px; }
+
+    .skeleton-detalle { padding: 20px 22px 40px; }
+    .skeleton-detalle .skeleton-identidad { padding: 0 22px; }
+    .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
+
+    .lista-skeleton-item { padding: 12px 14px; gap: 12px; }
+    .lista-skeleton-avatar { width: 44px; height: 44px; border-radius: 12px; }
+  }

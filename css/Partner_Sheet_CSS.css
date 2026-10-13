@@ -1,0 +1,578 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Partner_Sheet_CSS.html
+ESPEJO GITHUB:   css/Partner_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos del bottom sheet del Partner. Header
+                 sticky con avatar 56px a la izquierda + nombre
+                 y eslogan a la derecha. Debajo fila de stats
+                 (likes/comentarios/compartidos). Datos
+                 institucionales con dirección clickable a Maps.
+                 Colmena 3 columnas. Botón WhatsApp full-width.
+VERSIÓN:         1.0
+CAMBIOS:         R6: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos);
+                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
+                 local de .chip dentro de .partner-chips)
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     ROOT
+     ============================================================ */
+  .partner-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 650;
+  }
+  .partner-root.abierto { pointer-events: auto; }
+
+  /* ============================================================
+     BACKDROP
+     ============================================================ */
+  .partner-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: #0f172a;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 500;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .partner-backdrop.visible {
+    opacity: 0.45;
+    pointer-events: auto;
+  }
+
+  /* ============================================================
+     SHEET · altura 90%
+     ============================================================ */
+  .partner-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 90%;
+    background-color: #ffffff;
+    border-radius: 22px 22px 0 0;
+    z-index: 501;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0.42s;
+    will-change: transform;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .partner-sheet.abierto {
+    visibility: visible;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s;
+  }
+  .partner-sheet.sin-transicion { transition: none; }
+
+  /* ============================================================
+     BARRA DE ARRASTRE
+     ============================================================ */
+  .partner-handle-area {
+    flex-shrink: 0;
+    padding: 10px 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+    min-height: 40px;
+    z-index: 6;
+    background-color: #ffffff;
+  }
+  .partner-handle-area:active { cursor: grabbing; }
+
+  .partner-handle {
+    width: 38px;
+    height: 4px;
+    background-color: #cbd5e1;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, width 0.2s ease;
+  }
+  .partner-handle-area:active .partner-handle {
+    background-color: #94a3b8;
+    width: 46px;
+  }
+
+  /* ============================================================
+     BOTÓN CERRAR
+     ============================================================ */
+  .partner-close {
+    position: absolute;
+    top: 4px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    touch-action: manipulation;
+    z-index: 7;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .partner-close:active {
+    color: #475569;
+    background-color: #f1f5f9;
+  }
+  .partner-close svg { width: 18px; height: 18px; display: block; }
+
+  /* ============================================================
+     CONTENIDO · scroll interno
+     ============================================================ */
+  .partner-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .partner-content::-webkit-scrollbar { display: none; }
+
+  /* ============================================================
+     HEADER STICKY
+     ============================================================ */
+  .partner-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background-color: #ffffff;
+    padding: 14px 22px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .partner-header-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .partner-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1.5px solid #475569;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .partner-header-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 2px;
+  }
+
+  .partner-nombre {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .partner-eslogan {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  /* ============================================================
+     STATS
+     ============================================================ */
+  .partner-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px 22px 18px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .partner-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .partner-stat-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .partner-stat-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .partner-stat-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .partner-stat-icon.rojo svg,
+  .partner-stat-icon.rojo svg path {
+    fill: #ef4444;
+    stroke: #ef4444;
+    stroke-width: 1.8;
+  }
+
+  .partner-stat-icon.azul svg,
+  .partner-stat-icon.azul svg path {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 2;
+  }
+
+  .partner-stat-icon.verde svg,
+  .partner-stat-icon.verde svg path {
+    fill: #10b981;
+    stroke: #10b981;
+    stroke-width: 1.8;
+  }
+
+  .partner-stat-numero {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+  }
+
+  .partner-stat-label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* ============================================================
+     BLOQUE DE DATOS
+     ============================================================ */
+  .partner-datos {
+    list-style: none;
+    margin: 0;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .partner-dato-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .partner-dato-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #475569;
+  }
+  .partner-dato-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .partner-dato-texto {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .partner-dato-valor {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .partner-dato-maps {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease;
+  }
+  .partner-dato-maps:active { opacity: 0.7; }
+
+  .partner-maps-cta {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: -0.1px;
+  }
+
+  /* ============================================================
+     COLMENA
+     ============================================================ */
+  .partner-colmena {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 22px;
+    margin: 0 0 16px;
+  }
+
+  .partner-celda {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    padding: 14px 6px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    background-color: #f8fafc;
+
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+  }
+  .partner-celda:active {
+    background-color: #f1f5f9;
+    transform: scale(0.97);
+  }
+
+  .partner-celda-icono {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background-color: #ffffff;
+    border: 1.8px solid #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .partner-celda-nombre {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    line-height: 1.2;
+    letter-spacing: -0.1px;
+    word-break: break-word;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .partner-celda-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.54rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #b45309;
+    background-color: #fef3c7;
+    padding: 2px 5px;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  /* ============================================================
+     BOTÓN "VER TODOS"
+     ============================================================ */
+  .partner-ver-todos {
+    display: block;
+    width: calc(100% - 44px);
+    margin: 0 22px 16px;
+    padding: 11px 16px;
+
+    background: transparent;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 12px;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+  .partner-ver-todos:active {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+  }
+
+  /* ============================================================
+     ESTADO VACÍO
+     ============================================================ */
+  .partner-vacia {
+    padding: 20px 22px 24px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     BOTÓN WHATSAPP
+     ============================================================ */
+  .partner-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: calc(100% - 44px);
+    margin: 8px 22px 32px;
+    padding: 15px 20px;
+
+    border-radius: 999px;
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.94rem;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.28),
+                0 3px 8px rgba(15, 23, 42, 0.10);
+    transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .partner-whatsapp:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35),
+                0 2px 4px rgba(15, 23, 42, 0.10);
+  }
+
+  .partner-whatsapp-icono {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .partner-whatsapp-icono svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .partner-whatsapp-texto {
+    flex: 0 1 auto;
+  }
+
+    /* ============================================================
+     CHIPS DE FILTRO · idénticos a los chips de la app
+     ============================================================ */
+  .partner-chips {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px 4px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .partner-chips::-webkit-scrollbar { display: none; }
+
+  .partner-chips .chip {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 6px 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    color: #8e8e93;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.18s ease;
+  }
+  .partner-chips .chip:active { opacity: 0.7; }
+
+  .partner-chips .chip.activo {
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .partner-chips .chip.activo::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    width: 24px;
+    height: 2px;
+    background: #1f2937;
+    border-radius: 1px;
+  }
+
+  /* Chip único · no clickeable, funciona como título */
+  .partner-chips .chip[data-solo="1"] {
+    cursor: default;
+    pointer-events: none;
+  }

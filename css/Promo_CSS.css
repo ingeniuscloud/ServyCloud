@@ -1,0 +1,207 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Promo_CSS.html
+ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos del item de promoción destacada y del
+                 carrusel que lo contiene. Track horizontal con
+                 snap, dots debajo. El item mantiene el look
+                 original: fondo #fff7ed, campana naranja,
+                 tagline naranja, marca gris.
+                 Vive fuera del scroll en modo lista. Se oculta
+                 en modo detalle.
+VERSIÓN:         1.1
+CAMBIOS:         R9: versión de producción del dueño. El promo pasa de
+                 item único a carrusel: track con scroll-snap, dots
+                 indicadores, campana animada con punto de alerta,
+                 responsive ≤360px y respeto a prefers-reduced-motion.
+                 R6: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos).
+DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
+                 .fila-titulo, .titulo, .badge, .tagline, .marca),
+                 Index.html (#promoSlot)
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     SLOT · contenedor del carrusel
+     ============================================================ */
+  #promoSlot {
+    flex-shrink: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+  #promoSlot[hidden] { display: none !important; }
+
+  body.modo-detalle #promoSlot {
+    display: none !important;
+  }
+
+  /* ============================================================
+     TRACK · scroll horizontal con snap
+     ============================================================ */
+  .promo-track {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .promo-track::-webkit-scrollbar { display: none; }
+
+  .promo-track > .promo-item {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* ============================================================
+     ITEM PROMO · especificidad doble para ganar a .lista-item
+     ============================================================ */
+  .lista-item.promo-item {
+    background: #fff7ed;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  .lista-item.promo-item:active {
+    background: #ffedd5;
+  }
+
+  /* ============================================================
+     TAGLINE · especificidad (0,3,0), gana a .lista-item .tagline
+     ============================================================ */
+  .lista-item.promo-item .tagline {
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 500;
+    color: #ea580c;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ============================================================
+     MARCA · especificidad (0,3,0), gana a .lista-item .marca
+     ============================================================ */
+  .lista-item.promo-item .marca {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-top: 4px;
+    line-height: 1.2;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lista-item.promo-item .marca .check {
+    color: #059669;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .lista-item.promo-item .marca .marca-texto {
+    display: inline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  /* ============================================================
+     CAMPANA · reemplaza al avatar. Mismo tamaño (48×48).
+     ============================================================ */
+  .promo-campana {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.2px solid #f97316;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: #f97316;
+  }
+
+  .promo-campana svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    transform-origin: 50% 10%;
+    animation: promoShake 5s ease-in-out infinite;
+  }
+
+  @keyframes promoShake {
+    0%, 80%, 100% { transform: rotate(0deg); }
+    84%           { transform: rotate(-12deg); }
+    87%           { transform: rotate(10deg); }
+    90%           { transform: rotate(-8deg); }
+    93%           { transform: rotate(6deg); }
+    96%           { transform: rotate(-3deg); }
+  }
+
+  .promo-campana::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #f97316;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  /* ============================================================
+     DOTS · indicadores del carrusel
+     ============================================================ */
+  .promo-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 0 8px;
+    background: transparent;
+  }
+
+  .promo-dot {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(249, 115, 22, 0.28);
+    transition: background 0.2s ease, width 0.2s ease, border-radius 0.2s ease;
+  }
+
+  .promo-dot.activo {
+    background: #f97316;
+    width: 14px;
+    border-radius: 3px;
+  }
+
+  /* ============================================================
+     RESPONSIVE · ≤360px
+     ============================================================ */
+  @media (max-width: 360px) {
+    .promo-campana { width: 44px; height: 44px; }
+    .promo-campana svg { width: 20px; height: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .promo-campana svg { animation: none; }
+    .promo-track { scroll-behavior: auto; }
+  }

@@ -1,0 +1,332 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Chips_CSS.html
+ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: CSS del menú chips + botón menú global + botón
+                 lupa + fila de búsqueda expandible in-place +
+                 línea de aviso cuando la búsqueda no da resultados.
+                 Header sin fondo ni sombra. V2.1: línea fina
+                 entre ciudad y chips.
+VERSIÓN:         1.0
+CAMBIOS:         R5: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos).
+DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
+                 Index.html)
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     WRAP · contenedor chips + botones
+     V2.1: border-top que separa la barra de ciudad de los chips.
+     ============================================================ */
+  .filtros-wrap {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 8px 0 4px;
+    border-top: 1px solid rgba(15,23,42,.06);
+
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ============================================================
+     FILTROS · tira de chips
+     ============================================================ */
+  .filtros {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 0 4px 0 20px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .filtros::-webkit-scrollbar { display: none; }
+
+  /* ============================================================
+     CHIP · texto plano, sin cápsula
+     ============================================================ */
+  .chip {
+    position: relative;
+
+    flex: 0 0 auto;
+    padding: 6px 0 6px;
+
+    border: none;
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+
+    color: #8e8e93;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: color 0.18s ease, font-weight 0.18s ease;
+  }
+
+  .chip:active { opacity: 0.7; }
+
+  /* ============================================================
+     CHIP ACTIVO
+     ============================================================ */
+  .chip.activo {
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  /* ============================================================
+     LÍNEA BAJO EL ACTIVO
+     ============================================================ */
+  .chip.activo::after {
+    content: '';
+
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+
+    width: 24px;
+    height: 2px;
+
+    background: #1f2937;
+    border-radius: 1px;
+  }
+
+  /* ============================================================
+     BOTÓN MENÚ GLOBAL
+     ============================================================ */
+  .menu-global {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-right: 14px;
+
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+
+    color: #475569;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .menu-global:active { opacity: 0.5; }
+
+  .menu-global svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  /* ============================================================
+     BOTÓN LUPA
+     ============================================================ */
+  .btn-lupa {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-left: 8px;
+    margin-right: 8px;
+
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+
+    color: #475569;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-lupa:active { opacity: 0.5; }
+
+  .btn-lupa svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     FILA DE BÚSQUEDA · ocupa todo el ancho del wrap
+     ============================================================ */
+  .buscar-fila {
+    display: none;
+    align-items: center;
+    gap: 10px;
+
+    flex: 1 1 auto;
+    width: 100%;
+    padding: 0 14px 0 16px;
+  }
+
+  .buscar-input-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 6px 0;
+
+    border-bottom: 1.5px solid #cbd5e1;
+    transition: border-color 0.2s ease;
+  }
+
+  .buscar-input-wrap:focus-within {
+    border-bottom-color: #475569;
+  }
+
+  .buscar-lupa {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+  }
+
+  .buscar-lupa svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .buscar-input {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 2px 0;
+
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+    line-height: 1.1;
+  }
+
+  .buscar-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  .buscar-cerrar {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-right: 0;
+
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: color 0.15s ease;
+  }
+
+  .buscar-cerrar:active { opacity: 0.5; }
+
+  .buscar-cerrar svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     ESTADO · buscando
+     ============================================================ */
+  .filtros-wrap.buscando .filtros,
+  .filtros-wrap.buscando .btn-lupa,
+  .filtros-wrap.buscando .menu-global {
+    display: none;
+  }
+
+  .filtros-wrap.buscando .buscar-fila {
+    display: flex;
+  }
+
+  /* ============================================================
+     AVISO DE BÚSQUEDA SIN RESULTADOS
+     ============================================================ */
+  .buscar-vacio {
+    flex-shrink: 0;
+
+    padding: 8px 16px 10px;
+
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+    color: #94a3b8;
+
+    background: transparent;
+    text-align: left;
+  }
+
+  .buscar-vacio[hidden] { display: none; }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 360px) {
+    .filtros { gap: 16px; padding-left: 18px; }
+    .chip    { font-size: 20px; }
+    .menu-global { width: 32px; height: 32px; margin-right: 12px; }
+    .menu-global svg { width: 18px; height: 18px; }
+    .btn-lupa { width: 32px; height: 32px; margin-left: 6px; margin-right: 6px; }
+    .btn-lupa svg { width: 16px; height: 16px; }
+    .buscar-fila { padding: 0 12px 0 14px; }
+    .buscar-input { font-size: 16px; }
+    .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
+  }

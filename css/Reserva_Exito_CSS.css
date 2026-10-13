@@ -1,0 +1,299 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Reserva_Exito_CSS.html
+ESPEJO GITHUB:   css/Reserva_Exito_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
+                 vista de confirmación (wrap, tarjeta, icono,
+                 resumen, WhatsApp), skeleton mientras procesa la
+                 reserva y pantalla de error. Nació de la división
+                 PARTE G de Reserva_CSS.html (R10): los consume
+                 Reserva_Exito_Script.html.
+VERSIÓN:         1.0
+CAMBIOS:         R10: creado por división PARTE G (aprobación h).
+                 Contenido trasladado byte a byte desde
+                 Reserva_CSS.html (bloques VISTA DE ÉXITO, SKELETON
+                 y ERROR). Sin cambios de CSS.
+DEPENDENCIAS:    Reserva_CSS.html (raíz y sheet base), Global_CSS.html,
+                 Telefono.html
+════════════════════════════════════════════════════════════════════
+*/
+
+  /* ============================================================
+     VISTA DE ÉXITO · confirmación tras enviar
+     ============================================================ */
+  .reserva-exito {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 0 8px;
+  }
+
+  .reserva-exito-icono {
+    font-size: 3.2rem;
+    line-height: 1;
+    margin-bottom: 10px;
+    animation: revelarEntrada 0.5s cubic-bezier(0.34, 1.36, 0.64, 1) both;
+  }
+
+  .reserva-exito-titulo {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin: 0 0 6px;
+    animation: revelarEntrada 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .reserva-exito-sub {
+    font-size: 0.86rem;
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.45;
+    margin: 0 0 22px;
+    max-width: 300px;
+    animation: revelarEntrada 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .exito-lista {
+    width: 100%;
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    text-align: left;
+    animation: revelarEntrada 0.5s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .exito-lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .exito-check {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16a34a;
+    margin-top: 1px;
+  }
+  .exito-check svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .exito-txt {
+    flex: 1;
+    min-width: 0;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .exito-k {
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .exito-v {
+    color: #0f172a;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .exito-aviso {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    text-align: left;
+    margin: 0 0 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: revelarEntrada 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .exito-aviso-icono {
+    font-size: 1rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .exito-aviso.warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+  }
+  .exito-aviso.info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+  }
+
+  .exito-nota {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #475569;
+    text-align: left;
+    margin: 0 0 20px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: revelarEntrada 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .exito-nota-icono {
+    font-size: 1rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .exito-contacto {
+    width: 100%;
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+    margin: 0 0 4px;
+    animation: revelarEntrada 0.5s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .exito-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.94rem;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.28),
+                0 3px 8px rgba(15, 23, 42, 0.10);
+    transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+    animation: revelarEntrada 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .exito-whatsapp:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35),
+                0 2px 4px rgba(15, 23, 42, 0.10);
+  }
+
+  .exito-whatsapp-icono {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .exito-whatsapp-icono svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .exito-whatsapp-texto {
+    flex: 0 1 auto;
+  }
+
+  /* ============================================================
+     SKELETON · pantalla de éxito mientras procesa la reserva
+     ============================================================ */
+  .reserva-exito-cargando .reserva-exito-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .reserva-exito-cargando .spinner-exito {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 4px solid #e2e8f0;
+    border-top-color: #16a34a;
+    animation: spinnerRotar 0.9s linear infinite;
+  }
+  @keyframes spinnerRotar {
+    to { transform: rotate(360deg); }
+  }
+  .skeleton-line {
+    display: block;
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes skeletonShimmer {
+    0%   { background-position:  200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-dot {
+    background-color: #e2e8f0 !important;
+    border-radius: 50%;
+    color: transparent !important;
+  }
+
+  /* ============================================================
+     ERROR · no se pudo confirmar la reserva
+     ============================================================ */
+  .exito-acciones {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .exito-btn-primario {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.94rem;
+    font-weight: 800;
+    color: #ffffff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
+    transition: transform 0.15s;
+  }
+  .exito-btn-primario:active { transform: scale(0.98); }
+  .exito-btn-secundario {
+    width: 100%;
+    padding: 13px 20px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 999px;
+    background: transparent;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .exito-btn-secundario:active { background-color: #f1f5f9; }

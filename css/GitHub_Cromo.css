@@ -1,0 +1,194 @@
+/*
+════════════════════════════════════════════════════════════════════
+ARCHIVO:         GitHub_Cromo.css
+ESPEJO GITHUB:   css/GitHub_Cromo.css (SOLO-GitHub: no existe en GAS)
+PROYECTO:        ServyCloud | App en GitHub Pages
+RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
+                 orbital y píldora "Instalar app". Nació con el
+                 envoltorio (R26) y desde R29 vive como archivo
+                 propio. El dueño no necesita tocarlo.
+VERSIÓN:         1.0
+CAMBIOS:         R29: extraído del monolito v4.1 byte a byte.
+DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
+                 #zona-instalar) · js/GitHub_Cromo.js
+════════════════════════════════════════════════════════════════════
+*/
+    /* ═══ PRELOADER ORBITAL (mismo lenguaje visual de siempre;
+         ahora con fondo propio porque acompaña a la app, cuyo
+         fondo gestiona su propio CSS) ═══ */
+    .preloader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+      pointer-events: none;
+    }
+    .preloader-overlay.saliendo { opacity: 0; }
+    .preloader-overlay[hidden]  { display: none; }
+
+    .carga-preloader {
+      --text-primary: #0f172a;
+      --text-muted: #64748b;
+      --border-input: #cbd5e1;
+      --logo-primario: #00A3E0;
+      --logo-secundario: #0EA5E9;
+
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    @keyframes rot { to { transform: rotate(360deg); } }
+
+    .carga-loader {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+
+    .carga-orbital {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--border-input) 80%, transparent);
+    }
+
+    .carga-orbital-1 {
+      inset: 0;
+      border-top-color: var(--logo-primario);
+      border-right-color: var(--logo-primario);
+      animation: rot 1.6s linear infinite;
+    }
+
+    .carga-orbital-2 {
+      inset: 12px;
+      border-bottom-color: var(--logo-secundario);
+      border-left-color: var(--logo-secundario);
+      animation: rot 1.2s linear infinite reverse;
+    }
+
+    .carga-core {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carga-core span {
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      color: var(--logo-primario);
+      animation: cargaPulso 2s ease-in-out infinite;
+    }
+
+    .carga-brand {
+      margin-top: 25px;
+      font-size: 21px;
+      letter-spacing: -0.6px;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .carga-brand-in     { color: var(--logo-primario);   font-weight: 900; }
+    .carga-brand-genius { color: var(--text-primary);    font-weight: 700; }
+    .carga-brand-cloud  { color: var(--logo-secundario); font-weight: 300; letter-spacing: 1px; margin-left: 1px; }
+
+    .carga-status {
+      margin-top: 9px;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+    }
+
+    .carga-puntos {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 6px;
+    }
+
+    .carga-puntos span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--logo-primario);
+      animation: cargaPunto 1.4s infinite;
+    }
+    .carga-puntos span:nth-child(2) { animation-delay: 0.2s; }
+    .carga-puntos span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes cargaPunto {
+      0%, 100% { opacity: 0.2; transform: translateY(0); }
+      50%      { opacity: 1;   transform: translateY(-3px); }
+    }
+    @keyframes cargaPulso {
+      0%, 100% { transform: scale(0.92); opacity: 0.65; }
+      50%      { transform: scale(1);    opacity: 1; }
+    }
+
+    /* ═══ BOTÓN INSTALAR APP (PWA · solo Android) ═══ */
+    #zona-instalar {
+      position: fixed;
+      left: 14px;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      z-index: 9000;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 6px 14px;
+      border-radius: 999px;
+      background: #00A3E0;
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      animation: instalar-entrada 0.35s ease;
+    }
+    #zona-instalar[hidden] { display: none; }
+
+    #btn-instalar {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: none;
+      border: none;
+      color: inherit;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+
+    .zona-instalar-divisor {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    #btn-instalar-cerrar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    @keyframes instalar-entrada {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }

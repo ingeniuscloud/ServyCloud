@@ -1,0 +1,483 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Ciudad_Sheet_Script.html
+ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
+                 localStorage (app_ciudad). Si no existe, abre
+                 el sheet en modo BLOQUEADO: el usuario debe
+                 seleccionar una ciudad antes de ver cualquier
+                 lista. Pinta el botón .city-bar y emite
+                 'ciudad:change' cuando cambia.
+                 Ordena las ciudades alfabéticamente por título.
+                 Lista con radio button nativo.
+                 Chevron SVG desde Iconos.html (flechaAcordeon).
+VERSIÓN:         1.2
+CAMBIOS:         R26: nueva API pública reinicializar(): en la
+                 página estática de GitHub Pages los módulos
+                 cargan ANTES de que llegue SISTEMA (viaja con
+                 abrirSesion, Global_Script 1.5), así que iniciar()
+                 de carga se va con la lista vacía; el shim de la
+                 página llama reinicializar() apenas SISTEMA está
+                 en pantalla y la ciudad guardada se restaura en
+                 el MISMO camino de siempre. En la página de GAS
+                 nadie lo llama: iniciar() ya hizo el trabajo.
+                 R10: nueva API pública aplicarGuardada(ciudad): aplica
+                 la ciudad recordada por el puente (Core_Script) con
+                 el mismo camino de aplicar() (guarda, pinta, emite
+                 ciudad:change) y apaga pendienteSeleccion. La
+                 validación contra SISTEMA.ciudades la hace Puente.
+                 R6: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos).
+DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
+                 (pintarGlifos), Ciudad_Sheet_CSS.html
+════════════════════════════════════════════════════════════════════
+*/
+
+  window.Ciudad = (function () {
+
+    var KEY_CIUDAD = 'app_ciudad';
+
+    var UMBRAL_VELOCIDAD = 0.5;
+    var UMBRAL_DRAG      = 6;
+
+    /* Estado interno */
+    var actual             = null;
+    var lista              = [];
+    var inicializada       = false;
+    var botonEnlazado      = false;
+    var pendienteSeleccion = false;
+
+    /* Refs DOM */
+    var btnCity   = null;
+    var ciudadTxt = null;
+
+    /* Sheet */
+    var raiz       = null;
+    var backdrop   = null;
+    var sheet      = null;
+    var handleArea = null;
+    var content    = null;
+    var abierto    = false;
+
+    /* Drag */
+    var dragActivo    = false;
+    var dragMoved     = false;
+    var dragPointerId = null;
+    var dragStartY    = 0;
+    var dragUltimoY   = 0;
+    var dragUltimoT   = 0;
+    var dragVelocidad = 0;
+
+    /* ============================================================
+       Helpers
+       ============================================================ */
+    function haptic(v) {
+      if (navigator.vibrate) { try { navigator.vibrate(v); } catch (e) {} }
+    }
+
+    function leerStorage() {
+      try {
+        var raw = localStorage.getItem(KEY_CIUDAD);
+        if (!raw) return null;
+        var obj = JSON.parse(raw);
+        if (!obj || typeof obj !== 'object' || !obj.idCiudad) return null;
+        return obj;
+      } catch (_) { return null; }
+    }
+
+    function escribirStorage(obj) {
+      try { localStorage.setItem(KEY_CIUDAD, JSON.stringify(obj)); } catch (_) {}
+    }
+
+    function ciudadesDisponibles() {
+      var arr = (window.SISTEMA && window.SISTEMA.ciudades) || [];
+      return arr
+        .filter(function (c) {
+          return c && c.idCiudad && c.estado !== false;
+        })
+        .sort(function (a, b) {
+          return String(a.titulo || '').localeCompare(
+            String(b.titulo || ''), 'es', { sensitivity: 'base' }
+          );
+        });
+    }
+
+    function buscarPorId(id) {
+      for (var i = 0; i < lista.length; i++) {
+        if (lista[i].idCiudad === id) return lista[i];
+      }
+      return null;
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+      });
+    }
+
+    /* ============================================================
+       Pintar botón
+       ============================================================ */
+    function pintarBoton() {
+      if (!btnCity || !ciudadTxt) return;
+
+      if (!actual) {
+        btnCity.disabled = true;
+        ciudadTxt.textContent = '—';
+        return;
+      }
+
+      ciudadTxt.textContent = actual.titulo;
+      btnCity.setAttribute('aria-label', 'Cambiar ciudad. Actual: ' + actual.titulo);
+
+      var enDetalle = document.body.classList.contains('modo-detalle');
+      btnCity.disabled = enDetalle;
+    }
+
+    /* ============================================================
+       Aplicar ciudad · guarda, pinta, emite ciudad:change
+       ============================================================ */
+    function aplicar(ciudad) {
+      if (!ciudad) return;
+
+      actual = {
+        idCiudad: ciudad.idCiudad,
+        titulo:   ciudad.titulo
+      };
+      escribirStorage(actual);
+      pendienteSeleccion = false;
+      pintarBoton();
+
+      document.dispatchEvent(new CustomEvent('ciudad:change', {
+        detail: {
+          idCiudad: actual.idCiudad,
+          titulo:   actual.titulo
+        }
+      }));
+    }
+
+    /* ============================================================
+       Arranque · resolución inicial
+       ============================================================ */
+    function iniciar() {
+      if (inicializada) return;
+      inicializada = true;
+
+      lista = ciudadesDisponibles();
+
+      if (!lista.length) {
+        console.warn('[Ciudad] SISTEMA.ciudades vacío');
+        return;
+      }
+
+      var guardada = leerStorage();
+      if (guardada) {
+        var c = buscarPorId(guardada.idCiudad);
+        if (c) {
+          actual = { idCiudad: c.idCiudad, titulo: c.titulo };
+          pendienteSeleccion = false;
+          return;
+        }
+      }
+
+      /* Sin ciudad guardada → selección obligatoria */
+      pendienteSeleccion = true;
+    }
+
+    /* R26: reconstruye el estado con el SISTEMA ya presente.
+       Re-ejecutar iniciar() es seguro: solo fija estado (lista,
+       actual, pendienteSeleccion); los listeners y el DOM del
+       sheet se crean aparte y tienen sus propias guardias. */
+    function reinicializar() {
+      inicializada = false;
+      actual = null;
+      pendienteSeleccion = false;
+      iniciar();
+    }
+
+    /* R26: reconstruye el estado con el SISTEMA ya presente.
+       Re-ejecutar iniciar() es seguro: solo fija estado (lista,
+       actual, pendienteSeleccion); los listeners y el DOM del
+       sheet se crean aparte y tienen sus propias guardias. */
+    function reinicializar() {
+      inicializada = false;
+      actual = null;
+      pendienteSeleccion = false;
+      iniciar();
+    }
+
+    /* R26: reconstruye el estado con el SISTEMA ya presente.
+       Re-ejecutar iniciar() es seguro: solo fija estado (lista,
+       actual, pendienteSeleccion); los listeners y el DOM del
+       sheet se crean aparte y tienen sus propias guardias. */
+    function reinicializar() {
+      inicializada = false;
+      actual = null;
+      pendienteSeleccion = false;
+      iniciar();
+    }
+
+    /* ============================================================
+       Enganchar botón · llamado por Core tras inyectar lienzo
+       ============================================================ */
+    function engancharBoton() {
+      btnCity   = document.getElementById('btnCiudad');
+      ciudadTxt = document.getElementById('ciudadTxt');
+      if (!btnCity) return;
+
+      botonEnlazado = true;
+
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(btnCity);
+      }
+
+      initDelegacionBoton();
+
+      var observer = new MutationObserver(pintarBoton);
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+
+      pintarBoton();
+    }
+
+    function initDelegacionBoton() {
+      if (document.__ciudadDelegado === '1') return;
+      document.__ciudadDelegado = '1';
+
+      document.addEventListener('click', function (e) {
+        var btn = e.target && e.target.closest && e.target.closest('#btnCiudad');
+        if (!btn) return;
+        e.preventDefault();
+        if (btn.disabled) return;
+        if (abierto) cerrar();
+        else abrir(false);
+      });
+    }
+
+    /* ============================================================
+       Sheet · construir DOM
+       ============================================================ */
+    function construirDOM() {
+      if (raiz) return;
+      var area = document.querySelector('.area-contenido');
+      if (!area) return;
+
+      raiz = document.createElement('div');
+      raiz.className = 'ciudad-root';
+      raiz.innerHTML =
+        '<div class="ciudad-backdrop"></div>' +
+        '<div class="ciudad-sheet">' +
+          '<div class="ciudad-handle-area"><div class="ciudad-handle"></div></div>' +
+          '<button class="ciudad-close" type="button" aria-label="Cerrar">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<line x1="18" y1="6" x2="6" y2="18"/>' +
+              '<line x1="6" y1="6" x2="18" y2="18"/>' +
+            '</svg>' +
+          '</button>' +
+          '<div class="ciudad-content"></div>' +
+        '</div>';
+
+      area.appendChild(raiz);
+
+      backdrop   = raiz.querySelector('.ciudad-backdrop');
+      sheet      = raiz.querySelector('.ciudad-sheet');
+      handleArea = raiz.querySelector('.ciudad-handle-area');
+      content    = raiz.querySelector('.ciudad-content');
+
+      backdrop.addEventListener('click', onBackdropClick);
+      raiz.querySelector('.ciudad-close').addEventListener('click', cerrar);
+      handleArea.addEventListener('pointerdown', onDragDown);
+    }
+
+    function onBackdropClick() {
+      if (pendienteSeleccion) return;   /* bloqueado: no cierra */
+      cerrar();
+    }
+
+    function pintarContenido() {
+      if (!content) return;
+
+      var html = '<h2 class="ciudad-titulo">Selecciona tu ciudad</h2>';
+      html += '<ul class="ciudad-lista">';
+
+      lista.forEach(function (c) {
+        var esActual = actual && actual.idCiudad === c.idCiudad;
+        html += '<li>' +
+                  '<label class="ciudad-option">' +
+                    '<input type="radio" name="ciudad" class="ciudad-radio" ' +
+                           'value="' + escapeHtml(c.idCiudad) + '"' +
+                           (esActual ? ' checked' : '') + '>' +
+                    '<span class="ciudad-nombre">' + escapeHtml(c.titulo) + '</span>' +
+                  '</label>' +
+                '</li>';
+      });
+
+      html += '</ul>';
+      content.innerHTML = html;
+
+      content.querySelectorAll('.ciudad-radio').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          var id = this.value;
+          var c = buscarPorId(id);
+          if (c) {
+            haptic(10);
+            aplicar(c);
+            pendienteSeleccion = false;
+            cerrar();
+          }
+        });
+      });
+    }
+
+    /* ============================================================
+       Sheet · abrir/cerrar
+       obligatorio=true → modo bloqueado
+       ============================================================ */
+    function abrir(obligatorio) {
+      if (abierto) return;
+      if (!lista.length) return;
+      if (!obligatorio && btnCity && btnCity.disabled) return;
+
+      construirDOM();
+      if (!raiz) return;
+
+      pintarContenido();
+      haptic(10);
+
+      if (obligatorio) raiz.classList.add('bloqueado');
+      else             raiz.classList.remove('bloqueado');
+
+      sheet.classList.add('sin-transicion');
+      sheet.style.transform = 'translateY(100%)';
+      raiz.classList.add('abierto');
+      sheet.classList.add('abierto');
+
+      void sheet.offsetHeight;
+      sheet.classList.remove('sin-transicion');
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          sheet.style.transform = 'translateY(0)';
+          backdrop.classList.add('visible');
+          abierto = true;
+        });
+      });
+    }
+
+    function cerrar() {
+      if (!abierto) return;
+      abierto = false;
+
+      backdrop.classList.remove('visible');
+      sheet.style.transform = 'translateY(100%)';
+
+      setTimeout(function () {
+        if (!abierto) {
+          sheet.classList.remove('abierto');
+          raiz.classList.remove('abierto');
+          raiz.classList.remove('bloqueado');
+        }
+      }, 420);
+    }
+
+    /* ============================================================
+       Drag · solo cuando NO está bloqueado
+       ============================================================ */
+    function onDragDown(e) {
+      if (!abierto) return;
+      if (pendienteSeleccion) return;
+      if (e.button !== undefined && e.button !== 0) return;
+
+      dragActivo = true;
+      dragMoved = false;
+      dragPointerId = e.pointerId;
+      dragStartY = e.clientY;
+      dragUltimoY = e.clientY;
+      dragUltimoT = performance.now();
+      dragVelocidad = 0;
+
+      handleArea.addEventListener('pointermove', onDragMove);
+      handleArea.addEventListener('pointerup', onDragEnd);
+      handleArea.addEventListener('pointercancel', onDragEnd);
+    }
+
+    function onDragMove(e) {
+      if (!dragActivo) return;
+      if (e.pointerId !== dragPointerId) return;
+
+      var dy = e.clientY - dragStartY;
+
+      if (!dragMoved) {
+        if (Math.abs(dy) < UMBRAL_DRAG) return;
+        dragMoved = true;
+        sheet.classList.add('sin-transicion');
+        try { handleArea.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+
+      var altura = sheet.offsetHeight;
+      var pct = (dy / altura) * 100;
+      if (pct < 0) pct = 0;
+      if (pct > 100) pct = 100;
+      e.preventDefault();
+      sheet.style.transform = 'translateY(' + pct + '%)';
+
+      var ahora = performance.now();
+      var dt = ahora - dragUltimoT;
+      if (dt > 0) {
+        var v = (e.clientY - dragUltimoY) / dt;
+        dragVelocidad = dragVelocidad * 0.7 + v * 0.3;
+        dragUltimoY = e.clientY;
+        dragUltimoT = ahora;
+      }
+    }
+
+    function onDragEnd(e) {
+      if (!dragActivo) return;
+      if (e.pointerId !== dragPointerId) return;
+      dragActivo = false;
+      dragPointerId = null;
+
+      if (!dragMoved) { limpiarDrag(); return; }
+      dragMoved = false;
+      sheet.classList.remove('sin-transicion');
+
+      var t = sheet.style.transform || '';
+      var m = t.match(/translateY\(([\d.]+)%\)/);
+      var pct = m ? parseFloat(m[1]) : 0;
+
+      if ((dragVelocidad > UMBRAL_VELOCIDAD) || (pct > 30)) cerrar();
+      else sheet.style.transform = 'translateY(0)';
+
+      limpiarDrag();
+    }
+
+    function limpiarDrag() {
+      handleArea.removeEventListener('pointermove', onDragMove);
+      handleArea.removeEventListener('pointerup', onDragEnd);
+      handleArea.removeEventListener('pointercancel', onDragEnd);
+    }
+
+    /* ============================================================
+       Arranque del módulo
+       ============================================================ */
+    iniciar();
+
+    /* ============================================================
+       API pública
+       ============================================================ */
+    return {
+      getActual:          function () { return actual; },
+      getLista:           function () { return lista.slice(); },
+      hayPendiente:       function () { return pendienteSeleccion === true; },
+      engancharBoton:     engancharBoton,
+      abrirObligatorio:   function () { abrir(true); },
+      abrir:              function () { abrir(false); },
+      cerrar:             cerrar,
+      aplicarGuardada:    aplicar,
+      reinicializar:      reinicializar
+    };
+
+  })();
