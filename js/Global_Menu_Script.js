@@ -10,8 +10,18 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  (marcaApp, marcaEmpresa, correo, whatsapp), más la
                  guía PWA y el drag de cierre. Nació de la división
                  PARTE G de Global_Script.html (R10).
-VERSIÓN:         1.0
-CAMBIOS:         R10: creado por división PARTE G (aprobación h).
+VERSIÓN:         1.1
+CAMBIOS:         R33: el ítem "Instalar la app" del menú ahora
+                 instala de verdad: app ya instalada → aviso
+                 (texto de Constantes.gs pwa.mensajes.yaInstalada);
+                 Android con boleto disponible (beforeinstallprompt,
+                 compartido por GitHub_Cromo en window.__servyBoleto)
+                 → diálogo nativo de Chrome; dentro del envoltorio
+                 (iframe) → lo pide por el puente pwa-instalar /
+                 pwa-respuesta; sin boleto → abre esta guía con los
+                 pasos. iPhone sigue abriendo la guía (R30: Apple no
+                 permite instalar por código).
+                 R10: creado por división PARTE G (aprobación h).
                  Contenido trasladado byte a byte desde
                  Global_Script.html (módulo window.Global). Sin
                  cambios de código.
@@ -49,6 +59,18 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
     var dragUltimoT = 0;
     var dragVelocidad = 0;
     var dragDesdeHandle = false;
+
+    /* ============================================================
+       PWA · botón inteligente (R33)
+       El boleto de instalación (beforeinstallprompt) lo captura
+       GitHub_Cromo.js en la página estática y lo deja compartido
+       en window.__servyBoleto. Aquí NO se captura de nuevo: se
+       consume el compartido. Dentro del envoltorio (iframe) el
+       boleto vive en la página de arriba y se pide por el puente
+       pwa-instalar / pwa-respuesta. El aviso "ya instalada" usa
+       estilos inline para no tocar ningún CSS.
+       ============================================================ */
+    var avisoPwaTimer = null;
 
     function _renderMarcaApp(marca) {
       var s = String(marca || '');
@@ -265,6 +287,129 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       if (esIOS) return 'ios';
       if (/Android/i.test(ua)) return 'android';
       return 'android';
+    }
+
+    function pwaYaInstalada() {
+      try {
+        if (window.matchMedia &&
+            window.matchMedia('(display-mode: standalone)').matches) {
+          return true;
+        }
+        /* iOS instalada: standalone no siempre responde; Safari
+           expone navigator.standalone. */
+        if (window.navigator && window.navigator.standalone === true) {
+          return true;
+        }
+      } catch (err) {}
+      return false;
+    }
+
+    function pwaTextoAviso() {
+      var m = window.SISTEMA && window.SISTEMA.pwa &&
+              window.SISTEMA.pwa.mensajes;
+      return (m && m.yaInstalada) ||
+             'Ya tienes la app instalada en este dispositivo';
+    }
+
+    function avisoPwa(texto) {
+      var t = document.getElementById('aviso-pwa-global');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'aviso-pwa-global';
+        t.setAttribute('role', 'status');
+        t.setAttribute('style',
+          'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
+          'z-index:1400;max-width:calc(100vw - 32px);background:#1f2937;' +
+          'color:#ffffff;font-size:14px;font-weight:600;padding:11px 18px;' +
+          'border-radius:999px;text-align:center;box-shadow:' +
+          '0 10px 30px rgba(15,23,42,0.25);opacity:0;pointer-events:none;' +
+          'transition:opacity .22s ease;');
+        document.body.appendChild(t);
+      }
+      t.textContent = texto;
+      t.style.opacity = '1';
+      if (avisoPwaTimer) clearTimeout(avisoPwaTimer);
+      avisoPwaTimer = setTimeout(function () { t.style.opacity = '0'; }, 2600);
+    }
+
+    function hayPadreParaPwa() {
+      try {
+        return !!(window.parent && window.parent !== window);
+      } catch (err) { return false; }
+    }
+
+    /* Dentro del envoltorio: el boleto vive en la página de arriba.
+       Se le pide por postMessage; si contesta que NO hay boleto (o
+       no contesta en 1.2 seg), se abre la guía con los pasos. */
+    function pedirBoletoAlPadre() {
+      var resuelto = false;
+
+      function abrirGuia() {
+        if (resuelto) return;
+        resuelto = true;
+        window.removeEventListener('message', receptor);
+        navegar('pwa');
+      }
+
+      function receptor(e) {
+        if (e.source !== window.parent) return;
+        if (!e.data || e.data.tipo !== 'pwa-respuesta') return;
+        if (e.data.boleto) {
+          /* El envoltorio abre el diálogo nativo: aquí no hay nada
+             más que hacer. */
+          resuelto = true;
+          window.removeEventListener('message', receptor);
+          return;
+        }
+        abrirGuia();
+      }
+
+      window.addEventListener('message', receptor);
+      try {
+        window.parent.postMessage({ tipo: 'pwa-instalar' }, '*');
+      } catch (err) {
+        abrirGuia();
+        return;
+      }
+      setTimeout(abrirGuia, 1200);
+    }
+
+    function instalarPwa() {
+      /* 1 · Ya instalada: aviso y fuera. */
+      if (pwaYaInstalada()) {
+        avisoPwa(pwaTextoAviso());
+        return;
+      }
+
+      /* 2 · iPhone/iPad: Apple no da boleto de instalación por
+         código; la guía manual (R30) es el único camino. */
+      if (getPlataformaUsuario() === 'ios') {
+        navegar('pwa');
+        return;
+      }
+
+      /* 3 · Página estática: boleto compartido por GitHub_Cromo. */
+      var boleto = null;
+      try { boleto = window.__servyBoleto || null; } catch (err) { boleto = null; }
+      if (boleto && typeof boleto.prompt === 'function') {
+        window.__servyBoleto = null;
+        try {
+          boleto.prompt();
+          if (boleto.userChoice && boleto.userChoice.then) {
+            boleto.userChoice.then(function () {}, function () {});
+          }
+          return;
+        } catch (err) { /* boleto vencido: sigue abajo */ }
+      }
+
+      /* 4 · Envoltorio (iframe): pedir el boleto a la página de arriba. */
+      if (hayPadreParaPwa()) {
+        pedirBoletoAlPadre();
+        return;
+      }
+
+      /* 5 · Sin boleto y sin envoltorio: guía con los pasos. */
+      navegar('pwa');
     }
 
     function getPWAHTML() {
@@ -511,9 +656,13 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       if (accion === 'terminos'    ||
           accion === 'privacidad'  ||
           accion === 'cookies'     ||
-          accion === 'acerca'      ||
-          accion === 'pwa') {
+          accion === 'acerca') {
         navegar(accion);
+        return;
+      }
+
+      if (accion === 'pwa') {
+        instalarPwa();
         return;
       }
 
