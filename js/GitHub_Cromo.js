@@ -9,8 +9,14 @@ RESPONSABILIDAD: Cromo de la página estática: preloader orbital,
                  píldora "Instalar app" (Android) y registro del
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
-VERSIÓN:         1.0
-CAMBIOS:         R29: extraído del monolito v4.1 byte a byte.
+VERSIÓN:         1.1
+CAMBIOS:         R33: el boleto de instalación se comparte en
+                 window.__servyBoleto para que el ítem "Instalar la
+                 app" del menú (Global_Menu_Script) pueda abrir el
+                 diálogo nativo sin capturarlo de nuevo; la píldora
+                 consume con try/catch porque el menú puede canjear
+                 el boleto primero.
+                 R29: extraído del monolito v4.1 byte a byte.
 DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
                  Script.js (reinicializar) · css/GitHub_Cromo.css ·
                  sw.js · manifest.json. Debe cargarse ÚLTIMO.
@@ -235,6 +241,7 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
               window.addEventListener('beforeinstallprompt', function (e) {
                   e.preventDefault();
                   eventoInstalacion = e;
+                  window.__servyBoleto = e;   // R33: compartido con el menú
                   decidirSiMostrar();
               });
 
@@ -246,8 +253,13 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
               document.getElementById('btn-instalar').addEventListener('click', function () {
                   if (!eventoInstalacion) return;
                   zonaInstalar.hidden = true;
-                  eventoInstalacion.prompt();
-                  eventoInstalacion.userChoice.then(function () { eventoInstalacion = null; });
+                  window.__servyBoleto = null;   // R33: consumido
+                  try {
+                      eventoInstalacion.prompt();
+                      eventoInstalacion.userChoice.then(function () { eventoInstalacion = null; });
+                  } catch (err) {
+                      eventoInstalacion = null;  // R33: boleto ya canjeado por el menú
+                  }
               });
 
               document.getElementById('btn-instalar-cerrar').addEventListener('click', function () {
@@ -258,6 +270,7 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
               window.addEventListener('appinstalled', function () {
                   zonaInstalar.hidden = true;
                   yaInstalada = true;
+                  window.__servyBoleto = null;   // R33: ya no hay nada que canjear
               });
 
               // Service worker de paso puro (instalabilidad; sin caché).
