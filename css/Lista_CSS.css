@@ -9,8 +9,14 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  Skeleton del detalle (primera carga de un post).
                  Skeleton de lista (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
+VERSIÓN:         1.1
+CAMBIOS:         R32: el chevron (›) de los items de la lista pasa a
+                 30px, peso 700 y color naranja oficial Servy
+                 #FA6A08 (antes 22px, gris #cbd5e1 casi invisible:
+                 los usuarios no notaban que el item se pulsa para
+                 abrir el post completo). Cubre lista y carrusel de
+                 promos (ambos usan .lista-item).
+                 R6: baseline de producción incorporado al espejo;
                  encabezado normalizado al estándar ═══ (6 campos).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
@@ -231,8 +237,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .lista-item .flecha {
     flex: 0 0 auto;
-    color: #cbd5e1;
-    font-size: 22px;
+    color: #FA6A08;
+    font-size: 30px;
+    font-weight: 700;
     line-height: 1;
   }
 
