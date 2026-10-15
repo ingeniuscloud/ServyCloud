@@ -5,18 +5,20 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS de la fila de filtros: menú chips, lupa, botón
                  COMPARTIR (píldora icono + texto "Compartir", glifo
                  del post, naranja oficial al activarse) y fila de
-                 búsqueda expandible in-place con "Limpiar
-                 búsqueda". Modo compartida (recepción de un
-                 enlace): chips/lupa/compartir/menú global fuera,
-                 campo fijado sin foco y — en modo detalle — la
-                 fila compartida reemplaza a volver/título; city-bar
+                 búsqueda expandible in-place con "Limpiar filtro".
+                 Modo compartida (recepción de un enlace):
+                 chips/lupa/compartir/menú global fuera, campo
+                 fijado sin foco y — en modo detalle — la fila
+                 compartida reemplaza a volver/título; city-bar
                  bloqueada vía body.modo-compartido. Línea de aviso
                  cuando la búsqueda no da resultados.
-VERSIÓN:         1.3
-CAMBIOS:         R41: el botón compartir pasa de círculo a
-                 PÍLDORA icono + texto "Compartir" — misma fórmula
-                 de altura/tipografía que "Limpiar búsqueda"; glifo
-                 a 16px y texto 13px/600.
+VERSIÓN:         1.4
+CAMBIOS:         R42: la etiqueta del modo compartido pasa a
+                 "Limpiar filtro" (vive en Index.html, que la
+                 cambia esta ronda); encabezado y comentarios al
+                 día — cero cambios de CSS: la píldora
+                 "Compartir" y la fórmula tipográfica quedan
+                 igual.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
 ════════════════════════════════════════════════════════════════════*/
@@ -192,7 +194,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      del post (Iconos.html, data-glifo="share" en un SPAN
      interno — pintarGlifos escribe el innerHTML del portador)
      y MISMO trazo (stroke 1.05 como Social_CSS). Tipografía
-     igual que "Limpiar búsqueda" (13px/600): las dos píldoras
+     igual que "Limpiar filtro" (13px/600): las dos píldoras
      de la fila visten igual. Naranja oficial al activarse —
      siendo un botón temporal, no pasa desapercibido — y gris
      mientras está inactivo. Oculto por defecto ([hidden]
@@ -246,7 +248,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* Texto "Compartir": misma tipografía del botón
-     "Limpiar búsqueda" (13px/600) para que las dos
+     "Limpiar filtro" (13px/600) para que las dos
      píldoras de la fila vistan igual. */
   .btn-compartir-texto {
     font-size: 13px;
@@ -395,7 +397,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      El header es el MISMO para post y lista: chips y lupa fuera,
      fila de búsqueda visible con el campo FIJADO sin foco
      (pointer-events none), X de cerrar y MENÚ GLOBAL ocultos — a
-     la derecha solo queda "Limpiar búsqueda" —. En modo detalle
+     la derecha solo queda "Limpiar filtro" —. En modo detalle
      (post compartido) esta fila reemplaza al par volver/título.
      La ciudad (city-bar) queda visible pero BLOQUEADA vía
      body.modo-compartido.
@@ -444,7 +446,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   body.modo-compartido .city-bar:active { background: transparent; }
 
   /* ============================================================
-     BOTÓN LIMPIAR BÚSQUEDA · misma fila, lado derecho
+     BOTÓN LIMPIAR FILTRO · misma fila, lado derecho
      Solo existe en modo compartida: devuelve la app a su estado
      normal (ciudades, chips y todas las listas).
      ============================================================ */

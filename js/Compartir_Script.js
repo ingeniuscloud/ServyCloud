@@ -5,10 +5,10 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
                  su mensaje de WhatsApp lleva el enlace profundo;
-                 (2) LISTA FILTRADA — el botón circular
-                 #btnCompartir de la fila de filtros (INACTIVO al
-                 abrir la búsqueda, activo SOLO cuando el filtro
-                 trae resultados) comparte el término + la ciudad
+                 (2) LISTA FILTRADA — la píldora #btnCompartir de
+                 la fila de filtros (INACTIVA al abrir la
+                 búsqueda, activa SOLO cuando el filtro trae
+                 resultados) comparte el término + la ciudad
                  activa.
                  El enlace viaja en UN parámetro corto ?s= con el
                  payload compacto y OFUSCADO (XOR con clave
@@ -20,7 +20,7 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  está inyectado; se aplica ciudad + contenido y la
                  app entra en MODO COMPARTIDO: ciudad VISTA pero
                  BLOQUEADA, campo de búsqueda fijado SIN foco y solo
-                 "Limpiar búsqueda" a la derecha (sin menú global);
+                 "Limpiar filtro" a la derecha (sin menú global);
                  en un post compartido esa fila sustituye al par
                  volver/título del modo detalle. Al limpiar vuelve
                  todo el catálogo (la ciudad del enlace queda como
@@ -29,17 +29,13 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         1.2
-CAMBIOS:         R40: el enlace se emite CORTO — un parámetro
-                 ?s= con payload compacto ofuscado (XOR con la
-                 clave embebida + base64url), la mitad de
-                 caracteres para que no asuste; el ?d=
-                 AES-256-GCM queda SOLO como receptor legacy (los
-                 enlaces ya compartidos siguen abriendo). La
-                 línea de confianza del curso pasa a
-                 "Inscripciones abiertas, reserva tu cupo desde
-                 ya en la app Servy" (servicio: "Te lo
-                 recomiendo" sin cambio).
+VERSIÓN:         1.3
+CAMBIOS:         R42: encabezado y comentarios al día — la fila
+                 del modo compartido dice "Limpiar filtro" (la
+                 etiqueta vive en Index.html) y el emisor de
+                 lista es la píldora "Compartir". Cero cambios
+                 de código: enlace corto ?s=, receptor legacy
+                 ?d= y línea de confianza quedan igual.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Buscar_Script.html (buscar:estado,
                  #buscarInput), Lista_Script.html
@@ -580,7 +576,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
-       Limpiar · botón "Limpiar búsqueda" + auto-limpieza
+       Limpiar · botón "Limpiar filtro" + auto-limpieza
        Devuelve la app a su estado normal: ciudades, chips y
        todas las listas. La ciudad aplicada por el enlace queda
        como la del receptor (ya es "su" ciudad).
