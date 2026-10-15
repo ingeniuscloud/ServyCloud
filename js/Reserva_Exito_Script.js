@@ -7,17 +7,17 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
                  Index.html (TABLAS), Reserva_CSS.html (clases
                  reserva-root/sheet base), Reserva_Exito_CSS.html
-                 (clases reserva-exito/exito-* · R10),
+                 (clases reserva-exito/exito-*),
                  Reserva_Script.html (state + callbacks)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.ReservaExito = (function () {
 

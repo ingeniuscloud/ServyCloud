@@ -10,12 +10,12 @@ RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
                  'chips:change' con { idChip } para que Lista
                  reaccione. La ciudad vive fuera de los chips, en
                  Ciudad_Sheet_Script.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Chips = (function () {
 

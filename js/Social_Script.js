@@ -5,24 +5,19 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  compartir solo incrementa cuando el share nativo
                  resuelve (no en cancelación). Fallback WhatsApp
-                 también cuenta. El botón Partner abre el bottom
-                 sheet dedicado.
+                 también cuenta. El mensaje de WhatsApp lleva el
+                 formato del dueño: saludo con tipo y ciudad,
+                 partner con ✨, título en negrita, tagline y enlace
+                 profundo en línea propia. El botón Partner abre el
+                 bottom sheet dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.2
-CAMBIOS:         R36: compartir por enlace · el texto a compartir
-                 del post lleva el ENLACE PROFUNDO cifrado que
-                 genera Compartir.urlDePost(post) (abre la app
-                 directo en ese post, misma ciudad y chip) en vez
-                 de la URL principal; si Compartir no está o el
-                 cifrado no está disponible, cae a la URL principal
-                 de siempre. El texto vive íntegro aquí (Compartir
-                 solo devuelve el enlace). El conteo de compartidos
-                 y el fallback WhatsApp NO cambian.
-                 R12: Capa 1 GA4. like se mide SOLO aquí (frontend)
-                 cuando el usuario da un like NUEVO (quitar like no
-                 dispara; sin doble conteo con el backend).
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.3
+CAMBIOS:         R37: mensaje de WhatsApp del post con el formato
+                 del dueño: saludo "🖐️ ¡Mira este *TIPO* en Ciudad!
+                 🔎" (tipo CURSO o SERVICIO según el chip), partner
+                 con ✨, título en negrita sin emoji, tagline y
+                 enlace en línea propia. Encabezado simplificado:
+                 solo lo vigente.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Comenta_Script.html
@@ -61,6 +56,31 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         if (partners[i].id === idPartner) return partners[i];
       }
       return null;
+    }
+
+    /* Tipo del post en SINGULAR y MAYÚSCULAS para la negrita de
+       WhatsApp (los chips viven en plural: "Cursos" → "CURSO"). */
+    function tipoSingularDePost(post) {
+      var id = String(((post && post.idChips) || [])[0] || '').trim();
+      if (!id) return '';
+      var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
+      for (var i = 0; i < chips.length; i++) {
+        if (chips[i].idChip === id) {
+          return String(chips[i].titulo || '').trim().toUpperCase().replace(/S$/, '');
+        }
+      }
+      return '';
+    }
+
+    /* Ciudad del post (la primera declarada) en texto natural. */
+    function ciudadDePost(post) {
+      var id = String(((post && post.idCiudad) || [])[0] || '').trim();
+      if (!id) return '';
+      var ciudades = (window.SISTEMA && window.SISTEMA.ciudades) || [];
+      for (var i = 0; i < ciudades.length; i++) {
+        if (ciudades[i].idCiudad === id) return String(ciudades[i].titulo || '').trim();
+      }
+      return '';
     }
 
     function urlApp() {
@@ -317,23 +337,32 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var partner = buscarPartner(post.idPartner);
       var nombre  = partner ? String(partner.nombre || '').trim() : '';
 
-      /* R36: enlace profundo del post (cifrado, abre directo en
-         el post). Si Compartir no lo puede armar, la URL
-         principal de siempre. */
+      /* R37 · formato WhatsApp del dueño: saludo con tipo y
+         ciudad, partner con ✨, título SIN emoji y en negrita,
+         tagline, y el enlace en línea propia. */
       var url = String(urlEnlace || '').trim() || urlApp();
 
+      var tipo   = tipoSingularDePost(post);
+      var ciudad = ciudadDePost(post);
+
+      var saludo;
+      if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';
+      else if (tipo)      saludo = '🖐️ ¡Mira este *' + tipo + '*! 🔎';
+      else if (ciudad)    saludo = '🖐️ ¡Mira esto en ' + ciudad + '! 🔎';
+      else                saludo = '🖐️ ¡Mira esto! 🔎';
+
       var texto =
-        '¡Mira esto! 📌\n\n' +
-        (nombre ? nombre + '\n' : '') +
-        '🎓 *' + titulo + '*\n' +
+        saludo + '\n\n' +
+        (nombre ? '✨ ' + nombre + '\n' : '') +
+        '*' + titulo + '*\n' +
         (tagline ? tagline + '\n\n' : '\n') +
-        '📲 Abre la app para ver toda la información' +
-        (url ? '\n🔗 ' + url : '');
+        '🔗 Abre la app para ver toda la información' +
+        (url ? '\n' + url : '');
 
       return { titulo: titulo, texto: texto };
     }
 
-    /* R36: texto a compartir con enlace profundo · Promise.
+    /* Texto a compartir con enlace profundo · Promise.
        Compartir.urlDePost resuelve el enlace cifrado (o la URL
        principal si no pudo). */
     function textoCompartirDe(post) {

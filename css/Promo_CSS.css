@@ -6,56 +6,16 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE: deja ver el fondo del
                  lienzo y cada promo es una TARJETA BLANCA con radio,
                  borde y sombra propios (se sostiene sin banda).
-                 El riel NO usa scroll-snap: el avance continuo lo
-                 lleva Promo_Script (rAF sobre scrollLeft) y el snap
-                 lo haría imposible. Sin dots: el asomo de la
-                 tarjeta siguiente es la señal de que hay más.
+                 El avance continuo lo lleva
+                 Promo_Script (rAF sobre scrollLeft) y el asomo de
+                 la tarjeta siguiente es la señal de que hay más.
                  Campana naranja, tagline naranja, marca gris.
                  Vive fuera del scroll en modo lista. Se oculta
                  en modo detalle.
-VERSIÓN:         1.7
-CAMBIOS:         R35: el slot deja de ser banda: #promoSlot pasa a
-                 FONDO TRANSPARENTE (fuera #fff7ed) para que se vea
-                 el fondo del lienzo detrás de las promos. Las
-                 tarjetas blancas ya llevan borde, radio y sombra
-                 propias, así que se sostienen solas sin piso
-                 naranja debajo. El padding 12px 0 se queda: las
-                 promos siguen respirando igual respecto al header
-                 y a la lista.
-                 R34: en el teléfono la tarjeta pasa del 82% al 72%. Al
-                 82% el asomo son unos 70px, que es exactamente los
-                 16px de padding más el aro de la campana: un trazo
-                 fino naranja sobre blanco pegado al borde, que se ve
-                 pero no se LEE como "hay otra promo". Al 72% el asomo
-                 ronda los 110px y ya alcanza a mostrar el arranque del
-                 título de la siguiente, que es lo que sí comunica.
-                 Va con body.is-mobile y no con una media query porque
-                 el marco de escritorio mide 116.58mm (≈414px), casi
-                 igual que un teléfono: por ancho de viewport no se
-                 pueden distinguir. is-mobile ya hace esa distinción en
-                 Index.html.
-                 R33: fuera -webkit-overflow-scrolling del riel. Esa
-                 propiedad manda el scroll a un hilo aparte en iOS y
-                 agrava el desfase de lecturas de scrollLeft que dejaba
-                 la marquesina clavada (Promo_Script R33). Desde iOS 13
-                 la inercia ya es el comportamiento por defecto.
-                 R32: marquesina continua. (a) #promoSlot pasa a ser la
-                 banda naranja con padding y cada tarjeta pasa a fondo
-                 blanco, borde #f1f5f9, radio 14px y sombra suave: se
-                 separan entre sí y de la banda. (b) fuera
-                 scroll-snap-type/align/stop: el snap re-imanta el
-                 scroll a un punto fijo y bloquea el avance continuo.
-                 (c) item al 82% con margin-right para que la siguiente
-                 ASOME y reemplace a los dots. (d) fuera .promo-dots y
-                 .promo-dot. (e) la tarjeta ya no hereda el
-                 border-bottom de .lista-item: lleva borde propio en los
-                 cuatro lados.
-                 R9: versión de producción del dueño. El promo pasa de
-                 item único a carrusel: track con scroll-snap, dots
-                 indicadores, campana animada con punto de alerta,
-                 responsive ≤360px y respeto a prefers-reduced-motion.
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.8
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
                  .fila-titulo, .titulo, .badge, .tagline, .marca),
                  Promo_Script.html (duplica los items para el bucle
@@ -83,13 +43,11 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
 
   /* ============================================================
      TRACK · riel de la marquesina
-     SIN scroll-snap a propósito: el snap re-imanta el scrollLeft a
-     un punto fijo y haría imposible el avance continuo. La señal
-     de "hay más" la da el asomo de la tarjeta siguiente.
-     SIN -webkit-overflow-scrolling: esa propiedad manda el scroll
-     a un hilo aparte en iOS y las lecturas de scrollLeft quedan
-     desfasadas. Desde iOS 13 la inercia ya es el comportamiento
-     por defecto, así que quitarla no cuesta nada.
+     El scroll vive en el hilo principal: las lecturas de
+     scrollLeft siempre están frescas y el avance de Promo_Script
+     (rAF) y el arrastre del dedo comparten el MISMO contenedor
+     sin pelearse. La señal de "hay más" la da el asomo de la
+     tarjeta siguiente.
      ============================================================ */
   .promo-track {
     display: flex;
@@ -228,13 +186,6 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
     background: #f97316;
     box-shadow: 0 0 0 2px #ffffff;
   }
-
-  /* ============================================================
-     DOTS · retirados en R32
-     Con avance continuo no existe una "diapositiva actual": los
-     dots parpadearían sin parar. El asomo de la tarjeta siguiente
-     ya comunica que hay más, que es el patrón de Yummy.
-     ============================================================ */
 
   /* ============================================================
      RESPONSIVE · ≤360px

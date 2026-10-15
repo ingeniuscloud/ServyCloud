@@ -4,17 +4,14 @@ ESPEJO GITHUB:   css/Seccion_Imagen_CSS.css (subir a GitHub Pages; editar en GAS
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del LIGHTBOX: visor fullscreen de capturas
                  sobre <dialog> nativo, controles de cierre y estado
-                 body.lightbox-abierto. Nació de la división PARTE G
-                 de Seccion_CSS.html (R10): lo consume
+                 body.lightbox-abierto. Lo consume
                  Seccion_Imagen_Script.html.
-VERSIÓN:         1.0
-CAMBIOS:         R10: creado por división PARTE G (aprobación h).
-                 Contenido trasladado byte a byte desde
-                 Seccion_CSS.html (bloque LIGHTBOX). Sin cambios de
-                 CSS.
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Seccion_CSS.html (sistema de texto/base)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      LIGHTBOX · visor fullscreen sobre <dialog> nativo

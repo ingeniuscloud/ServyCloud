@@ -12,15 +12,15 @@ RESPONSABILIDAD: Bottom sheet dedicado al partner del post activo.
                  Dirección opcional: si el partner no tiene
                  dirección, el bloque completo se omite sin
                  reservar espacio.
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .area-contenido),
                  Chips_Script.html (window.Chips), Iconos.html
                  (pintarGlifos), Global_Script.html (abrirWhatsapp),
                  Partner_Sheet_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.PartnerSheet = (function () {
 

@@ -29,62 +29,16 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-VERSIÓN:         1.5
-CAMBIOS:         R33: arreglo del riel clavado en iPhone. (a) El
-                 avance ya no parte de track.scrollLeft sino de
-                 posMarquesina, una variable en memoria: en iOS el
-                 scroll es asíncrono y "leer + sumar + escribir"
-                 releía siempre el valor viejo, así que el riel se
-                 quedaba quieto (en PC, con scrollLeft síncrono, se
-                 veía perfecto). (b) Nueva sincronizarPosicion():
-                 adopta el scrollLeft real al construir y al soltar
-                 el dedo, y normaliza a [0, anchoVuelta). (c) Fuera
-                 -webkit-overflow-scrolling del CSS: manda el scroll
-                 a un hilo aparte en iOS y agrava el desfase; desde
-                 iOS 13 la inercia ya es por defecto.
-                 R32: el carrusel pasa a marquesina continua. (a) Se
-                 retira setInterval + scrollTo smooth (7 s quieto y
-                 un salto de 400 ms: eso era el "se paraliza") y
-                 entra un bucle rAF que suma a scrollLeft. (b) Items
-                 duplicados + envolvimiento en anchoVuelta para que
-                 el bucle no tenga costura; los clones van con
-                 aria-hidden y tabindex -1. (c) Fuera los dots: con
-                 avance continuo no hay "diapositiva actual".
-                 (d) Fuera el listener de visibilitychange: rAF ya no
-                 corre en tab oculto y dt va acotado a 100 ms.
-                 (e) Con UNA sola promo no hay bucle ni asomo: ocupa
-                 el 100% y no se duplica. (f) promo_swipe ya no manda
-                 post_id: sin diapositiva actual, apuntar a un post
-                 sería mentir. Sigue mandando city_id.
-                 R12: Capa 1 GA4. promo_click en el toque de una
-                 promo (antes de irAPost) y promo_swipe cuando el
-                 usuario arrastra el track (solo con el dedo
-                 puesto: el avance automático no cuenta, ni
-                 tampoco el cambio de dot programático), con
-                 debounce de 800ms. Sin envoltorio: no-op.
-                 R10: blindaje B6. El contenido de la hoja que pinta
-                 cada item de promo (titulo, badge, texto, marca,
-                 color del badge e inicial) se interpola escapado
-                 con escapeHtml(). Hoy es texto plano (cotejado
-                 R10): render idéntico.
-                 R9: versión de producción del dueño. La promo deja de
-                 depender del backend: el índice ya no trae
-                 promoTexto/promoPrioridad ni hay rotación
-                 calculada en el servidor. Ahora lee el PROMOJSON
-                 crudo (SISTEMA.promo), filtra vigencia por fechas
-                 (inicia/termina) y estado activo del post EN EL
-                 CLIENTE, y monta un carrusel (track + snap + dots,
-                 auto-avance con pausa por interacción y
-                 visibilidad).
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.6
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                  Ciudad_Sheet_Script.html (getActual),
                  Chips_Script.html (getChipActivo, seleccionar),
                  Iconos.html (pintarGlifos), Promo_CSS.html,
                  Lista_CSS.html (clases .lista-item compartidas)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Promo = (function () {
 

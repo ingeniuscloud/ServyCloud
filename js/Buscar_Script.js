@@ -8,15 +8,10 @@ RESPONSABILIDAD: Buscador in-place en la fila de chips. Al tocar
                  inmediato). Al escribir, emite 'buscar:change'
                  con el término y el flag de límite alcanzado.
                  Límite: 40 chars.
-VERSIÓN:         1.1
-CAMBIOS:         R36: compartir por enlace · al abrir y al cerrar la
-                 búsqueda se emite 'buscar:estado' ({abierta: true |
-                 false}): el módulo Compartir usa esa señal para
-                 mostrar el botón compartir INACTIVO en cuanto se
-                 abre el campo y volver a ocultarlo al cerrar. Cero
-                 cambios en el flujo de búsqueda existente.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
                  Chips_Script.html (window.Chips), Lista_Script.html
                  (window.Lista.getPostActivo)

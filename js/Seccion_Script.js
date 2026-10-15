@@ -25,47 +25,10 @@ RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  Ubicación: solo si el post la declara Y el partner
                  tiene direccion. Si falta cualquiera de las dos,
                  no se crea la sección (no queda ni el título).
-VERSIÓN:         1.4
-CAMBIOS:         R36: compartir por enlace · irAPost() pasa a API
-                 pública (window.Secciones.irAPost): el módulo
-                 Compartir reutiliza EXACTAMENTE el mismo camino
-                 R19 del cross-sell para abrir el post de un enlace
-                 (cambio de ciudad con aplicarGuardada + cambio de
-                 chip + apertura diferida 80 ms). Lógica intacta:
-                 solo se publica en el return.
-                 R31: nueva sección 5 · seccionUbicacion. Muestra el
-                 título del post más la dirección del partner con
-                 enlace a Google Maps, reutilizando el MISMO bloque
-                 del sheet del partner (.partner-dato-maps / -icon /
-                 -texto / -valor / .partner-maps-cta) más el título
-                 con .t-seccion: cero CSS nuevo. Doble guarda: sin
-                 seccionUbicacion.titulo, o sin direccion en el
-                 partner, devuelve '' y pintarVistas() no crea la
-                 sección. Sin red ni caché nuevas: direccion ya
-                 viaja en TABLAS.partners (Cache.gs · _partnerPublico
-                 solo depura telegramtoken/telegramid). El orden lo
-                 manda el array de pintarVistas(), no el JSON.
-                 R19: navegación cross-post ahora cambia TAMBIÉN la
-                 ciudad. irAPost() compara post.idCiudad con la
-                 ciudad activa (Ciudad.getActual) y, si el post no
-                 pertenece a ella, aplica la primera ciudad válida
-                 del post con Ciudad.aplicarGuardada (API existente
-                 R10, emite ciudad:change → píldora "Estás viendo…"
-                 y lista se refrescan solas). Después hace el mismo
-                 cambio de chip de siempre. Sin cambios de flujo ni
-                 de red.
-                 R10: blindaje B6 (defensa en profundidad). Todo el
-                 contenido que viene de la hoja (títulos, taglines,
-                 descripciones, temario, beneficios, planes,
-                 cross-sell, marca del partner, tasas, atributos y
-                 colores) se interpola escapado con escapeHtml().
-                 Cotejado con la BD (R10): hoy es texto plano, así
-                 que el renderizado queda IDÉNTICO; el escapado
-                 bloquea el día en que algo del Sheet lleve < > " '
-                 sin querer. Los íconos de beneficios siguen siendo
-                 claves del catálogo IMAGENES (Iconos.html).
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.5
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Chips_Script.html (window.Chips),
@@ -73,7 +36,7 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Seccion_CSS.html (.t-seccion / .t-body),
                  Partner_Sheet_CSS.html (bloque .partner-dato-maps /
                  -icon / -texto / -valor y .partner-maps-cta que
-                 reutiliza la sección Ubicación · R31)
+                 reutiliza la sección Ubicación)
 ════════════════════════════════════════════════════════════════════*/
 
   window.Secciones = (function () {

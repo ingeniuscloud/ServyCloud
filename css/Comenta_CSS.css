@@ -4,14 +4,13 @@ ESPEJO GITHUB:   css/Comenta_CSS.css (subir a GitHub Pages; editar en GAS y paga
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del bottom sheet de comentarios. Incluye
                  skeleton loader con shimmer para carga inicial.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_CSS.html (base .sheet, .sheet-backdrop,
                  .sheet-content, .sheet-handle-*)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      ROOT

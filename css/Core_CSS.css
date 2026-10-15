@@ -6,14 +6,13 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  dinámico) + CTA alineado a la izquierda para
                  respetar la columna de contenido. Incluye estado
                  deshabilitado en naranja tenue para cursos "pronto".
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   *{ box-sizing: border-box; }
 

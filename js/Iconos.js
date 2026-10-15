@@ -8,26 +8,15 @@ RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  [data-glifo="clave"]. Al cargar el DOM, pinta todos
                  los data-glifo del documento automáticamente.
 
-                 Catálogo depurado (R10 · auditoría A del informe
-                 R8): 21 glifos EN USO confirmado (0 referencias =
-                 fuera). Verificado contra código y BD antes de
-                 borrar: check, arribaSuave, flechaVolver, mail,
-                 whatsappVerde, graduacion, formador, checkCirculo,
-                 ruta, medalla, pagoMovil, binance, imagen, copiar.
-                 flechaAcordeon permanece (chevron del botón de
-                 ciudad: Index.html y Ciudad_Sheet_Script).
-VERSIÓN:         1.1
-CAMBIOS:         R10: limpieza de código muerto (aprobación d).
-                 Borrados los 14 glifos sin uso (lista arriba);
-                KB menos en cada carga de página. flechaAcordeon
-                 pasa de "sin uso" a "en uso confirmado".
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+                 Catálogo: 21 glifos EN USO confirmado.
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
                  Global_Script.html, Social_Script.html,
                  Reserva_Script.html y Comenta_* vía DOM)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   const IMAGENES = {
 

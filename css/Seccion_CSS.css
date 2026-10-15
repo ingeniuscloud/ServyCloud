@@ -8,31 +8,13 @@ RESPONSABILIDAD: Estilos de las 5 secciones del panorama:
                  tagline, descripción, cupos), temario, beneficios,
                  cierre (planes, turnos, tasas BCV) y cross-sell
                  (miniaturas + In Company + bloque asesor).
-                 El LIGHTBOX vive en Seccion_Imagen_CSS.html
-                 (división PARTE G · R10).
-VERSIÓN:         1.2
-CAMBIOS:         R17: ELIMINADO el encabezado huérfano que quedó
-                 DENTRO del bloque de estilos (resto de la
-                 normalización R6 / división R10). Ese texto basura se
-                 pegaba al selector
-                 de la PRIMERA regla (.secciones-wrap) y el navegador
-                 descartaba la regla ENTERA: el contenedor dejaba de
-                 hacer scroll (overflow-y: visible) y quien scrolleaba
-                 era .lienzo → el degradado del área se estiraba a la
-                 altura de todo el contenido y la franja blanca + la
-                 transición ocupaban media pantalla (el "corte a la
-                 mitad" que veía el dueño). Con el encabezado fuera,
-                 .secciones-wrap recobra overflow-y: auto y el
-                 degradado cubre el lienzo visible de punta a punta.
-                 R10: división PARTE G (aprobación h). El bloque
-                 LIGHTBOX se traslada a Seccion_Imagen_CSS.html (lo
-                 usa Seccion_Imagen_Script). Nada de CSS se modifica:
-                 solo se reubica.
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+                 El LIGHTBOX vive en Seccion_Imagen_CSS.html.
+VERSIÓN:         1.3
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      CONTENEDOR DE SECCIONES · scroll vertical libre
@@ -716,4 +698,3 @@ DEPENDENCIAS:    Ninguna
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-

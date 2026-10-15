@@ -6,14 +6,13 @@ RESPONSABILIDAD: Infraestructura del bottom sheet. Apertura,
                  cierre, drag con inercia, backdrop, scroll.
                  NO conoce el flujo de reserva: recibe HTML y
                  callbacks. Reutilizable para cualquier sheet.
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (.area-contenido), Global_CSS.html y
                  Reserva_CSS.html (clases .sheet-*, .reserva-root)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Sheet = (function () {
 

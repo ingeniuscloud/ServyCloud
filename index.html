@@ -12,19 +12,11 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  el header y la lista.
                  Incluye botón de ciudad (.city-bar) encima de la
                  fila de chips. Módulo Ciudad se encarga de todo.
-VERSIÓN:         1.2
-CAMBIOS:         R36: compartir por enlace — espejo del Index.html
-                 1.2 de GAS: botón circular #btnCompartir (entre la
-                 lupa y el menú, oculto por defecto, INACTIVO al
-                 abrir la búsqueda y activo solo con resultados),
-                 botón "Limpiar búsqueda" (#btnLimpiarBusqueda) en
-                 la fila de búsqueda (solo modo compartido) y script
-                 js/Compartir_Script.js antes de Core_Script.js.
-                 R10: división PARTE G — se añaden los includes de los
-                 3 archivos nuevos: Seccion_Imagen_CSS.html,
-                 Reserva_Exito_CSS.html y Global_Menu_Script.html.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.3
+CAMBIOS:         R37: el botón compartir viste el MISMO glifo del
+                 post (Iconos.js, data-glifo "share") — cero SVG
+                 harcodeado. Encabezado simplificado: solo lo
+                 vigente.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -512,17 +504,15 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
-          <!-- R36 · Compartir búsqueda · círculo igual que el menú
-               global. Oculto por defecto; Buscar y Lista lo activan
-               con buscar:estado / buscar:resultados. -->
+          <!-- Compartir búsqueda · MISMO glifo que el botón
+               compartir del post (Iconos.html, data-glifo="share"):
+               todo lo que comparte viste igual. Círculo y fórmula
+               del menú global; naranja oficial al activarse
+               (Chips_CSS). Oculto por defecto; Buscar y Lista lo
+               activan con buscar:estado / buscar:resultados. -->
           <button type="button" class="btn-compartir" id="btnCompartir"
-                  aria-label="Compartir búsqueda" hidden disabled>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-              <polyline points="16 6 12 2 8 6"/>
-              <line x1="12" y1="2" x2="12" y2="15"/>
-            </svg>
-          </button>
+                  aria-label="Compartir búsqueda" data-glifo="share"
+                  hidden disabled></button>
 
           <button type="button" class="menu-global" aria-label="Menú">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -554,7 +544,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
               </svg>
             </button>
 
-            <!-- R36 · Solo visible en modo compartido (enlace
+            <!-- Solo visible en modo compartido (enlace
                  entrante): libera la vista y devuelve el acceso
                  normal a ciudades, chips y listas. -->
             <button type="button" class="btn-limpiar" id="btnLimpiarBusqueda">

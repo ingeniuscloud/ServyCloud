@@ -2,47 +2,48 @@
 ARCHIVO:         Compartir_Script.html
 ESPEJO GITHUB:   js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Compartir por enlace (R36). Dos emisores:
+RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
-                 su texto a compartir lleva el enlace profundo;
+                 su mensaje de WhatsApp lleva el enlace profundo;
                  (2) LISTA FILTRADA — el botón circular
-                 #btnCompartir de la fila de filtros (aparece
-                 INACTIVO al abrir la búsqueda y se activa SOLO
-                 cuando el filtro trae resultados) comparte el
-                 término + la ciudad activa.
+                 #btnCompartir de la fila de filtros (INACTIVO al
+                 abrir la búsqueda, activo SOLO cuando el filtro
+                 trae resultados) comparte el término + la ciudad
+                 activa.
                  El enlace viaja en UN parámetro ?d= con el payload
                  CIFRADO (AES-256-GCM, IV aleatorio por enlace,
                  base64url): el ID del post o el término NUNCA van
                  planos en la URL. Receptor: Core llama
                  Compartir.recibir() cuando TABLAS cargó y el lienzo
                  está inyectado; se aplica ciudad + contenido y la
-                 app entra en MODO COMPARTIDO: campo de búsqueda
-                 fijado SIN foco, ciudades y chips bloqueados y
-                 botón "Limpiar búsqueda" en la misma fila para
-                 volver a todo el catálogo. Si el receptor cambia de
-                 ciudad o chip, el modo compartido se limpia solo.
-                 Aviso amable si el contenido compartido ya no
-                 existe. La instalación de la PWA NO cambia: se hace
-                 desde la app con el enlace principal (menú /
-                 píldora), nunca desde el enlace compartido.
-VERSIÓN:         1.0
-CAMBIOS:         R36: nace el módulo. Cifrado AES-256-GCM (Web
-                 Crypto, clave fija embebida — ofuscación del
-                 parámetro, no custodia de secretos; sin
-                 crypto.subtle degrada a la URL principal), payload
-                 {v,t,id,q,c} en ?d= con history.replaceState para
-                 limpiar la barra; receptor con modo compartido
-                 (.filtros-wrap.compartida + buscar:change) y
-                 limpieza automática en chips:change/ciudad:change;
-                 emisor de lista con share nativo + fallback
-                 wa.me. El flujo de instalación queda intacto.
+                 app entra en MODO COMPARTIDO: ciudad VISTA pero
+                 BLOQUEADA, campo de búsqueda fijado SIN foco y solo
+                 "Limpiar búsqueda" a la derecha (sin menú global);
+                 en un post compartido esa fila sustituye al par
+                 volver/título del modo detalle. Al limpiar vuelve
+                 todo el catálogo (la ciudad del enlace queda como
+                 la del receptor). Aviso amable si el contenido
+                 compartido ya no existe. La instalación de la PWA
+                 NO cambia: se hace desde la app con el enlace
+                 principal (menú / píldora), nunca desde el enlace
+                 compartido.
+VERSIÓN:         1.1
+CAMBIOS:         R37: mensaje de WhatsApp de la lista con el formato
+                 del dueño: saludo con la ciudad en MAYÚSCULAS y
+                 negrita, "✨ Lista de *CHIP* de Grupo" y línea de
+                 confianza (curso: inscripciones abiertas ·
+                 servicio: te lo recomiendo), enlace en línea
+                 propia; el modo compartido activa
+                 body.modo-compartido y "Limpiar búsqueda" también
+                 cierra el detalle de un post compartido. Encabezado
+                 simplificado: solo lo vigente.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Buscar_Script.html (buscar:estado,
                  #buscarInput), Lista_Script.html
                  (buscar:resultados, TABLAS.posts),
                  Ciudad_Sheet_Script.html (getActual, getLista,
                  aplicarGuardada), Chips_Script.html (chips:change),
-                 Seccion_Script.html (irAPost público · R36),
+                 Seccion_Script.html (irAPost público),
                  Core_Script.html (llama pintar/recibir),
                  Social_Script.html (urlDePost), Chips_CSS.html
                  (.btn-compartir / .btn-limpiar / .compartida)
@@ -228,6 +229,15 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
           ? window.Ciudad.getActual() : null;
       } catch (_) {}
 
+      /* El mensaje describe la lista VISIBLE: el primer item en
+         pantalla da el chip y el grupo (curso/servicio). */
+      var primer = null;
+      var item = document.querySelector('#listaWrap .lista-item[data-post]');
+      if (item) primer = buscarPost(item.getAttribute('data-post'));
+
+      var tipo = singularDe(tituloChip(primer && (primer.idChips || [])[0]));
+      var grupo = tituloGrupo(primer && (primer.idGrupo || [])[0]);
+
       var payload = { v: 1, t: 'l', q: termino.slice(0, 40) };
       if (ciudad && ciudad.idCiudad) payload.c = String(ciudad.idCiudad);
 
@@ -236,11 +246,26 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       cifrar(payload)
         .then(function (token) {
           var url = armarEnlace(token);
+
+          var saludo = (ciudad && ciudad.titulo)
+            ? '🖐️ ¡Mira esto en *' + String(ciudad.titulo).trim().toUpperCase() + '*! 🔎'
+            : '🖐️ ¡Mira esto! 🔎';
+
+          var que = '✨ Lista';
+          if (tipo)  que += ' de *' + tipo + '*';
+          if (grupo) que += ' de ' + grupo;
+
+          /* Línea de confianza según el caso (decisión del dueño) */
+          var confianza = esServicio(tipo)
+            ? 'Te lo recomiendo'
+            : 'Inscripciones abiertas actualmente';
+
           var texto =
-            '¡Mira lo que encontré! 🔎\n\n' +
-            '🔎 *' + termino + '*\n\n' +
-            '📲 Abre el enlace para ver la lista en la app' +
-            '\n🔗 ' + url;
+            saludo + '\n\n' +
+            que + '\n' +
+            confianza + '\n\n' +
+            '🔗 Abre el enlace para ver la lista en la app' +
+            '\n' + url;
 
           if (navigator.share) {
             return navigator.share({ title: marcaApp(), text: texto })
@@ -276,6 +301,11 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       if (!btn || !btnLimpiar) return;
 
       window.__compartirBound = '1';
+
+      /* El botón viste el MISMO glifo que el compartir del post */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(btn);
+      }
 
       btn.addEventListener('click', compartirLista);
       btnLimpiar.addEventListener('click', function () {
@@ -361,6 +391,37 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return null;
     }
 
+    /* Nombres legibles para el mensaje de WhatsApp. Los chips se
+       escriben en plural ("Cursos", "Servicios"): al usuario se le
+       habla en singular ("CURSO", "SERVICIO") con mayúsculas para
+       la negrita de WhatsApp. */
+    function tituloChip(idChip) {
+      var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
+      var id = String(idChip || '').trim();
+      for (var i = 0; i < chips.length; i++) {
+        if (chips[i].idChip === id) return String(chips[i].titulo || '').trim();
+      }
+      return '';
+    }
+
+    function tituloGrupo(idGrupo) {
+      var grupos = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
+      var id = String(idGrupo || '').trim();
+      for (var i = 0; i < grupos.length; i++) {
+        if (grupos[i].idGrupo === id) return String(grupos[i].titulo || '').trim();
+      }
+      return '';
+    }
+
+    function singularDe(titulo) {
+      var t = String(titulo || '').trim().toUpperCase();
+      return t.replace(/S$/, '');
+    }
+
+    function esServicio(tipoSingular) {
+      return String(tipoSingular || '').indexOf('SERVIC') === 0;
+    }
+
     function avisoAmable(texto) {
       var el = document.getElementById('buscarVacio');
       if (!el) return;
@@ -380,6 +441,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         input.readOnly = true;
         if (typeof input.blur === 'function') input.blur();
       }
+
+      /* La ciudad se ve pero NO se toca (CSS en Chips_CSS) */
+      document.body.classList.add('modo-compartido');
     }
 
     function recibirPost(datos) {
@@ -502,6 +566,18 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
 
       modoCompartido = null;
+      document.body.classList.remove('modo-compartido');
+
+      /* Post compartido: la app está en modo detalle. Limpiar
+         devuelve a la normalidad COMPLETA: cerrar el detalle y
+         volver al listado. */
+      try {
+        if (window.Lista && typeof window.Lista.getModo === 'function' &&
+            window.Lista.getModo() === 'detalle' &&
+            typeof window.Lista.cerrarDetalle === 'function') {
+          window.Lista.cerrarDetalle(false);
+        }
+      } catch (_) {}
 
       /* Mismo carril que cerrar la búsqueda: la lista vuelve al
          chip activo (y el botón compartir se oculta por

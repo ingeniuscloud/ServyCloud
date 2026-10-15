@@ -8,28 +8,15 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  "Acerca de", "Términos y condiciones", "Privacidad"
                  y "Cookies" interpolando datos de ROOTJSON
                  (marcaApp, marcaEmpresa, correo, whatsapp), más la
-                 guía PWA y el drag de cierre. Nació de la división
-                 PARTE G de Global_Script.html (R10).
-VERSIÓN:         1.1
-CAMBIOS:         R33: el ítem "Instalar la app" del menú ahora
-                 instala de verdad: app ya instalada → aviso
-                 (texto de Constantes.gs pwa.mensajes.yaInstalada);
-                 Android con boleto disponible (beforeinstallprompt,
-                 compartido por GitHub_Cromo en window.__servyBoleto)
-                 → diálogo nativo de Chrome; dentro del envoltorio
-                 (iframe) → lo pide por el puente pwa-instalar /
-                 pwa-respuesta; sin boleto → abre esta guía con los
-                 pasos. iPhone sigue abriendo la guía (R30: Apple no
-                 permite instalar por código).
-                 R10: creado por división PARTE G (aprobación h).
-                 Contenido trasladado byte a byte desde
-                 Global_Script.html (módulo window.Global). Sin
-                 cambios de código.
+                 guía PWA y el drag de cierre.
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      MÓDULO GLOBAL · Menú (bottom sheet)

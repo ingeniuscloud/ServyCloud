@@ -5,18 +5,15 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
                  vista de confirmación (wrap, tarjeta, icono,
                  resumen, WhatsApp), skeleton mientras procesa la
-                 reserva y pantalla de error. Nació de la división
-                 PARTE G de Reserva_CSS.html (R10): los consume
+                 reserva y pantalla de error. Los consume
                  Reserva_Exito_Script.html.
-VERSIÓN:         1.0
-CAMBIOS:         R10: creado por división PARTE G (aprobación h).
-                 Contenido trasladado byte a byte desde
-                 Reserva_CSS.html (bloques VISTA DE ÉXITO, SKELETON
-                 y ERROR). Sin cambios de CSS.
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Reserva_CSS.html (raíz y sheet base), Global_CSS.html,
                  Telefono.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      VISTA DE ÉXITO · confirmación tras enviar

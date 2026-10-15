@@ -7,10 +7,10 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  frío que superan los 8s). Retry con backoff
                  exponencial SOLO en acciones idempotentes.
                  Píldora "Reconectando…" visible SOLO desde el
-                 reintento 2 (R21): los cortes que el primer
+                 reintento 2: los cortes que el primer
                  reintento resuelve en silencio dejan de parpadear.
                  Modo mudo { mudo: true } para revalidaciones en
-                 segundo plano (caché L2 · Core_Script 1.7): sin
+                 segundo plano (caché L2 de Core_Script): sin
                  píldora y sin pantalla de error, porque el
                  usuario ya tiene contenido en pantalla.
                  Guardia anti-loop de token: corta a los 3 intentos.
@@ -18,61 +18,13 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
                  y aplicarPlaceholders.
                  El módulo window.Global (menú + subvistas) vive en
-                 Global_Menu_Script.html (división PARTE G · R10).
-VERSIÓN:         1.5
-CAMBIOS:         R26 (la app vive en GitHub Pages · sesión por
-                 datos): (a) window.asegurarSesion(): si la página
-                 ya trae token (página de GAS) resuelve al
-                 instante; si no (página estática), pide la
-                 sesión con UNA llamada a abrirSesion y guarda
-                 TOKEN_SESION y SISTEMA. (b) TOKEN_INVALIDO ya no
-                 recarga la página: pide sesión nueva por datos y
-                 reintentA la misma acción (el guardia anti-loop
-                 de 3 intentos se queda igual); la app abierta
-                 más de 1h se repara sola SIN recargar ni perder
-                 el estado. (c) postBackend no cambia: mismos
-                 reintentos, mismo backoff, misma píldora R21.
-                 (d) Core_Script 1.8 espera asegurarSesion al
-                 arrancar; en la página de GAS es un no-op.
-                 R21 (GO del dueño a la propuesta 1+3 de R20):
-                 (a) La píldora "Reconectando…" ya no aparece al
-                 agendar el PRIMER reintento: solo desde el
-                 reintento 2 (dos fallos completos ≈ 24.5 s con
-                 TIMEOUT 12 s). La mayoría de las pausas de red las
-                 resuelve el primer reintento: el usuario evaluador
-                 deja de ver la píldora en el día a día. (b)
-                 postBackend acepta opciones { mudo: true }: la
-                 petición se comporta igual (reintentos, backoff)
-                 pero sin píldora y sin pantalla "Sin conexión",
-                 pensado para las revalidaciones en segundo plano
-                 de la caché L2, donde ya hay contenido pintado
-                 desde el disco. Las peticiones normales (arranque
-                 sin caché, apertura sin caché) NO cambian.
-                 R14: (a) TIMEOUT_MS 8000→12000: los arranques en
-                 frío de GAS superan los 8s con frecuencia y cada
-                 timeout falso terminaba en la pantalla "Sin
-                 conexión". (b) Píldora "Reconectando…" (fija,
-                 arriba, no bloquea toques): aparece cuando un
-                 reintento se agenda y se oculta sola al responder
-                 el servidor, para que una pausa de red no parezca
-                 una app rota. Cero impacto en el flujo: solo
-                 feedback visual.
-                 R12: postBackend añade idPuente (deviceid estable
-                 prestado por el envoltorio de github.io vía
-                 Puente.getDispositivo) al cuerpo de cada POST.
-                 El backend NO lo usa para lógica ni seguridad:
-                 solo GA4.gs lo toma como user_id para unificar
-                 la identidad en analítica. Sin envoltorio vale
-                 undefined y no viaja nada.
-                 R10: división PARTE G (aprobación h). El módulo
-                 window.Global (menú bottom sheet, acerca de, legal,
-                 PWA, drag) se traslada a Global_Menu_Script.html.
-                 Nada de código se modifica: solo se reubica.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+                 Global_Menu_Script.html.
+VERSIÓN:         1.6
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      HELPERS GLOBALES · Backend

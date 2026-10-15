@@ -8,14 +8,14 @@ RESPONSABILIDAD: Bottom sheet de comentarios. Skeleton en carga
                  Placeholder leído de seccionPresentacion.titulo.
                  Keys localStorage: post_comments_user,
                  post_comments_likes.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Comenta_CSS.html, Global_CSS.html (base .sheet),
                  Iconos.html (glifos vía DOM)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Comentarios = (function () {
 

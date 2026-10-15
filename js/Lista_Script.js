@@ -14,32 +14,10 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.4
-CAMBIOS:         R36: compartir por enlace · pintarBusqueda emite
-                 'buscar:resultados' con la CANTIDAD de posts que
-                 trajo el filtro: Compartir activa el botón
-                 compartir SOLO cuando la búsqueda filtró alguna
-                 lista (con resultados). Cero cambios en el filtro
-                 ni en el pintado.
-                 R19: blindaje del cierre diferido. El borrado del
-                 detalle se agenda a 200 ms (fade) pero NO re-chequeaba
-                 el modo al ejecutarse: si un cross-sell abría otro post
-                 a los ~80 ms (cambio de chip o de ciudad), el borrado
-                 tardío vaciaba el detalle NUEVO (post sin datos, solo
-                 marca). Ahora, al ejecutarse, si el modo volvió a
-                 'detalle' se aborta el borrado. Cierre normal: intacto.
-                 R10: blindaje B6. El contenido de la hoja que pinta
-                 la lista (titulo, tagline, badge, marca, colores e
-                 inicial) se interpola escapado con escapeHtml().
-                 Hoy es texto plano (cotejado R10): render idéntico.
-                 R9: versión de producción del dueño. La lista sigue
-                 dependiendo solo de TABLAS (el índice ya no trae
-                 promoTexto/promoPrioridad). Se consolida skeleton de
-                 detalle con precarga del primer post, badges/marca,
-                 búsqueda cruzada (título, tagline, grupos, partner y
-                 eslogan) y manejo del historial (popstate).
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.5
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
                  (getActual, hayPendiente), Chips_Script.html
                  (getChipActivo, seleccionar), Core_Script.html

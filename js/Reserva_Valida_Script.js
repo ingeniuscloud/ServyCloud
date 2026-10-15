@@ -5,14 +5,13 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Validadores y limpiadores puros del módulo
                  Reserva. Sin DOM, sin state, sin dependencias.
                  Espejo conceptual de Seguridad.gs en el frontend.
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (módulo puro; espejo conceptual de
                  Seguridad.gs)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.ReservaValida = (function () {
 

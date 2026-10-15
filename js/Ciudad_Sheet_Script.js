@@ -11,27 +11,13 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  Ordena las ciudades alfabéticamente por título.
                  Lista con radio button nativo.
                  Chevron SVG desde Iconos.html (flechaAcordeon).
-VERSIÓN:         1.2
-CAMBIOS:         R26: nueva API pública reinicializar(): en la
-                 página estática de GitHub Pages los módulos
-                 cargan ANTES de que llegue SISTEMA (viaja con
-                 abrirSesion, Global_Script 1.5), así que iniciar()
-                 de carga se va con la lista vacía; el shim de la
-                 página llama reinicializar() apenas SISTEMA está
-                 en pantalla y la ciudad guardada se restaura en
-                 el MISMO camino de siempre. En la página de GAS
-                 nadie lo llama: iniciar() ya hizo el trabajo.
-                 R10: nueva API pública aplicarGuardada(ciudad): aplica
-                 la ciudad recordada por el puente (Core_Script) con
-                 el mismo camino de aplicar() (guarda, pinta, emite
-                 ciudad:change) y apaga pendienteSeleccion. La
-                 validación contra SISTEMA.ciudades la hace Puente.
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.3
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Ciudad = (function () {
 

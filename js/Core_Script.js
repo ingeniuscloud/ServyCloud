@@ -4,7 +4,7 @@ ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                  WhatsApp o el sheet de reserva.
-                 CacheL2 (R21): persistencia del catálogo y de los
+                 CacheL2: persistencia del catálogo y de los
                  detalles en localStorage del dispositivo. La
                  reapertura de la app pinta AL INSTANTE desde disco
                  y la red valida por detrás (stale-while-revalidate:
@@ -20,101 +20,10 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.9
-CAMBIOS:         R36: compartir por enlace · (a) en arranque(), tras
-                 Puente.aplicarEstado, si la URL trae el parámetro
-                 del enlace compartido (window.Compartir.hayEntrante)
-                 la recepción MANDA: se salta la selección obligatoria
-                 de ciudad (el enlace trae su ciudad), se espera la
-                 carga de TABLAS, se inyecta el lienzo y se llama
-                 Compartir.recibir() — que aplica ciudad/término/post
-                 y activa el modo compartido con el campo bloqueado
-                 y "Limpiar búsqueda"; (b) arrancarComponentes llama
-                 Compartir.pintar() para ligar #btnCompartir y
-                 #btnLimpiarBusqueda. Fuera de un enlace entrante el
-                 arranque es IDÉNTICO al de v1.8.
-                 R26 (la app vive en GitHub Pages · sesión por
-                 datos): (a) arranque() espera window.asegurarSesion
-                 (Global_Script 1.5) ANTES de cargar TABLAS y de
-                 pedir el estado del puente: SISTEMA ya está en
-                 pantalla cuando Ciudad/Chips/Promo lo leen. En la
-                 página de GAS (token inyectado) es un no-op: el
-                 arranque es IDÉNTICO al de v1.7. Si la sesión no
-                 llega (red caída), pantalla "Sin conexión" con
-                 Reintentar. (b) avisarAlPadre() también emite el
-                 evento DOM 'app-lista': la página estática no
-                 tiene padre, y así el preloader del envoltorio se
-                 retira con la MISMA señal (el postMessage al padre
-                 se conserva intacto para la vía iframe).
-                 R21 (GO del dueño a la propuesta 1+3 de R20):
-                 Caché L2 en localStorage, 0 cuotas nuevas:
-                 (a) window.CacheL2: sobre del dispositivo con
-                 vencimiento duro de 7 días y tope LRU de 30
-                 posts. Todo en try/catch: si el storage del
-                 iframe no persiste (sandbox + ITP), degrada a
-                 la L1 en memoria y el comportamiento es
-                 idéntico al de v1.6.
-                 (b) PostFull.obtener: si el detalle está en L2,
-                 se resuelve YA (el usuario ni ve el skeleton)
-                 y se revalida en silencio por detrás
-                 ({ mudo: true }); las mismas peticiones que
-                 antes, pintadas al instante.
-                 (c) cargarTablas: si el catálogo está en L2,
-                 TABLAS se llena sincrónicamente (la lista pinta
-                 al toque, incluso con GAS en frío) y se
-                 revalida en silencio; si el catálogo fresco
-                 cambió y el usuario sigue en la lista, se
-                 repinta lista+promo SIN evento de chip (no
-                 contamina GA4 ni el puente). Si está leyendo
-                 un post, no se toca la pantalla.
-                 (d) refrescarCatalogo (visibility) pasa a mudo
-                 y guarda en L2: si falla el refresco con la app
-                 ya pintada, ya no salta la pantalla "Sin
-                 conexión" sobre contenido vivo.
-                 R16: RESTAURADO el degradado original del dueño en
-                 pintarAreaConPost (fuente de verdad: los 2 archivos
-                 originales que pegó en el chat). El gradiente blanco
-                 → colorClaro del post cubre TODO el lienzo hasta el
-                 final (100%) — la corrección R15 (fondo sólido) fue
-                 un error de interpretación y queda revertida.
-                 R15: (revertida por R16, ver arriba).
-                 R14: pedirEstado espera la respuesta del
-                 envoltorio hasta 1500ms (antes 600ms). En móviles
-                 lentos la respuesta del contenedor podía llegar
-                 tarde y la app se quedaba sin estado aunque el
-                 envoltorio lo tuviera guardado. Solo afecta al
-                 arranque con envoltorio; sin él resuelve igual.
-                 R13: puente a prueba de versiones mezcladas y
-                 autoreparación. (a) aplicarEstado: si la ciudad
-                 restaurada es válida pero el módulo Ciudad no
-                 expone aplicarGuardada (producción con archivo
-                 viejo), se escribe app_ciudad en el storage del
-                 iframe para que cualquier versión la restaure.
-                 (b) guardar(): si #filtros aún no está pintado,
-                 la vista se completa con app_vista del storage
-                 en vez de ir como null. Sin cambios de flujo:
-                 el camino normal se comporta exactamente igual.
-                 R12: Capa 1 GA4. window.Analitica centraliza el
-                 envío de eventos (solo 12 de la lista blanca; sin
-                 doble conteo: comment/share van SOLO backend) por
-                 el puente existente: Puente.hayPuente() +
-                 Puente.retransmitir() hacia el envoltorio (que
-                 reenvía a GA4). Los 5 eventos "gratis" se capturan
-                 con listeners que YA existían (ciudad:change,
-                 chips:change, post:change, post:solicitar →
-                 post_open/post_close, buscar:change) + app_ready
-                 al primer pintado. Puente además recoge el
-                 deviceid estable del contenedor (estado-aplicar)
-                 y postBackend lo manda como idPuente para unificar
-                 identidad con el backend. Sin envoltorio: nada.
-                 R10: puente de persistencia (F). window.Puente pide
-                 al envoltorio de github.io el estado guardado
-                 (estado-pedir/estado-aplicar) y lo aplica ANTES de
-                 decidir si se abre el sheet de ciudad; los cambios de
-                 ciudad/chip se reportan con estado-guardar. Sin
-                 envoltorio (exec directo) el puente no hace nada.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.10
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
@@ -122,7 +31,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  Promo_Script.html, Social_Script.html,
                  Global_Menu_Script.html (window.Global), Lista_Script.html,
                  Seccion_Script.html, Comenta_Script.html,
-                 Compartir_Script.html (R36 · recibir/pintar)
+                 Compartir_Script.html (recibir/pintar)
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================

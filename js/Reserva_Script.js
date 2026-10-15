@@ -4,12 +4,10 @@ ESPEJO GITHUB:   js/Reserva_Script.js (subir a GitHub Pages; editar en GAS y pag
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Orquestador. Abre directo al formulario de horario
                  + datos. Envía la reserva y maneja errores.
-VERSIÓN:         1.1
-CAMBIOS:         R12: Capa 1 GA4. reserva_start al abrir el sheet de
-                 reserva con post activo. Sin envoltorio: no-op.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -18,8 +16,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global.getLegalHTML), Lista_Script.html
                  (window.Lista), Index.html (SISTEMA.origenes),
                  Iconos.html (pintarGlifos), Reserva_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Reserva = (function () {
 

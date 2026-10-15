@@ -7,13 +7,13 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
                  texto y chevron SVG. Lista con radio button
                  nativo estilizado. Sheet al 90%. Modo bloqueado
                  para primera selección sin ciudad guardada.
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html y pintados por Ciudad_Sheet_Script.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      BOTÓN CIUDAD · fila propia, encima de .filtros-wrap

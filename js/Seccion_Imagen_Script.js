@@ -13,13 +13,13 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                    cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.0
-CAMBIOS:         R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.1
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
-                 Seccion_Imagen_CSS.html (clases lightbox-* · R10)
-════════════════════════════════════════════════════════════════════
-*/
+                 Seccion_Imagen_CSS.html (clases lightbox-*)
+════════════════════════════════════════════════════════════════════*/
 
   window.SeccionImagen = (function () {
 

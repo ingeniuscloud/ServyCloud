@@ -9,18 +9,14 @@ RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
                  de privacidad, botón submit y animaciones.
                  BLOQUE REVELABLE (zona-otp / post-validación).
                  La vista de éxito, su skeleton y su error viven en
-                 Reserva_Exito_CSS.html (división PARTE G · R10).
-VERSIÓN:         1.1
-CAMBIOS:         R10: división PARTE G (aprobación h). La VISTA DE
-                 ÉXITO, el SKELETON y el ERROR se trasladan a
-                 Reserva_Exito_CSS.html (los usa Reserva_Exito_Script).
-                 Nada de CSS se modifica: solo se reubica.
-                 R4: baseline de producción incorporado al espejo.
-                 R5: encabezado normalizado al estándar ═══ (6 campos).
+                 Reserva_Exito_CSS.html.
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
                  (.sheet-content, .sheet-back, .sheet-close)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      ROOT · capa superior al sheet de Global (400/600)
@@ -556,4 +552,3 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
     opacity: 1;
     transform: translateY(0);
   }
-

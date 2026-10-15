@@ -2,28 +2,24 @@
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS del menú chips + botón menú global + botón
-                 lupa + fila de búsqueda expandible in-place +
-                 línea de aviso cuando la búsqueda no da resultados.
-                 Header sin fondo ni sombra. V2.1: línea fina
-                 entre ciudad y chips.
-VERSIÓN:         1.1
-CAMBIOS:         R36: compartir por enlace · (a) botón circular
-                 .btn-compartir (mismo lenguaje visual del menú
-                 global y de la lupa): oculto por defecto, visible
-                 junto a la fila de búsqueda cuando está abierta
-                 (order 10 → queda AL LADO DERECHO del campo),
-                 INACTIVO con [disabled] (gris claro) y activo con
-                 los colores normales; (b) modo COMPARTIDO
-                 .filtros-wrap.compartida (recepción de un enlace):
-                 chips y lupa ocultos, fila de búsqueda visible con
-                 el campo SIN foco (pointer-events none), X de
-                 cerrar oculta y botón .btn-limpiar "Limpiar
-                 búsqueda" visible en su lugar (misma fila, lado
-                 derecho); el menú global SIGUE visible. Responsive
-                 360px: círculos a 32px.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+RESPONSABILIDAD: CSS de la fila de filtros: menú chips, lupa, botón
+                 COMPARTIR (círculo como el menú global, glifo del
+                 post, naranja oficial al activarse) y fila de
+                 búsqueda expandible in-place con "Limpiar
+                 búsqueda". Modo compartida (recepción de un
+                 enlace): chips/lupa/compartir/menú global fuera,
+                 campo fijado sin foco y — en modo detalle — la
+                 fila compartida reemplaza a volver/título; city-bar
+                 bloqueada vía body.modo-compartido. Línea de aviso
+                 cuando la búsqueda no da resultados.
+VERSIÓN:         1.2
+CAMBIOS:         R37: botón compartir NARANJA oficial #FA6A08 al
+                 activarse (gris mientras inactivo) con el glifo del
+                 post a stroke 1.05; modo compartida: menú global
+                 oculto, ciudad bloqueada (body.modo-compartido) y
+                 en detalle la fila compartida reemplaza a
+                 volver/título. Encabezado simplificado: solo lo
+                 vigente.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
 ════════════════════════════════════════════════════════════════════*/
@@ -192,11 +188,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     BOTÓN COMPARTIR BÚSQUEDA (R36)
-     Círculo igual que el menú global. Oculto por defecto
-     ([hidden] desde HTML); Buscar lo muestra INACTIVO al abrir
-     la búsqueda y Lista lo activa cuando el filtro trae
-     resultados. En modo compartida desaparece (no aplica).
+     BOTÓN COMPARTIR BÚSQUEDA
+     Círculo y fórmula del menú global. MISMO glifo que el botón
+     compartir del post (Iconos.html, data-glifo="share") y MISMO
+     trazo (stroke 1.05 como Social_CSS). Naranja oficial al
+     activarse — siendo un botón temporal, no pasa desapercibido —
+     y gris mientras está inactivo. Oculto por defecto ([hidden]
+     desde HTML); Buscar lo muestra INACTIVO al abrir la búsqueda
+     y Lista lo activa cuando el filtro trae resultados. En modo
+     compartida desaparece (no aplica).
      ============================================================ */
   .btn-compartir {
     flex: 0 0 auto;
@@ -207,11 +207,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     margin-left: 2px;
     margin-right: 8px;
 
-    border: 1.2px solid #475569;
+    border: 1.2px solid #FA6A08;
     border-radius: 50%;
     background: transparent;
 
-    color: #475569;
+    color: #FA6A08;
 
     display: flex;
     align-items: center;
@@ -230,12 +230,13 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      .buscar-vacio[hidden]. */
   .btn-compartir[hidden] { display: none; }
 
+  /* Glifo share (Iconos.html): mismo trazo que el botón del post */
   .btn-compartir svg {
-    width: 17px;
-    height: 17px;
+    width: 19px;
+    height: 19px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 2;
+    stroke-width: 1.05;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
@@ -372,15 +373,19 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     ESTADO · compartida (R36 · recepción de un enlace)
-     El receptor ve el campo de búsqueda FIJADO con el contenido
-     del enlace (post o término), SIN foco y SIN teclado: chips y
-     lupa ocultos hasta "Limpiar búsqueda". El menú global sigue
-     a la vista (instalación y menú intactos).
+     ESTADO · compartida (recepción de un enlace)
+     El header es el MISMO para post y lista: chips y lupa fuera,
+     fila de búsqueda visible con el campo FIJADO sin foco
+     (pointer-events none), X de cerrar y MENÚ GLOBAL ocultos — a
+     la derecha solo queda "Limpiar búsqueda" —. En modo detalle
+     (post compartido) esta fila reemplaza al par volver/título.
+     La ciudad (city-bar) queda visible pero BLOQUEADA vía
+     body.modo-compartido.
      ============================================================ */
   .filtros-wrap.compartida .filtros,
   .filtros-wrap.compartida .btn-lupa,
-  .filtros-wrap.compartida .btn-compartir {
+  .filtros-wrap.compartida .btn-compartir,
+  .filtros-wrap.compartida .menu-global {
     display: none;
   }
 
@@ -398,8 +403,30 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     border-bottom-color: #cbd5e1;
   }
 
+  /* Post compartido: la app entra en modo detalle (Lista_CSS
+     oculta la fila de búsqueda con !important). En compartida la
+     fila ES el header: visible, y el par volver/título fuera. */
+  body.modo-detalle .filtros-wrap.compartida .buscar-fila {
+    display: flex !important;
+  }
+
+  body.modo-detalle .filtros-wrap.compartida .btn-volver,
+  body.modo-detalle .filtros-wrap.compartida .titulo-categoria {
+    display: none !important;
+  }
+
+  /* Ciudad visible pero BLOQUEADA mientras dure el modo
+     compartido (decisión del dueño: sin cambios hasta limpiar). */
+  body.modo-compartido .city-bar {
+    pointer-events: none;
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  body.modo-compartido .city-bar:active { background: transparent; }
+
   /* ============================================================
-     BOTÓN LIMPIAR BÚSQUEDA (R36) · misma fila, lado derecho
+     BOTÓN LIMPIAR BÚSQUEDA · misma fila, lado derecho
      Solo existe en modo compartida: devuelve la app a su estado
      normal (ciudades, chips y todas las listas).
      ============================================================ */
@@ -464,7 +491,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .btn-lupa { width: 32px; height: 32px; margin-left: 6px; margin-right: 6px; }
     .btn-lupa svg { width: 16px; height: 16px; }
     .btn-compartir { width: 32px; height: 32px; margin-right: 6px; }
-    .btn-compartir svg { width: 16px; height: 16px; }
+    .btn-compartir svg { width: 17px; height: 17px; }
     .btn-limpiar { height: 32px; padding: 0 10px; font-size: 12px; }
     .buscar-fila { padding: 0 12px 0 14px; }
     .buscar-input { font-size: 16px; }

@@ -6,20 +6,15 @@ RESPONSABILIDAD: Lógica de solicitud, reenvío y verificación del
                  código OTP enviado por el backend (OTP.gs).
                  El aviso de reserva activa muestra nombre y post
                  de la reserva que causó el conflicto.
-VERSIÓN:         1.1
-CAMBIOS:         R12: Capa 1 GA4. otp_request cuando el usuario
-                 pide (o re-pide) código con éxito. La VERIFICACIÓN
-                 se mide SOLO en backend (otp_verified): sin doble
-                 conteo. Sin envoltorio: no-op.
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+VERSIÓN:         1.2
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
                  Reserva_Valida_Script.html (window.ReservaValida),
                  Index.html (TABLAS), Iconos.html (pintarGlifos),
                  Reserva_CSS.html (clases zona-otp/link-reenviar)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.ReservaOTP = (function () {
 
