@@ -7,13 +7,26 @@ RESPONSABILIDAD: CSS del menú chips + botón menú global + botón
                  línea de aviso cuando la búsqueda no da resultados.
                  Header sin fondo ni sombra. V2.1: línea fina
                  entre ciudad y chips.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
+VERSIÓN:         1.1
+CAMBIOS:         R36: compartir por enlace · (a) botón circular
+                 .btn-compartir (mismo lenguaje visual del menú
+                 global y de la lupa): oculto por defecto, visible
+                 junto a la fila de búsqueda cuando está abierta
+                 (order 10 → queda AL LADO DERECHO del campo),
+                 INACTIVO con [disabled] (gris claro) y activo con
+                 los colores normales; (b) modo COMPARTIDO
+                 .filtros-wrap.compartida (recepción de un enlace):
+                 chips y lupa ocultos, fila de búsqueda visible con
+                 el campo SIN foco (pointer-events none), X de
+                 cerrar oculta y botón .btn-limpiar "Limpiar
+                 búsqueda" visible en su lugar (misma fila, lado
+                 derecho); el menú global SIGUE visible. Responsive
+                 360px: círculos a 32px.
+                 R5: baseline de producción incorporado al espejo;
                  encabezado normalizado al estándar ═══ (6 campos).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      WRAP · contenedor chips + botones
@@ -179,6 +192,68 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
+     BOTÓN COMPARTIR BÚSQUEDA (R36)
+     Círculo igual que el menú global. Oculto por defecto
+     ([hidden] desde HTML); Buscar lo muestra INACTIVO al abrir
+     la búsqueda y Lista lo activa cuando el filtro trae
+     resultados. En modo compartida desaparece (no aplica).
+     ============================================================ */
+  .btn-compartir {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-left: 2px;
+    margin-right: 8px;
+
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+
+    color: #475569;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-compartir:active { opacity: 0.5; }
+
+  /* [hidden] DEBE ganar sobre display:flex (lección del estándar:
+     sin esto el botón se vería siempre). Mismo patrón que
+     .buscar-vacio[hidden]. */
+  .btn-compartir[hidden] { display: none; }
+
+  .btn-compartir svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Inactivo: mientras la búsqueda aún no filtra nada */
+  .btn-compartir[disabled] {
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    opacity: 0.6;
+    cursor: default;
+  }
+  .btn-compartir[disabled]:active { opacity: 0.6; }
+
+  /* Durante la búsqueda abierta, el campo va primero y el
+     botón compartir queda AL LADO DERECHO del campo. */
+  .filtros-wrap.buscando .btn-compartir { order: 10; }
+
+  /* ============================================================
      FILA DE BÚSQUEDA · ocupa todo el ancho del wrap
      ============================================================ */
   .buscar-fila {
@@ -297,6 +372,68 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
+     ESTADO · compartida (R36 · recepción de un enlace)
+     El receptor ve el campo de búsqueda FIJADO con el contenido
+     del enlace (post o término), SIN foco y SIN teclado: chips y
+     lupa ocultos hasta "Limpiar búsqueda". El menú global sigue
+     a la vista (instalación y menú intactos).
+     ============================================================ */
+  .filtros-wrap.compartida .filtros,
+  .filtros-wrap.compartida .btn-lupa,
+  .filtros-wrap.compartida .btn-compartir {
+    display: none;
+  }
+
+  .filtros-wrap.compartida .buscar-fila {
+    display: flex;
+  }
+
+  .filtros-wrap.compartida .buscar-cerrar { display: none; }
+
+  .filtros-wrap.compartida .buscar-input {
+    pointer-events: none;
+  }
+
+  .filtros-wrap.compartida .buscar-input-wrap {
+    border-bottom-color: #cbd5e1;
+  }
+
+  /* ============================================================
+     BOTÓN LIMPIAR BÚSQUEDA (R36) · misma fila, lado derecho
+     Solo existe en modo compartida: devuelve la app a su estado
+     normal (ciudades, chips y todas las listas).
+     ============================================================ */
+  .btn-limpiar {
+    display: none;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    height: 34px;
+    padding: 0 12px;
+
+    border: 1.2px solid #475569;
+    border-radius: 50px;
+    background: transparent;
+
+    color: #475569;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-limpiar:active { opacity: 0.5; }
+
+  .filtros-wrap.compartida .btn-limpiar { display: inline-flex; }
+
+  /* ============================================================
      AVISO DE BÚSQUEDA SIN RESULTADOS
      ============================================================ */
   .buscar-vacio {
@@ -326,6 +463,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .menu-global svg { width: 18px; height: 18px; }
     .btn-lupa { width: 32px; height: 32px; margin-left: 6px; margin-right: 6px; }
     .btn-lupa svg { width: 16px; height: 16px; }
+    .btn-compartir { width: 32px; height: 32px; margin-right: 6px; }
+    .btn-compartir svg { width: 16px; height: 16px; }
+    .btn-limpiar { height: 32px; padding: 0 10px; font-size: 12px; }
     .buscar-fila { padding: 0 12px 0 14px; }
     .buscar-input { font-size: 16px; }
     .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
