@@ -4,15 +4,17 @@ ESPEJO GITHUB:   js/Iconos.js (subir a GitHub Pages; editar en GAS y pagar el co
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  (data URLs) y la función global pintarGlifos(root)
-                 que inyecta el SVG en cualquier elemento con
-                 [data-glifo="clave"]. Al cargar el DOM, pinta todos
-                 los data-glifo del documento automáticamente.
+                 que inyecta el SVG en la raíz recibida —si ella
+                 misma porta [data-glifo]— y en todo descendiente
+                 con [data-glifo="clave"]. Al cargar el DOM, pinta
+                 todos los data-glifo del documento automáticamente.
 
                  Catálogo: 21 glifos EN USO confirmado.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.3
+CAMBIOS:         R39: pintarGlifos también pinta la raíz recibida
+                 si porta data-glifo (el botón compartir del
+                 header pasaba el botón como raíz y quedaba sin
+                 glifo: querySelectorAll no mira a la raíz).
 DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
                  Global_Script.html, Social_Script.html,
                  Reserva_Script.html y Comenta_* vía DOM)
@@ -62,30 +64,40 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
   /* ============================================================
      PINTAR GLIFOS
      ============================================================ */
+  function pintarUno(el) {
+    if (el.dataset.glifoPintado === '1') return;
+
+    var clave = el.getAttribute('data-glifo');
+    var valor = IMAGENES[clave];
+    if (!valor) return;
+
+    var svgString = valor;
+    if (valor.indexOf('data:image/svg+xml,') === 0) {
+      try {
+        svgString = decodeURIComponent(valor.substring(19));
+      } catch (err) {
+        svgString = '';
+      }
+    }
+
+    if (svgString) {
+      el.innerHTML = svgString;
+      el.dataset.glifoPintado = '1';
+    }
+  }
+
   function pintarGlifos(root) {
     root = root || document;
+
+    /* La raíz también puede ser la portadora del glifo
+       (querySelectorAll solo mira descendientes). */
+    if (root.nodeType === 1 && root.hasAttribute('data-glifo')) {
+      pintarUno(root);
+    }
+
     var nodos = root.querySelectorAll('[data-glifo]');
     for (var i = 0; i < nodos.length; i++) {
-      var el = nodos[i];
-      if (el.dataset.glifoPintado === '1') continue;
-
-      var clave = el.getAttribute('data-glifo');
-      var valor = IMAGENES[clave];
-      if (!valor) continue;
-
-      var svgString = valor;
-      if (valor.indexOf('data:image/svg+xml,') === 0) {
-        try {
-          svgString = decodeURIComponent(valor.substring(19));
-        } catch (err) {
-          svgString = '';
-        }
-      }
-
-      if (svgString) {
-        el.innerHTML = svgString;
-        el.dataset.glifoPintado = '1';
-      }
+      pintarUno(nodos[i]);
     }
   }
 
