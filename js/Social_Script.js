@@ -8,16 +8,17 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  también cuenta. El mensaje de WhatsApp lleva el
                  formato del dueño: saludo con tipo y ciudad,
                  partner con ✨, título en negrita, tagline, línea
-                 de confianza (curso: inscripciones abiertas ·
-                 servicio: te lo recomiendo) y enlace profundo en
+                 de confianza (curso: inscripciones abiertas con
+                 invitación a reservar en la app · servicio: te lo
+                 recomiendo) y enlace profundo en
                  línea propia. El botón Partner abre el bottom
                  sheet dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.4
-CAMBIOS:         R38: línea de confianza en el mensaje del post,
-                 debajo del tagline: "Inscripciones abiertas
-                 actualmente" (curso) o "Te lo recomiendo"
-                 (servicio), según el chip del post.
+VERSIÓN:         1.5
+CAMBIOS:         R40: la línea de confianza del curso pasa a
+                 "Inscripciones abiertas, reserva tu cupo desde
+                 ya en la app Servy" (servicio: "Te lo
+                 recomiendo" sin cambio).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Comenta_Script.html
@@ -353,7 +354,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       var confianza = esServicio(tipo)
         ? 'Te lo recomiendo'
-        : 'Inscripciones abiertas actualmente';
+        : 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy';
 
       var saludo;
       if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';

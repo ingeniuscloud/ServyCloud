@@ -10,10 +10,12 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  abrir la búsqueda, activo SOLO cuando el filtro
                  trae resultados) comparte el término + la ciudad
                  activa.
-                 El enlace viaja en UN parámetro ?d= con el payload
-                 CIFRADO (AES-256-GCM, IV aleatorio por enlace,
-                 base64url): el ID del post o el término NUNCA van
-                 planos en la URL. Receptor: Core llama
+                 El enlace viaja en UN parámetro corto ?s= con el
+                 payload compacto y OFUSCADO (XOR con clave
+                 embebida + base64url): el ID del post o el
+                 término NUNCA van planos en la URL. Los enlaces
+                 antiguos ?d= (AES-256-GCM) siguen abriendo.
+                 Receptor: Core llama
                  Compartir.recibir() cuando TABLAS cargó y el lienzo
                  está inyectado; se aplica ciudad + contenido y la
                  app entra en MODO COMPARTIDO: ciudad VISTA pero
@@ -27,16 +29,17 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         1.1
-CAMBIOS:         R37: mensaje de WhatsApp de la lista con el formato
-                 del dueño: saludo con la ciudad en MAYÚSCULAS y
-                 negrita, "✨ Lista de *CHIP* de Grupo" y línea de
-                 confianza (curso: inscripciones abiertas ·
-                 servicio: te lo recomiendo), enlace en línea
-                 propia; el modo compartido activa
-                 body.modo-compartido y "Limpiar búsqueda" también
-                 cierra el detalle de un post compartido. Encabezado
-                 simplificado: solo lo vigente.
+VERSIÓN:         1.2
+CAMBIOS:         R40: el enlace se emite CORTO — un parámetro
+                 ?s= con payload compacto ofuscado (XOR con la
+                 clave embebida + base64url), la mitad de
+                 caracteres para que no asuste; el ?d=
+                 AES-256-GCM queda SOLO como receptor legacy (los
+                 enlaces ya compartidos siguen abriendo). La
+                 línea de confianza del curso pasa a
+                 "Inscripciones abiertas, reserva tu cupo desde
+                 ya en la app Servy" (servicio: "Te lo
+                 recomiendo" sin cambio).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Buscar_Script.html (buscar:estado,
                  #buscarInput), Lista_Script.html
@@ -52,25 +55,20 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
   window.Compartir = (function () {
 
     /* ============================================================
-       CIFRADO · AES-256-GCM · clave fija embebida
-       El objetivo (definido con el dueño) es que el enlace NO
-       lleve el ID del post ni el término en claro: cifrar con una
-       clave que viaja dentro de la app es OFUSCAMIENTO FUERTE, no
-       custodia de secretos. IV aleatorio de 12 bytes por enlace →
-       el mismo contenido produce enlaces distintos cada vez.
-       Sin crypto.subtle (navegador viejo) no hay enlace profundo:
-       urlDePost resuelve la URL principal y el resto funciona
-       como siempre.
+       ENLACE CORTO · ?s= · payload compacto + XOR embebido
+       Mismo objetivo de siempre (el ID del post y el término
+       NUNCA legibles en la URL) en la MENOS bytes posible:
+       payload mínimo separado por \x1f, XOR con la clave
+       embebida y base64url. La clave viaja dentro de la app:
+       ofuscamiento, no custodia de secretos. Y sin crypto.subtle
+       funciona igual (el enlace corto no lo necesita).
+       LEGADO: los enlaces ?d= (AES-256-GCM) ya compartidos
+       siguen abriendo por descifrar(); ya no se emiten.
        ============================================================ */
     var CLAVE_B64 = 'jU8VmYAwIx8ipwsLIt3nAjo2fKPSdCPUphlZtVj6GlQ=';
-    var LARGO_IV  = 12;
+    var LARGO_IV  = 12;   /* solo receptor legacy ?d= */
 
     var clavePromesa = null;
-
-    function hayCrypto() {
-      return !!(window.crypto && window.crypto.subtle &&
-                typeof window.crypto.subtle.importKey === 'function');
-    }
 
     function getClave() {
       if (!clavePromesa) {
@@ -78,7 +76,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
           return c.charCodeAt(0);
         });
         clavePromesa = window.crypto.subtle.importKey(
-          'raw', crudo, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
+          'raw', crudo, { name: 'AES-GCM' }, false, ['decrypt']
         );
       }
       return clavePromesa;
@@ -106,37 +104,63 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return bytes;
     }
 
-    function cifrar(obj) {
-      if (!hayCrypto()) return Promise.resolve(null);
+    function xorBytes(bytes) {
+      var clave = Uint8Array.from(atob(CLAVE_B64), function (c) {
+        return c.charCodeAt(0);
+      });
+      var salida = new Uint8Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) {
+        salida[i] = bytes[i] ^ clave[i % clave.length];
+      }
+      return salida;
+    }
 
+    /* Payload mínimo: 'p·id' para post y 'l·ciudad·término'
+       para lista (el separador real es \x1f, imposible de
+       teclear). Devuelve el token corto o null si no pudo. */
+    function empaquetar(tipo, partes) {
       try {
-        var datos = new TextEncoder().encode(JSON.stringify(obj));
-        var iv = window.crypto.getRandomValues(new Uint8Array(LARGO_IV));
+        var crudo = tipo;
+        for (var i = 0; i < partes.length; i++) {
+          var parte = String(partes[i] == null ? '' : partes[i]).trim();
+          if (!parte) return null;
+          crudo += '\x1f' + parte;
+        }
 
-        return getClave()
-          .then(function (clave) {
-            return window.crypto.subtle.encrypt(
-              { name: 'AES-GCM', iv: iv }, clave, datos
-            );
-          })
-          .then(function (buf) {
-            var cuerpo = new Uint8Array(buf);
-            var todo = new Uint8Array(iv.length + cuerpo.length);
-            todo.set(iv, 0);
-            todo.set(cuerpo, iv.length);
-            return bytesAB64url(todo);
-          })
-          .catch(function (err) {
-            console.warn('[Compartir] Cifrado no disponible:', err && err.message);
-            return null;
-          });
+        var bytes = new TextEncoder().encode(crudo);
+        if (!bytes.length) return null;
+
+        return bytesAB64url(xorBytes(bytes));
       } catch (err) {
-        console.warn('[Compartir] Cifrado no disponible:', err && err.message);
-        return Promise.resolve(null);
+        console.warn('[Compartir] Enlace corto no disponible:', err && err.message);
+        return null;
       }
     }
 
+    /* Inverso EXACTO de empaquetar. Valida la estructura: si el
+       token no decodifica a post o lista completa, falla (el
+       receptor lo trata como enlace no válido). */
+    function desempaquetar(token) {
+      var partes = new TextDecoder()
+        .decode(xorBytes(b64urlABytes(token)))
+        .split('\x1f');
+
+      var tipo = partes.shift();
+
+      if (tipo === 'p' && partes.length === 1 && partes[0]) {
+        return { t: 'p', id: partes[0] };
+      }
+
+      if (tipo === 'l' && partes.length === 2 && partes[0] && partes[1]) {
+        return { t: 'l', c: partes[0], q: partes[1].slice(0, 40) };
+      }
+
+      throw new Error('enlace no válido');
+    }
+
     function descifrar(token) {
+      /* Receptor LEGADO ?d= (AES-256-GCM): los enlaces ya
+         compartidos antes del enlace corto siguen abriendo. */
       try {
         var bytes = b64urlABytes(token);
         if (bytes.length <= LARGO_IV) {
@@ -177,7 +201,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     function armarEnlace(token) {
       if (!token) return urlBase();
-      return urlBase() + '?d=' + token;
+      return urlBase() + '?s=' + token;
     }
 
     /* ============================================================
@@ -198,10 +222,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     function urlDePost(post) {
       if (!post || !post.id) return Promise.resolve(urlBase());
 
-      return cifrar({ v: 1, t: 'p', id: String(post.id) })
-        .then(function (token) {
-          return armarEnlace(token);
-        });
+      return Promise.resolve(
+        armarEnlace(empaquetar('p', [String(post.id)]))
+      );
     }
 
     /* ============================================================
@@ -238,47 +261,46 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       var tipo = singularDe(tituloChip(primer && (primer.idChips || [])[0]));
       var grupo = tituloGrupo(primer && (primer.idGrupo || [])[0]);
 
-      var payload = { v: 1, t: 'l', q: termino.slice(0, 40) };
-      if (ciudad && ciudad.idCiudad) payload.c = String(ciudad.idCiudad);
-
       haptic(10);
 
-      cifrar(payload)
-        .then(function (token) {
-          var url = armarEnlace(token);
+      var token = (ciudad && ciudad.idCiudad)
+        ? empaquetar('l', [String(ciudad.idCiudad), termino.slice(0, 40)])
+        : null;
 
-          var saludo = (ciudad && ciudad.titulo)
-            ? '🖐️ ¡Mira esto en *' + String(ciudad.titulo).trim().toUpperCase() + '*! 🔎'
-            : '🖐️ ¡Mira esto! 🔎';
+      try {
+        var url = armarEnlace(token);
 
-          var que = '✨ Lista';
-          if (tipo)  que += ' de *' + tipo + '*';
-          if (grupo) que += ' de ' + grupo;
+        var saludo = (ciudad && ciudad.titulo)
+          ? '🖐️ ¡Mira esto en *' + String(ciudad.titulo).trim().toUpperCase() + '*! 🔎'
+          : '🖐️ ¡Mira esto! 🔎';
 
-          /* Línea de confianza según el caso (decisión del dueño) */
-          var confianza = esServicio(tipo)
-            ? 'Te lo recomiendo'
-            : 'Inscripciones abiertas actualmente';
+        var que = '✨ Lista';
+        if (tipo)  que += ' de *' + tipo + '*';
+        if (grupo) que += ' de ' + grupo;
 
-          var texto =
-            saludo + '\n\n' +
-            que + '\n' +
-            confianza + '\n\n' +
-            '🔗 Abre el enlace para ver la lista en la app' +
-            '\n' + url;
+        /* Línea de confianza según el caso (decisión del dueño) */
+        var confianza = esServicio(tipo)
+          ? 'Te lo recomiendo'
+          : 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy';
 
-          if (navigator.share) {
-            return navigator.share({ title: marcaApp(), text: texto })
-              .catch(function (err) {
-                if (err && err.name === 'AbortError') return null;
-                abrirWhatsApp(texto);
-              });
-          }
-          abrirWhatsApp(texto);
-        })
-        .catch(function (err) {
-          console.warn('[Compartir] No se pudo compartir la lista:', err && err.message);
-        });
+        var texto =
+          saludo + '\n\n' +
+          que + '\n' +
+          confianza + '\n\n' +
+          '🔗 Abre el enlace para ver la lista en la app' +
+          '\n' + url;
+
+        if (navigator.share) {
+          return navigator.share({ title: marcaApp(), text: texto })
+            .catch(function (err) {
+              if (err && err.name === 'AbortError') return null;
+              abrirWhatsApp(texto);
+            });
+        }
+        abrirWhatsApp(texto);
+      } catch (err) {
+        console.warn('[Compartir] No se pudo compartir la lista:', err && err.message);
+      }
     }
 
     function abrirWhatsApp(texto) {
@@ -336,10 +358,10 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     /* ============================================================
        Receptor · detección y recepción del enlace
        ============================================================ */
-    function leerParam() {
+    function leerParam(nombre) {
       try {
         var q = new URLSearchParams(window.location.search);
-        var v = String(q.get('d') || '').trim();
+        var v = String(q.get(nombre) || '').trim();
         return v || null;
       } catch (_) {
         return null;
@@ -347,7 +369,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     function hayEntrante() {
-      return !!leerParam();
+      return !!(leerParam('s') || leerParam('d'));
     }
 
     function limpiarUrl() {
@@ -357,7 +379,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     function recibir() {
-      var crudo = leerParam();
+      var corto = leerParam('s');
+      var crudo = corto || leerParam('d');
       if (!crudo) return;
 
       /* La barra queda limpia YA: recargar o reenviar la URL no
@@ -365,7 +388,13 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
          compartir URLs sucias desde la barra del navegador). */
       limpiarUrl();
 
-      descifrar(crudo)
+      /* Enlace corto ?s= → desempaquetar. Enlace legacy ?d=
+         (compartido antes de R40) → descifrar AES. */
+      var tarea = corto
+        ? Promise.resolve().then(function () { return desempaquetar(corto); })
+        : descifrar(crudo);
+
+      tarea
         .then(function (datos) {
           if (!datos || typeof datos !== 'object') return;
 

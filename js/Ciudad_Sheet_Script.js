@@ -8,7 +8,9 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  seleccionar una ciudad antes de ver cualquier
                  lista. En esa primera carga el sheet muestra
                  PRIMERO el aviso de cookies (key
-                 localStorage: app_cookies): hasta pulsar
+                 localStorage: app_cookies; el TEXTO llega servido
+                 en SISTEMA.avisos.cookies — Constantes.gs —, no
+                 vive aquí): hasta pulsar
                  Aceptar no se ve la lista de ciudades, y tras
                  aceptar el aviso desaparece y la selección
                  obligatoria sigue. Pinta el botón .city-bar y
@@ -16,13 +18,12 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  Ordena las ciudades alfabéticamente por título.
                  Lista con radio button nativo.
                  Chevron SVG desde Iconos.html (flechaAcordeon).
-VERSIÓN:         1.4
-CAMBIOS:         R38: aviso de cookies en el sheet obligatorio
-                 de la primera carga: icono a la izquierda del
-                 texto y botón Aceptar debajo; al aceptar se
-                 guarda app_cookies y el aviso cede su lugar a
-                 la lista de ciudades. Copia duplicada de
-                 reinicializar eliminada.
+VERSIÓN:         1.5
+CAMBIOS:         R40: el texto del aviso de cookies ya no vive
+                 aquí: llega en SISTEMA.avisos.cookies
+                 (Constantes.gs, única fuente de los textos);
+                 sin texto disponible el aviso muestra solo el
+                 icono y Aceptar.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
@@ -205,13 +206,20 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
     function pintarCookies() {
       if (!content) return;
 
+      /* Texto servido en SISTEMA.avisos (Constantes.gs). Sin
+         texto (backend viejo o sin avisos) el aviso sigue
+         funcionando: icono + Aceptar, sin párrafo. */
+      var texto = '';
+      try {
+        texto = String((window.SISTEMA && window.SISTEMA.avisos &&
+                window.SISTEMA.avisos.cookies) || '').trim();
+      } catch (_) {}
+
       content.innerHTML =
         '<div class="ciudad-cookies">' +
           '<div class="cookies-fila">' +
             '<span class="cookies-icono" data-glifo="cookie" aria-hidden="true"></span>' +
-            '<p class="cookies-texto">Este sitio utiliza cookies para ' +
-            'mejorar tu experiencia de navegación. Al continuar usando ' +
-            'este sitio, aceptas el uso de cookies.</p>' +
+            (texto ? '<p class="cookies-texto">' + texto + '</p>' : '') +
           '</div>' +
           '<button class="cookies-aceptar" type="button">Aceptar</button>' +
         '</div>';
