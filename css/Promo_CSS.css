@@ -2,15 +2,46 @@
 ARCHIVO:         Promo_CSS.html
 ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del item de promoción destacada y del
-                 carrusel que lo contiene. Track horizontal con
-                 snap, dots debajo. El item mantiene el look
-                 original: fondo #fff7ed, campana naranja,
-                 tagline naranja, marca gris.
+RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
+                 La banda naranja (#fff7ed) vive en #promoSlot; cada
+                 promo es una TARJETA BLANCA con radio y borde.
+                 El riel NO usa scroll-snap: el avance continuo lo
+                 lleva Promo_Script (rAF sobre scrollLeft) y el snap
+                 lo haría imposible. Sin dots: el asomo de la
+                 tarjeta siguiente es la señal de que hay más.
+                 Campana naranja, tagline naranja, marca gris.
                  Vive fuera del scroll en modo lista. Se oculta
                  en modo detalle.
-VERSIÓN:         1.1
-CAMBIOS:         R9: versión de producción del dueño. El promo pasa de
+VERSIÓN:         1.6
+CAMBIOS:         R34: en el teléfono la tarjeta pasa del 82% al 72%. Al
+                 82% el asomo son unos 70px, que es exactamente los
+                 16px de padding más el aro de la campana: un trazo
+                 fino naranja sobre blanco pegado al borde, que se ve
+                 pero no se LEE como "hay otra promo". Al 72% el asomo
+                 ronda los 110px y ya alcanza a mostrar el arranque del
+                 título de la siguiente, que es lo que sí comunica.
+                 Va con body.is-mobile y no con una media query porque
+                 el marco de escritorio mide 116.58mm (≈414px), casi
+                 igual que un teléfono: por ancho de viewport no se
+                 pueden distinguir. is-mobile ya hace esa distinción en
+                 Index.html.
+                 R33: fuera -webkit-overflow-scrolling del riel. Esa
+                 propiedad manda el scroll a un hilo aparte en iOS y
+                 agrava el desfase de lecturas de scrollLeft que dejaba
+                 la marquesina clavada (Promo_Script R33). Desde iOS 13
+                 la inercia ya es el comportamiento por defecto.
+                 R32: marquesina continua. (a) #promoSlot pasa a ser la
+                 banda naranja con padding y cada tarjeta pasa a fondo
+                 blanco, borde #f1f5f9, radio 14px y sombra suave: se
+                 separan entre sí y de la banda. (b) fuera
+                 scroll-snap-type/align/stop: el snap re-imanta el
+                 scroll a un punto fijo y bloquea el avance continuo.
+                 (c) item al 82% con margin-right para que la siguiente
+                 ASOME y reemplace a los dots. (d) fuera .promo-dots y
+                 .promo-dot. (e) la tarjeta ya no hereda el
+                 border-bottom de .lista-item: lleva borde propio en los
+                 cuatro lados.
+                 R9: versión de producción del dueño. El promo pasa de
                  item único a carrusel: track con scroll-snap, dots
                  indicadores, campana animada con punto de alerta,
                  responsive ≤360px y respeto a prefers-reduced-motion.
@@ -18,16 +49,19 @@ CAMBIOS:         R9: versión de producción del dueño. El promo pasa de
                  encabezado normalizado al estándar ═══ (6 campos).
 DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
                  .fila-titulo, .titulo, .badge, .tagline, .marca),
+                 Promo_Script.html (duplica los items para el bucle
+                 continuo y lleva el scrollLeft),
                  Index.html (#promoSlot)
 ════════════════════════════════════════════════════════════════════
 */
 
   /* ============================================================
-     SLOT · contenedor del carrusel
+     SLOT · la BANDA naranja que contiene la marquesina
      ============================================================ */
   #promoSlot {
     flex-shrink: 0;
-    background: transparent;
+    background: #fff7ed;
+    padding: 12px 0;
     overflow: hidden;
   }
   #promoSlot[hidden] { display: none !important; }
@@ -37,39 +71,57 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
   }
 
   /* ============================================================
-     TRACK · scroll horizontal con snap
+     TRACK · riel de la marquesina
+     SIN scroll-snap a propósito: el snap re-imanta el scrollLeft a
+     un punto fijo y haría imposible el avance continuo. La señal
+     de "hay más" la da el asomo de la tarjeta siguiente.
+     SIN -webkit-overflow-scrolling: esa propiedad manda el scroll
+     a un hilo aparte en iOS y las lecturas de scrollLeft quedan
+     desfasadas. Desde iOS 13 la inercia ya es el comportamiento
+     por defecto, así que quitarla no cuesta nada.
      ============================================================ */
   .promo-track {
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
   .promo-track::-webkit-scrollbar { display: none; }
 
+  /* 82% para que la siguiente tarjeta ASOME por la derecha.
+     Promo_Script lo ajusta a 100% cuando hay una sola promo
+     (lo hace con estilo inline, así que gana a estas reglas). */
   .promo-track > .promo-item {
-    flex: 0 0 100%;
-    width: 100%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    flex: 0 0 82%;
+    margin-right: 10px;
+  }
+
+  /* En el teléfono, 72%: el asomo pasa de ~70px (solo el aro de la
+     campana) a ~110px, suficiente para ver el arranque del título de
+     la promo siguiente. Se usa body.is-mobile y no una media query
+     porque el marco de escritorio mide ≈414px, casi igual que un
+     teléfono: por ancho de viewport no se distinguen. */
+  body.is-mobile .promo-track > .promo-item {
+    flex: 0 0 72%;
   }
 
   /* ============================================================
-     ITEM PROMO · especificidad doble para ganar a .lista-item
+     ITEM PROMO · tarjeta BLANCA sobre la banda naranja
+     Especificidad doble para ganar a .lista-item, que trae
+     border-bottom y fondo transparente.
      ============================================================ */
   .lista-item.promo-item {
-    background: #fff7ed;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
     position: relative;
     z-index: 2;
-    width: 100%;
   }
 
   .lista-item.promo-item:active {
-    background: #ffedd5;
+    background: #fffbf5;
   }
 
   /* ============================================================
@@ -167,31 +219,11 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
   }
 
   /* ============================================================
-     DOTS · indicadores del carrusel
+     DOTS · retirados en R32
+     Con avance continuo no existe una "diapositiva actual": los
+     dots parpadearían sin parar. El asomo de la tarjeta siguiente
+     ya comunica que hay más, que es el patrón de Yummy.
      ============================================================ */
-  .promo-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 0 8px;
-    background: transparent;
-  }
-
-  .promo-dot {
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: rgba(249, 115, 22, 0.28);
-    transition: background 0.2s ease, width 0.2s ease, border-radius 0.2s ease;
-  }
-
-  .promo-dot.activo {
-    background: #f97316;
-    width: 14px;
-    border-radius: 3px;
-  }
 
   /* ============================================================
      RESPONSIVE · ≤360px
@@ -201,7 +233,8 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
     .promo-campana svg { width: 20px; height: 20px; }
   }
 
+  /* La marquesina la mueve Promo_Script por JS: si el sistema pide
+     menos movimiento, el script no arranca el bucle. */
   @media (prefers-reduced-motion: reduce) {
     .promo-campana svg { animation: none; }
-    .promo-track { scroll-behavior: auto; }
   }
