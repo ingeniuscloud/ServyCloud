@@ -2,13 +2,14 @@
 ARCHIVO:         Seccion_Script.html
 ESPEJO GITHUB:   js/Seccion_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Genera las 5 secciones del panorama desde la
+RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  BD real, en orden fijo:
                    1. seccionPresentacion
                    2. seccionContenido
                    3. seccionValor
                    4. seccionPlanes
-                   5. seccionCrossSell
+                   5. seccionUbicacion
+                   6. seccionCrossSell
                  El post que llega por 'post:change' viene
                  enriquecido (seccionJson + planJson) gracias a
                  Lista_Script + PostFull.
@@ -21,8 +22,23 @@ RESPONSABILIDAD: Genera las 5 secciones del panorama desde la
                  Cross-sell lee del índice liviano (TABLAS.posts):
                  campos planos titulo, boton, colorOficial.
                  Contenido y Valor: siempre visibles.
-VERSIÓN:         1.2
-CAMBIOS:         R19: navegación cross-post ahora cambia TAMBIÉN la
+                 Ubicación: solo si el post la declara Y el partner
+                 tiene direccion. Si falta cualquiera de las dos,
+                 no se crea la sección (no queda ni el título).
+VERSIÓN:         1.3
+CAMBIOS:         R31: nueva sección 5 · seccionUbicacion. Muestra el
+                 título del post más la dirección del partner con
+                 enlace a Google Maps, reutilizando el MISMO bloque
+                 del sheet del partner (.partner-dato-maps / -icon /
+                 -texto / -valor / .partner-maps-cta) más el título
+                 con .t-seccion: cero CSS nuevo. Doble guarda: sin
+                 seccionUbicacion.titulo, o sin direccion en el
+                 partner, devuelve '' y pintarVistas() no crea la
+                 sección. Sin red ni caché nuevas: direccion ya
+                 viaja en TABLAS.partners (Cache.gs · _partnerPublico
+                 solo depura telegramtoken/telegramid). El orden lo
+                 manda el array de pintarVistas(), no el JSON.
+                 R19: navegación cross-post ahora cambia TAMBIÉN la
                  ciudad. irAPost() compara post.idCiudad con la
                  ciudad activa (Ciudad.getActual) y, si el post no
                  pertenece a ella, aplica la primera ciudad válida
@@ -47,7 +63,10 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Chips_Script.html (window.Chips),
                  Global_Script.html (abrirWhatsapp),
-                 Seccion_CSS.html
+                 Seccion_CSS.html (.t-seccion / .t-body),
+                 Partner_Sheet_CSS.html (bloque .partner-dato-maps /
+                 -icon / -texto / -valor y .partner-maps-cta que
+                 reutiliza la sección Ubicación · R31)
 ════════════════════════════════════════════════════════════════════
 */
 
@@ -405,7 +424,52 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
     }
 
     /* ============================================================
-       5 · CROSS-SELL
+       5 · UBICACIÓN (R31)
+       Se muestra solo si el post declara seccionUbicacion.titulo
+       Y el partner del post tiene direccion. Si falta cualquiera
+       de las dos, devuelve '' y pintarVistas() salta la sección
+       entera (el título incluido).
+       Reutiliza el bloque del sheet del partner tal cual:
+         .partner-dato-maps / .partner-dato-icon /
+         .partner-dato-texto / .partner-dato-valor /
+         .partner-maps-cta      (Partner_Sheet_CSS, global)
+       y el título con el sistema de texto del post (.t-seccion).
+       Enlace: misma Maps URL API en modo dir que el sheet del
+       partner. CERO CSS nuevo.
+       ============================================================ */
+    function buildUbicacion() {
+      var post = postActivo;
+      if (!post) return '';
+
+      var s = (post.seccionJson || {}).seccionUbicacion || {};
+      if (!s.titulo) return '';
+
+      var partner = buscarPartner(post.idPartner);
+      var pj = (partner && partner.partnerJson) ? partner.partnerJson : {};
+      var direccion = String(pj.direccion || '').trim();
+      if (!direccion) return '';
+
+      var urlMaps = 'https://www.google.com/maps/dir/?api=1&destination=' +
+                    encodeURIComponent(direccion);
+
+      var html = '';
+      html += '<h2 class="t-seccion">' + escapeHtml(s.titulo) + '</h2>';
+      html += '<a class="partner-dato-maps" href="' + urlMaps + '"' +
+                ' target="_blank" rel="noopener">' +
+                '<span class="partner-dato-icon" data-glifo="ubicacion" ' +
+                      'style="color:var(--post-color, #475569);"></span>' +
+                '<div class="partner-dato-texto">' +
+                  '<span class="partner-dato-valor">' + escapeHtml(direccion) + '</span>' +
+                  '<span class="partner-maps-cta" ' +
+                        'style="color:var(--post-color, #475569);">Cómo llegar →</span>' +
+                '</div>' +
+              '</a>';
+
+      return html;
+    }
+
+    /* ============================================================
+       6 · CROSS-SELL
        AHORA lee del índice liviano (TABLAS.posts).
        Campos planos: titulo, boton, colorOficial.
        ============================================================ */
@@ -514,6 +578,7 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
         { clave: 'contenido',    clase: 'vista-temario',      builder: buildContenido },
         { clave: 'valor',        clase: 'vista-beneficios',   builder: buildValor },
         { clave: 'planes',       clase: 'vista-cierre',       builder: buildPlanes },
+        { clave: 'ubicacion',    clase: 'vista-cierre',       builder: buildUbicacion },
         { clave: 'crossSell',    clase: 'vista-cierre',       builder: buildCrossSell }
       ];
 
