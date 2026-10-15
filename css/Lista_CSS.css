@@ -9,8 +9,13 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  Skeleton del detalle (primera carga de un post).
                  Skeleton de lista (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         1.1
-CAMBIOS:         R32: el chevron (›) de los items de la lista pasa a
+VERSIÓN:         1.2
+CAMBIOS:         R36: compartir por enlace · el botón .btn-compartir
+                 (nuevo en Index.html, estilado en Chips_CSS) también
+                 se oculta en modo detalle: comparte LISTAS filtradas,
+                 no posts, y en detalle la fila pertenece al título de
+                 la categoría + botón volver.
+                 R32: el chevron (›) de los items de la lista pasa a
                  30px, peso 700 y color naranja oficial Servy
                  #FA6A08 (antes 22px, gris #cbd5e1 casi invisible:
                  los usuarios no notaban que el item se pulsa para
@@ -21,8 +26,7 @@ CAMBIOS:         R32: el chevron (›) de los items de la lista pasa a
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      BOTÓN VOLVER
@@ -88,6 +92,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   body.modo-detalle .btn-lupa,
+  body.modo-detalle .btn-compartir,
   body.modo-detalle .filtros,
   body.modo-detalle .buscar-fila {
     display: none !important;
