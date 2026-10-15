@@ -8,17 +8,22 @@ RESPONSABILIDAD: CSS de la fila de filtros: menú chips, lupa, botón
                  búsqueda expandible in-place con "Limpiar filtro".
                  Modo compartida (recepción de un enlace):
                  chips/lupa/compartir/menú global fuera, campo
-                 fijado sin foco y — en modo detalle — la fila
-                 compartida reemplaza a volver/título; city-bar
-                 bloqueada vía body.modo-compartido. Línea de aviso
-                 cuando la búsqueda no da resultados.
-VERSIÓN:         1.4
-CAMBIOS:         R42: la etiqueta del modo compartido pasa a
-                 "Limpiar filtro" (vive en Index.html, que la
-                 cambia esta ronda); encabezado y comentarios al
-                 día — cero cambios de CSS: la píldora
-                 "Compartir" y la fórmula tipográfica quedan
-                 igual.
+                 fijado sin foco; city-bar bloqueada vía
+                 body.modo-compartido. El header del detalle lo
+                 decide el TIPO de enlace (Compartir marca el body):
+                 un post compartido usa la fila compartida en lugar
+                 de volver/título; una lista compartida vuelve al
+                 par volver/título dentro de cada post — el
+                 receptor recorre la lista con "Volver" y limpia
+                 desde la lista. Línea de aviso cuando la búsqueda
+                 no da resultados.
+VERSIÓN:         1.5
+CAMBIOS:         R43: lista compartida — dentro del post el
+                 header vuelve al par volver/título (reglas nuevas
+                 con body.compartido-lista + :not([hidden])); la
+                 fila compartida con "Limpiar filtro" queda como
+                 cabecera SOLO de la lista y del post compartido
+                 solitario, igual que siempre.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
 ════════════════════════════════════════════════════════════════════*/
@@ -394,11 +399,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   /* ============================================================
      ESTADO · compartida (recepción de un enlace)
-     El header es el MISMO para post y lista: chips y lupa fuera,
-     fila de búsqueda visible con el campo FIJADO sin foco
-     (pointer-events none), X de cerrar y MENÚ GLOBAL ocultos — a
-     la derecha solo queda "Limpiar filtro" —. En modo detalle
-     (post compartido) esta fila reemplaza al par volver/título.
+     Chips y lupa fuera, fila de búsqueda visible con el campo
+     FIJADO sin foco (pointer-events none), X de cerrar y MENÚ
+     GLOBAL ocultos — a la derecha solo queda "Limpiar filtro" —.
+     En modo detalle el header lo decide el TIPO de enlace
+     (Compartir marca el body con compartido-post /
+     compartido-lista): con un POST compartido esta fila
+     reemplaza al par volver/título (reglas de abajo); con una
+     LISTA compartida el post abre con volver/título normales y
+     la fila solo cabecera la lista.
      La ciudad (city-bar) queda visible pero BLOQUEADA vía
      body.modo-compartido.
      ============================================================ */
@@ -433,6 +442,24 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   body.modo-detalle .filtros-wrap.compartida .btn-volver,
   body.modo-detalle .filtros-wrap.compartida .titulo-categoria {
     display: none !important;
+  }
+
+  /* LISTA compartida: dentro del post el header vuelve al par
+     volver/título — el receptor navega cada post de la lista con
+     "Volver" y regresa a la lista, donde sigue "Limpiar filtro".
+     Más específico que las reglas de arriba (compartido-lista en
+     el body) y con :not([hidden]) para respetar los estados que
+     Lista pinta al abrir/cerrar el detalle. */
+  body.modo-detalle.compartido-lista .filtros-wrap.compartida .buscar-fila {
+    display: none !important;
+  }
+
+  body.modo-detalle.compartido-lista .filtros-wrap.compartida .btn-volver:not([hidden]) {
+    display: flex !important;
+  }
+
+  body.modo-detalle.compartido-lista .filtros-wrap.compartida .titulo-categoria:not([hidden]) {
+    display: block !important;
   }
 
   /* Ciudad visible pero BLOQUEADA mientras dure el modo
