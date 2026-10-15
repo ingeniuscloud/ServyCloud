@@ -7,10 +7,12 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
                  texto y chevron SVG. Lista con radio button
                  nativo estilizado. Sheet al 90%. Modo bloqueado
                  para primera selección sin ciudad guardada.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+                 Aviso de cookies de esa primera carga: icono a
+                 la izquierda del texto y botón Aceptar debajo.
+VERSIÓN:         1.2
+CAMBIOS:         R38: estilos del aviso de cookies dentro del
+                 sheet (.ciudad-cookies): icono, texto y botón
+                 Aceptar centrados como puerta de entrada.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html y pintados por Ciudad_Sheet_Script.html)
 ════════════════════════════════════════════════════════════════════*/
@@ -258,6 +260,70 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
+     AVISO DE COOKIES · puerta de la primera carga
+     Icono a la izquierda del texto y botón Aceptar debajo.
+     Centrado en el sheet: hasta aceptar no se ve la lista.
+     ============================================================ */
+  .ciudad-cookies {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    padding: 32px 4px;
+  }
+
+  .cookies-fila {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cookies-icono {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    color: #FA6A08;
+  }
+  .cookies-icono svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .cookies-texto {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #475569;
+    text-align: left;
+  }
+
+  .cookies-aceptar {
+    margin-top: 24px;
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 999px;
+    background: #FA6A08;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .cookies-aceptar:active {
+    background: #e05e07;
+    transform: scale(0.98);
+  }
+
+  /* ============================================================
      LISTA DE CIUDADES · radio button nativo
      ============================================================ */
   .ciudad-lista {
@@ -349,4 +415,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .ciudad-content { padding: 4px 18px 22px; }
     .ciudad-option { font-size: 14px; padding: 13px 6px; }
     .ciudad-titulo { font-size: 1.02rem; }
+    .ciudad-cookies { max-width: 280px; }
+    .cookies-icono { width: 26px; height: 26px; }
+    .cookies-texto { font-size: 13px; }
   }

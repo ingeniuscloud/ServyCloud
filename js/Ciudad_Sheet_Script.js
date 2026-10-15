@@ -6,15 +6,23 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  localStorage (app_ciudad). Si no existe, abre
                  el sheet en modo BLOQUEADO: el usuario debe
                  seleccionar una ciudad antes de ver cualquier
-                 lista. Pinta el botón .city-bar y emite
-                 'ciudad:change' cuando cambia.
+                 lista. En esa primera carga el sheet muestra
+                 PRIMERO el aviso de cookies (key
+                 localStorage: app_cookies): hasta pulsar
+                 Aceptar no se ve la lista de ciudades, y tras
+                 aceptar el aviso desaparece y la selección
+                 obligatoria sigue. Pinta el botón .city-bar y
+                 emite 'ciudad:change' cuando cambia.
                  Ordena las ciudades alfabéticamente por título.
                  Lista con radio button nativo.
                  Chevron SVG desde Iconos.html (flechaAcordeon).
-VERSIÓN:         1.3
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.4
+CAMBIOS:         R38: aviso de cookies en el sheet obligatorio
+                 de la primera carga: icono a la izquierda del
+                 texto y botón Aceptar debajo; al aceptar se
+                 guarda app_cookies y el aviso cede su lugar a
+                 la lista de ciudades. Copia duplicada de
+                 reinicializar eliminada.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
@@ -22,6 +30,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
   window.Ciudad = (function () {
 
     var KEY_CIUDAD = 'app_ciudad';
+    var KEY_COOKIES = 'app_cookies';
 
     var UMBRAL_VELOCIDAD = 0.5;
     var UMBRAL_DRAG      = 6;
@@ -181,26 +190,43 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       iniciar();
     }
 
-    /* R26: reconstruye el estado con el SISTEMA ya presente.
-       Re-ejecutar iniciar() es seguro: solo fija estado (lista,
-       actual, pendienteSeleccion); los listeners y el DOM del
-       sheet se crean aparte y tienen sus propias guardias. */
-    function reinicializar() {
-      inicializada = false;
-      actual = null;
-      pendienteSeleccion = false;
-      iniciar();
+    /* ============================================================
+       Cookies · aviso de UNA SOLA VEZ en la primera carga.
+       El sheet obligatorio muestra el aviso y NO deja ver la
+       lista de ciudades hasta pulsar Aceptar: así el aviso se
+       acepta sin opción de continuar sin hacerlo (petición del
+       dueño). El flag vive en localStorage (app_cookies).
+       ============================================================ */
+    function cookiesAceptadas() {
+      try { return localStorage.getItem(KEY_COOKIES) === '1'; }
+      catch (_) { return false; }
     }
 
-    /* R26: reconstruye el estado con el SISTEMA ya presente.
-       Re-ejecutar iniciar() es seguro: solo fija estado (lista,
-       actual, pendienteSeleccion); los listeners y el DOM del
-       sheet se crean aparte y tienen sus propias guardias. */
-    function reinicializar() {
-      inicializada = false;
-      actual = null;
-      pendienteSeleccion = false;
-      iniciar();
+    function pintarCookies() {
+      if (!content) return;
+
+      content.innerHTML =
+        '<div class="ciudad-cookies">' +
+          '<div class="cookies-fila">' +
+            '<span class="cookies-icono" data-glifo="cookie" aria-hidden="true"></span>' +
+            '<p class="cookies-texto">Este sitio utiliza cookies para ' +
+            'mejorar tu experiencia de navegación. Al continuar usando ' +
+            'este sitio, aceptas el uso de cookies.</p>' +
+          '</div>' +
+          '<button class="cookies-aceptar" type="button">Aceptar</button>' +
+        '</div>';
+
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(content);
+      }
+
+      content.querySelector('.cookies-aceptar').addEventListener('click', aceptarCookies);
+    }
+
+    function aceptarCookies() {
+      haptic(10);
+      try { localStorage.setItem(KEY_COOKIES, '1'); } catch (_) {}
+      pintarContenido();
     }
 
     /* ============================================================
@@ -330,7 +356,11 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       construirDOM();
       if (!raiz) return;
 
-      pintarContenido();
+      /* Primera carga: el aviso de cookies va ANTES de la lista
+         (no se puede continuar sin aceptar). Con cookies ya
+         aceptadas, directo a las ciudades. */
+      if (obligatorio && !cookiesAceptadas()) pintarCookies();
+      else                                     pintarContenido();
       haptic(10);
 
       if (obligatorio) raiz.classList.add('bloqueado');

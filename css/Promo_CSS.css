@@ -9,13 +9,19 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  El avance continuo lo lleva
                  Promo_Script (rAF sobre scrollLeft) y el asomo de
                  la tarjeta siguiente es la señal de que hay más.
-                 Campana naranja, tagline naranja, marca gris.
+                 El círculo de la campana viste los colores del
+                 post (borde pastel, fondo claro, punto oficial —
+                 variable --promo-punto que pinta Promo_Script) y
+                 tagline y marca heredan los estilos del item de
+                 la lista (mismo color, tamaño y grosor).
                  Vive fuera del scroll en modo lista. Se oculta
                  en modo detalle.
-VERSIÓN:         1.8
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.9
+CAMBIOS:         R38: el punto del círculo toma el colorOficial
+                 del post vía var(--promo-punto); los overrides
+                 de tagline y marca salen — ahora son EXACTAMENTE
+                 los del item de la lista (Lista_CSS): tagline
+                 13px/400/#64748b y marca 12px/500/#94a3b8.
 DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
                  .fila-titulo, .titulo, .badge, .tagline, .marca),
                  Promo_Script.html (duplica los items para el bucle
@@ -94,53 +100,19 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
   }
 
   /* ============================================================
-     TAGLINE · especificidad (0,3,0), gana a .lista-item .tagline
+     TAGLINE y MARCA · SIN overrides a propósito: heredan las
+     reglas de .lista-item (Lista_CSS) y quedan IDÉNTICAS al
+     item de la lista en color, tamaño y grosor (petición del
+     dueño). Solo la campana tiene estilo propio aquí abajo.
      ============================================================ */
-  .lista-item.promo-item .tagline {
-    display: block;
-    font-size: 13px;
-    line-height: 1.35;
-    font-weight: 500;
-    color: #ea580c;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   /* ============================================================
-     MARCA · especificidad (0,3,0), gana a .lista-item .marca
-     ============================================================ */
-  .lista-item.promo-item .marca {
-    display: flex !important;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #94a3b8;
-    margin-top: 4px;
-    line-height: 1.2;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .lista-item.promo-item .marca .check {
-    color: #059669;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .lista-item.promo-item .marca .marca-texto {
-    display: inline;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: inherit;
-  }
-
-  /* ============================================================
-     CAMPANA · reemplaza al avatar. Mismo tamaño (48×48).
+     CAMPANA · círculo que viste los colores del post.
+     Promo_Script pinta en línea el borde (colorPastel), el
+     fondo (colorClaro) y la variable --promo-punto
+     (colorOficial) que consume el punto ::after. Los valores
+     fijos de esta regla son solo el respaldo si el post no
+     trae colores.
      ============================================================ */
   .promo-campana {
     flex-shrink: 0;
@@ -183,7 +155,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #f97316;
+    background: var(--promo-punto, #f97316);
     box-shadow: 0 0 0 2px #ffffff;
   }
 

@@ -7,17 +7,17 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  resuelve (no en cancelación). Fallback WhatsApp
                  también cuenta. El mensaje de WhatsApp lleva el
                  formato del dueño: saludo con tipo y ciudad,
-                 partner con ✨, título en negrita, tagline y enlace
-                 profundo en línea propia. El botón Partner abre el
-                 bottom sheet dedicado.
+                 partner con ✨, título en negrita, tagline, línea
+                 de confianza (curso: inscripciones abiertas ·
+                 servicio: te lo recomiendo) y enlace profundo en
+                 línea propia. El botón Partner abre el bottom
+                 sheet dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.3
-CAMBIOS:         R37: mensaje de WhatsApp del post con el formato
-                 del dueño: saludo "🖐️ ¡Mira este *TIPO* en Ciudad!
-                 🔎" (tipo CURSO o SERVICIO según el chip), partner
-                 con ✨, título en negrita sin emoji, tagline y
-                 enlace en línea propia. Encabezado simplificado:
-                 solo lo vigente.
+VERSIÓN:         1.4
+CAMBIOS:         R38: línea de confianza en el mensaje del post,
+                 debajo del tagline: "Inscripciones abiertas
+                 actualmente" (curso) o "Te lo recomiendo"
+                 (servicio), según el chip del post.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Comenta_Script.html
@@ -70,6 +70,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         }
       }
       return '';
+    }
+
+    /* Línea de confianza del mensaje (decisión del dueño):
+       curso → inscripciones abiertas · servicio → recomendación. */
+    function esServicio(tipoSingular) {
+      return String(tipoSingular || '').indexOf('SERVIC') === 0;
     }
 
     /* Ciudad del post (la primera declarada) en texto natural. */
@@ -337,13 +343,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var partner = buscarPartner(post.idPartner);
       var nombre  = partner ? String(partner.nombre || '').trim() : '';
 
-      /* R37 · formato WhatsApp del dueño: saludo con tipo y
-         ciudad, partner con ✨, título SIN emoji y en negrita,
-         tagline, y el enlace en línea propia. */
+      /* Formato WhatsApp del dueño: saludo con tipo y ciudad,
+         partner con ✨, título SIN emoji y en negrita, tagline,
+         línea de confianza y el enlace en línea propia. */
       var url = String(urlEnlace || '').trim() || urlApp();
 
       var tipo   = tipoSingularDePost(post);
       var ciudad = ciudadDePost(post);
+
+      var confianza = esServicio(tipo)
+        ? 'Te lo recomiendo'
+        : 'Inscripciones abiertas actualmente';
 
       var saludo;
       if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';
@@ -355,7 +365,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         saludo + '\n\n' +
         (nombre ? '✨ ' + nombre + '\n' : '') +
         '*' + titulo + '*\n' +
-        (tagline ? tagline + '\n\n' : '\n') +
+        (tagline ? tagline + '\n' : '') +
+        confianza + '\n\n' +
         '🔗 Abre la app para ver toda la información' +
         (url ? '\n' + url : '');
 

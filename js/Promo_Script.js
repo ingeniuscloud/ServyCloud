@@ -29,10 +29,11 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-VERSIÓN:         1.6
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.7
+CAMBIOS:         R38: cada item viste los colores de SU post:
+                 título y flecha en colorOficial, y el círculo de
+                 la campana con borde colorPastel, fondo
+                 colorClaro y punto colorOficial.
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                  Ciudad_Sheet_Script.html (getActual),
                  Chips_Script.html (getChipActivo, seleccionar),
@@ -163,11 +164,22 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
       var partner = buscarPartner(post.idPartner) || {};
       var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
 
+      /* Colores del post (mismo contrato que el avatar de la
+         lista: colorOficial con fallback). Pastel y claro
+         alimentan el círculo de la campana; el punto usa el
+         oficial vía --promo-punto (variable CSS). */
+      var oficial = escapeHtml(post.colorOficial || '#475569');
+      var pastel  = escapeHtml(post.colorPastel || post.colorClaro || '#e2e8f0');
+      var claro   = escapeHtml(post.colorClaro || '#f4f6fc');
+
       var html = '';
-      html += '<span class="promo-campana" data-glifo="campana" aria-hidden="true"></span>';
+      html += '<span class="promo-campana" data-glifo="campana" aria-hidden="true" ' +
+              'style="border-color:' + pastel +
+              '; background:' + claro +
+              '; --promo-punto:' + oficial + ';"></span>';
       html += '<span class="body">';
       html +=   '<span class="fila-titulo">';
-      html +=     '<span class="titulo">' + titulo + '</span>';
+      html +=     '<span class="titulo" style="color:' + oficial + '">' + titulo + '</span>';
       if (badge && badge.titulo) {
         var bColor = badge.colorTextoBorde || '#475569';
         html += '<span class="badge" style="color:' + escapeHtml(bColor) + ';">' + escapeHtml(badge.titulo) + '</span>';
@@ -181,7 +193,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                 '</span>';
       }
       html += '</span>';
-      html += '<span class="flecha">›</span>';
+      html += '<span class="flecha" style="color:' + oficial + '">›</span>';
 
       return html;
     }
