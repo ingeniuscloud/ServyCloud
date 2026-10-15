@@ -37,6 +37,34 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
 -->
 
 <!DOCTYPE html>
+<!--
+* ══════════════════════════════════════════════════════════════
+* ARCHIVO:         index.html (GitHub Pages · app MULTI-ARCHIVO)
+* PROYECTO:        ServyCloud | App en GitHub Pages
+* RESPONSABILIDAD: Estructura de la página (espejo del Index.html
+*                  de GAS) + cromo solo-GitHub (GA4, píldora
+*                  instalar, variables de despliegue). Desde R29 la
+*                  producción está PARTIDA: los estilos viven en
+*                  css/<Nombre>.css y los scripts en js/<Nombre>.js,
+*                  con EL MISMO NOMBRE que sus hermanos de Apps
+*                  Script (procedimiento del dueño: se prueba en
+*                  GAS y lo que queda bien se paga en GitHub).
+*                  Telefono.html queda inline (es HTML del body).
+*                  GAS (/exec) sigue siendo SOLO el motor de datos.
+* VERSIÓN:         1.0
+* CAMBIOS:         R29: nace la carpeta multi-archivo (GO del
+*                  dueño). Partido de Index_GitHub.html v4.1, que
+*                  queda como respaldo. Icono PWA nuevo: "Servy"
+*                  en cursiva (antes SERVY en mayúsculas).
+* DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
+*                  sw.js, icon-192.png, icon-512.png. Backend:
+*                  /exec doPost con abrirSesion (R26). Regla: el
+*                  contenido de cada css/js es el INTERIOR del
+*                  fragmento de GAS, SIN el envoltorio de estilo o
+*                  de script (el encabezado va como comentario).
+* ══════════════════════════════════════════════════════════════
+-->
+
 <html lang="es">
 <head>
   <base target="_top">
