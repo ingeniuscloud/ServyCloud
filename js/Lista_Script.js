@@ -14,8 +14,14 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.3
-CAMBIOS:         R19: blindaje del cierre diferido. El borrado del
+VERSIÓN:         1.4
+CAMBIOS:         R36: compartir por enlace · pintarBusqueda emite
+                 'buscar:resultados' con la CANTIDAD de posts que
+                 trajo el filtro: Compartir activa el botón
+                 compartir SOLO cuando la búsqueda filtró alguna
+                 lista (con resultados). Cero cambios en el filtro
+                 ni en el pintado.
+                 R19: blindaje del cierre diferido. El borrado del
                  detalle se agenda a 200 ms (fade) pero NO re-chequeaba
                  el modo al ejecutarse: si un cross-sell abría otro post
                  a los ~80 ms (cambio de chip o de ciudad), el borrado
@@ -38,8 +44,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
                  (getActual, hayPendiente), Chips_Script.html
                  (getChipActivo, seleccionar), Core_Script.html
                  (window.PostFull.obtener), Lista_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Lista = (function () {
 
@@ -373,7 +378,14 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     }
 
     function pintarBusqueda(termino, enLimite) {
-      pintarLista(postsDeBusqueda(termino), true, enLimite);
+      var resultados = postsDeBusqueda(termino);
+      pintarLista(resultados, true, enLimite);
+
+      /* R36: cuántos posts trajo el filtro — Compartir activa el
+         botón compartir solo si hubo resultados. */
+      document.dispatchEvent(new CustomEvent('buscar:resultados', {
+        detail: { cantidad: resultados.length, termino: termino || '' }
+      }));
     }
 
     /* ============================================================

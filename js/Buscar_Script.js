@@ -8,14 +8,19 @@ RESPONSABILIDAD: Buscador in-place en la fila de chips. Al tocar
                  inmediato). Al escribir, emite 'buscar:change'
                  con el término y el flag de límite alcanzado.
                  Límite: 40 chars.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
+VERSIÓN:         1.1
+CAMBIOS:         R36: compartir por enlace · al abrir y al cerrar la
+                 búsqueda se emite 'buscar:estado' ({abierta: true |
+                 false}): el módulo Compartir usa esa señal para
+                 mostrar el botón compartir INACTIVO en cuanto se
+                 abre el campo y volver a ocultarlo al cerrar. Cero
+                 cambios en el flujo de búsqueda existente.
+                 R5: baseline de producción incorporado al espejo;
                  encabezado normalizado al estándar ═══ (6 campos).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
                  Chips_Script.html (window.Chips), Lista_Script.html
                  (window.Lista.getPostActivo)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Buscar = (function () {
 
@@ -44,6 +49,15 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       }));
     }
 
+    /* R36: estado de la fila de búsqueda (abierta/cerrada) para
+       Compartir · el botón compartir aparece INACTIVO al abrir y
+       se oculta al cerrar. */
+    function emitirEstado(abierta) {
+      document.dispatchEvent(new CustomEvent('buscar:estado', {
+        detail: { abierta: abierta === true }
+      }));
+    }
+
     function abrir() {
       if (abierto) return;
       if (!wrap) return;
@@ -51,6 +65,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       abierto = true;
       wrap.classList.add('buscando');
       input.value = '';
+
+      emitirEstado(true);
 
       void input.offsetHeight;
       input.focus();
@@ -65,6 +81,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
     function cerrar() {
       if (!abierto) return;
       abierto = false;
+
+      emitirEstado(false);
 
       if (document.activeElement === input) input.blur();
 

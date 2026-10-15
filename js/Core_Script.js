@@ -20,8 +20,20 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.8
-CAMBIOS:         R26 (la app vive en GitHub Pages · sesión por
+VERSIÓN:         1.9
+CAMBIOS:         R36: compartir por enlace · (a) en arranque(), tras
+                 Puente.aplicarEstado, si la URL trae el parámetro
+                 del enlace compartido (window.Compartir.hayEntrante)
+                 la recepción MANDA: se salta la selección obligatoria
+                 de ciudad (el enlace trae su ciudad), se espera la
+                 carga de TABLAS, se inyecta el lienzo y se llama
+                 Compartir.recibir() — que aplica ciudad/término/post
+                 y activa el modo compartido con el campo bloqueado
+                 y "Limpiar búsqueda"; (b) arrancarComponentes llama
+                 Compartir.pintar() para ligar #btnCompartir y
+                 #btnLimpiarBusqueda. Fuera de un enlace entrante el
+                 arranque es IDÉNTICO al de v1.8.
+                 R26 (la app vive en GitHub Pages · sesión por
                  datos): (a) arranque() espera window.asegurarSesion
                  (Global_Script 1.5) ANTES de cargar TABLAS y de
                  pedir el estado del puente: SISTEMA ya está en
@@ -109,9 +121,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  Chips_Script.html, Buscar_Script.html,
                  Promo_Script.html, Social_Script.html,
                  Global_Menu_Script.html (window.Global), Lista_Script.html,
-                 Seccion_Script.html, Comenta_Script.html
-════════════════════════════════════════════════════════════════════
-*/
+                 Seccion_Script.html, Comenta_Script.html,
+                 Compartir_Script.html (R36 · recibir/pintar)
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      CACHEL2 · capa del dispositivo (R21 · Propuesta 1 del dueño)
@@ -896,6 +908,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (window.Global && typeof window.Global.pintar === 'function') {
         window.Global.pintar();
       }
+      /* R36: liga #btnCompartir y #btnLimpiarBusqueda */
+      if (window.Compartir && typeof window.Compartir.pintar === 'function') {
+        window.Compartir.pintar();
+      }
 
       pintarAreaConPost(null);
       actualizarTextoCTA();
@@ -946,6 +962,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       pre.then(function () {
         window.Puente.pedirEstado().then(function (estado) {
           window.Puente.aplicarEstado(estado);
+
+          /* R36 · ENLACE COMPARTIDO ENTRANTE: la recepción manda.
+             El enlace trae su contenido cifrado (post o lista con
+             ciudad): se omite la selección obligatoria de ciudad,
+             se espera la carga de TABLAS, se inyecta el lienzo y
+             Compartir.recibir() aplica todo y activa el modo
+             compartido (campo bloqueado + "Limpiar búsqueda"). */
+          if (window.Compartir &&
+              typeof window.Compartir.hayEntrante === 'function' &&
+              window.Compartir.hayEntrante()) {
+            promesaCarga.then(function () {
+              inyectarLienzo();
+              try {
+                window.Compartir.recibir();
+              } catch (e2) {
+                console.warn('[Core] Compartir.recibir:', e2 && e2.message);
+              }
+            });
+            return;
+          }
 
           var hayPendiente = window.Ciudad &&
                              typeof window.Ciudad.hayPendiente === 'function' &&

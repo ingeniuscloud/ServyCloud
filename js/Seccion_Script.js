@@ -25,8 +25,15 @@ RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  Ubicación: solo si el post la declara Y el partner
                  tiene direccion. Si falta cualquiera de las dos,
                  no se crea la sección (no queda ni el título).
-VERSIÓN:         1.3
-CAMBIOS:         R31: nueva sección 5 · seccionUbicacion. Muestra el
+VERSIÓN:         1.4
+CAMBIOS:         R36: compartir por enlace · irAPost() pasa a API
+                 pública (window.Secciones.irAPost): el módulo
+                 Compartir reutiliza EXACTAMENTE el mismo camino
+                 R19 del cross-sell para abrir el post de un enlace
+                 (cambio de ciudad con aplicarGuardada + cambio de
+                 chip + apertura diferida 80 ms). Lógica intacta:
+                 solo se publica en el return.
+                 R31: nueva sección 5 · seccionUbicacion. Muestra el
                  título del post más la dirección del partner con
                  enlace a Google Maps, reutilizando el MISMO bloque
                  del sheet del partner (.partner-dato-maps / -icon /
@@ -67,8 +74,7 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Partner_Sheet_CSS.html (bloque .partner-dato-maps /
                  -icon / -texto / -valor y .partner-maps-cta que
                  reutiliza la sección Ubicación · R31)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Secciones = (function () {
 
@@ -741,7 +747,8 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
 
     return {
       pintar:    pintar,
-      irAInicio: irAInicio
+      irAInicio: irAInicio,
+      irAPost:   irAPost
     };
 
   })();

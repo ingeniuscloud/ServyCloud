@@ -12,8 +12,15 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  el header y la lista.
                  Incluye botón de ciudad (.city-bar) encima de la
                  fila de chips. Módulo Ciudad se encarga de todo.
-VERSIÓN:         1.1
-CAMBIOS:         R10: división PARTE G — se añaden los includes de los
+VERSIÓN:         1.2
+CAMBIOS:         R36: compartir por enlace — espejo del Index.html
+                 1.2 de GAS: botón circular #btnCompartir (entre la
+                 lupa y el menú, oculto por defecto, INACTIVO al
+                 abrir la búsqueda y activo solo con resultados),
+                 botón "Limpiar búsqueda" (#btnLimpiarBusqueda) en
+                 la fila de búsqueda (solo modo compartido) y script
+                 js/Compartir_Script.js antes de Core_Script.js.
+                 R10: división PARTE G — se añaden los includes de los
                  3 archivos nuevos: Seccion_Imagen_CSS.html,
                  Reserva_Exito_CSS.html y Global_Menu_Script.html.
                  R5: baseline de producción incorporado al espejo;
@@ -505,6 +512,18 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
+          <!-- R36 · Compartir búsqueda · círculo igual que el menú
+               global. Oculto por defecto; Buscar y Lista lo activan
+               con buscar:estado / buscar:resultados. -->
+          <button type="button" class="btn-compartir" id="btnCompartir"
+                  aria-label="Compartir búsqueda" hidden disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </button>
+
           <button type="button" class="menu-global" aria-label="Menú">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="5"  cy="12" r="1.7"/>
@@ -533,6 +552,13 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                 <line x1="6" y1="6" x2="18" y2="18"/>
                 <line x1="18" y1="6" x2="6" y2="18"/>
               </svg>
+            </button>
+
+            <!-- R36 · Solo visible en modo compartido (enlace
+                 entrante): libera la vista y devuelve el acceso
+                 normal a ciudades, chips y listas. -->
+            <button type="button" class="btn-limpiar" id="btnLimpiarBusqueda">
+              Limpiar búsqueda
             </button>
           </div>
 
@@ -563,7 +589,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>

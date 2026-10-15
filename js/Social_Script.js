@@ -8,8 +8,17 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  también cuenta. El botón Partner abre el bottom
                  sheet dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.1
-CAMBIOS:         R12: Capa 1 GA4. like se mide SOLO aquí (frontend)
+VERSIÓN:         1.2
+CAMBIOS:         R36: compartir por enlace · el texto a compartir
+                 del post lleva el ENLACE PROFUNDO cifrado que
+                 genera Compartir.urlDePost(post) (abre la app
+                 directo en ese post, misma ciudad y chip) en vez
+                 de la URL principal; si Compartir no está o el
+                 cifrado no está disponible, cae a la URL principal
+                 de siempre. El texto vive íntegro aquí (Compartir
+                 solo devuelve el enlace). El conteo de compartidos
+                 y el fallback WhatsApp NO cambian.
+                 R12: Capa 1 GA4. like se mide SOLO aquí (frontend)
                  cuando el usuario da un like NUEVO (quitar like no
                  dispara; sin doble conteo con el backend).
                  R5: baseline de producción incorporado al espejo;
@@ -20,8 +29,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  (window.Comentarios), Partner_Sheet_Script.html
                  (window.PartnerSheet), Lista_Script.html
                  (window.Lista), Social_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Social = (function () {
 
@@ -299,7 +307,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     /* ============================================================
        Texto a compartir
        ============================================================ */
-    function generarTextoCompartir(post) {
+    function generarTextoCompartir(post, urlEnlace) {
       var sj = post.seccionJson || {};
       var sp = sj.seccionPresentacion || {};
 
@@ -309,7 +317,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var partner = buscarPartner(post.idPartner);
       var nombre  = partner ? String(partner.nombre || '').trim() : '';
 
-      var url = urlApp();
+      /* R36: enlace profundo del post (cifrado, abre directo en
+         el post). Si Compartir no lo puede armar, la URL
+         principal de siempre. */
+      var url = String(urlEnlace || '').trim() || urlApp();
 
       var texto =
         '¡Mira esto! 📌\n\n' +
@@ -322,34 +333,52 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return { titulo: titulo, texto: texto };
     }
 
+    /* R36: texto a compartir con enlace profundo · Promise.
+       Compartir.urlDePost resuelve el enlace cifrado (o la URL
+       principal si no pudo). */
+    function textoCompartirDe(post) {
+      if (window.Compartir && typeof window.Compartir.urlDePost === 'function') {
+        return window.Compartir.urlDePost(post)
+          .then(function (enlace) {
+            return generarTextoCompartir(post, enlace);
+          })
+          .catch(function () {
+            return generarTextoCompartir(post, '');
+          });
+      }
+      return Promise.resolve(generarTextoCompartir(post, ''));
+    }
+
     /* ============================================================
        Share nativo
        ============================================================ */
     function compartirNativo(post) {
       if (!navigator.share) return Promise.resolve('no-soportado');
 
-      var info = generarTextoCompartir(post);
-
-      return navigator.share({
-        title: info.titulo,
-        text:  info.texto
-      })
-      .then(function () {
-        return 'compartido';
-      })
-      .catch(function (err) {
-        if (err && err.name === 'AbortError') return 'cancelado';
-        return 'cancelado';
-      });
+      return textoCompartirDe(post)
+        .then(function (info) {
+          return navigator.share({
+            title: info.titulo,
+            text:  info.texto
+          })
+          .then(function () {
+            return 'compartido';
+          })
+          .catch(function (err) {
+            if (err && err.name === 'AbortError') return 'cancelado';
+            return 'cancelado';
+          });
+        });
     }
 
     /* ============================================================
        Fallback WhatsApp
        ============================================================ */
     function compartirWhatsApp(post) {
-      var info = generarTextoCompartir(post);
-      var url = 'https://wa.me/?text=' + encodeURIComponent(info.texto);
-      window.open(url, '_blank', 'noopener,noreferrer');
+      textoCompartirDe(post).then(function (info) {
+        var url = 'https://wa.me/?text=' + encodeURIComponent(info.texto);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
     }
 
     /* ============================================================
