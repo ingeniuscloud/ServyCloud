@@ -20,22 +20,30 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  está inyectado; se aplica ciudad + contenido y la
                  app entra en MODO COMPARTIDO: ciudad VISTA pero
                  BLOQUEADA, campo de búsqueda fijado SIN foco y solo
-                 "Limpiar filtro" a la derecha (sin menú global);
-                 en un post compartido esa fila sustituye al par
-                 volver/título del modo detalle. Al limpiar vuelve
+                 "Limpiar filtro" a la derecha (sin menú global).
+                 El header del detalle lo decide el TIPO de enlace
+                 (esta ronda marca el body): con UN post la fila
+                 sustituye al par volver/título del modo detalle y
+                 la salida es "Limpiar filtro"; con una LISTA cada
+                 post abre con volver/título normales para recorrer
+                 los demás posts del filtro, y "Limpiar filtro"
+                 queda en la lista. Al limpiar vuelve
                  todo el catálogo (la ciudad del enlace queda como
                  la del receptor). Aviso amable si el contenido
                  compartido ya no existe. La instalación de la PWA
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         1.3
-CAMBIOS:         R42: encabezado y comentarios al día — la fila
-                 del modo compartido dice "Limpiar filtro" (la
-                 etiqueta vive en Index.html) y el emisor de
-                 lista es la píldora "Compartir". Cero cambios
-                 de código: enlace corto ?s=, receptor legacy
-                 ?d= y línea de confianza quedan igual.
+VERSIÓN:         1.4
+CAMBIOS:         R43: lista compartida — activarModo marca el body
+                 con compartido-lista / compartido-post y limpiar
+                 los retira; con eso Chips_CSS devuelve el par
+                 volver/título dentro de cada post de una lista
+                 compartida (el receptor puede verlos todos y
+                 regresar). El post compartido solitario queda
+                 exactamente igual: la fila con "Limpiar filtro"
+                 es su salida. Enlace corto ?s=, receptor legacy
+                 ?d= y línea de confianza intactos.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Buscar_Script.html (buscar:estado,
                  #buscarInput), Lista_Script.html
@@ -467,6 +475,17 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         if (typeof input.blur === 'function') input.blur();
       }
 
+      /* El header del detalle lo decide el TIPO de enlace:
+         compartido-lista → dentro del post vuelve el par
+         volver/título (Chips_CSS) para recorrer la lista;
+         compartido-post  → la fila con "Limpiar filtro" sigue
+         sustituyendo a ese par, como siempre. */
+      document.body.classList.remove('compartido-post');
+      document.body.classList.remove('compartido-lista');
+      document.body.classList.add(
+        tipo === 'post' ? 'compartido-post' : 'compartido-lista'
+      );
+
       /* La ciudad se ve pero NO se toca (CSS en Chips_CSS) */
       document.body.classList.add('modo-compartido');
     }
@@ -591,6 +610,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
 
       modoCompartido = null;
+      document.body.classList.remove('compartido-post');
+      document.body.classList.remove('compartido-lista');
       document.body.classList.remove('modo-compartido');
 
       /* Post compartido: la app está en modo detalle. Limpiar
