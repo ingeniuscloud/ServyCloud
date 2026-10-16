@@ -6,10 +6,15 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  dinámico) + CTA alineado a la izquierda para
                  respetar la columna de contenido. Incluye estado
                  deshabilitado en naranja tenue para cursos "pronto".
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.2
+CAMBIOS:         R46: la fila .cta-fila agrupa duda + CTA (duda a
+                 la IZQUIERDA: outline de 1px en el color del
+                 post, fondo transparente, nunca deshabilitada;
+                 CTA a la DERECHA con su diseño intacto — texto a
+                 la izquierda + flecha a la derecha — tomando el
+                 ancho restante). Ocultar .cta-duda[hidden] y
+                 .cta-fila en modo lista. Responsive 360 ajustado
+                 a la fila.
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
 ════════════════════════════════════════════════════════════════════*/
@@ -180,13 +185,72 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
+     FILA CTA (R46) · duda a la izquierda + CTA a la derecha
+     La fila toma el ancho/márgenes que antes tenía el CTA solo.
+     La duda: outline FINO de 1px en el color del post, fondo
+     transparente, no se deshabilita nunca y no compite con el
+     CTA (si el post es modo WhatsApp, Core_Script la oculta).
+     ============================================================ */
+  .cta-fila {
+    flex-shrink: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    width: calc(100% - 86px);
+    margin: 4px 60px 16px 26px;
+  }
+
+  .cta-fila .cta-reservar {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .cta-duda {
+    flex: 0 0 auto;
+    max-width: 46%;
+    padding: 14px 18px;
+
+    border: 1px solid var(--post-color, #64748b);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--post-color, #475569);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease;
+  }
+
+  .cta-duda:active { opacity: 0.55; }
+
+  .cta-duda[hidden] { display: none; }
+
+  body.modo-lista .cta-fila { display: none !important; }
+
+  /* ============================================================
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .cta-reservar {
+    .cta-fila {
       width: calc(100% - 74px);
       margin: 4px 52px 16px 22px;
+    }
+    .cta-fila .cta-reservar {
       padding: 13px 18px;
+      font-size: 14px;
+    }
+    .cta-duda {
+      padding: 13px 14px;
       font-size: 14px;
     }
   }

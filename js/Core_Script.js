@@ -20,10 +20,14 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.10
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.11
+CAMBIOS:         R46: vuelve el botón de duda del post
+                 (.cta-duda): visible solo si meta.botonDuda trae
+                 texto y el CTA NO es modo WhatsApp; nunca
+                 deshabilitado; al pulsar abre el WhatsApp del
+                 partner con meta.mensajeDuda sustituyendo
+                 {titulo} por el título del post y dispara
+                 GA4 whatsapp_click con tipo "duda".
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
@@ -511,33 +515,107 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     function actualizarTextoCTA() {
       var btn  = document.querySelector('.cta-reservar');
       var span = document.querySelector('.cta-reservar .cta-reservar-texto');
-      if (!btn || !span) return;
 
-      if (!postActivoGlobal) {
-        btn.disabled = true;
-        span.textContent = 'Quiero reservar mi cupo';
-        return;
+      if (btn && span) {
+        if (!postActivoGlobal) {
+          btn.disabled = true;
+          span.textContent = 'Quiero reservar mi cupo';
+        } else {
+          var sj = postActivoGlobal.seccionJson || {};
+          var meta = sj.meta || {};
+          span.textContent = meta.cta || 'Quiero reservar mi cupo';
+
+          var estado = postActivoGlobal.estado || 'activo';
+
+          if (estado === 'pronto') {
+            btn.disabled = true;
+          } else if (esModoWhatsapp(postActivoGlobal)) {
+            btn.disabled = false;
+          } else {
+            var totalCupos = calcularTotalCupos(postActivoGlobal);
+            btn.disabled = (totalCupos === 0);
+          }
+        }
       }
 
-      var sj = postActivoGlobal.seccionJson || {};
-      var meta = sj.meta || {};
-      span.textContent = meta.cta || 'Quiero reservar mi cupo';
-
-      var estado = postActivoGlobal.estado || 'activo';
-
-      if (estado === 'pronto') {
-        btn.disabled = true;
-        return;
-      }
-
-      if (esModoWhatsapp(postActivoGlobal)) {
-        btn.disabled = false;
-        return;
-      }
-
-      var totalCupos = calcularTotalCupos(postActivoGlobal);
-      btn.disabled = (totalCupos === 0);
+      /* R46: la duda del post se sincroniza con cada cambio
+         (mismos disparadores que el CTA). */
+      actualizarDuda();
     }
+
+    /* ============================================================
+       R46 · DUDA DEL POST (botón "Consultar")
+       Visibilidad: solo si el post declara meta.botonDuda con
+       texto Y el CTA NO es modo WhatsApp (dos botones que abren
+       WhatsApp no suman). Nunca se deshabilita: aunque el CTA
+       esté off (pronto o cupos agotados), preguntar sigue siendo
+       válido. El texto viaja en meta.mensajeDuda con el
+       placeholder {titulo}, que se sustituye por el título del
+       post al armar el mensaje.
+       ============================================================ */
+    function actualizarDuda() {
+      var btn = document.querySelector('.cta-duda');
+      if (!btn) return;
+
+      var texto = '';
+      if (postActivoGlobal) {
+        var sj = postActivoGlobal.seccionJson || {};
+        var meta = sj.meta || {};
+        texto = String(meta.botonDuda || '').trim();
+        if (esModoWhatsapp(postActivoGlobal)) texto = '';
+      }
+
+      if (texto) {
+        btn.textContent = texto;
+        btn.hidden = false;
+      } else {
+        btn.hidden = true;
+      }
+    }
+
+    /* Click de la duda · delegado en document (capture, mismo
+       carril que el CTA). Arma el mensaje con {titulo} y abre
+       el WhatsApp del partner. */
+    document.addEventListener('click', function (e) {
+      var objetivo = e.target;
+      if (!objetivo || !objetivo.closest) return;
+
+      var btn = objetivo.closest('.cta-duda');
+      if (!btn || btn.hidden) return;
+
+      var post = postActivoGlobal;
+      if (!post) return;
+
+      var sj = post.seccionJson || {};
+      var meta = sj.meta || {};
+      var sp = sj.seccionPresentacion || {};
+
+      var mensaje = String(meta.mensajeDuda || '').trim();
+      if (!mensaje) return;
+
+      var titulo = String(sp.titulo || post.titulo || '').trim();
+      if (titulo) mensaje = mensaje.split('{titulo}').join(titulo);
+
+      var partner = buscarPartner(post.idPartner);
+      var numero = partner && partner.partnerJson
+        ? partner.partnerJson.whatsapp
+        : '';
+      if (!numero) return;
+
+      if (typeof window.abrirWhatsapp === 'function') {
+        window.abrirWhatsapp(numero, mensaje);
+
+        /* GA4 (R12): mismo evento del CTA, con el tipo para
+           separar duda de reserva en los informes. */
+        if (window.Analitica) {
+          window.Analitica.enviar('whatsapp_click', {
+            post_id:    post.id || '',
+            partner_id: post.idPartner || '',
+            tipo:       'duda'
+          });
+        }
+      }
+    }, true);
 
     document.addEventListener('click', function (e) {
       var objetivo = e.target;

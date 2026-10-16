@@ -25,10 +25,13 @@ RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  Ubicación: solo si el post la declara Y el partner
                  tiene direccion. Si falta cualquiera de las dos,
                  no se crea la sección (no queda ni el título).
-VERSIÓN:         1.5
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.6
+CAMBIOS:         R46: la fecha de inicio del turno
+                 (plan.fechaInicio, ISO en PLANJSON) se pinta
+                 como PRIMERA fila del turno-card, arriba de
+                 Inscripción, en formato largo
+                 ("Lunes 26 de octubre"). Si el turno no trae
+                 fechaInicio, no se pinta nada (compatibilidad).
 DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Chips_Script.html (window.Chips),
@@ -112,6 +115,31 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
       var mes = parseInt(partes[1], 10) - 1;
       if (isNaN(dia) || isNaN(mes) || !MESES[mes]) return iso;
       return dia + ' de ' + MESES[mes];
+    }
+
+    /* R46 · fecha larga con día de la semana
+       ("Lunes 26 de octubre") para la fecha de inicio del turno.
+       Se parsea por PARTES (como formatearFecha) y se construye
+       la fecha en hora LOCAL: new Date("2026-10-26") sería UTC
+       medianoche y en UTC-4 retrocedería al día anterior, dando
+       el día de la semana equivocado. */
+    var DIAS_SEMANA = [
+      'Domingo','Lunes','Martes','Miércoles',
+      'Jueves','Viernes','Sábado'
+    ];
+
+    function formatearFechaLarga(iso) {
+      if (!iso || typeof iso !== 'string') return '';
+      var partes = iso.split('-');
+      if (partes.length !== 3) return '';
+      var anio = parseInt(partes[0], 10);
+      var mes  = parseInt(partes[1], 10) - 1;
+      var dia  = parseInt(partes[2], 10);
+      if (isNaN(anio) || isNaN(mes) || isNaN(dia)) return '';
+      if (!MESES[mes] || !DIAS_SEMANA) return '';
+      var f = new Date(anio, mes, dia);
+      if (isNaN(f.getTime())) return '';
+      return DIAS_SEMANA[f.getDay()] + ' ' + dia + ' de ' + MESES[mes];
     }
 
     function formatearBs(n) {
@@ -313,6 +341,18 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
 
       if (horario) {
         html += '<p class="turno-card-sub">' + escapeHtml(horario) + '</p>';
+      }
+
+      /* R46 · FECHA DE INICIO DEL TURNO: primera fila del card,
+         arriba de Inscripción (que es fechasPago[0]). Fila
+         destacada (color del post) con la fecha en formato
+         largo. Si el turno no declara fechaInicio, no se pinta
+         nada. */
+      var inicio = formatearFechaLarga(plan.fechaInicio);
+      if (inicio) {
+        html += '<div class="turno-inv-row destacado">';
+        html +=   '<span class="turno-inv-concepto">' + escapeHtml(inicio) + '</span>';
+        html += '</div>';
       }
 
       var pagos = plan.fechasPago || [];

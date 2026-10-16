@@ -15,11 +15,14 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  La fila de filtros lleva lupa, COMPARTIR (píldora
                  icono + texto "Compartir", glifo del post vía
                  Iconos.js) y menú global.
-VERSIÓN:         1.5
-CAMBIOS:         R42: el botón del modo compartido pasa de
-                 "Limpiar búsqueda" a "Limpiar filtro" — lo que
-                 suelta es el filtro que viajó en el enlace, no
-                 una búsqueda tecleada.
+VERSIÓN:         1.6
+CAMBIOS:         R46: vuelve el botón de duda del post
+                 (meta.botonDuda "Consultar") en una fila .cta-fila:
+                 duda a la IZQUIERDA con borde fino de 1px en el
+                 color del post, CTA a la DERECHA igual que antes
+                 (texto a la izquierda + flecha a la derecha).
+                 La fila entera se oculta en modo lista y la duda
+                 desaparece si el CTA es modo WhatsApp.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -573,15 +576,28 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           <div class="secciones-track" id="seccionesTrack" hidden></div>
         </div>
 
-        <button type="button" class="cta-reservar" aria-label="Reservar cupo">
-          <span class="cta-reservar-texto">Quiero reservar mi cupo</span>
-          <span class="cta-reservar-icono" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M5 12h14"/>
-              <path d="m12 5 7 7-7 7"/>
-            </svg>
-          </span>
-        </button>
+        <div class="cta-fila">
+
+          <!-- Duda del post · botón outline a la IZQUIERDA del CTA
+               (decisión del dueño). Se muestra solo si el post
+               declara meta.botonDuda con texto Y el CTA NO es modo
+               WhatsApp (dos botones que abren WhatsApp no suman).
+               Nunca se deshabilita. Core_Script decide
+               visibilidad/texto y arma el mensaje con
+               meta.mensajeDuda + {titulo}. -->
+          <button type="button" class="cta-duda" hidden>Consultar</button>
+
+          <button type="button" class="cta-reservar" aria-label="Reservar cupo">
+            <span class="cta-reservar-texto">Quiero reservar mi cupo</span>
+            <span class="cta-reservar-icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </button>
+
+        </div>
 
         <div class="botones-flotantes"></div>
       </div>
