@@ -11,11 +11,19 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  de confianza (curso: inscripciones abiertas con
                  invitación a reservar en la app · servicio: te lo
                  recomiendo) y enlace profundo en
-                 línea propia. El botón Partner abre el bottom
-                 sheet dedicado.
+                 línea propia. La fila del partner (bajo la fila
+                 CTA, estilo Instagram) abre el bottom sheet
+                 dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.5
-CAMBIOS:         R40: la línea de confianza del curso pasa a
+VERSIÓN:         1.6
+CAMBIOS:         R49: el botón Partner sale de la columna
+                 flotante y vive en la fila .user-fila bajo la
+                 fila CTA (estilo Instagram del dueño): nombre
+                 del partner y su eslogan como subtítulo, misma
+                 acción (Partner Sheet). La fila se oculta sin
+                 post/partner; el rail queda like/comenta/
+                 comparte.
+                 R40: la línea de confianza del curso pasa a
                  "Inscripciones abiertas, reserva tu cupo desde
                  ya en la app Servy" (servicio: "Te lo
                  recomiendo" sin cambio).
@@ -152,14 +160,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       shares.textContent = '0';
       contenedor.appendChild(shares);
 
-      var btnPartner = document.createElement('button');
-      btnPartner.type = 'button';
-      btnPartner.id = 'btnPartnerFlotante';
-      btnPartner.className = 'btn-partner';
-      btnPartner.setAttribute('aria-label', 'Sobre el partner');
-      btnPartner.setAttribute('data-glifo', 'user');
-      contenedor.appendChild(btnPartner);
-
       if (typeof window.pintarGlifos === 'function') {
         window.pintarGlifos(contenedor);
       }
@@ -167,7 +167,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       btnLike.addEventListener('click', onLikeClick);
       btnComment.addEventListener('click', onCommentClick);
       btnShare.addEventListener('click', onShareClick);
-      btnPartner.addEventListener('click', irAPartner);
+
+      engancharUserFila();
+      actualizarUserFila();
 
       if (!postActivoObj && window.Lista && typeof window.Lista.getPostActivo === 'function') {
         postActivoObj = window.Lista.getPostActivo();
@@ -473,11 +475,62 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
+       FILA PARTNER (R49) · estilo Instagram bajo la fila CTA.
+       Muestra nombre + eslogan del partner del post activo y
+       mantiene la acción de siempre: abrir el Partner Sheet.
+       Sin post/partner: fila oculta. El texto vive en
+       Index.html (userFila); aquí solo se llena y se decide
+       visibilidad (post:change + arranque).
+       ============================================================ */
+    function partnerDePost(post) {
+      if (!post || !post.idPartner) return null;
+      var partners = (window.TABLAS && window.TABLAS.partners) || [];
+      for (var i = 0; i < partners.length; i++) {
+        if (partners[i].id === post.idPartner) return partners[i];
+      }
+      return null;
+    }
+
+    function actualizarUserFila() {
+      var fila = document.getElementById('userFila');
+      if (!fila) return;
+
+      var partner = partnerDePost(postActivoObj);
+      var nombre = (partner && partner.nombre) ? String(partner.nombre).trim() : '';
+      if (!nombre) {
+        fila.hidden = true;
+        return;
+      }
+
+      var pj = (partner && partner.partnerJson) || {};
+      var eslogan = String(pj.esloganPartner || '').trim();
+
+      var nombreEl  = fila.querySelector('.user-nombre');
+      var esloganEl = fila.querySelector('.user-eslogan');
+
+      if (nombreEl) nombreEl.textContent = nombre;
+      if (esloganEl) {
+        esloganEl.textContent = eslogan;
+        esloganEl.hidden = !eslogan;
+      }
+
+      fila.hidden = false;
+    }
+
+    function engancharUserFila() {
+      var fila = document.getElementById('userFila');
+      if (!fila || fila.getAttribute('data-enganchado') === '1') return;
+      fila.setAttribute('data-enganchado', '1');
+      fila.addEventListener('click', irAPartner);
+    }
+
+    /* ============================================================
        Escuchar eventos
        ============================================================ */
     document.addEventListener('post:change', function (e) {
       postActivoObj = (e.detail && e.detail.post) ? e.detail.post : null;
       actualizarContadores();
+      actualizarUserFila();
     });
 
     document.addEventListener('chips:change', function () {

@@ -2,16 +2,20 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de los botones flotantes laterales. Botón
-                 Partner circular con borde del color oficial
-                 del post, sin fondo.
+RESPONSABILIDAD: CSS de los botones flotantes laterales (like,
+                 comenta, comparte + contadores).
                  Iconos sociales OUTLINE con stroke-width 1.05
-                 (equivalente visual a 1.2px reales · mismo
-                 grosor del borde del botón partner).
+                 (equivalente visual a 1.2px reales).
                  Like con fill rojo cuando está activo.
                  Corazón volador: sube linealmente 200px.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 La fila del partner (.user-fila) vive en
+                 Core_CSS.html desde R49.
+VERSIÓN:         1.2
+CAMBIOS:         R49: se retira el botón Partner flotante (su
+                 fila .user-fila vive en Core_CSS.html desde
+                 R49). Quedan los botones flotantes like/
+                 comenta/comparte con sus contadores.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
@@ -134,44 +138,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .likes-flotante.bump { transform: scale(1.25); }
 
   /* ============================================================
-     BOTÓN PARTNER · círculo con borde del color del post
-     ============================================================ */
-  .btn-partner {
-    width: 34px;
-    height: 34px;
-    margin-top: 14px;
-    padding: 0;
-
-    border: 1.2px solid var(--post-color, #475569);
-    border-radius: 50%;
-    background: transparent;
-
-    color: var(--post-color, #475569);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-  }
-  .btn-partner:active {
-    opacity: 0.6;
-    transform: scale(0.92);
-  }
-  .btn-partner svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
      CORAZÓN VOLADOR · relleno rojo
      ============================================================ */
   .heart-pop-wrap {
@@ -225,6 +191,4 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .btn-flotante { width: 34px; height: 34px; }
     .btn-flotante svg { width: 24px; height: 24px; }
     .likes-flotante { font-size: 0.75rem; width: 38px; }
-    .btn-partner { width: 30px; height: 30px; }
-    .btn-partner svg { width: 18px; height: 18px; }
   }

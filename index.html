@@ -15,8 +15,16 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  La fila de filtros lleva lupa, COMPARTIR (píldora
                  icono + texto "Compartir", glifo del post vía
                  Iconos.js) y menú global.
-VERSIÓN:         1.6
-CAMBIOS:         R46: vuelve el botón de duda del post
+VERSIÓN:         1.7
+CAMBIOS:         R49: fila del partner .user-fila bajo la fila
+                 CTA (estilo Instagram del dueño): círculo con
+                 glifo user + punto como la campanita de la
+                 promo, nombre del partner y su eslogan como
+                 subtítulo. Misma acción (Partner Sheet), sin
+                 chevron. Social_Script llena textos y decide
+                 visibilidad; oculta en modo lista y sin
+                 partner.
+                 R46: vuelve el botón de duda del post
                  (meta.botonDuda "Consultar") en una fila .cta-fila:
                  duda a la IZQUIERDA con borde fino de 1px en el
                  color del post, CTA a la DERECHA igual que antes
@@ -598,6 +606,28 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           </button>
 
         </div>
+
+        <!-- R49 · Fila del partner · estilo Instagram bajo la fila
+             CTA. Círculo con glifo user + punto (como la campanita
+             de la promo) + nombre del partner y su eslogan como
+             subtítulo. Social_Script llena textos/visibilidad con
+             post:change y mantiene la MISMA acción de antes:
+             abrir el Partner Sheet. Sin chevron (decisión del
+             dueño: fricción con la flecha del CTA). Oculta en
+             modo lista y si el post no tiene partner. -->
+        <button type="button" class="user-fila" id="userFila" hidden aria-label="Sobre el partner">
+          <span class="user-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span class="user-punto"></span>
+          </span>
+          <span class="user-info">
+            <span class="user-nombre">Partner</span>
+            <span class="user-eslogan" hidden>Eslogan</span>
+          </span>
+        </button>
 
         <div class="botones-flotantes"></div>
       </div>
