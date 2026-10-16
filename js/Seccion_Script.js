@@ -25,8 +25,13 @@ RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  Ubicación: solo si el post la declara Y el partner
                  tiene direccion. Si falta cualquiera de las dos,
                  no se crea la sección (no queda ni el título).
-VERSIÓN:         1.6
-CAMBIOS:         R46: la fecha de inicio del turno
+VERSIÓN:         1.7
+CAMBIOS:         R47: la fila de inicio del turno ahora lee
+                 "Inicia el Lunes 26 de octubre": se antepone
+                 la palabra "Inicia el " a la fecha larga que
+                 ya pintaba R46 (pedido del dueño). Sin cambios
+                 de estructura ni de estilos.
+                 R46: la fecha de inicio del turno
                  (plan.fechaInicio, ISO en PLANJSON) se pinta
                  como PRIMERA fila del turno-card, arriba de
                  Inscripción, en formato largo
@@ -343,15 +348,16 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
         html += '<p class="turno-card-sub">' + escapeHtml(horario) + '</p>';
       }
 
-      /* R46 · FECHA DE INICIO DEL TURNO: primera fila del card,
-         arriba de Inscripción (que es fechasPago[0]). Fila
-         destacada (color del post) con la fecha en formato
-         largo. Si el turno no declara fechaInicio, no se pinta
+      /* R46/R47 · FECHA DE INICIO DEL TURNO: primera fila del
+         card, arriba de Inscripción (que es fechasPago[0]).
+         Fila destacada (color del post) con "Inicia el " +
+         fecha larga ("Inicia el Lunes 26 de octubre", R47).
+         Si el turno no declara fechaInicio, no se pinta
          nada. */
       var inicio = formatearFechaLarga(plan.fechaInicio);
       if (inicio) {
         html += '<div class="turno-inv-row destacado">';
-        html +=   '<span class="turno-inv-concepto">' + escapeHtml(inicio) + '</span>';
+        html +=   '<span class="turno-inv-concepto">Inicia el ' + escapeHtml(inicio) + '</span>';
         html += '</div>';
       }
 
