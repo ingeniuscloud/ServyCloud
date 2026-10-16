@@ -9,24 +9,14 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  Skeleton del detalle (primera carga de un post).
                  Skeleton de lista (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         1.2
-CAMBIOS:         R35: en modo lista se oculta la fila .cta-fila
-                 entera (antes solo .cta-reservar): así se esconden
-                 juntos el CTA y el nuevo botón de duda .cta-duda
-                 (R35). El resto de la alternancia intacta.
-                 R32: el chevron (›) de los items de la lista pasa a
-                 30px, peso 700 y color naranja oficial Servy
-                 #FA6A08 (antes 22px, gris #cbd5e1 casi invisible:
-                 los usuarios no notaban que el item se pulsa para
-                 abrir el post completo). Cubre lista y carrusel de
-                 promos (ambos usan .lista-item).
-                 R6: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.3
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      BOTÓN VOLVER
@@ -84,7 +74,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   /* ============================================================
      ALTERNANCIA LISTA ↔ DETALLE
      ============================================================ */
-  body.modo-lista .cta-fila,
+  body.modo-lista .cta-reservar,
   body.modo-lista .botones-flotantes,
   body.modo-lista .btn-volver,
   body.modo-lista .titulo-categoria {
@@ -92,6 +82,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   body.modo-detalle .btn-lupa,
+  body.modo-detalle .btn-compartir,
   body.modo-detalle .filtros,
   body.modo-detalle .buscar-fila {
     display: none !important;

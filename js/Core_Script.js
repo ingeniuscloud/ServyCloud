@@ -4,7 +4,7 @@ ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                  WhatsApp o el sheet de reserva.
-                 CacheL2 (R21): persistencia del catálogo y de los
+                 CacheL2: persistencia del catálogo y de los
                  detalles en localStorage del dispositivo. La
                  reapertura de la app pinta AL INSTANTE desde disco
                  y la red valida por detrás (stale-while-revalidate:
@@ -20,116 +20,19 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.9
-CAMBIOS:         R35: botón secundario de duda .cta-duda
-                 ("Consultar") en la fila .cta-fila (Index 1.2 /
-                 Core_CSS 1.1). (a) esModoDuda: visible SOLO si el
-                 post trae meta.botonDuda con texto Y su CTA NO es
-                 WhatsApp (esModoWhatsapp): si el CTA ya abre
-                 WhatsApp el canal es uno solo y no se duplica.
-                 (b) Nunca se deshabilita: post 'pronto' o sin
-                 cupos dejan el CTA apagado pero la duda activa —
-                 captura la pregunta de quien hoy se iba en
-                 silencio ("¿cuándo abren nuevos cupos?").
-                 (c) Click → WhatsApp al partner del post con
-                 meta.mensajeDuda reemplazando {titulo} por el
-                 título de la presentación (aplicarPlaceholders de
-                 Global_Script); si mensajeDuda viene vacío usa
-                 MENSAJE_DUDA_DEFAULT. GA4: 'whatsapp_duda'
-                 (post_id + partner_id), espejo del 'whatsapp_click'
-                 del CTA. (d) pintarAreaConPost también expone
-                 --post-color-claro (fondo del botón duda).
-                 R26 (la app vive en GitHub Pages · sesión por
-                 datos): (a) arranque() espera window.asegurarSesion
-                 (Global_Script 1.5) ANTES de cargar TABLAS y de
-                 pedir el estado del puente: SISTEMA ya está en
-                 pantalla cuando Ciudad/Chips/Promo lo leen. En la
-                 página de GAS (token inyectado) es un no-op: el
-                 arranque es IDÉNTICO al de v1.7. Si la sesión no
-                 llega (red caída), pantalla "Sin conexión" con
-                 Reintentar. (b) avisarAlPadre() también emite el
-                 evento DOM 'app-lista': la página estática no
-                 tiene padre, y así el preloader del envoltorio se
-                 retira con la MISMA señal (el postMessage al padre
-                 se conserva intacto para la vía iframe).
-                 R21 (GO del dueño a la propuesta 1+3 de R20):
-                 Caché L2 en localStorage, 0 cuotas nuevas:
-                 (a) window.CacheL2: sobre del dispositivo con
-                 vencimiento duro de 7 días y tope LRU de 30
-                 posts. Todo en try/catch: si el storage del
-                 iframe no persiste (sandbox + ITP), degrada a
-                 la L1 en memoria y el comportamiento es
-                 idéntico al de v1.6.
-                 (b) PostFull.obtener: si el detalle está en L2,
-                 se resuelve YA (el usuario ni ve el skeleton)
-                 y se revalida en silencio por detrás
-                 ({ mudo: true }); las mismas peticiones que
-                 antes, pintadas al instante.
-                 (c) cargarTablas: si el catálogo está en L2,
-                 TABLAS se llena sincrónicamente (la lista pinta
-                 al toque, incluso con GAS en frío) y se
-                 revalida en silencio; si el catálogo fresco
-                 cambió y el usuario sigue en la lista, se
-                 repinta lista+promo SIN evento de chip (no
-                 contamina GA4 ni el puente). Si está leyendo
-                 un post, no se toca la pantalla.
-                 (d) refrescarCatalogo (visibility) pasa a mudo
-                 y guarda en L2: si falla el refresco con la app
-                 ya pintada, ya no salta la pantalla "Sin
-                 conexión" sobre contenido vivo.
-                 R16: RESTAURADO el degradado original del dueño en
-                 pintarAreaConPost (fuente de verdad: los 2 archivos
-                 originales que pegó en el chat). El gradiente blanco
-                 → colorClaro del post cubre TODO el lienzo hasta el
-                 final (100%) — la corrección R15 (fondo sólido) fue
-                 un error de interpretación y queda revertida.
-                 R15: (revertida por R16, ver arriba).
-                 R14: pedirEstado espera la respuesta del
-                 envoltorio hasta 1500ms (antes 600ms). En móviles
-                 lentos la respuesta del contenedor podía llegar
-                 tarde y la app se quedaba sin estado aunque el
-                 envoltorio lo tuviera guardado. Solo afecta al
-                 arranque con envoltorio; sin él resuelve igual.
-                 R13: puente a prueba de versiones mezcladas y
-                 autoreparación. (a) aplicarEstado: si la ciudad
-                 restaurada es válida pero el módulo Ciudad no
-                 expone aplicarGuardada (producción con archivo
-                 viejo), se escribe app_ciudad en el storage del
-                 iframe para que cualquier versión la restaure.
-                 (b) guardar(): si #filtros aún no está pintado,
-                 la vista se completa con app_vista del storage
-                 en vez de ir como null. Sin cambios de flujo:
-                 el camino normal se comporta exactamente igual.
-                 R12: Capa 1 GA4. window.Analitica centraliza el
-                 envío de eventos (solo 12 de la lista blanca; sin
-                 doble conteo: comment/share van SOLO backend) por
-                 el puente existente: Puente.hayPuente() +
-                 Puente.retransmitir() hacia el envoltorio (que
-                 reenvía a GA4). Los 5 eventos "gratis" se capturan
-                 con listeners que YA existían (ciudad:change,
-                 chips:change, post:change, post:solicitar →
-                 post_open/post_close, buscar:change) + app_ready
-                 al primer pintado. Puente además recoge el
-                 deviceid estable del contenedor (estado-aplicar)
-                 y postBackend lo manda como idPuente para unificar
-                 identidad con el backend. Sin envoltorio: nada.
-                 R10: puente de persistencia (F). window.Puente pide
-                 al envoltorio de github.io el estado guardado
-                 (estado-pedir/estado-aplicar) y lo aplica ANTES de
-                 decidir si se abre el sheet de ciudad; los cambios de
-                 ciudad/chip se reportan con estado-guardar. Sin
-                 envoltorio (exec directo) el puente no hace nada.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+VERSIÓN:         1.10
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
                  Chips_Script.html, Buscar_Script.html,
                  Promo_Script.html, Social_Script.html,
                  Global_Menu_Script.html (window.Global), Lista_Script.html,
-                 Seccion_Script.html, Comenta_Script.html
-════════════════════════════════════════════════════════════════════
-*/
+                 Seccion_Script.html, Comenta_Script.html,
+                 Compartir_Script.html (recibir/pintar)
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      CACHEL2 · capa del dispositivo (R21 · Propuesta 1 del dueño)
@@ -466,7 +369,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     var EVENTOS_OK = {
       app_ready: 1, city_change: 1, chip_change: 1,
       post_open: 1, post_close: 1, search: 1,
-      like: 1, whatsapp_click: 1, whatsapp_duda: 1,
+      like: 1, whatsapp_click: 1,
       promo_click: 1, promo_swipe: 1,
       reserva_start: 1, otp_request: 1
     };
@@ -525,32 +428,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     var promesaCarga = null;
     var datosListos = false;
 
-    /* R35: mensaje de duda por defecto (el mismo texto que el
-       dueño definió para meta.mensajeDuda). Se usa si el post
-       trae botonDuda sin mensajeDuda; {titulo} lo reemplaza
-       aplicarPlaceholders (Global_Script). */
-    var MENSAJE_DUDA_DEFAULT =
-      '\uD83D\uDD90\uFE0F Hola, escribo desde la app ServyCloud. ' +
-      'Me interesa {titulo} y tengo una duda antes de reservar ' +
-      'mi cupo. Mi consulta:';
-
     function esModoWhatsapp(post) {
       if (!post) return false;
       var sj = post.seccionJson || {};
       var meta = sj.meta || {};
       return String(meta.mensajeWhatsapp || '').trim().length > 0;
-    }
-
-    /* R35: modo duda del post. El botón secundario solo existe
-       cuando el partner declaró meta.botonDuda Y el CTA del post
-       NO es WhatsApp: si el CTA ya abre WhatsApp, el canal de
-       contacto es uno solo y no se duplica. */
-    function esModoDuda(post) {
-      if (!post) return false;
-      if (esModoWhatsapp(post)) return false;
-      var sj = post.seccionJson || {};
-      var meta = sj.meta || {};
-      return String(meta.botonDuda || '').trim().length > 0;
     }
 
     function intentarWhatsapp() {
@@ -593,7 +475,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
             '#ecf3fd 15%, ' +
             '#ecf3fd 100%)';
         area.style.removeProperty('--post-color');
-        area.style.removeProperty('--post-color-claro');
         return;
       }
 
@@ -613,10 +494,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       } else {
         area.style.removeProperty('--post-color');
       }
-
-      /* R35: colorClaro del post como variable para el fondo del
-         botón de duda (.cta-duda en Core_CSS 1.1). */
-      area.style.setProperty('--post-color-claro', colorClaro);
     }
 
     function calcularTotalCupos(post) {
@@ -662,29 +539,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       btn.disabled = (totalCupos === 0);
     }
 
-    /* R35: visibilidad y texto del botón de duda. Sin post o sin
-       modo duda → hidden y la fila pierde .con-duda (el CTA
-       vuelve a ocuparla completa). Visible → texto del partner y
-       SIEMPRE activo, aunque el CTA esté 'pronto' o sin cupos:
-       ahí está su valor (capturar la pregunta antes de que
-       exista cupo). */
-    function actualizarBotonDuda() {
-      var btn  = document.querySelector('.cta-duda');
-      var fila = document.querySelector('.cta-fila');
-      if (!btn || !fila) return;
-
-      if (!postActivoGlobal || !esModoDuda(postActivoGlobal)) {
-        btn.hidden = true;
-        fila.classList.remove('con-duda');
-        return;
-      }
-
-      var meta = (postActivoGlobal.seccionJson || {}).meta || {};
-      btn.textContent = String(meta.botonDuda || '').trim() || 'Consultar';
-      btn.hidden = false;
-      fila.classList.add('con-duda');
-    }
-
     document.addEventListener('click', function (e) {
       var objetivo = e.target;
       if (!objetivo || !objetivo.closest) return;
@@ -703,39 +557,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         }
         e.preventDefault();
         e.stopImmediatePropagation();
-      }
-    }, true);
-
-    /* R35: click en la duda → WhatsApp al partner con el mensaje
-       de duda ({titulo} → título de la presentación). Nunca
-       deshabilitado. GA4 espejo del whatsapp_click del CTA. */
-    document.addEventListener('click', function (e) {
-      var objetivo = e.target;
-      if (!objetivo || !objetivo.closest) return;
-
-      var btn = objetivo.closest('.cta-duda');
-      if (!btn || btn.hidden) return;
-      if (!postActivoGlobal || !esModoDuda(postActivoGlobal)) return;
-
-      var sj   = postActivoGlobal.seccionJson || {};
-      var meta = sj.meta || {};
-      var mensaje = String(meta.mensajeDuda || '').trim() ||
-                    MENSAJE_DUDA_DEFAULT;
-      mensaje = aplicarPlaceholders(mensaje, sj.seccionPresentacion || {});
-
-      var partner = buscarPartner(postActivoGlobal.idPartner);
-      var numero = partner && partner.partnerJson
-        ? partner.partnerJson.whatsapp
-        : '';
-
-      var abierto = abrirWhatsapp(numero, mensaje);
-
-      /* GA4 (R35): duda pre-reserva del post activo */
-      if (abierto && window.Analitica) {
-        window.Analitica.enviar('whatsapp_duda', {
-          post_id:    postActivoGlobal.id || '',
-          partner_id: postActivoGlobal.idPartner || ''
-        });
       }
     }, true);
 
@@ -761,7 +582,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
       pintarAreaConPost(post);
       actualizarTextoCTA();
-      actualizarBotonDuda();
 
       if (window.Secciones && typeof window.Secciones.irAInicio === 'function') {
         window.Secciones.irAInicio();
@@ -770,7 +590,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
     document.addEventListener('chips:change', function (e) {
       actualizarTextoCTA();
-      actualizarBotonDuda();
       if (window.Puente) window.Puente.guardar();
 
       /* GA4 (R12) */
@@ -998,6 +817,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (window.Global && typeof window.Global.pintar === 'function') {
         window.Global.pintar();
       }
+      /* R36: liga #btnCompartir y #btnLimpiarBusqueda */
+      if (window.Compartir && typeof window.Compartir.pintar === 'function') {
+        window.Compartir.pintar();
+      }
 
       pintarAreaConPost(null);
       actualizarTextoCTA();
@@ -1048,6 +871,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       pre.then(function () {
         window.Puente.pedirEstado().then(function (estado) {
           window.Puente.aplicarEstado(estado);
+
+          /* R36 · ENLACE COMPARTIDO ENTRANTE: la recepción manda.
+             El enlace trae su contenido cifrado (post o lista con
+             ciudad): se omite la selección obligatoria de ciudad,
+             se espera la carga de TABLAS, se inyecta el lienzo y
+             Compartir.recibir() aplica todo y activa el modo
+             compartido (campo bloqueado + "Limpiar búsqueda"). */
+          if (window.Compartir &&
+              typeof window.Compartir.hayEntrante === 'function' &&
+              window.Compartir.hayEntrante()) {
+            promesaCarga.then(function () {
+              inyectarLienzo();
+              try {
+                window.Compartir.recibir();
+              } catch (e2) {
+                console.warn('[Core] Compartir.recibir:', e2 && e2.message);
+              }
+            });
+            return;
+          }
 
           var hayPendiente = window.Ciudad &&
                              typeof window.Ciudad.hayPendiente === 'function' &&

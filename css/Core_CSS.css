@@ -3,34 +3,16 @@ ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
-                 dinámico) + fila CTA (.cta-fila, R35) alineada a la
-                 izquierda para respetar la columna de contenido:
-                 CTA primario naranja + botón secundario .cta-duda
-                 (outline con los colores del post). Incluye estado
+                 dinámico) + CTA alineado a la izquierda para
+                 respetar la columna de contenido. Incluye estado
                  deshabilitado en naranja tenue para cursos "pronto".
 VERSIÓN:         1.1
-CAMBIOS:         R35: los márgenes del CTA (26px izq · 60px der para
-                 los flotantes) suben a la nueva fila .cta-fila y el
-                 botón pasa a flex: 1 — sin duda visible queda solo
-                 y ocupa la fila completa, idéntico a v1.0. Nuevo
-                 .cta-duda secundario: fondo colorClaro del post
-                 (--post-color-claro, lo pinta Core_Script), borde y
-                 texto colorOficial (--post-color), sin sombra y sin
-                 icono: jerarquía clara, el naranja manda. Con duda
-                 visible la fila lleva .con-duda (la pone
-                 Core_Script): CTA sin icono, texto centrado y
-                 padding compacto para que quepan los dos; la duda
-                 se recorta con ellipsis (max-width 46%) si el
-                 partner escribe largo. .cta-duda[hidden] display
-                 none (el hidden del markup no basta contra
-                 display:flex). Media 360px ajustada a la fila.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
 
   *{ box-sizing: border-box; }
 
@@ -111,27 +93,15 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
 
   /* ============================================================
      CTA · Reservar cupo / Consultar fechas
-     Fila (R35) alineada a la izquierda, mismo margen que el
-     contenido (26px izquierda) y misma reserva derecha (60px
-     para los íconos flotantes). Ancho = 100% - 86px.
-     La fila reparte el ancho entre el CTA (flex 1) y la duda
-     (.cta-duda). Sin duda visible el CTA ocupa todo, igual que
-     la v1.0.
+     Alineado a la izquierda, mismo margen que el contenido
+     (26px izquierda) y misma reserva derecha (60px para los
+     íconos flotantes). Ancho = 100% - 86px.
      ============================================================ */
-  .cta-fila {
+  .cta-reservar {
     flex-shrink: 0;
-    display: flex;
-    align-items: stretch;
-    gap: 10px;
 
     width: calc(100% - 86px);
     margin: 4px 60px 16px 26px;
-  }
-
-  .cta-reservar {
-    flex: 1 1 auto;
-    min-width: 0;
-
     padding: 14px 22px;
 
     border: none;
@@ -161,15 +131,6 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                 box-shadow 0.2s ease;
   }
 
-  /* Con duda visible: CTA compacto, sin icono, texto centrado */
-  .cta-fila.con-duda .cta-reservar {
-    padding: 14px 14px;
-    justify-content: center;
-  }
-  .cta-fila.con-duda .cta-reservar-icono {
-    display: none;
-  }
-
   .cta-reservar:active {
     transform: scale(0.97);
     background: #ea580c;
@@ -180,10 +141,6 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   .cta-reservar-texto {
     flex: 1;
     text-align: left;
-  }
-
-  .cta-fila.con-duda .cta-reservar-texto {
-    text-align: center;
   }
 
   .cta-reservar-icono {
@@ -206,47 +163,6 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     CTA · botón secundario de duda (R35)
-     Outline con los colores del post: fondo colorClaro
-     (--post-color-claro), borde y texto colorOficial
-     (--post-color). Sin sombra y sin icono: el naranja es el
-     único protagonista. Nunca se deshabilita (Core_Script).
-     ============================================================ */
-  .cta-duda {
-    flex: 0 1 auto;
-    max-width: 46%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    padding: 14px 20px;
-
-    border: 1.5px solid var(--post-color, #64748b);
-    border-radius: 999px;
-
-    background: var(--post-color-claro, #eef2f7);
-    color: var(--post-color, #475569);
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-
-    transition: transform 0.15s ease, opacity 0.2s ease;
-  }
-
-  .cta-duda:active {
-    transform: scale(0.97);
-    opacity: 0.85;
-  }
-
-  .cta-duda[hidden] { display: none; }
-
-  /* ============================================================
      CTA · estado deshabilitado
      ============================================================ */
   .cta-reservar:disabled {
@@ -267,19 +183,10 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .cta-fila {
+    .cta-reservar {
       width: calc(100% - 74px);
       margin: 4px 52px 16px 22px;
-    }
-    .cta-reservar {
       padding: 13px 18px;
-      font-size: 14px;
-    }
-    .cta-fila.con-duda .cta-reservar {
-      padding: 13px 12px;
-    }
-    .cta-duda {
-      padding: 13px 16px;
       font-size: 14px;
     }
   }
