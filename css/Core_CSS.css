@@ -3,26 +3,32 @@ ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
-                 dinámico) + CTA alineado a la izquierda para
-                 respetar la columna de contenido. Incluye estado
-                 deshabilitado en naranja tenue para cursos "pronto".
-VERSIÓN:         1.3
-CAMBIOS:         R49: fila del partner .user-fila bajo la fila
-                 CTA (estilo Instagram del dueño): avatar 44px
-                 con borde del color del post + glifo user +
-                 punto con anillo blanco (como la campanita de
-                 la promo), nombre en negrita y eslogan gris
-                 como subtítulo, texto a la izquierda, sin
-                 chevron. Oculta en modo lista y con [hidden].
-                 Responsive 360 ajustado a la fila.
-                 R46: la fila .cta-fila agrupa duda + CTA (duda a
-                 la IZQUIERDA: outline de 1px en el color del
-                 post, fondo transparente, nunca deshabilitada;
-                 CTA a la DERECHA con su diseño intacto — texto a
-                 la izquierda + flecha a la derecha — tomando el
-                 ancho restante). Ocultar .cta-duda[hidden] y
-                 .cta-fila en modo lista. Responsive 360 ajustado
-                 a la fila.
+                 dinámico) + fila CTA del post: píldora naranja
+                 semi-transparente (estilo Instagram del dueño)
+                 y, cuando el post declara duda, la fila se
+                 vuelve UNA sola píldora dividida (.segmentada):
+                 duda secundaria a la izquierda + CTA principal
+                 a la derecha. Incluye la fila del partner
+                 estilo Instagram y el estado deshabilitado en
+                 naranja tenue para cursos "pronto".
+VERSIÓN:         1.4
+CAMBIOS:         R50: CTA semi-transparente (un poco más ligero
+                 que antes, referencia Instagram del dueño).
+                 Con duda + CTA visibles, la fila es una píldora
+                 única dividida (.segmentada que pinta
+                 Core_Script): borde del color del post, duda
+                 secundaria a la izquierda y CTA a la derecha.
+                 Fila del partner: línea divisoria sutil sobre
+                 la fila; el título lo pinta Social_Script con
+                 el colorOficial del partner.
+                 R49: fila .user-fila del partner bajo la fila
+                 CTA: avatar 44px con borde del color del post
+                 + glifo user + punto con anillo blanco (como
+                 la campanita de la promo), eslogan gris de
+                 subtítulo, sin chevron.
+                 R46: la duda no se deshabilita nunca y
+                 desaparece si el CTA es modo WhatsApp; fila y
+                 partner ocultas en modo lista.
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
 ════════════════════════════════════════════════════════════════════*/
@@ -109,6 +115,10 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      Alineado a la izquierda, mismo margen que el contenido
      (26px izquierda) y misma reserva derecha (60px para los
      íconos flotantes). Ancho = 100% - 86px.
+     R50 · Transparencia estilo Instagram (referencia del
+     dueño): el naranja oficial va en rgba al ~87% para que
+     el botón destaque sin opacar el contenido del partner;
+     sombra más suave en la misma línea.
      ============================================================ */
   .cta-reservar {
     flex-shrink: 0;
@@ -120,7 +130,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     border: none;
     border-radius: 999px;
 
-    background: #f97316;
+    background: rgba(249, 115, 22, 0.87);
     color: #ffffff;
 
     display: flex;
@@ -137,7 +147,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.32),
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24),
                 0 3px 8px rgba(15, 23, 42, 0.10);
 
     transition: transform 0.15s ease, background-color 0.2s ease,
@@ -146,8 +156,8 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
 
   .cta-reservar:active {
     transform: scale(0.97);
-    background: #ea580c;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35),
+    background: rgba(234, 88, 12, 0.92);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.26),
                 0 2px 4px rgba(15, 23, 42, 0.10);
   }
 
@@ -179,16 +189,16 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      CTA · estado deshabilitado
      ============================================================ */
   .cta-reservar:disabled {
-    background: #fdba74;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.18),
+    background: rgba(253, 186, 116, 0.9);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.16),
                 0 2px 6px rgba(15, 23, 42, 0.06);
     cursor: not-allowed;
   }
 
   .cta-reservar:disabled:active {
     transform: none;
-    background: #fdba74;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.18),
+    background: rgba(253, 186, 116, 0.9);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.16),
                 0 2px 6px rgba(15, 23, 42, 0.06);
   }
 
@@ -213,6 +223,47 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     width: auto;
     min-width: 0;
     margin: 0;
+  }
+
+  /* ============================================================
+     FILA CTA · PÍLDORA SEGMENTADA (R50)
+     Cuando la duda está visible, Core_Script pone la clase
+     .segmentada y la fila se vuelve UN solo botón dividido
+     (split pill del dueño): contenedor píldora con borde del
+     color del post; duda secundaria a la IZQUIERDA (fondo
+     transparente, texto del color del post) y CTA principal a
+     la DERECHA. Los rellenos van rectos (radius 0) y el
+     overflow del contenedor recorta las esquinas; el brillo
+     naranja sube al contenedor para que la píldora brille
+     completa.
+     ============================================================ */
+  .cta-fila.segmentada {
+    gap: 0;
+    padding: 0;
+
+    border: 1px solid var(--post-color, #64748b);
+    border-radius: 999px;
+    overflow: hidden;
+
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.20),
+                0 3px 8px rgba(15, 23, 42, 0.08);
+  }
+
+  .cta-fila.segmentada .cta-duda {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--post-color, #475569);
+  }
+
+  .cta-fila.segmentada .cta-reservar {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .cta-fila.segmentada .cta-reservar:active {
+    transform: none;
+    background: rgba(234, 88, 12, 0.92);
   }
 
   .cta-duda {
@@ -256,6 +307,8 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      fricción con la flecha del CTA). Social_Script llena
      textos y decide visibilidad ([hidden]); en modo lista se
      oculta con la fila CTA (regla de arriba).
+     R50: línea divisoria sutil sobre la fila, separando la
+     sección del partner de los botones duda/CTA.
      ============================================================ */
   .user-fila {
     display: flex;
@@ -263,10 +316,11 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     gap: 12px;
     width: calc(100% - 86px);
     margin: 0 60px 12px 26px;
-    padding: 0;
+    padding: 12px 0 0;
 
     background: transparent;
     border: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
     text-align: left;
     font-family: inherit;
 

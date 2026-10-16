@@ -15,14 +15,15 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  CTA, estilo Instagram) abre el bottom sheet
                  dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.6
-CAMBIOS:         R49: el botón Partner sale de la columna
-                 flotante y vive en la fila .user-fila bajo la
-                 fila CTA (estilo Instagram del dueño): nombre
-                 del partner y su eslogan como subtítulo, misma
-                 acción (Partner Sheet). La fila se oculta sin
-                 post/partner; el rail queda like/comenta/
-                 comparte.
+VERSIÓN:         1.7
+CAMBIOS:         R50: el título de la fila del partner se pinta
+                 con el colorOficial del partner (sin color,
+                 hereda el del texto).
+                 R49: fila .user-fila del partner bajo la fila
+                 CTA (estilo Instagram del dueño): nombre y
+                 eslogan de subtítulo, misma acción (Partner
+                 Sheet); se oculta sin post/partner; el rail
+                 queda like/comenta/comparte.
                  R40: la línea de confianza del curso pasa a
                  "Inscripciones abiertas, reserva tu cupo desde
                  ya en la app Servy" (servicio: "Te lo
@@ -481,6 +482,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Sin post/partner: fila oculta. El texto vive en
        Index.html (userFila); aquí solo se llena y se decide
        visibilidad (post:change + arranque).
+       R50 · el título va en el colorOficial del partner (campo
+       plano, mismo que pinta el Partner Sheet); si no tiene,
+       se limpia el inline y hereda el color del texto.
        ============================================================ */
     function partnerDePost(post) {
       if (!post || !post.idPartner) return null;
@@ -504,11 +508,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       var pj = (partner && partner.partnerJson) || {};
       var eslogan = String(pj.esloganPartner || '').trim();
+      var colorPartner = (partner && partner.colorOficial)
+        ? String(partner.colorOficial).trim() : '';
 
       var nombreEl  = fila.querySelector('.user-nombre');
       var esloganEl = fila.querySelector('.user-eslogan');
 
-      if (nombreEl) nombreEl.textContent = nombre;
+      if (nombreEl) {
+        nombreEl.textContent = nombre;
+        nombreEl.style.color = colorPartner;
+      }
       if (esloganEl) {
         esloganEl.textContent = eslogan;
         esloganEl.hidden = !eslogan;

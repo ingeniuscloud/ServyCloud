@@ -20,14 +20,16 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.11
-CAMBIOS:         R46: vuelve el botón de duda del post
-                 (.cta-duda): visible solo si meta.botonDuda trae
-                 texto y el CTA NO es modo WhatsApp; nunca
-                 deshabilitado; al pulsar abre el WhatsApp del
-                 partner con meta.mensajeDuda sustituyendo
-                 {titulo} por el título del post y dispara
-                 GA4 whatsapp_click con tipo "duda".
+VERSIÓN:         1.12
+CAMBIOS:         R50: la fila CTA recibe la clase .segmentada
+                 mientras la duda esté visible (píldora única
+                 dividida; Core_CSS la pinta).
+                 R46: duda del post (.cta-duda): visible solo si
+                 meta.botonDuda trae texto y el CTA NO es modo
+                 WhatsApp; nunca deshabilitada; al pulsar abre el
+                 WhatsApp del partner con meta.mensajeDuda
+                 sustituyendo {titulo} por el título del post y
+                 dispara GA4 whatsapp_click con tipo "duda".
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
@@ -552,6 +554,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
        válido. El texto viaja en meta.mensajeDuda con el
        placeholder {titulo}, que se sustituye por el título del
        post al armar el mensaje.
+       R50 · con duda visible, la fila se marca .segmentada:
+       duda + CTA se pintan como UNA sola píldora dividida.
        ============================================================ */
     function actualizarDuda() {
       var btn = document.querySelector('.cta-duda');
@@ -571,6 +575,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       } else {
         btn.hidden = true;
       }
+
+      var fila = btn.closest('.cta-fila');
+      if (fila) fila.classList.toggle('segmentada', !!texto);
     }
 
     /* Click de la duda · delegado en document (capture, mismo
