@@ -25,10 +25,51 @@ RESPONSABILIDAD: Genera las 6 secciones del panorama desde la
                  Ubicación: solo si el post la declara Y el partner
                  tiene direccion. Si falta cualquiera de las dos,
                  no se crea la sección (no queda ni el título).
-VERSIÓN:         1.5
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.4
+CAMBIOS:         R35: fecha de inicio del turno en el lienzo de
+                 planes. PLANJSON.planes[].fechaInicio (ISO
+                 aaaa-mm-dd, por turno) se pinta como línea propia
+                 entre el horario y la primera fila de pagos
+                 (arriba de Inscripción) con formato "Lunes 26 de
+                 octubre": día de la semana real + día + mes, sin
+                 año. Helper formatearFechaInicio() parsea Y-M-D a
+                 mano y construye Date local (sin trampas de zona
+                 UTC del parse de strings); si falta o viene mal,
+                 no se pinta nada (defensivo). Sin turno con
+                 fechaInicio el card queda idéntico a v1.3.
+                 R31: nueva sección 5 · seccionUbicacion. Muestra el
+                 título del post más la dirección del partner con
+                 enlace a Google Maps, reutilizando el MISMO bloque
+                 del sheet del partner (.partner-dato-maps / -icon /
+                 -texto / -valor / .partner-maps-cta) más el título
+                 con .t-seccion: cero CSS nuevo. Doble guarda: sin
+                 seccionUbicacion.titulo, o sin direccion en el
+                 partner, devuelve '' y pintarVistas() no crea la
+                 sección. Sin red ni caché nuevas: direccion ya
+                 viaja en TABLAS.partners (Cache.gs · _partnerPublico
+                 solo depura telegramtoken/telegramid). El orden lo
+                 manda el array de pintarVistas(), no el JSON.
+                 R19: navegación cross-post ahora cambia TAMBIÉN la
+                 ciudad. irAPost() compara post.idCiudad con la
+                 ciudad activa (Ciudad.getActual) y, si el post no
+                 pertenece a ella, aplica la primera ciudad válida
+                 del post con Ciudad.aplicarGuardada (API existente
+                 R10, emite ciudad:change → píldora "Estás viendo…"
+                 y lista se refrescan solas). Después hace el mismo
+                 cambio de chip de siempre. Sin cambios de flujo ni
+                 de red.
+                 R10: blindaje B6 (defensa en profundidad). Todo el
+                 contenido que viene de la hoja (títulos, taglines,
+                 descripciones, temario, beneficios, planes,
+                 cross-sell, marca del partner, tasas, atributos y
+                 colores) se interpola escapado con escapeHtml().
+                 Cotejado con la BD (R10): hoy es texto plano, así
+                 que el renderizado queda IDÉNTICO; el escapado
+                 bloquea el día en que algo del Sheet lleve < > " '
+                 sin querer. Los íconos de beneficios siguen siendo
+                 claves del catálogo IMAGENES (Iconos.html).
+                 R6: baseline de producción incorporado al espejo;
+                 encabezado normalizado al estándar ═══ (6 campos).
 DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Chips_Script.html (window.Chips),
@@ -36,8 +77,9 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
                  Seccion_CSS.html (.t-seccion / .t-body),
                  Partner_Sheet_CSS.html (bloque .partner-dato-maps /
                  -icon / -texto / -valor y .partner-maps-cta que
-                 reutiliza la sección Ubicación)
-════════════════════════════════════════════════════════════════════*/
+                 reutiliza la sección Ubicación · R31)
+════════════════════════════════════════════════════════════════════
+*/
 
   window.Secciones = (function () {
 
@@ -49,6 +91,11 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
     var MESES = [
       'enero','febrero','marzo','abril','mayo','junio',
       'julio','agosto','septiembre','octubre','noviembre','diciembre'
+    ];
+
+    /* R35: días de la semana para la fecha de inicio del turno */
+    var DIAS_SEMANA = [
+      'Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'
     ];
 
     /* ============================================================
@@ -112,6 +159,24 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
       var mes = parseInt(partes[1], 10) - 1;
       if (isNaN(dia) || isNaN(mes) || !MESES[mes]) return iso;
       return dia + ' de ' + MESES[mes];
+    }
+
+    /* R35: "Lunes 26 de octubre" desde fechaInicio ISO
+       aaaa-mm-dd. Parseo a mano + Date local: sin trampas de
+       zona del parse de strings (new Date('2026-10-26') es UTC
+       y puede correr el día). Sin año, como la pidió el dueño.
+       Si viene mal, '' y el card no pinta la línea. */
+    function formatearFechaInicio(iso) {
+      if (!iso || typeof iso !== 'string') return '';
+      var partes = iso.split('-');
+      if (partes.length !== 3) return '';
+      var anio = parseInt(partes[0], 10);
+      var mes  = parseInt(partes[1], 10) - 1;
+      var dia  = parseInt(partes[2], 10);
+      if (isNaN(anio) || isNaN(mes) || isNaN(dia) || !MESES[mes]) return '';
+      var f = new Date(anio, mes, dia);
+      if (isNaN(f.getTime())) return '';
+      return DIAS_SEMANA[f.getDay()] + ' ' + dia + ' de ' + MESES[mes];
     }
 
     function formatearBs(n) {
@@ -313,6 +378,14 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
 
       if (horario) {
         html += '<p class="turno-card-sub">' + escapeHtml(horario) + '</p>';
+      }
+
+      /* R35: fecha de inicio del turno, arriba de Inscripción.
+         Solo si el turno la trae y parsea bien. */
+      var inicio = formatearFechaInicio(plan.fechaInicio);
+      if (inicio) {
+        html += '<p class="turno-card-inicio">Inicia: ' +
+                escapeHtml(inicio) + '</p>';
       }
 
       var pagos = plan.fechasPago || [];
@@ -710,8 +783,7 @@ DEPENDENCIAS:    Seccion_Imagen_Script.html (window.SeccionImagen),
 
     return {
       pintar:    pintar,
-      irAInicio: irAInicio,
-      irAPost:   irAPost
+      irAInicio: irAInicio
     };
 
   })();
