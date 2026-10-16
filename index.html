@@ -12,22 +12,14 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  el header y la lista.
                  Incluye botón de ciudad (.city-bar) encima de la
                  fila de chips. Módulo Ciudad se encarga de todo.
-                 El CTA vive dentro de la fila .cta-fila, junto al
-                 botón secundario .cta-duda (R35).
-VERSIÓN:         1.2
-CAMBIOS:         R35: fila .cta-fila para el CTA + nuevo botón
-                 secundario .cta-duda ("Consultar", texto viene de
-                 meta.botonDuda). Arranca hidden y oculto: la
-                 visibilidad la controla Core_Script (esModoDuda:
-                 solo si el post trae botonDuda Y su CTA NO es
-                 WhatsApp). Sin duda, el CTA queda solo y ocupa
-                 la fila completa como siempre. Estilos en
-                 Core_CSS v1.1; lógica en Core_Script v1.9.
-                 R10: división PARTE G — se añaden los includes de los
-                 3 archivos nuevos: Seccion_Imagen_CSS.html,
-                 Reserva_Exito_CSS.html y Global_Menu_Script.html.
-                 R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos).
+                 La fila de filtros lleva lupa, COMPARTIR (píldora
+                 icono + texto "Compartir", glifo del post vía
+                 Iconos.js) y menú global.
+VERSIÓN:         1.5
+CAMBIOS:         R42: el botón del modo compartido pasa de
+                 "Limpiar búsqueda" a "Limpiar filtro" — lo que
+                 suelta es el filtro que viajó en el enlace, no
+                 una búsqueda tecleada.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -515,6 +507,22 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
+          <!-- Compartir búsqueda · píldora icono + texto
+               "Compartir" (decisión del dueño: la palabra junto al
+               campo ya dice qué se comparte). El glifo es el MISMO
+               del botón compartir del post (Iconos.js,
+               data-glifo="share") pero en un SPAN INTERNO:
+               pintarGlifos escribe el innerHTML del portador y
+               borraría el texto si el botón fuera el portador.
+               Naranja oficial al activarse (Chips_CSS). Oculto por
+               defecto; Buscar y Lista lo activan con
+               buscar:estado / buscar:resultados. -->
+          <button type="button" class="btn-compartir" id="btnCompartir"
+                  aria-label="Compartir búsqueda" hidden disabled>
+            <span class="btn-compartir-glifo" data-glifo="share" aria-hidden="true"></span>
+            <span class="btn-compartir-texto">Compartir</span>
+          </button>
+
           <button type="button" class="menu-global" aria-label="Menú">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="5"  cy="12" r="1.7"/>
@@ -544,6 +552,13 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                 <line x1="18" y1="6" x2="6" y2="18"/>
               </svg>
             </button>
+
+            <!-- Solo visible en modo compartido (enlace
+                 entrante): libera la vista y devuelve el acceso
+                 normal a ciudades, chips y listas. -->
+            <button type="button" class="btn-limpiar" id="btnLimpiarBusqueda">
+              Limpiar filtro
+            </button>
           </div>
 
         </div>
@@ -558,25 +573,22 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           <div class="secciones-track" id="seccionesTrack" hidden></div>
         </div>
 
-        <div class="cta-fila">
-          <button type="button" class="cta-reservar" aria-label="Reservar cupo">
-            <span class="cta-reservar-texto">Quiero reservar mi cupo</span>
-            <span class="cta-reservar-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M5 12h14"/>
-                <path d="m12 5 7 7-7 7"/>
-              </svg>
-            </span>
-          </button>
-          <button type="button" class="cta-duda" hidden>Consultar</button>
-        </div>
+        <button type="button" class="cta-reservar" aria-label="Reservar cupo">
+          <span class="cta-reservar-texto">Quiero reservar mi cupo</span>
+          <span class="cta-reservar-icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </span>
+        </button>
 
         <div class="botones-flotantes"></div>
       </div>
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>
