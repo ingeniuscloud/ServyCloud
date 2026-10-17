@@ -1,0 +1,658 @@
+/*════════════════════════════════════════════════════════════════════
+ARCHIVO:         Lista_CSS.html
+ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
+                 categoría, alternancia lista ↔ detalle con
+                 fade. Item de la vidriera (R58 · CAJA como la
+                 imagen del dueño): TARJETA BLANCA con radio y
+                 sombra suave, franja del colorOficial a sangre
+                 en el borde izquierdo (variable --post-color que
+                 pinta Lista_Script), título y subtítulo en su
+                 color normal (tinta/gris, SIN colorOficial) con
+                 recorte a 2 líneas, línea divisora debajo del
+                 subtítulo y fila del partner abajo: avatar
+                 circular SIN BORDES con la INICIAL (fondo
+                 colorClaro del post, letra colorOficial) + nombre
+                 + glifo verificado (Iconos.html); a la derecha
+                 "Ver publicación →" en NARANJA oficial y peso
+                 normal. La estrella métrica pasiva se queda
+                 anclada a la esquina superior derecha (fila
+                 horizontal: glifo amarillo + contador a su
+                 derecha, oculta en 0).
+                 Sin badge (vive en la promo y el post). La lista
+                 es PLANA bajo el rótulo "Explorar" (el agrupado
+                 por grupo vuelve como opción del filtro cuando
+                 el dueño lo ordene). Skeleton del detalle
+                 (primera carga de un post). Skeleton de lista con
+                 la misma anatomía de caja (solo si el POST
+                 inicial aún está en vuelo cuando el usuario
+                 elige ciudad).
+VERSIÓN:         1.8
+CAMBIOS:         R59: 3 ajustes del item — "Ver publicación" en
+                 NARANJA oficial #f97316 (la flecha hereda por
+                 currentColor); avatar del partner SIN BORDES
+                 (el borde 1.5px de la regla global .partner-avatar
+                 de Partner_Sheet_CSS se colaba en el item y le
+                 quitaba protagonismo al título) y el check
+                 verificado más grande (15→17px).
+                 R58: item como CAJA — tarjeta blanca con radio
+                 16px, sombra suave y franja colorOficial a
+                 sangre en el borde izquierdo (::before con
+                 var(--post-color)); título y subtítulo vuelven a
+                 su color normal (#1f2937/#64748b, fuera
+                 var(--post-color) del título) con recorte a 2
+                 líneas; divisoria interna debajo del subtítulo;
+                 partner con avatar circular de la inicial
+                 (--post-claro/--post-color) + glifo verificado;
+                 "Ver detalles" pasa a "Ver publicación" (mismo
+                 gris medio, sin bold, glifo flechaVer); fuera la
+                 agrupación por grupos (lista plana bajo el
+                 rótulo "Explorar"); skeleton espeja la caja.
+                 R56: estrella en fila horizontal (glifo +
+                 contador a su derecha) y amarilla #fbbf24,
+                 anclada absolute a la esquina — deja de reservar
+                 carril; "Ver detalles" en peso normal (sin
+                 bold); la fila del título reserva 44px para no
+                 chocar con la estrella (la promo no reserva).
+DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
+                 Index.html; base .lista-item re-estilizada por
+                 Promo_CSS.html, que aporta la regla .badge)
+════════════════════════════════════════════════════════════════════
+*/
+  /* ============================================================
+     BOTÓN VOLVER
+     ============================================================ */
+  .btn-volver {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease;
+  }
+  .btn-volver:active { opacity: 0.5; }
+  .btn-volver svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .btn-volver[hidden] { display: none; }
+
+  /* ============================================================
+     TÍTULO DE CATEGORÍA
+     ============================================================ */
+  .titulo-categoria {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .titulo-categoria[hidden] { display: none; }
+
+  /* ============================================================
+     ALTERNANCIA LISTA ↔ DETALLE
+     ============================================================ */
+  body.modo-lista .cta-reservar,
+  body.modo-lista .botones-flotantes,
+  body.modo-lista .btn-volver,
+  body.modo-lista .titulo-categoria {
+    display: none !important;
+  }
+
+  body.modo-detalle .btn-lupa,
+  body.modo-detalle .btn-compartir,
+  body.modo-detalle .filtros,
+  body.modo-detalle .buscar-fila,
+  body.modo-detalle .titulo-header,
+  body.modo-detalle .promo-encabezado,
+  body.modo-detalle .city-bar,
+  body.modo-detalle .lista-encabezado {
+    display: none !important;
+  }
+
+  /* ============================================================
+     TRANSICIÓN FADE
+     ============================================================ */
+  .lista-wrap,
+  .secciones-track {
+    will-change: opacity;
+  }
+
+  .lista-wrap.fade-out {
+    animation: listaFadeOut 0.2s ease forwards;
+  }
+  .secciones-track.fade-in {
+    animation: listaFadeIn 0.2s ease forwards;
+  }
+
+  @keyframes listaFadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+  @keyframes listaFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista-wrap.fade-out,
+    .secciones-track.fade-in {
+      animation-duration: 0.01s;
+    }
+  }
+
+  /* ============================================================
+     CONTENEDORES
+     ============================================================ */
+  .lista-wrap[hidden] { display: none; }
+  .secciones-track[hidden] { display: none !important; }
+
+  /* ============================================================
+     LISTA ITEM · CAJA (R58)
+     Tarjeta blanca con radio, borde y sombra suave, separada
+     por aire (sin divisoria entre items: las cajas se
+     sostienen solas). La FRANJA del colorOficial vuelve a
+     sangre en el borde izquierdo (::before con la variable
+     --post-color que pinta Lista_Script); overflow hidden la
+     recorta con el radio de la tarjeta. La promo no lleva
+     franja (su tarjeta es propia de Promo_CSS).
+     ============================================================ */
+  .lista-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 14px 16px 14px 21px;
+    background: #ffffff;
+    width: 100%;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    margin-bottom: 10px;
+    overflow: hidden;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s ease;
+  }
+  .lista-item:active { background: rgba(15, 23, 42, 0.03); }
+
+  .lista-item:not(.promo-item)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--post-color, #cbd5e1);
+  }
+
+  /* ============================================================
+     RÓTULO "EXPLORAR" (R58) · etiqueta de la vidriera, sobre
+     la lista plana (la imagen del dueño). La fila "Relevantes"
+     del filtro es PENDIENTE (el dueño lo anotó para después).
+     ============================================================ */
+  .lista-encabezado {
+    flex-shrink: 0;
+    padding: 12px 16px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #64748b;
+  }
+
+  /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
+     glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
+     esquina para NO reservar carril. Métrica PASIVA: no es botón
+     ni pide tap — la validación se da en el detalle con el
+     corazón. Amarillo de valoración (#fbbf24): el idioma
+     universal de las estrellas; el contador sigue en gris tinta.
+     Oculta con cero: la prueba social nunca se muestra vacía. */
+  .lista-item .estrella-col {
+    position: absolute;
+    top: 15px;
+    right: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    color: #fbbf24;
+  }
+  .lista-item .estrella-col[hidden] { display: none; }
+  .lista-item .estrella-glifo {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  .lista-item .estrella-glifo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .lista-item .estrella-num {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lista-item .body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lista-item .fila-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+    min-width: 0;
+  }
+  /* La estrella vive en la esquina (absolute): la fila del
+     título reserva su espacio para que el texto nunca corra por
+     debajo (glifo 16px + hueco 4px + contador hasta 3 dígitos).
+     La promo no reserva: ella no lleva estrella. */
+  .lista-item:not(.promo-item) .fila-titulo {
+    padding-right: 44px;
+  }
+
+  /* Título y subtítulo en su COLOR NORMAL (R58): tinta para el
+     título, gris para el subtítulo — el colorOficial vuelve a
+     vivir SOLO en la franja y en el avatar del partner. Recorte
+     a 2 líneas en ambos, como la imagen del dueño. La promo no
+     usa estas vías: su tarjeta se pinta entera en Promo_CSS. */
+  .lista-item .titulo {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lista-item .tagline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* Divisora INTERNA debajo del subtítulo (R58): separa el
+     texto de la fila del partner, como la imagen del dueño. */
+  .lista-item .item-divisoria {
+    display: block;
+    height: 1px;
+    background: #eef2f7;
+    margin: 10px 0;
+  }
+
+  /* ============================================================
+     PARTNER · avatar de la inicial + nombre + verificado (R58)
+     Avatar circular con la PRIMERA letra de la marca del
+     partner: fondo colorClaro del post (--post-claro) y letra
+     colorOficial (--post-color), mismas variables que la
+     franja. SIN BORDES (R59): la regla global .partner-avatar
+     de Partner_Sheet_CSS trae un borde 1.5px #475569 que se
+     colaba aquí y le quitaba protagonismo al título — el item
+     lo apaga. Nombre en tinta semibold + glifo verificado
+     verde (Iconos.html). El texto "Responde en…" de la
+     referencia NO va (decisión del dueño).
+     ============================================================ */
+  .lista-item .partner-avatar {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--post-claro, #f1f5f9);
+    color: var(--post-color, #475569);
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lista-item .marca {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 0;
+  }
+  /* Check verificado (R59): un poquito más grande (15→17px)
+     para que se lea junto al nombre sin taparlo. */
+  .lista-item .marca .check {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #059669;
+    display: inline-flex;
+  }
+  .lista-item .marca .check svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .lista-item .marca .marca-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  /* Fila del partner (R58) · debajo de la divisoria: avatar +
+   nombre/verificado a la izquierda y "Ver publicación →" a la
+   derecha — mismo verbo de invitación, nuevo texto del dueño.
+   NARANJA OFICIAL #f97316 (R59): el dueño lo pidió del color
+   de la app; la flecha hereda por currentColor. Peso NORMAL
+   (R56) intacto. */
+  .lista-item .pie {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .lista-item .ver-detalles {
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: #f97316;
+    white-space: nowrap;
+  }
+  .lista-item .ver-glifo {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+  .lista-item .ver-glifo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ============================================================
+     SKELETON DEL DETALLE
+     ============================================================ */
+  .skeleton-detalle {
+    padding: 24px 26px 40px;
+    animation: skeletonFadeIn 0.15s ease;
+  }
+
+  @keyframes skeletonFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .skeleton-linea {
+    display: block;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+  }
+
+  @keyframes skeletonShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .skeleton-detalle .skeleton-foto {
+    width: 65%;
+    margin: 0 auto 28px;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  .skeleton-detalle .skeleton-identidad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 26px;
+  }
+
+  .skeleton-detalle .skeleton-marca {
+    width: 42%;
+    height: 14px;
+    border-radius: 4px;
+  }
+
+  .skeleton-detalle .skeleton-titulo {
+    width: 78%;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .skeleton-detalle .skeleton-tagline {
+    width: 55%;
+    height: 22px;
+    border-radius: 999px;
+  }
+
+  .skeleton-detalle .skeleton-desc {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 60px 0 26px;
+  }
+
+  .skeleton-detalle .skeleton-desc .skeleton-linea {
+    height: 12px;
+  }
+
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(1) { width: 100%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(2) { width: 95%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(3) { width: 70%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-linea,
+    .skeleton-detalle .skeleton-foto {
+      animation: none;
+      background: rgba(15, 23, 42, 0.08);
+    }
+  }
+
+  /* ============================================================
+     SKELETON DE LISTA
+     Se muestra solo cuando el POST inicial aún no llegó y el
+     usuario ya eligió ciudad (teléfonos lentos o elección muy
+     rápida). Replica la estructura de .lista-item para que no
+     haya salto al reemplazarse.
+     ============================================================ */
+  .lista-skeleton {
+    animation: skeletonFadeIn 0.15s ease;
+  }
+
+  .lista-skeleton-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 14px 16px 14px 21px;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  /* Espejo de la franja colorOficial (R58): banda neutra a
+     sangre en el borde izquierdo. */
+  .lista-skeleton-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #eef2f7;
+  }
+
+  .lista-skeleton-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lista-skeleton-line {
+    display: block;
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.06) 0%,
+      rgba(15, 23, 42, 0.10) 50%,
+      rgba(15, 23, 42, 0.06) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  .lista-skeleton-line.short  { width: 60%; height: 14px; }
+  .lista-skeleton-line.long   { width: 90%; }
+  .lista-skeleton-line.medium { width: 40%; }
+  .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
+
+  /* Espejo de la divisoria interna (R58). */
+  .lista-skeleton-divisoria {
+    height: 1px;
+    background: #eef2f7;
+    margin: 4px 0;
+  }
+
+  /* Espejo de la fila del partner (R58): avatar circular +
+   barra del nombre + barra del "Ver publicación" a la derecha. */
+  .lista-skeleton-pie {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .lista-skeleton-avatar {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  .lista-skeleton-line.nombre { width: 110px; }
+
+  /* Espejo de la estrella real (R56): fila horizontal anclada a
+     la esquina — punto (glifo) + barra (contador) a su derecha. */
+  .lista-skeleton-estrella {
+    position: absolute;
+    top: 15px;
+    right: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+  }
+  .lista-skeleton-estrella .punto {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.08);
+  }
+  .lista-skeleton-estrella .barra {
+    width: 14px;
+    height: 9px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista-skeleton-line {
+      animation: none;
+      background: rgba(15, 23, 42, 0.08);
+    }
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 360px) {
+    .lista-item { padding: 12px 14px 12px 19px; }
+    .lista-item .estrella-glifo { width: 14px; height: 14px; }
+    .lista-item .estrella-num { font-size: 11px; }
+    .lista-item .titulo { font-size: 14px; font-weight: 600; }
+    .lista-item .tagline { font-size: 12px; font-weight: 400; }
+    .lista-item .marca { font-size: 12px; }
+    .lista-item .ver-detalles { font-size: 12px; }
+    .lista-item .ver-glifo { width: 13px; height: 13px; }
+    .lista-item .partner-avatar { width: 30px; height: 30px; font-size: 13px; }
+    .lista-encabezado { padding: 10px 14px 8px; }
+    .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
+    .btn-volver svg { width: 16px; height: 16px; }
+    .titulo-categoria { font-size: 16px; }
+
+    .skeleton-detalle { padding: 20px 22px 40px; }
+    .skeleton-detalle .skeleton-identidad { padding: 0 22px; }
+    .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
+
+    .lista-skeleton-item { padding: 12px 14px 12px 19px; }
+    .lista-skeleton-avatar { width: 30px; height: 30px; }
+    .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
+  }
+
