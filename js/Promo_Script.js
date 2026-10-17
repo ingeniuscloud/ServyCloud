@@ -29,19 +29,29 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Tarjeta (R60): BADGE arriba (blanco), título
-                 grande, TEXTO DE LA PROMO (la esencia del
-                 mensaje: item.texto de PROMOJSON, con respaldo
-                 en el promoTexto del post), partner debajo y
-                 botón circular de flecha a la derecha. Cada
-                 tarjeta lleva su COLOR de la paleta (promo-c0…c5,
-                 por índice — el naranja oficial es el 0); los
-                 clones del bucle llevan el MISMO índice que su
-                 original para que la vuelta no cambie de color.
-                 El encabezado "Promos cerca de ti" + "Toca para
-                 conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.1
-CAMBIOS:         R60: entra el texto de la promo al HTML de la
+                 Tarjeta (R61): BADGE arriba (blanco), TÍTULO =
+                 TEXTO DE LA PROMO (la esencia del mensaje:
+                 item.texto de PROMOJSON, con respaldo en el
+                 promoTexto del post — grande y sin bold),
+                 SUBTÍTULO = título del post, y TERCERA FILA =
+                 partner con el CHECK DE CERTIFICADO en blanco a
+                 la derecha (glifo badgeCheck). Botón circular de
+                 flecha a la derecha. Cada tarjeta lleva su COLOR
+                 de la paleta (promo-c0…c5, por índice — el
+                 naranja oficial es el 0); los clones del bucle
+                 llevan el MISMO índice que su original para que
+                 la vuelta no cambie de color. El encabezado
+                 "Promos cerca de ti" + "Toca para conocer más" se
+                 muestra/oculta junto con el slot.
+VERSIÓN:         2.2
+CAMBIOS:         R61: la tarjeta cambia de anatomía — el TÍTULO
+                 de la promo ES el texto de PROMOJSON
+                 (textoDePromo) y el título del post baja a
+                 .promo-sub; la fila del partner lleva .promo-check
+                 (badgeCheck, blanco — el color lo pinta
+                 Promo_CSS). Si la promo no trae texto, el título
+                 del post sube y no hay subtítulo (sin duplicar).
+                 R60: entra el texto de la promo al HTML de la
                  tarjeta (.promo-texto) — se lee de PROMOJSON
                  (item.texto, con variantes promoTexto/
                  descripcion/mensaje) y como respaldo del
@@ -191,7 +201,8 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     /* TEXTO DE LA PROMO (R60) · la esencia del mensaje. Se lee
        del item de PROMOJSON (texto, con variantes por si la hoja
        usa otro nombre) y como respaldo del promoTexto que el
-       índice del catálogo trae desde PostDetalle (Cache.gs). */
+       índice del catálogo trae desde PostDetalle (Cache.gs).
+       R61: este texto ES el título de la tarjeta. */
     function textoDePromo(item, post) {
       var campos = ['texto', 'promoTexto', 'descripcion', 'mensaje'];
       for (var i = 0; i < campos.length; i++) {
@@ -206,28 +217,41 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     }
 
     function buildItemHTML(item, post) {
-      var titulo = escapeHtml(post.titulo || post.boton || post.id);
       var badge  = buscarBadge(post.idBadge);
       var partner = buscarPartner(post.idPartner) || {};
       var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
-      var textoPromo = escapeHtml(textoDePromo(item, post));
+      var textoPromo = textoDePromo(item, post);
+      var tituloPost = String(post.titulo || post.boton || '').trim();
 
-      /* R60 · Tarjeta con color propio y contenido blanco:
-         badge arriba (el color blanco lo manda Promo_CSS),
-         título grande, TEXTO DE LA PROMO, partner debajo y
-         flecha circular a la derecha. Fuera la campana, el
-         tagline y el pie "Ver detalles". */
+      /* R61 · Anatomía pedida por el dueño:
+         1) TÍTULO = TEXTO de la promo (PROMOJSON), grande y sin
+            bold (el estilo lo pinta Promo_CSS).
+         2) SUBTÍTULO = título del post.
+         3) TERCERA FILA = nombre del partner + check de
+            certificado a la derecha, en BLANCO (badgeCheck).
+         Si la promo no trae texto, el título del post sube y NO
+         se duplica en el subtítulo. La flecha circular cierra. */
       var html = '';
       if (badge && badge.titulo) {
         html += '<span class="badge">' + escapeHtml(badge.titulo) + '</span>';
       }
-      html += '<span class="promo-titulo">' + titulo + '</span>';
+
       if (textoPromo) {
-        html += '<span class="promo-texto">' + textoPromo + '</span>';
+        html += '<span class="promo-titulo">' + escapeHtml(textoPromo) + '</span>';
+        if (tituloPost) {
+          html += '<span class="promo-sub">' + escapeHtml(tituloPost) + '</span>';
+        }
+      } else {
+        html += '<span class="promo-titulo">' +
+                escapeHtml(tituloPost || post.id) + '</span>';
       }
+
       if (marca) {
-        html += '<span class="promo-partner">' + marca + '</span>';
+        html += '<span class="promo-partner">' + marca +
+                '<span class="promo-check" data-glifo="badgeCheck" aria-hidden="true"></span>' +
+                '</span>';
       }
+
       html += '<span class="promo-flecha" aria-hidden="true">' +
               '<span class="promo-flecha-glifo" data-glifo="flechaVer"></span>' +
               '</span>';

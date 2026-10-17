@@ -20,8 +20,13 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.15
-CAMBIOS:         R58: pantalla principal refactorizada — el
+VERSIÓN:         1.16
+CAMBIOS:         R61: el PLACEHOLDER del buscador se pinta desde
+                 la BD real (SISTEMA.root →
+                 app.placeholderBuscar; si la BD no lo trae queda
+                 el fijo de la app) — se deja de hardcodear el
+                 texto en el markup.
+                 R58: pantalla principal refactorizada — el
                  TÍTULO INICIAL grande se pinta desde la BD real
                  (SISTEMA.root → app.tituloHeader; si la BD no lo
                  trae queda oculto) y el skeleton de lista
@@ -830,6 +835,25 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     }
 
+    /* ============================================================
+       PLACEHOLDER DEL BUSCADOR (R61) · el texto guía vive en
+       la BD real: ROOTJSON → app.placeholderBuscar
+       (SISTEMA.root). Si la BD no lo trae queda el fijo de la
+       app. Así el dueño cambia el texto desde la hoja sin
+       tocar código.
+       ============================================================ */
+    function pintarPlaceholderBuscar() {
+      var input = document.getElementById('buscarInput');
+      if (!input) return;
+
+      var root = (window.SISTEMA && window.SISTEMA.root) || {};
+      var app  = root.app || {};
+      var t = String(app.placeholderBuscar || '').trim();
+
+      input.setAttribute('placeholder',
+        t || 'Buscar servicio, curso o palabra clave');
+    }
+
     function inyectarLienzo() {
       var lienzo = document.getElementById('lienzo');
       var plantilla = document.getElementById('canvas-content');
@@ -949,6 +973,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
 
       pintarTituloHeader();
+      pintarPlaceholderBuscar();
       pintarAreaConPost(null);
       actualizarTextoCTA();
     }

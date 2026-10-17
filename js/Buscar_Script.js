@@ -2,19 +2,31 @@
 ARCHIVO:         Buscar_Script.html
 ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Buscador CÁPSULA (R60): la LUPA circular vive a
-                 la derecha de los chips; al tocarla la fila añade
-                 .buscando y la CÁPSULA split pill se expande
-                 tapando los chips (lupa a la izquierda dentro,
-                 "Limpiar filtro" como segmento derecho, SIN X) y
-                 marca body.en-busqueda (rótulo "Explorar" fuera).
-                 El foco pasa al campo. Al escribir, emite
+RESPONSABILIDAD: Buscador CÁPSULA (R61): la LUPA circular vive a
+                 la derecha de los chips y, a su derecha, el BOTÓN
+                 FILTRO (sin acción todavía). Al tocarla la fila
+                 añade .buscando y la CÁPSULA split pill se
+                 expande tapando SOLO los chips (lupa a la
+                 izquierda dentro, "Limpiar filtro" como segmento
+                 derecho, SIN X) y marca body.en-busqueda — la
+                 fila "Explorar" SE QUEDA VIVA (R61: solo se tapan
+                 los chips). El placeholder lo pinta Core_Script
+                 desde la BD real (app.placeholderBuscar). El foco
+                 pasa al campo. Al escribir, emite
                  'buscar:change' con el término y el flag de límite
                  alcanzado. "Limpiar filtro" limpia y cierra (en
                  modo compartido delega en Compartir.limpiar(), su
                  trabajo de siempre). Límite: 40 chars.
-VERSIÓN:         1.4
-CAMBIOS:         R60: vuelve la LUPA (#btnBuscar a la derecha de
+VERSIÓN:         1.5
+CAMBIOS:         R61: comentario al día — la fila "Explorar" ya no
+                 se oculta en búsqueda (fuera el efecto de
+                 body.en-busqueda sobre el rótulo, R61) y el
+                 placeholder lo pinta Core_Script desde
+                 app.placeholderBuscar. Código intacto: abrir()
+                 sigue marcando body.en-busqueda (la cápsula y el
+                 retiro de chips dependen de él) y el binding
+                 completo de siempre.
+                 R60: vuelve la LUPA (#btnBuscar a la derecha de
                  los chips) y con ella abrir() por click (foco al
                  campo tras expandir la cápsula); la X desaparece —
                  el segmento "Limpiar filtro" de la split pill

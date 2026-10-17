@@ -8,34 +8,45 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  La detección de móvil corre ANTES de renderizar
                  Telefono.html para evitar el flash del marco.
                  El título se compone desde ROOTJSON.
+                 R61 · Junto a la LUPA entra el BOTÓN FILTRO
+                 (círculo, sin acción por ahora). La fila de
+                 "Explorar" NO se oculta al abrir la búsqueda y
+                 lleva CONTADOR de items + modo de VISTA (lista /
+                 miniatura en cápsula, seleccionable, sin acción).
+                 El COMPARTIR deja de ser botón: es un TEXTO
+                 SUBLINADO PUNTEADO bajo el campo que dice
+                 "Compartir lista filtrada". La ciudad dice
+                 "Estás viendo EN Ciudad" (17px). El placeholder
+                 del campo llega de la BD real (ROOTJSON
+                 app.placeholderBuscar, lo pinta Core_Script).
                  R60 · La fila de cabecera queda LIMPIA: CIUDAD
                  COMPLETA a la izquierda y MENÚ GLOBAL a la derecha.
-                 La búsqueda vuelve a ser LUPA: botón circular a la
+                 La búsqueda vive en LUPA: botón circular a la
                  derecha de los chips (.filtros-fila debajo de las
                  promos); al tocarla se expande a CÁPSULA que tapa
                  los chips (lupa a la izquierda dentro, botón
                  "Limpiar filtro" como SPLIT PILL a la derecha,
-                 sin X) y aparece COMPARTIR a la derecha de la
-                 cápsula. En modo compartido la cápsula queda
+                 sin X). En modo compartido la cápsula queda
                  desplegada y bloqueada: solo "Limpiar filtro"
                  está activo. Debajo va el TÍTULO GRANDE del header
                  (.titulo-header, texto que llega de la BD real en
                  ROOTJSON app.tituloHeader y pinta Core_Script);
                  encima de las promos el encabezado "Promos cerca
-                 de ti" + "Toca para conocer más"; la lista abre
-                 con el rótulo "Explorar". Módulo Ciudad se encarga
-                 de la ciudad.
-VERSIÓN:         1.10
-CAMBIOS:         R60: cabecera con ciudad completa + menú global
+                 de ti" + "Toca para conocer más". Módulo Ciudad
+                 se encarga de la ciudad.
+VERSIÓN:         1.11
+CAMBIOS:         R61: mismo markup que Index.html 1.10 de GAS —
+                 BOTÓN FILTRO (#btnFiltro) a la derecha de la
+                 lupa; fila "Explorar" viva en búsqueda con
+                 CONTADOR (#listaContador) y modo de VISTA
+                 (.modo-vista, seleccionable sin acción);
+                 COMPARTIR como TEXTO "Compartir lista filtrada"
+                 bajo el campo; ciudad "Estás viendo EN Ciudad".
+                 R60: cabecera con ciudad completa + menú global
                  (fuera campo y compartir); vuelve la LUPA a la
                  derecha de los chips (#filtros en .filtros-fila)
-                 y con ella la CÁPSULA split pill (lupa + campo
-                 "buscar servicio o curso" + Limpiar filtro, sin
-                 X); COMPARTIR a la derecha de la cápsula. Mismo
-                 markup que Index.html 1.9 de GAS.
-                 R58: refactor de la pantalla principal (título
-                 grande desde la BD, encabezado de promos, chips
-                 bajo las promos, rótulo "Explorar").
+                 y con ella la CÁPSULA split pill (lupa + campo +
+                 Limpiar filtro, sin X).
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -532,12 +543,13 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
       <div class="area-contenido">
 
         <!-- ============================================================
-             FILA DE CABECERA (R60)
+             FILA DE CABECERA (R60 · R61 el texto "en")
              CIUDAD COMPLETA + MENÚ GLOBAL en una sola fila, encima
-             del título grande. La búsqueda es la LUPA junto a los
-             chips (más abajo). En modo detalle la fila muestra
-             volver + título de categoría (ciudad/global fuera vía
-             CSS).
+             del título grande. Ciudad: "Estás viendo en
+             <b>Ciudad</b>" (el EN lo pide el dueño R61) + chevron
+             SVG. La búsqueda es la LUPA junto a los chips (más
+             abajo). En modo detalle la fila muestra volver +
+             título de categoría (ciudad/global fuera vía CSS).
              ============================================================ -->
         <div class="filtros-wrap">
 
@@ -555,7 +567,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                   disabled
                   aria-label="Cambiar ciudad">
             <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
-            <span class="city-txt">Estás viendo <b id="ciudadTxt">—</b></span>
+            <span class="city-txt">Estás viendo en <b id="ciudadTxt">—</b></span>
             <span class="city-chev" data-glifo="flechaAcordeon" aria-hidden="true"></span>
           </button>
 
@@ -590,13 +602,15 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         <div id="promoSlot" hidden></div>
 
         <!-- ============================================================
-             FILA DE CHIPS + BUSCAR (R60) · vive DEBAJO de las
-             promos. Chips_Script pinta los segmentos en #filtros;
-             a la derecha queda la LUPA circular (#btnBuscar). Al
-             tocarla Buscar_Script añade .buscando a la fila: los
-             chips se tapan y la CÁPSULA (split pill: lupa + campo
-             + "Limpiar filtro", SIN X) se expande a todo el ancho;
-             COMPARTIR aparece a su derecha. En modo compartido la
+             FILA DE CHIPS + BUSCAR + FILTRO (R60 · R61 el filtro)
+             vive DEBAJO de las promos. Chips_Script pinta los
+             segmentos en #filtros; a la derecha quedan la LUPA
+             circular (#btnBuscar) y, a su derecha, el BOTÓN
+             FILTRO (#btnFiltro, círculo con embudo — R61: SIN
+             acción todavía). Al tocar la lupa Buscar_Script añade
+             .buscando a la fila: los chips se tapan y la CÁPSULA
+             (split pill: lupa + campo + "Limpiar filtro", SIN X)
+             se expande a todo el ancho. En modo compartido la
              cápsula queda desplegada y bloqueada (solo "Limpiar
              filtro" activo).
              ============================================================ -->
@@ -611,6 +625,16 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
+          <!-- R61 · BOTÓN FILTRO · círculo con embudo a la derecha
+               de la lupa. Sin handler todavía (el dueño lo pidió
+               sin acción por ahora); se comporta como la lupa en
+               los estados buscando/compartida (se retira). -->
+          <button type="button" class="btn-filtro" id="btnFiltro" aria-label="Filtrar">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            </svg>
+          </button>
+
           <div class="buscar-capsula" id="buscarFila">
             <div class="buscar-input-wrap">
               <span class="buscar-lupa" aria-hidden="true">
@@ -620,7 +644,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                 </svg>
               </span>
               <input type="text" class="buscar-input" id="buscarInput"
-                     placeholder="buscar servicio o curso"
+                     placeholder="Buscar servicio, curso o palabra clave"
                      maxlength="40"
                      autocomplete="off" autocorrect="off"
                      autocapitalize="off" spellcheck="false">
@@ -637,28 +661,42 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </button>
           </div>
 
-          <!-- Compartir búsqueda · píldora icono + texto
-               "Compartir" a la DERECHA de la cápsula (decisión del
-               dueño). El glifo es el MISMO del botón compartir del
-               post (Iconos.js, data-glifo="share") pero en un
-               SPAN INTERNO: pintarGlifos escribe el innerHTML del
-               portador y borraría el texto si el botón fuera el
-               portador. Naranja oficial al activarse (Chips_CSS).
-               Oculto por defecto; Buscar y Lista lo activan con
-               buscar:estado / buscar:resultados. En modo
-               compartida desaparece (no aplica). -->
-          <button type="button" class="btn-compartir" id="btnCompartir"
-                  aria-label="Compartir búsqueda" hidden disabled>
-            <span class="btn-compartir-glifo" data-glifo="share" aria-hidden="true"></span>
-            <span class="btn-compartir-texto">Compartir</span>
-          </button>
-
         </div>
+
+        <!-- R61 · COMPARTIR LISTA FILTRADA · deja de ser botón
+             píldora: es un TEXTO bajo el campo, a la izquierda,
+             un poco más grande y con SUBLINADO PUNTEADO. El
+             binding y los estados los lleva Compartir_Script con
+             buscar:estado / buscar:resultados (IDs y clases
+             intactos). -->
+        <button type="button" class="btn-compartir" id="btnCompartir"
+                aria-label="Compartir lista filtrada" hidden disabled>
+          Compartir lista filtrada
+        </button>
 
         <div id="buscarVacio" class="buscar-vacio" hidden></div>
 
-        <!-- R58 · rótulo de la vidriera de items -->
-        <div class="lista-encabezado">Explorar</div>
+        <!-- ============================================================
+             RÓTULO DE LA VIDRIERA (R58 · R61 contador + modo vista)
+             "Explorar" con el CONTADOR de items que pinta
+             Lista_Script (#listaContador), y a la derecha la
+             CÁPSULA de modo de vista (.modo-vista: lista /
+             miniatura), el mismo idioma visual del menú de chips.
+             Seleccionable pero SIN acción todavía (decisión del
+             dueño R61). Esta fila NO se oculta al abrir la
+             búsqueda: lo único que se tapa es el menú chips.
+             ============================================================ -->
+        <div class="lista-encabezado">
+          <span class="lista-encabezado-texto">Explorar<span class="lista-contador" id="listaContador">0</span></span>
+          <div class="modo-vista" role="group" aria-label="Modo de vista">
+            <button type="button" class="mv-btn activo" id="mvLista" aria-label="Ver como lista">
+              <span data-glifo="vistaLista" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="mv-btn" id="mvMiniatura" aria-label="Ver como miniatura">
+              <span data-glifo="vistaMiniatura" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
 
         <div class="secciones-wrap">
           <div class="lista-wrap" id="listaWrap"></div>

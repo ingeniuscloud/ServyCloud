@@ -3,18 +3,27 @@ ARCHIVO:         Ciudad_Sheet_CSS.html
 ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
-                 bottom sheet de selección. Botón COMPACTO dentro de
+                 bottom sheet de selección. Botón dentro de
                  la fila de cabecera (R58): pin + "Estás viendo
-                 Ciudad" + chevron SVG. R60: dentro de la fila de
-                 cabecera ocupa el ancho disponible con el texto
-                 COMPLETO (sin recortes) y el menú global a la
-                 derecha. Lista con radio button nativo estilizado.
-                 Sheet al 90%. Modo bloqueado para primera selección
-                 sin ciudad guardada. Aviso de cookies de esa
-                 primera carga: icono a la izquierda del texto y
-                 botón Aceptar debajo.
-VERSIÓN:         1.4
-CAMBIOS:         R60: la city-bar recupera la UBICACIÓN COMPLETA
+                 en Ciudad" + chevron SVG. R61: al TAMAÑO de
+                 "Promos cerca de ti" (17px) — ahora con la
+                 búsqueda fuera de la fila hay espacio de sobra.
+                 R60: dentro de la fila de cabecera ocupa el ancho
+                 disponible con el texto COMPLETO (sin recortes) y
+                 el menú global a la derecha. Lista con radio
+                 button nativo estilizado. Sheet al 90%. Modo
+                 bloqueado para primera selección sin ciudad
+                 guardada. Aviso de cookies de esa primera carga:
+                 icono a la izquierda del texto y botón Aceptar
+                 debajo.
+VERSIÓN:         1.5
+CAMBIOS:         R61: la ubicación sube al TAMAÑO del encabezado
+                 de promos — 13→17px (el dueño: "mismo tamaño de
+                 'promos cerca de ti', ahora sí tiene espacio
+                 suficiente"); pin 15→16px y chevron 14→15px para
+                 acompañar al texto. El EN lo lleva el markup
+                 (Index.html: "Estás viendo en Ciudad").
+                 R60: la city-bar recupera la UBICACIÓN COMPLETA
                  como antes de R58: fuera el ancho acotado
                  (max-width 46%) y la elipsis — el texto completo
                  respira en la fila (la búsqueda ya no vive ahí) y
@@ -31,11 +40,14 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 ════════════════════════════════════════════════════════════════════
 */
   /* ============================================================
-     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R60)
-     Misma pieza de siempre (pin + "Estás viendo Ciudad" +
+     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R61)
+     Misma pieza de siempre (pin + "Estás viendo en Ciudad" +
      chevron). R60: UBICACIÓN COMPLETA como antes de R58 —
      ocupa el ancho disponible de la fila (el menú global queda
      a la derecha) y el texto NO se recorta.
+     R61: al TAMAÑO de "Promos cerca de ti" (17px, el dueño
+     pidió igualarlos y ahora hay espacio de sobra); el pin y
+     el chevron crecen un punto para acompañar al texto.
      ============================================================ */
   .city-bar {
     flex: 1 1 auto;
@@ -45,7 +57,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     gap: 6px;
 
-    padding: 7px 6px 7px 12px;
+    padding: 6px 6px 6px 12px;
     margin: 0;
 
     border: none;
@@ -53,7 +65,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     border-radius: 10px;
 
     font-family: inherit;
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -75,8 +87,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .city-bar .city-pin {
     flex-shrink: 0;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     color: #475569;
     display: flex;
     align-items: center;
@@ -103,8 +115,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .city-bar .city-chev {
     flex-shrink: 0;
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     color: #94a3b8;
     display: flex;
     align-items: center;
@@ -421,10 +433,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      ============================================================ */
   @media (max-width: 360px) {
     .city-bar {
-      padding: 8px 12px 8px 16px;
+      padding: 6px 12px 6px 14px;
       font-size: 16px;
-      gap: 6px;
+      gap: 5px;
     }
+    .city-bar .city-pin { width: 15px; height: 15px; }
     .city-bar .city-chev { width: 14px; height: 14px; }
     .ciudad-content { padding: 4px 18px 22px; }
     .ciudad-option { font-size: 14px; padding: 13px 6px; }

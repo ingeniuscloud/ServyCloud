@@ -9,9 +9,14 @@ RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  con [data-glifo="clave"]. Al cargar el DOM, pinta
                  todos los data-glifo del documento automáticamente.
 
-                 Catálogo: 24 glifos EN USO confirmado.
-VERSIÓN:         1.5
-CAMBIOS:         R58: glifo verificado — círculo relleno en
+                 Catálogo: 26 glifos EN USO confirmado.
+VERSIÓN:         1.6
+CAMBIOS:         R61: glifos vistaLista y vistaMiniatura — la
+                 cápsula de modo de vista de la fila "Explorar"
+                 (Lista_Script los pinta con data-glifo; trazo
+                 currentColor para que el activo vista en naranja
+                 oficial).
+                 R58: glifo verificado — círculo relleno en
                  currentColor con palomita blanca; vive junto al
                  nombre del partner en el item de la lista
                  (Lista_Script lo llama con data-glifo).
@@ -27,13 +32,17 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
   const IMAGENES = {
 
     /* ============================================================
-       ICONOS EN USO CONFIRMADO (24)
+       ICONOS EN USO CONFIRMADO (26)
        ============================================================ */
 
     /* ---------- Navegación ---------- */
     flecha:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     flechaVer:      "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     flechaAcordeon: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%2F%3E%3C%2Fsvg%3E",
+
+    /* ---------- Modo de vista (R61 · fila Explorar) ---------- */
+    vistaLista:     "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%228%22%20y1%3D%226%22%20x2%3D%2221%22%20y2%3D%226%22%2F%3E%3Cline%20x1%3D%228%22%20y1%3D%2212%22%20x2%3D%2221%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%228%22%20y1%3D%2218%22%20x2%3D%2221%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%223%22%20y1%3D%226%22%20x2%3D%223.01%22%20y2%3D%226%22%2F%3E%3Cline%20x1%3D%223%22%20y1%3D%2212%22%20x2%3D%223.01%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%223%22%20y1%3D%2218%22%20x2%3D%223.01%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",
+    vistaMiniatura: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%223%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2214%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3C%2Fsvg%3E",
 
     /* ---------- Contacto y redes ---------- */
     whatsapp:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.472%2014.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94%201.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198%200-.52.074-.792.372-.272.297-1.04%201.016-1.04%202.479%200%201.462%201.065%202.875%201.213%203.074.149.198%202.096%203.2%205.077%204.487.709.306%201.262.489%201.694.625.712.227%201.36.195%201.871.118.571-.085%201.758-.719%202.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421%207.403h-.004a9.87%209.87%200%2001-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86%209.86%200%2001-1.51-5.26c.001-5.45%204.436-9.884%209.888-9.884%202.64%200%205.122%201.03%206.988%202.898a9.825%209.825%200%20012.893%206.994c-.003%205.45-4.437%209.884-9.885%209.884m8.413-18.297A11.815%2011.815%200%200012.05%200C5.495%200%20.16%205.335.157%2011.892c0%202.096.547%204.142%201.588%205.945L.057%2024l6.305-1.654a11.882%2011.882%200%20005.683%201.448h.005c6.554%200%2011.89-5.335%2011.893-11.893a11.821%2011.821%200%2000-3.48-8.413z%22/%3E%3C/svg%3E",

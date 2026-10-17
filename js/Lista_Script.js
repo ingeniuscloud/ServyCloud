@@ -6,10 +6,14 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  ciudad activa + chip activo, sobre TABLAS.posts
                  cargada una sola vez. Emite 'post:change'.
                  Escucha 'chips:change', 'buscar:change' y
-                 'ciudad:change'. R60: el estado abierto de la
-                 búsqueda se lee en la FILA de chips + buscar
-                 (.filtros-fila.buscando, nueva casa de la
-                 cápsula split pill).
+                 'ciudad:change'. R61: pinta el CONTADOR de
+                 items del rótulo "Explorar" (#listaContador, la
+                 cantidad exacta que trae el filtro) y liga el
+                 MODO DE VISTA (lista / miniatura): seleccionable
+                 sin acción de render todavía. R60: el estado
+                 abierto de la búsqueda se lee en la FILA de
+                 chips + buscar (.filtros-fila.buscando, casa de
+                 la cápsula split pill).
                  Item de la vidriera (R58 · CAJA): tarjeta blanca
                  con franja del colorOficial a la izquierda
                  (variables --post-color/--post-claro), título y
@@ -36,8 +40,17 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.9
-CAMBIOS:         R60: el selector del estado abierto de la
+VERSIÓN:         2.0
+CAMBIOS:         R61: CONTADOR de items — actualizarContador() escribe
+                 #listaContador en cada repintado (la cantidad que
+                 trae el filtro, incluido el 0 de la búsqueda
+                 vacía); MODO DE VISTA — pintarVista() pinta los
+                 glifos (vistaLista/vistaMiniatura) y liga el
+                 toggle .activo entre #mvLista y #mvMiniatura,
+                 SIN acción de render todavía (decisión del
+                 dueño); se llama al inicio de pintarLista, cuando
+                 el lienzo ya está inyectado.
+                 R60: el selector del estado abierto de la
                  búsqueda pasa de .filtros-wrap.buscando a
                  .filtros-fila.buscando (la cápsula vive en la
                  fila de chips, no en la cabecera).
@@ -294,6 +307,54 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       aviso.textContent = '';
     }
 
+    /* ============================================================
+       CONTADOR DE EXPLORAR (R61) · la cantidad de items que
+       contiene la vidriera, junto al rótulo. Se pinta en cada
+       repintado: la cifra SIEMPRE es la de la lista en pantalla
+       (ciudad + chip o filtro de búsqueda, incluido el 0).
+       ============================================================ */
+    function actualizarContador(cantidad) {
+      var el = document.getElementById('listaContador');
+      if (el) el.textContent = String(cantidad);
+    }
+
+    /* ============================================================
+       MODO DE VISTA (R61) · cápsula lista / miniatura
+       Pinta los glifos (Iconos.html) y liga la SELECCIÓN: un
+       solo botón activo a la vez. SIN acción de render todavía
+       (el dueño la pidió seleccionable, no funcional — la
+       vidriera en miniatura llegará cuando la ordene).
+       Se llama desde pintarLista: el lienzo ya está inyectado
+       y los botones existen.
+       ============================================================ */
+    var vistaLigada = false;
+
+    function pintarVista() {
+      var mvLista = document.getElementById('mvLista');
+      var mvMini  = document.getElementById('mvMiniatura');
+      if (!mvLista || !mvMini) return;
+
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(mvLista);
+        window.pintarGlifos(mvMini);
+      }
+
+      if (vistaLigada) return;
+      vistaLigada = true;
+
+      mvLista.addEventListener('click', function () {
+        if (mvLista.classList.contains('activo')) return;
+        mvLista.classList.add('activo');
+        mvMini.classList.remove('activo');
+      });
+
+      mvMini.addEventListener('click', function () {
+        if (mvMini.classList.contains('activo')) return;
+        mvMini.classList.add('activo');
+        mvLista.classList.remove('activo');
+      });
+    }
+
     /* R55 · Al cerrar el detalle, las estrellas se re-leen de
        TABLAS: si el usuario dio (o quitó) like con el corazón
        flotante, el número de la fila queda IGUAL al que dejó
@@ -330,6 +391,11 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     function pintarLista(lista, modoBusqueda, enLimite) {
       var cont = document.getElementById('listaWrap');
       if (!cont) return;
+
+      /* R61 · contador + ligadura del modo de vista (primera
+         pasada con el lienzo vivo). */
+      pintarVista();
+      actualizarContador(lista ? lista.length : 0);
 
       cont.innerHTML = '';
 

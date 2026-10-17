@@ -20,6 +20,11 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  anclada a la esquina superior derecha (fila
                  horizontal: glifo amarillo + contador a su
                  derecha, oculta en 0).
+                 R61: el rótulo "Explorar" es una FILA — texto con
+                 CONTADOR de items (píldora pequeña, lo pinta
+                 Lista_Script) y, a la derecha, la CÁPSULA de modo
+                 de VISTA (lista / miniatura, el mismo idioma del
+                 menú chips, seleccionable sin acción).
                  Sin badge (vive en la promo y el post). La lista
                  es PLANA bajo el rótulo "Explorar" (el agrupado
                  por grupo vuelve como opción del filtro cuando
@@ -28,8 +33,18 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  la misma anatomía de caja (solo si el POST
                  inicial aún está en vuelo cuando el usuario
                  elige ciudad).
-VERSIÓN:         1.9
-CAMBIOS:         R60: el bloque modo-detalle oculta la FILA
+VERSIÓN:         2.0
+CAMBIOS:         R61: .lista-encabezado pasa de rótulo a FILA
+                 (flex, espacio entre extremos): a la izquierda
+                 "Explorar" + .lista-contador (píldora con la
+                 cantidad de items, la pinta Lista_Script en cada
+                 repintado) y a la derecha .modo-vista — cápsula
+                 #f1f3f7 con dos botones (glifos vistaLista /
+                 vistaMiniatura de Iconos.html), el ACTIVO en
+                 blanco con el naranja oficial, tal como el
+                 control segmentado de los chips. Sin acción de
+                 render todavía (decisión del dueño).
+                 R60: el bloque modo-detalle oculta la FILA
                  COMPLETA de chips + buscar (.filtros-fila —
                  chips, lupa, cápsula y compartir son hijos de
                  esa fila); la excepción del post compartido
@@ -214,19 +229,123 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     RÓTULO "EXPLORAR" (R58) · etiqueta de la vidriera, sobre
-     la lista plana (la imagen del dueño). La fila "Relevantes"
-     del filtro es PENDIENTE (el dueño lo anotó para después).
+     RÓTULO "EXPLORAR" (R58 · R61 FILA con contador + vista)
+     Etiqueta de la vidriera, sobre la lista plana (la imagen
+     del dueño). R61: es una FILA — "Explorar" con el CONTADOR
+     de items (píldora pequeña; Lista_Script la pinta en cada
+     repintado con la cantidad que trae el filtro) y, alineada
+     a la derecha, la CÁPSULA de modo de vista (lista /
+     miniatura): el mismo idioma visual del menú chips
+     (contenedor #f1f3f7, activo blanco + naranja oficial).
+     Selección SIN acción de render por ahora (el dueño la pidió
+     seleccionable, no funcional). Esta fila NO se oculta al
+     abrir la búsqueda (R61: solo se tapan los chips).
      ============================================================ */
   .lista-encabezado {
     flex-shrink: 0;
     padding: 12px 16px 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .lista-encabezado-texto {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+
     font-size: 13px;
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: #64748b;
   }
+
+  /* CONTADOR de items (R61): píldora pequeña junto al rótulo.
+     Números tabulares para que no baile al cambiar. */
+  .lista-contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 8px;
+    padding: 1px 8px 2px;
+
+    background: rgba(15, 23, 42, 0.06);
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* MODO DE VISTA (R61) · cápsula lista / miniatura a la
+     derecha de la fila, idéntico idioma del menú chips:
+     contenedor claro con radio, botón ACTIVO blanco con el
+     naranja oficial y sombra suave. Los glifos vienen de
+     Iconos.html (vistaLista / vistaMiniatura, stroke
+     currentColor). */
+  .modo-vista {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    padding: 3px;
+
+    background: #f1f3f7;
+    border-radius: 999px;
+  }
+
+  .mv-btn {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 26px;
+    padding: 0;
+
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+
+    color: #64748b;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: color 0.18s ease, background 0.18s ease,
+                box-shadow 0.18s ease;
+  }
+
+  .mv-btn:active { opacity: 0.7; }
+
+  .mv-btn svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .mv-btn.activo {
+    background: #ffffff;
+    color: #f97316;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.10);
+  }
+
+  /* Portador del glifo: inline-flex para que el svg herede el
+     centro del botón sin descuadres verticales. */
+  .mv-btn span { display: inline-flex; }
 
   /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
      glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
@@ -656,5 +775,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .lista-skeleton-item { padding: 12px 14px 12px 19px; }
     .lista-skeleton-avatar { width: 30px; height: 30px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
+    .lista-encabezado { padding: 10px 14px 8px; }
+    .modo-vista { padding: 2px; }
+    .mv-btn { width: 30px; height: 24px; }
+    .mv-btn svg { width: 14px; height: 14px; }
+    .lista-contador { font-size: 10px; margin-left: 6px; }
   }
 

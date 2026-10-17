@@ -5,11 +5,11 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
                  su mensaje de WhatsApp lleva el enlace profundo;
-                 (2) LISTA FILTRADA — la píldora #btnCompartir de
-                 la fila de filtros (INACTIVA al abrir la
-                 búsqueda, activa SOLO cuando el filtro trae
-                 resultados) comparte el término + la ciudad
-                 activa.
+                 (2) LISTA FILTRADA — el TEXTO "Compartir lista
+                 filtrada" bajo el campo de búsqueda (R61: ya no
+                 es botón píldora; INACTIVO al abrir la búsqueda,
+                 activo SOLO cuando el filtro trae resultados)
+                 comparte el término + la ciudad activa.
                  El enlace viaja en UN parámetro corto ?s= con el
                  payload compacto y OFUSCADO (XOR con clave
                  embebida + base64url): el ID del post o el
@@ -20,30 +20,34 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  está inyectado; se aplica ciudad + contenido y la
                  app entra en MODO COMPARTIDO: ciudad VISTA pero
                  BLOQUEADA, campo de búsqueda fijado SIN foco y solo
-                 "Limpiar filtro" a la derecha (sin menú global).
-                 El header del detalle lo decide el TIPO de enlace
-                 (esta ronda marca el body): con UN post la fila
-                 sustituye al par volver/título del modo detalle y
-                 la salida es "Limpiar filtro"; con una LISTA cada
-                 post abre con volver/título normales para recorrer
-                 los demás posts del filtro, y "Limpiar filtro"
-                 queda en la lista. Al limpiar vuelve
-                 todo el catálogo (la ciudad del enlace queda como
-                 la del receptor). Aviso amable si el contenido
+                 "Limpiar filtro" a la derecha (sin menú global ni
+                 compartir). El header del detalle lo decide el
+                 TIPO de enlace (esta ronda marca el body): con UN
+                 post la fila sustituye al par volver/título del
+                 modo detalle y la salida es "Limpiar filtro"; con
+                 una LISTA cada post abre con volver/título normales
+                 para recorrer los demás posts del filtro, y
+                 "Limpiar filtro" queda en la lista. Al limpiar
+                 vuelve todo el catálogo (la ciudad del enlace queda
+                 como la del receptor). Aviso amable si el contenido
                  compartido ya no existe. La instalación de la PWA
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         1.5
-CAMBIOS:         R60: el modo compartido despliega la CÁPSULA
+VERSIÓN:         1.6
+CAMBIOS:         R61: el emisor de LISTA FILTRADA ya no es botón
+                 píldora en la fila — es el TEXTO "Compartir
+                 lista filtrada" bajo el campo (el estilo lo
+                 viste Chips_CSS; el binding con buscar:estado /
+                 buscar:resultados queda EXACTO). El modo
+                 compartido lo retira con body.modo-compartido.
+                 R60: el modo compartido despliega la CÁPSULA
                  bloqueada (clase .compartida también en la fila
-                 .filtros-fila: chips/lupa/compartir fuera, campo
-                 sin foco, solo "Limpiar filtro" activo) y el
-                 botón compartir vive a la derecha de la cápsula
-                 (mismo trabajo de siempre). "Limpiar filtro" lo
-                 liga Buscar_Script (delega en limpiar() cuando
-                 hay modo compartido) — aquí solo queda el binding
-                 del botón compartir.
+                 .filtros-fila: chips/lupa/filtro fuera, campo
+                 sin foco, solo "Limpiar filtro" activo).
+                 "Limpiar filtro" lo liga Buscar_Script (delega
+                 en limpiar() cuando hay modo compartido) — aquí
+                 solo queda el binding del compartir.
                  R43: lista compartida — activarModo marca el body
                  con compartido-lista / compartido-post y limpiar
                  los retira; con eso Chips_CSS devuelve el par
@@ -322,6 +326,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     /* ============================================================
        Botón compartir · estados pedido por el dueño
+       (R61: es el TEXTO "Compartir lista filtrada" bajo el
+       campo; la mecánica es la misma de siempre)
        · Oculto por defecto.
        · Al dar click en la lupa: aparece INACTIVO.
        · Solo cuando el filtro trae resultados: ACTIVO.

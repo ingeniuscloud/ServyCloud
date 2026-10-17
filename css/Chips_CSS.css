@@ -2,37 +2,52 @@
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de la pantalla principal (R60): FILA DE
+RESPONSABILIDAD: CSS de la pantalla principal (R61): FILA DE
                  CABECERA con la CIUDAD COMPLETA (sin recortes) a
                  la izquierda y el MENÚ GLOBAL a la derecha; FILA
-                 DE CHIPS + BUSCAR (.filtros-fila debajo de las
-                 promos): chips en control segmentado y la LUPA
-                 circular a la derecha. Al abrir, la cápsula de
-                 búsqueda (SPLIT PILL: lupa + campo "buscar
-                 servicio o curso" + "Limpiar filtro", SIN X) se
-                 expande a todo el ancho tapando los chips y
-                 COMPARTIR aparece a su derecha. Modo compartido
-                 (recepción de un enlace): chips/lupa/compartir/menú
-                 global fuera, cápsula DESPLEGADA y BLOQUEADA con
-                 solo "Limpiar filtro" activo; city-bar bloqueada
-                 vía body.modo-compartido. El header del detalle lo
-                 decide el TIPO de enlace (Compartir marca el
-                 body): un post compartido usa la cápsula en lugar
-                 de volver/título; una lista compartida vuelve al
-                 par volver/título dentro de cada post. Línea de
-                 aviso cuando la búsqueda no da resultados.
-VERSIÓN:         1.7
-CAMBIOS:         R60: la cabecera queda con la ciudad completa +
+                 DE CHIPS + BUSCAR + FILTRO (.filtros-fila debajo
+                 de las promos): chips en control segmentado, la
+                 LUPA circular y, a su derecha, el BOTÓN FILTRO
+                 (círculo, sin acción por ahora). Al abrir la
+                 búsqueda, la cápsula SPLIT PILL (lupa + campo +
+                 "Limpiar filtro", SIN X) se expande tapando SOLO
+                 los chips: la fila "Explorar" se queda VIVA con
+                 su contador y el modo de vista. COMPARTIR ya no
+                 vive en la fila: es un TEXTO "Compartir lista
+                 filtrada" bajo el campo, a la izquierda, con
+                 subrayado punteado. La CÁPSULA es BLANCA para que
+                 la escritura se note. Modo compartido
+                 (recepción de un enlace): chips/lupa/filtro/
+                 compartir/menú global fuera, cápsula DESPLEGADA y
+                 BLOQUEADA con solo "Limpiar filtro" activo;
+                 city-bar bloqueada vía body.modo-compartido. El
+                 header del detalle lo decide el TIPO de enlace
+                 (Compartir marca el body): un post compartido usa
+                 la cápsula en lugar de volver/título; una lista
+                 compartida vuelve al par volver/título dentro de
+                 cada post. Línea de aviso cuando la búsqueda no da
+                 resultados.
+VERSIÓN:         1.8
+CAMBIOS:         R61: entra el BOTÓN FILTRO (.btn-filtro, círculo
+                 con embudo a la derecha de la lupa, misma pata
+                 visual; sin acción todavía); la CÁPSULA pasa a
+                 FONDO BLANCO (se nota la escritura) con sombra
+                 suave; la fila "Explorar" deja de ocultarse en
+                 búsqueda (fuera body.en-busqueda .lista-encabezado
+                 — solo se tapan los chips); COMPARTIR deja de ser
+                 píldora en la fila: TEXTO "Compartir lista
+                 filtrada" bajo el campo, a la izquierda, 14px con
+                 subrayado punteado (el modo compartido lo retira
+                 con body.modo-compartido).
+                 R60: la cabecera queda con la ciudad completa +
                  global (fuera campo y compartir); vuelve la LUPA
                  circular (.btn-lupa) a la derecha de los chips y
                  con ella la CÁPSULA .buscar-capsula SPLIT PILL
                  (lupa + input + "Limpiar filtro" como segmento
                  derecho con divisoria, SIN X) que se expande desde
                  la derecha tapando los chips (animación scaleX);
-                 placeholder "buscar servicio o curso"; Compartir
-                 aparece a la derecha de la cápsula; compartida:
-                 cápsula desplegada y bloqueada (input sin foco,
-                 solo "Limpiar filtro" activo).
+                 compartida: cápsula desplegada y bloqueada (input
+                 sin foco, solo "Limpiar filtro" activo).
                  R58: la ciudad entró a la fila de cabecera; los
                  chips salieron del wrap como CONTROL SEGMENTADO
                  debajo de las promos.
@@ -218,14 +233,58 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     CÁPSULA DE BÚSQUEDA · SPLIT PILL (R60)
+     BOTÓN FILTRO (R61) · a la derecha de la lupa
+     Círculo con embudo, misma pata visual de la lupa. SIN
+     acción todavía (el dueño lo pidió así); en los estados
+     buscando/compartida se retira junto con la lupa.
+     ============================================================ */
+  .btn-filtro {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+
+    color: #475569;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-filtro:active { opacity: 0.5; }
+
+  .btn-filtro svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     CÁPSULA DE BÚSQUEDA · SPLIT PILL (R60 · R61 fondo BLANCO)
      Cerrada NO existe (display:none): la fila muestra chips +
-     lupa. Abierta se expande a TODO el ancho de la fila tapando
-     los chips (animación desde la derecha: la lupa que vive a
-     la izquierda del campo se desplaza hacia la izquierda con
-     la expansión — el efecto pedido). Split pill: [lupa+campo |
-     "Limpiar filtro"] divididos por una línea; SIN X (más claro
-     para quien no es técnico).
+     lupa + filtro. Abierta se expande a TODO el ancho de la
+     fila tapando SOLO los chips (animación desde la derecha: la
+     lupa que vive a la izquierda del campo se desplaza hacia la
+     izquierda con la expansión — el efecto pedido). Split pill:
+     [lupa+campo | "Limpiar filtro"] divididos por una línea;
+     SIN X (más claro para quien no es técnico).
+     R61 · fondo BLANCO (antes #f1f3f7): la escritura se nota
+     sobre el campo; sombra suave para que el blanco se
+     defina sobre el tinte del lienzo.
      ============================================================ */
   .buscar-capsula {
     display: none;
@@ -235,7 +294,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
     height: 38px;
 
-    background: #f1f3f7;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
     border-radius: 50px;
     overflow: hidden;
   }
@@ -345,37 +405,39 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .btn-limpiar:active { opacity: 0.5; }
 
   /* ============================================================
-     BOTÓN COMPARTIR BÚSQUEDA
-     Píldora icono + texto "Compartir" a la DERECHA de la
-     cápsula (decisión del dueño R60: su trabajo es el mismo de
-     siempre). MISMO glifo que el botón compartir del post
-     (Iconos.html, data-glifo="share" en un SPAN interno —
-     pintarGlifos escribe el innerHTML del portador) y MISMO
-     trazo (stroke 1.05 como Social_CSS). Tipografía igual que
-     "Limpiar filtro" (13px/600). Naranja oficial al activarse y
-     gris mientras está inactivo. Oculto por defecto ([hidden]
-     desde HTML); Buscar lo muestra INACTIVO al abrir la
-     búsqueda y Lista lo activa cuando el filtro trae
-     resultados. En modo compartida desaparece (no aplica).
+     COMPARTIR LISTA FILTRADA (R61) · texto bajo el campo
+     Deja de ser botón píldora: es un TEXTO a la izquierda,
+     debajo del campo buscar, un poco más grande (14px) y con
+     SUBLINADO PUNTEADO — invita al toque sin ser técnico. MISMO
+     trabajo de siempre (Compartir_Script, buscar:estado /
+     buscar:resultados, id y clase intactos). Naranja oficial;
+     gris mientras está inactivo. En modo compartido no aplica
+     (body.modo-compartido lo retira). Vive FUERA de la fila:
+     align-self flex-start para no estirarse en el lienzo.
      ============================================================ */
   .btn-compartir {
     flex: 0 0 auto;
+    align-self: flex-start;
 
-    height: 34px;
-    padding: 0 12px;
-    margin-right: 0;
-    gap: 6px;
+    padding: 2px 2px 2px 16px;
+    margin: 0 0 4px;
 
-    border: 1.2px solid #FA6A08;
-    border-radius: 50px;
+    border: none;
     background: transparent;
 
     color: #FA6A08;
     font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    text-align: left;
+    white-space: nowrap;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -385,66 +447,45 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .btn-compartir:active { opacity: 0.5; }
 
-  /* [hidden] DEBE ganar sobre display:flex (lección del estándar:
-     sin esto el botón se vería siempre). Mismo patrón que
-     .buscar-vacio[hidden]. */
+  /* [hidden] DEBE ganar sobre display:inline-flex (lección del
+     estándar: sin esto el botón se vería siempre). Mismo patrón
+     que .buscar-vacio[hidden]. */
   .btn-compartir[hidden] { display: none; }
-
-  /* Glifo share (Iconos.html): mismo trazo que el botón del post */
-  .btn-compartir svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.05;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* Texto "Compartir": misma tipografía del botón
-     "Limpiar filtro" (13px/600) para que las dos
-     píldoras de la fila vistan igual. */
-  .btn-compartir-texto {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    line-height: 1;
-  }
 
   /* Inactivo: mientras la búsqueda aún no filtra nada */
   .btn-compartir[disabled] {
-    border-color: #cbd5e1;
     color: #94a3b8;
     opacity: 0.6;
     cursor: default;
   }
   .btn-compartir[disabled]:active { opacity: 0.6; }
 
+  /* Modo compartido: el receptor no comparte (no aplica). */
+  body.modo-compartido .btn-compartir { display: none !important; }
+
   /* ============================================================
      ESTADO · buscando (la lupa activa)
      La cápsula tapa los chips y la lupa del círculo desaparece
-     (la cápsula lleva la suya a la izquierda); el rótulo
-     "Explorar" se oculta (body.en-busqueda, lo marca
-     Buscar_Script junto con .buscando en la fila).
+     (la cápsula lleva la suya a la izquierda); el BOTÓN FILTRO
+     se retira con ella (R61). La fila "Explorar" SE QUEDA
+     VIVA — con su contador y su modo de vista (R61: el dueño
+     pidió que solo se oculte el menú chips).
      ============================================================ */
   .filtros-fila.buscando .filtros,
-  .filtros-fila.buscando .btn-lupa {
-    display: none;
-  }
-
-  body.en-busqueda .lista-encabezado {
+  .filtros-fila.buscando .btn-lupa,
+  .filtros-fila.buscando .btn-filtro {
     display: none;
   }
 
   /* ============================================================
      ESTADO · compartida (recepción de un enlace)
-     Cápsula DESPLEGADA y BLOQUEADA: chips, lupa y compartir
+     Cápsula DESPLEGADA y BLOQUEADA: chips, lupa y filtro
      fuera; el campo fijado sin foco (pointer-events none) y
      solo "Limpiar filtro" activo (trabajo de siempre, solo
-     cambió la estética). La ciudad queda visible pero
-     BLOQUEADA vía body.modo-compartido (decisión del dueño).
+     cambió la estética). COMPARTIR se retira aparte (R61:
+     vive fuera de la fila — body.modo-compartido lo retira).
+     La ciudad queda visible pero BLOQUEADA vía
+     body.modo-compartido (decisión del dueño).
      En modo detalle el header lo decide el TIPO de enlace
      (Compartir marca el body con compartido-post /
      compartido-lista): con un POST compartido esta fila
@@ -454,7 +495,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      ============================================================ */
   .filtros-fila.compartida .filtros,
   .filtros-fila.compartida .btn-lupa,
-  .filtros-fila.compartida .btn-compartir {
+  .filtros-fila.compartida .btn-filtro {
     display: none;
   }
 
@@ -548,13 +589,13 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .menu-global svg { width: 18px; height: 18px; }
     .btn-lupa { width: 32px; height: 32px; }
     .btn-lupa svg { width: 16px; height: 16px; }
+    .btn-filtro { width: 32px; height: 32px; }
+    .btn-filtro svg { width: 15px; height: 15px; }
     .buscar-capsula { height: 34px; }
     .buscar-input { font-size: 14px; }
     .buscar-input-wrap { padding: 0 2px 0 12px; }
     .btn-limpiar { padding: 0 10px 0 8px; font-size: 12px; }
-    .btn-compartir { height: 32px; padding: 0 10px; }
-    .btn-compartir svg { width: 15px; height: 15px; }
-    .btn-compartir-texto { font-size: 12px; }
+    .btn-compartir { font-size: 13px; padding: 2px 2px 2px 14px; }
     .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
   }
 

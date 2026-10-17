@@ -16,8 +16,16 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  cursos "pronto". R58: TÍTULO INICIAL grande del
                  header (.titulo-header, texto de la BD real en
                  app.tituloHeader).
-VERSIÓN:         1.8
-CAMBIOS:         R60: .titulo-header gana aire y presencia —
+VERSIÓN:         1.9
+CAMBIOS:         R61: .titulo-header gana el TAMAÑO DEFINITIVO del
+                 dueño — +20% (30→36px) y la MITAD de bold
+                 (700→400, font simple pero grande), mismo aire
+                 arriba/abajo de R60; .area-contenido pierde el
+                 GRIS BÁSICO #e5e7eb del respaldo (la caja donde
+                 viven las promos se veía gris antes del pintado
+                 del lienzo) y ahora respalda con el tinte
+                 #fdf3ec del lienzo R57.
+                 R60: .titulo-header gana aire y presencia —
                  menos bold (800→700) y MÁS GRANDE (26→30px), con
                  más padding arriba y abajo para que respire sin
                  ruido.
@@ -105,13 +113,13 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     TÍTULO INICIAL (R60) · texto grande que viene de la BD real
+     TÍTULO INICIAL (R61) · texto grande que viene de la BD real
      (ROOTJSON → app.tituloHeader, lo pinta Core_Script). Vive
      DEBAJO de la fila de cabecera (ciudad + menú global) y
-     ENCIMA del encabezado de promos. R60: menos bold (700) y
-     MÁS GRANDE (30px), con más padding arriba y abajo para
-     que respire sin ruido. Dos líneas máximo; si la BD no lo
-     trae, Core_Script lo deja oculto ([hidden]).
+     ENCIMA del encabezado de promos. R61: +20% de tamaño
+     (30→36px) y la mitad de bold (700→400) — font SIMPLE pero
+     GRANDE, con el aire de R60 intacto. Dos líneas máximo; si
+     la BD no lo trae, Core_Script lo deja oculto ([hidden]).
      ============================================================ */
   .titulo-header {
     flex-shrink: 0;
@@ -119,10 +127,10 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     padding: 4px 0 8px;
 
     font-family: inherit;
-    font-size: 30px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
     color: #1f2937;
     text-align: left;
 
@@ -134,17 +142,22 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   .titulo-header[hidden] { display: none; }
 
   @media (max-width: 360px) {
-    .titulo-header { font-size: 26px; margin: 8px 14px 0; padding: 4px 0 6px; }
+    .titulo-header { font-size: 31px; margin: 8px 14px 0; padding: 4px 0 6px; }
   }
 
   /* ============================================================
      ÁREA DE CONTENIDO — degradado + color heredable
+     R61 · el respaldo ya NO es el gris básico #e5e7eb: era el
+     gris que se veía en la caja de las promos antes del
+     pintado del lienzo. Ahora respalda con el TINTE del
+     lienzo (#fdf3ec, R57) — Core_Script pinta encima su
+     degradado (blanco 0–5% + tinte) en el arranque.
      ============================================================ */
   .area-contenido {
     flex: 1 1 auto;
     min-height: 0;
 
-    background: #e5e7eb;
+    background: #fdf3ec;
     color: #1f2937;
 
     display: flex;

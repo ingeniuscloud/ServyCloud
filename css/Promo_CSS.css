@@ -9,9 +9,13 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  verde, violeta, turquesa, fucsia y ámbar; el
                  índice lo asigna Promo_Script): radio, sombra
                  propia del color y contenido en blanco — badge
-                 PROMOCIONADO arriba, título grande, TEXTO DE LA
-                 PROMO (PROMOJSON, la esencia del mensaje), partner
-                 debajo y botón circular de flecha a la derecha.
+                 PROMOCIONADO arriba, TÍTULO = TEXTO DE LA PROMO
+                 (R61: PROMOJSON, grande y sin bold), subtítulo =
+                 título del post, partner con check de
+                 certificado blanco a la derecha y botón circular
+                 de flecha a la derecha. La tarjeta es un 18% MÁS
+                 ANCHA (R61) y el GRID de la marquesina queda
+                 TRANSPARENTE (R61: sin gris, se ve el lienzo).
                  Encabezado propio ("Promos cerca de ti" + "Toca
                  para conocer más") y FADE a los laterales de la
                  marquesina hacia el color del lienzo. El avance
@@ -21,8 +25,19 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  del sistema. Sin estrella (la métrica es solo del
                  item de la lista). Vive fuera del scroll en modo
                  lista. Se oculta en modo detalle.
-VERSIÓN:         2.2
-CAMBIOS:         R60: entra el TEXTO DE LA PROMO (.promo-texto,
+VERSIÓN:         2.3
+CAMBIOS:         R61: anatomía de la tarjeta al pie del dueño —
+                 .promo-titulo ES el texto de PROMOJSON (18px,
+                 peso 400, sin bold) y el título del post baja a
+                 .promo-sub (subtítulo blanco suavizado); la
+                 tercera fila es .promo-partner con el check de
+                 certificado (.promo-check, badgeCheck de
+                 Iconos.html) en BLANCO a la derecha; la tarjeta
+                 crece un 18% de ancho (82→97% escritorio,
+                 72→85% móvil); .promo-track declara
+                 background:transparent (el grid no tapa el
+                 lienzo).
+                 R60: entra el TEXTO DE LA PROMO (.promo-texto,
                  blanco suavizado, 2 líneas) y la PALETA de
                  degradados (.promo-c0…c5) para distinguir las
                  tarjetas entre sí — el naranja oficial sigue
@@ -126,9 +141,13 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
      (rAF) y el arrastre del dedo comparten el MISMO contenedor
      sin pelearse. La señal de "hay más" la da el asomo de la
      tarjeta siguiente.
+     R61 · background:transparent explícito en el GRID: la caja
+     donde viven las promos no pinta nada propio — el fondo del
+     lienzo (#fdf3ec) se ve a través, como pidió el dueño.
      ============================================================ */
   .promo-track {
     display: flex;
+    background: transparent;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
@@ -136,21 +155,21 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
   }
   .promo-track::-webkit-scrollbar { display: none; }
 
-  /* 82% para que la siguiente tarjeta ASOME por la derecha.
-     Promo_Script lo ajusta a 100% cuando hay una sola promo
-     (lo hace con estilo inline, así que gana a estas reglas). */
+  /* 97% (R61 · era 82%): la tarjeta crece un 18% y el asomo de
+     la siguiente queda como brillo al borde. Promo_Script lo
+     ajusta a 100% cuando hay una sola promo (lo hace con
+     estilo inline, así que gana a estas reglas). */
   .promo-track > .promo-item {
-    flex: 0 0 82%;
+    flex: 0 0 97%;
     margin-right: 10px;
   }
 
-  /* En el teléfono, 72%: el asomo pasa de ~70px (solo el aro de la
-     campana) a ~110px, suficiente para ver el arranque del título de
-     la promo siguiente. Se usa body.is-mobile y no una media query
-     porque el marco de escritorio mide ≈414px, casi igual que un
+  /* En el teléfono, 85% (R61 · era 72%): mismo crecimiento del
+     18%. Se usa body.is-mobile y no una media query porque el
+     marco de escritorio mide ≈414px, casi igual que un
      teléfono: por ancho de viewport no se distinguen. */
   body.is-mobile .promo-track > .promo-item {
-    flex: 0 0 72%;
+    flex: 0 0 85%;
   }
 
   /* ============================================================
@@ -158,11 +177,12 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
      Especificidad doble para ganar a .lista-item. La PALETA
      (promo-c0…c5) distingue las tarjetas entre sí; el color 0
      es el NARANJA oficial de la app (la primera promo, como la
-     imagen del dueño). Contenido blanco en columna: badge
-     arriba, título grande, TEXTO DE LA PROMO, partner debajo y
-     botón circular de flecha anclado a la derecha. Sin franja,
-     sin estrella, sin "Ver detalles" (la flecha circular es la
-     invitación).
+     imagen del dueño). Contenido blanco en columna (R61):
+     badge arriba, TÍTULO = texto de la promo (grande, sin
+     bold), subtítulo = título del post, partner + check
+     blanco, y botón circular de flecha anclado a la derecha.
+     Sin franja, sin estrella, sin "Ver detalles" (la flecha
+     circular es la invitación).
      ============================================================ */
   .lista-item.promo-item {
     background: linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
@@ -175,7 +195,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
-    padding: 13px 62px 14px 16px;
+    padding: 14px 62px 15px 16px;
     margin-bottom: 0;
     overflow: hidden;
     text-align: left;
@@ -234,11 +254,13 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     margin-bottom: 3px;
   }
 
-  /* Título de la promo: grande, blanco, hasta 2 líneas. */
+  /* TÍTULO DE LA PROMO (R61) · ES el TEXTO de PROMOJSON — la
+     esencia del mensaje manda en la tarjeta. Grande y SIN
+     bold (font simple, sensación estética), blanco, 2 líneas. */
   .lista-item.promo-item .promo-titulo {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.25;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
     letter-spacing: -0.01em;
     color: #ffffff;
     display: -webkit-box;
@@ -247,10 +269,10 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     overflow: hidden;
   }
 
-  /* TEXTO DE LA PROMO (R60): la esencia del mensaje que viaja
-     en PROMOJSON (item.texto, con respaldo en el promoTexto del
-     post). Blanco suavizado, hasta 2 líneas, bajo el título. */
-  .lista-item.promo-item .promo-texto {
+  /* SUBTÍTULO (R61) · el título del post bajo el texto de la
+     promo. Blanco suavizado, hasta 2 líneas. Sustituye al
+     .promo-texto de R60 (ahora el texto ES el título). */
+  .lista-item.promo-item .promo-sub {
     max-width: 100%;
     font-size: 13px;
     font-weight: 400;
@@ -263,16 +285,36 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     overflow: hidden;
   }
 
-  /* Partner debajo del título: blanco suavizado. */
+  /* TERCERA FILA (R61) · nombre del partner + check de
+     certificado a la derecha, en BLANCO (el dueño lo pidió
+     blanco sobre el degradado). El glifo badgeCheck
+     (Iconos.html) es de trazo: currentColor = blanco. */
   .lista-item.promo-item .promo-partner {
     max-width: 100%;
     font-size: 12px;
     font-weight: 500;
     line-height: 1.2;
     color: rgba(255, 255, 255, 0.85);
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .lista-item.promo-item .promo-check {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    color: #ffffff;
+    display: inline-flex;
+  }
+  .lista-item.promo-item .promo-check svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   /* Flecha circular (R58): el botón-invitación de la tarjeta,
@@ -309,8 +351,9 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
   @media (max-width: 360px) {
     .promo-encabezado { padding: 8px 14px 0; }
     .promo-encabezado-titulo { font-size: 16px; }
-    .lista-item.promo-item .promo-titulo { font-size: 15px; }
-    .lista-item.promo-item .promo-texto { font-size: 12px; }
+    .lista-item.promo-item .promo-titulo { font-size: 17px; }
+    .lista-item.promo-item .promo-sub { font-size: 12px; }
+    .lista-item.promo-item .promo-check { width: 13px; height: 13px; }
     .lista-item.promo-item .promo-flecha { width: 32px; height: 32px; right: 12px; }
     .lista-item.promo-item .promo-flecha svg { width: 16px; height: 16px; }
     #promoSlot::before, #promoSlot::after { width: 22px; }
