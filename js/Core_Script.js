@@ -20,12 +20,19 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.13
-CAMBIOS:         R55: el skeleton de lista replica la anatomía
-                 nueva del item de la vidriera (cinta lateral,
-                 sin avatar, pie con marca y "Ver detalles",
-                 columna de estrella) para que no haya salto
-                 visual al reemplazarse.
+VERSIÓN:         1.14
+CAMBIOS:         R57: el fondo del lienzo de la pantalla
+                 principal (pintarAreaConPost sin post) deja el
+                 degradado azul #ecf3fd y viste su EQUIVALENTE
+                 NARANJA de la app (#fdf3ec — mismo peso del
+                 tinte, espejo del canal azul al naranja oficial
+                 #f97316); el skeleton de lista estrena la
+                 cabecera de grupo (barra gris arriba) para
+                 espejar la lista agrupada de Lista_Script 1.7.
+                 R55: el skeleton de lista replica la anatomía
+                 nueva del item de la vidriera (sin avatar, pie
+                 con marca y "Ver detalles", estrella) para que
+                 no haya salto visual al reemplazarse.
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
@@ -34,8 +41,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  Global_Menu_Script.html (window.Global), Lista_Script.html,
                  Seccion_Script.html, Comenta_Script.html,
                  Compartir_Script.html (recibir/pintar)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   /* ============================================================
      CACHEL2 · capa del dispositivo (R21 · Propuesta 1 del dueño)
      La sesión ya tenía L1 en memoria (PostFull._cache). L2
@@ -470,12 +477,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!area) return;
 
       if (!post) {
+        /* R57 · fondo de la PANTALLA PRINCIPAL: el tinte azul
+           #ecf3fd sale y entra su EQUIVALENTE NARANJA de la app
+           (#fdf3ec): mismo peso de tinte (espejo de canales del
+           azul), familia del naranja oficial #f97316. La franja
+           blanca superior (0–5%) queda EXACTA. */
         area.style.background =
           'linear-gradient(180deg, ' +
             '#ffffff 0%, ' +
             '#ffffff 5%, ' +
-            '#ecf3fd 15%, ' +
-            '#ecf3fd 100%)';
+            '#fdf3ec 15%, ' +
+            '#fdf3ec 100%)';
         area.style.removeProperty('--post-color');
         return;
       }
@@ -831,6 +843,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!wrap) return;
 
       var html = '<div class="lista-skeleton">';
+      /* R57 · cabecera de grupo esqueleto: la lista real abre con
+         un título de grupo, el skeleton lo espeja para que no
+         haya salto al reemplazarse. */
+      html +=
+        '<div class="lista-skeleton-grupo">' +
+          '<div class="lista-skeleton-line grupo"></div>' +
+        '</div>';
       for (var i = 0; i < 5; i++) {
         html +=
           '<div class="lista-skeleton-item">' +
@@ -1064,3 +1083,4 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     document.addEventListener('visibilitychange', onVisibilityChange);
 
   })();
+

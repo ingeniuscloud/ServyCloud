@@ -4,29 +4,42 @@ ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
-                 fade. Item de la vidriera: transparente con
-                 línea divisora, cinta lateral colorOficial
-                 (ancla visual a sangre) y estrella métrica
-                 pasiva anclada a la esquina superior derecha
-                 (fila horizontal: glifo amarillo + contador a
-                 su derecha, oculta en 0 — no reserva carril).
+                 fade. Item de la vidriera: FONDO BLANCO con
+                 línea divisora, título del colorOficial del
+                 post (variable --post-color que pinta
+                 Lista_Script) y estrella métrica pasiva
+                 anclada a la esquina superior derecha (fila
+                 horizontal: glifo amarillo + contador a su
+                 derecha, oculta en 0 — no reserva carril).
                  Pie con la marca a la izquierda y "Ver
                  detalles →" a la derecha en peso normal, al ras
-                 del borde. Sin avatar ni badge (el badge vive en
-                 la promo y el post). Skeleton del detalle
-                 (primera carga de un post). Skeleton de lista
-                 con la misma anatomía (solo si el POST inicial
-                 aún está en vuelo cuando el usuario elige
-                 ciudad).
-VERSIÓN:         1.5
-CAMBIOS:         R56: estrella en fila horizontal (glifo +
+                 del borde. Sin avatar, sin cinta lateral y sin
+                 badge (el badge vive en la promo y el post).
+                 Los items se agrupan por título de grupo
+                 (.lista-grupo): cabecera gris sobre el lienzo y
+                 bloque blanco de items debajo. Skeleton del
+                 detalle (primera carga de un post). Skeleton de
+                 lista con la misma anatomía (solo si el POST
+                 inicial aún está en vuelo cuando el usuario
+                 elige ciudad).
+VERSIÓN:         1.6
+CAMBIOS:         R57: fuera la cinta lateral (::before
+                 eliminado — el color lo lleva ahora el título);
+                 item con FONDO BLANCO (la tarjeta promo conserva
+                 su regla propia); título del colorOficial vía
+                 var(--post-color) con fallback #1f2937;
+                 agrupación por título de grupo (.lista-grupo +
+                 .lista-grupo-titulo, gris sobre el lienzo); el
+                 divisor cierra CADA bloque blanco (fuera la
+                 excepción :last-child); skeleton espeja: cabecera
+                 de grupo + items blancos sin banda.
+                 R56: estrella en fila horizontal (glifo +
                  contador a su derecha) y amarilla #fbbf24,
                  anclada absolute a la esquina — deja de reservar
                  carril y "Ver detalles" llega al ras del borde
                  derecho; "Ver detalles" en peso normal (sin
                  bold); la fila del título reserva 44px para no
-                 chocar con la estrella (la promo no reserva);
-                 skeleton de lista espeja la anatomía nueva.
+                 chocar con la estrella (la promo no reserva).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html, que aporta la regla .badge)
@@ -148,7 +161,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
-    background: transparent;
+    background: #ffffff;
     width: 100%;
     border: 0;
     border-bottom: 1px solid #e2e8f0;
@@ -159,22 +172,26 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     transition: background 0.12s ease;
   }
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
-  .lista-item:last-child { border-bottom: 0; }
 
-  /* Cinta lateral · ancla visual del item (R55). Pegada al borde
-     izquierdo y de borde a borde en vertical, tocando las dos
-     divisorias. El color lo inyecta Lista_Script con la variable
-     --cinta-color (colorOficial del post). Excluye a la tarjeta
-     promo: ella ya viste los colores del post con la campana. */
-  .lista-item:not(.promo-item)::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;
-    background: var(--cinta-color, #475569);
+  /* ============================================================
+     GRUPOS (R57) · la lista se organiza por título de grupo:
+     cabecera gris sobre el lienzo (señala la sección) y bloque
+     blanco de items debajo. La cabecera no es botón: es
+     etiqueta. Cada bloque blanco cierra con su divisoria (no
+     hay excepción :last-child: el hairline remata la tarjeta).
+     ============================================================ */
+  .lista-grupo { display: block; }
+  .lista-grupo-titulo {
+    display: block;
+    padding: 16px 16px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
   }
+  .lista-grupo-items { display: block; }
 
   /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
      glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
@@ -234,10 +251,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding-right: 44px;
   }
 
+  /* Título del colorOficial del post (R57): la variable la pone
+     Lista_Script en cada botón (--post-color) y el CSS la
+     consume aquí. Fallback tinta si el post no trae color. La
+     promo no usa esta vía: su título va pintado inline por
+     Promo_Script y gana sobre esta regla. */
   .lista-item .titulo {
     font-size: 15px;
     font-weight: 500;
-    color: #1f2937;
+    color: var(--post-color, #1f2937);
     letter-spacing: -0.01em;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -427,19 +449,14 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
+    background: #ffffff;
     border-bottom: 1px solid #e2e8f0;
   }
-  .lista-skeleton-item:last-child { border-bottom: 0; }
 
-  .lista-skeleton-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;
-    background: rgba(15, 23, 42, 0.08);
-  }
+  /* Espejo de la cabecera de grupo (R57): barra gris arriba de
+     los items, mismo padding que .lista-grupo-titulo. */
+  .lista-skeleton-grupo { padding: 16px 16px 8px; }
+  .lista-skeleton-line.grupo { width: 34%; height: 12px; }
 
   .lista-skeleton-body {
     flex: 1;
@@ -519,6 +536,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .lista-item .marca { font-size: 11px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
+    .lista-grupo-titulo { font-size: 11px; padding: 14px 14px 6px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -528,5 +546,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
 
     .lista-skeleton-item { padding: 12px 14px; gap: 12px; }
+    .lista-skeleton-grupo { padding: 14px 14px 6px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }
+
