@@ -8,19 +8,26 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  y, cuando el post declara duda, la fila se
                  vuelve UNA sola píldora dividida (.segmentada):
                  duda secundaria a la izquierda + CTA principal
-                 a la derecha. Incluye la fila del partner
-                 estilo Instagram y el estado deshabilitado en
-                 naranja tenue para cursos "pronto".
-VERSIÓN:         1.4
-CAMBIOS:         R50: CTA semi-transparente (un poco más ligero
-                 que antes, referencia Instagram del dueño).
-                 Con duda + CTA visibles, la fila es una píldora
-                 única dividida (.segmentada que pinta
-                 Core_Script): borde del color del post, duda
-                 secundaria a la izquierda y CTA a la derecha.
-                 Fila del partner: línea divisoria sutil sobre
-                 la fila; el título lo pinta Social_Script con
-                 el colorOficial del partner.
+                 a la derecha, con borde hairline translúcido.
+                 Incluye la fila del partner estilo Instagram
+                 (divisoria a sangre, de borde a borde) y el
+                 estado deshabilitado en naranja tenue para
+                 cursos "pronto".
+VERSIÓN:         1.5
+CAMBIOS:         R51: la divisoria de la fila del partner va de
+                 borde a borde de la pantalla (la fila se hace
+                 full-width con padding interno) y se hace más
+                 sutil. El borde de la píldora dividida pasa a
+                 hairline: 1px del color del post al ~38% de
+                 opacidad (color-mix con fallback al color
+                 pleno) y sombra más suave. El título de la
+                 fila del partner lo pinta el CSS con el
+                 colorOficial del post (var --post-color).
+                 R50: CTA semi-transparente (referencia
+                 Instagram del dueño); con duda + CTA visibles
+                 la fila es UNA píldora dividida
+                 (.segmentada que pinta Core_Script): duda
+                 secundaria a la izquierda + CTA a la derecha.
                  R49: fila .user-fila del partner bajo la fila
                  CTA: avatar 44px con borde del color del post
                  + glifo user + punto con anillo blanco (como
@@ -229,24 +236,30 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      FILA CTA · PÍLDORA SEGMENTADA (R50)
      Cuando la duda está visible, Core_Script pone la clase
      .segmentada y la fila se vuelve UN solo botón dividido
-     (split pill del dueño): contenedor píldora con borde del
-     color del post; duda secundaria a la IZQUIERDA (fondo
-     transparente, texto del color del post) y CTA principal a
-     la DERECHA. Los rellenos van rectos (radius 0) y el
-     overflow del contenedor recorta las esquinas; el brillo
-     naranja sube al contenedor para que la píldora brille
-     completa.
+     (split pill del dueño): contenedor píldora con borde
+     hairline del color del post; duda secundaria a la
+     IZQUIERDA (fondo transparente, texto del color del post)
+     y CTA principal a la DERECHA. Los rellenos van rectos
+     (radius 0) y el overflow del contenedor recorta las
+     esquinas; el brillo naranja sube al contenedor para que
+     la píldora brille completa.
+     R51 · borde hairline: 1px al ~38% de opacidad con
+     color-mix (línea fina que no compite con el contenido);
+     la declaración previa con el color pleno queda como
+     fallback para navegadores sin color-mix. Sombra más
+     suave en la misma línea minimalista.
      ============================================================ */
   .cta-fila.segmentada {
     gap: 0;
     padding: 0;
 
     border: 1px solid var(--post-color, #64748b);
+    border-color: color-mix(in srgb, var(--post-color, #64748b) 38%, transparent);
     border-radius: 999px;
     overflow: hidden;
 
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.20),
-                0 3px 8px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.14),
+                0 3px 8px rgba(15, 23, 42, 0.06);
   }
 
   .cta-fila.segmentada .cta-duda {
@@ -307,20 +320,25 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      fricción con la flecha del CTA). Social_Script llena
      textos y decide visibilidad ([hidden]); en modo lista se
      oculta con la fila CTA (regla de arriba).
-     R50: línea divisoria sutil sobre la fila, separando la
-     sección del partner de los botones duda/CTA.
+     R51 · divisoria a sangre (del dueño): la fila ocupa el
+     100% del ancho y el aire de siempre pasa a padding
+     interno (26px izq / 60px der), así la línea divisoria
+     corre de borde a borde de la pantalla. Línea más sutil
+     (5% en vez de 8%) para que se sienta hairline y no un
+     marco. El título del partner va en el color oficial del
+     post (var --post-color).
      ============================================================ */
   .user-fila {
     display: flex;
     align-items: center;
     gap: 12px;
-    width: calc(100% - 86px);
-    margin: 0 60px 12px 26px;
-    padding: 12px 0 0;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 12px 60px 0 26px;
 
     background: transparent;
     border: none;
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    border-top: 1px solid rgba(15, 23, 42, 0.05);
     text-align: left;
     font-family: inherit;
 
@@ -376,7 +394,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     font-size: 14px;
     font-weight: 700;
     line-height: 1.25;
-    color: inherit;
+    color: var(--post-color, #1f2937);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -410,8 +428,9 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
       font-size: 14px;
     }
     .user-fila {
-      width: calc(100% - 74px);
-      margin: 0 52px 10px 22px;
+      width: 100%;
+      margin: 0 0 10px;
+      padding: 12px 52px 0 22px;
       gap: 10px;
     }
     .user-avatar { width: 40px; height: 40px; }

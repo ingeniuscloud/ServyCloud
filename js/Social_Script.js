@@ -15,10 +15,12 @@ RESPONSABILIDAD: Botones flotantes laterales. El contador de
                  CTA, estilo Instagram) abre el bottom sheet
                  dedicado.
                  Key localStorage: post_likes.
-VERSIÓN:         1.7
-CAMBIOS:         R50: el título de la fila del partner se pinta
-                 con el colorOficial del partner (sin color,
-                 hereda el del texto).
+VERSIÓN:         1.8
+CAMBIOS:         R51: el título de la fila del partner ya no
+                 lleva color inline: su color lo pone el CSS
+                 (Core_CSS) con el colorOficial del post
+                 (var --post-color), igual que el avatar y el
+                 punto.
                  R49: fila .user-fila del partner bajo la fila
                  CTA (estilo Instagram del dueño): nombre y
                  eslogan de subtítulo, misma acción (Partner
@@ -482,9 +484,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Sin post/partner: fila oculta. El texto vive en
        Index.html (userFila); aquí solo se llena y se decide
        visibilidad (post:change + arranque).
-       R50 · el título va en el colorOficial del partner (campo
-       plano, mismo que pinta el Partner Sheet); si no tiene,
-       se limpia el inline y hereda el color del texto.
+       R51 · el título NO lleva color inline: lo pinta el CSS
+       con el colorOficial del post (var --post-color),
+       igual que el avatar y el punto del círculo.
        ============================================================ */
     function partnerDePost(post) {
       if (!post || !post.idPartner) return null;
@@ -508,15 +510,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       var pj = (partner && partner.partnerJson) || {};
       var eslogan = String(pj.esloganPartner || '').trim();
-      var colorPartner = (partner && partner.colorOficial)
-        ? String(partner.colorOficial).trim() : '';
 
       var nombreEl  = fila.querySelector('.user-nombre');
       var esloganEl = fila.querySelector('.user-eslogan');
 
       if (nombreEl) {
         nombreEl.textContent = nombre;
-        nombreEl.style.color = colorPartner;
       }
       if (esloganEl) {
         esloganEl.textContent = eslogan;
