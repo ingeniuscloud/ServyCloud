@@ -6,7 +6,10 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  ciudad activa + chip activo, sobre TABLAS.posts
                  cargada una sola vez. Emite 'post:change'.
                  Escucha 'chips:change', 'buscar:change' y
-                 'ciudad:change'.
+                 'ciudad:change'. R60: el estado abierto de la
+                 búsqueda se lee en la FILA de chips + buscar
+                 (.filtros-fila.buscando, nueva casa de la
+                 cápsula split pill).
                  Item de la vidriera (R58 · CAJA): tarjeta blanca
                  con franja del colorOficial a la izquierda
                  (variables --post-color/--post-claro), título y
@@ -33,8 +36,12 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.8
-CAMBIOS:         R58: item como CAJA — franja colorOficial
+VERSIÓN:         1.9
+CAMBIOS:         R60: el selector del estado abierto de la
+                 búsqueda pasa de .filtros-wrap.buscando a
+                 .filtros-fila.buscando (la cápsula vive en la
+                 fila de chips, no en la cabecera).
+                 R58: item como CAJA — franja colorOficial
                  (--post-color) y avatar del partner (--post-claro
                  + inicial); título/subtítulo en color normal;
                  divisoria bajo el subtítulo; glifo verificado;
@@ -607,7 +614,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       if (modo === 'detalle') cerrarDetalle(false);
 
       var input = document.getElementById('buscarInput');
-      var wrapBuscar = document.querySelector('.filtros-wrap.buscando');
+      var wrapBuscar = document.querySelector('.filtros-fila.buscando');
       if (wrapBuscar && input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
       } else {

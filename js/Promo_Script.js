@@ -29,14 +29,27 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Tarjeta (R58): BADGE arriba (blanco sobre el
-                 naranja), título grande, partner debajo y botón
-                 circular de flecha a la derecha — como la imagen
-                 del dueño. El encabezado "Promos cerca de ti" +
-                 "Toca para conocer más" se muestra/oculta junto
-                 con el slot.
-VERSIÓN:         2.0
-CAMBIOS:         R58: contenido nuevo de la tarjeta — fuera la
+                 Tarjeta (R60): BADGE arriba (blanco), título
+                 grande, TEXTO DE LA PROMO (la esencia del
+                 mensaje: item.texto de PROMOJSON, con respaldo
+                 en el promoTexto del post), partner debajo y
+                 botón circular de flecha a la derecha. Cada
+                 tarjeta lleva su COLOR de la paleta (promo-c0…c5,
+                 por índice — el naranja oficial es el 0); los
+                 clones del bucle llevan el MISMO índice que su
+                 original para que la vuelta no cambie de color.
+                 El encabezado "Promos cerca de ti" + "Toca para
+                 conocer más" se muestra/oculta junto con el slot.
+VERSIÓN:         2.1
+CAMBIOS:         R60: entra el texto de la promo al HTML de la
+                 tarjeta (.promo-texto) — se lee de PROMOJSON
+                 (item.texto, con variantes promoTexto/
+                 descripcion/mensaje) y como respaldo del
+                 promoTexto que el índice del catálogo lleva
+                 desde PostDetalle (Cache.gs); entra la PALETA:
+                 cada tarjeta pinta promo-c{indice % 6} y el clon
+                 hereda el índice de su original.
+                 R58: contenido nuevo de la tarjeta — fuera la
                  campana, el tagline y el pie "Ver detalles";
                  entra badge blanco + promo-titulo +
                  promo-partner + promo-flecha (glifo flechaVer);
@@ -58,6 +71,12 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     var items = [];
     var pausadoPorInteraccion = false;
     var reducedMotion = false;
+
+    /* PALETA R60 · colores de tarjeta (el degradado lo pinta
+       Promo_CSS con la clase promo-c{n}): naranja oficial, verde,
+       violeta, turquesa, fucsia y ámbar. El índice de la promo
+       decide (i % 6) y el clon hereda el de su original. */
+    var PALETA_LARGO = 6;
 
     /* Marquesina · R32 */
     var VELOCIDAD_FALLBACK = 22;   /* px/s si no se puede derivar */
@@ -169,21 +188,43 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       });
     }
 
+    /* TEXTO DE LA PROMO (R60) · la esencia del mensaje. Se lee
+       del item de PROMOJSON (texto, con variantes por si la hoja
+       usa otro nombre) y como respaldo del promoTexto que el
+       índice del catálogo trae desde PostDetalle (Cache.gs). */
+    function textoDePromo(item, post) {
+      var campos = ['texto', 'promoTexto', 'descripcion', 'mensaje'];
+      for (var i = 0; i < campos.length; i++) {
+        var v = item ? item[campos[i]] : null;
+        if (typeof v === 'string' && v.trim()) return v.trim();
+      }
+      var t = post ? post.promoTexto : null;
+      if (typeof t === 'string' && t.trim()) return t.trim();
+      var meta = (post && post.seccionJson && post.seccionJson.meta) || null;
+      t = meta ? meta.promoTexto : null;
+      return (typeof t === 'string' && t.trim()) ? t.trim() : '';
+    }
+
     function buildItemHTML(item, post) {
       var titulo = escapeHtml(post.titulo || post.boton || post.id);
       var badge  = buscarBadge(post.idBadge);
       var partner = buscarPartner(post.idPartner) || {};
       var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
+      var textoPromo = escapeHtml(textoDePromo(item, post));
 
-      /* R58 · Tarjeta naranja de contenido blanco: badge arriba
-         (el color blanco lo manda Promo_CSS), título grande,
-         partner debajo y flecha circular a la derecha. Fuera la
-         campana, el tagline y el pie "Ver detalles". */
+      /* R60 · Tarjeta con color propio y contenido blanco:
+         badge arriba (el color blanco lo manda Promo_CSS),
+         título grande, TEXTO DE LA PROMO, partner debajo y
+         flecha circular a la derecha. Fuera la campana, el
+         tagline y el pie "Ver detalles". */
       var html = '';
       if (badge && badge.titulo) {
         html += '<span class="badge">' + escapeHtml(badge.titulo) + '</span>';
       }
       html += '<span class="promo-titulo">' + titulo + '</span>';
+      if (textoPromo) {
+        html += '<span class="promo-texto">' + textoPromo + '</span>';
+      }
       if (marca) {
         html += '<span class="promo-partner">' + marca + '</span>';
       }
@@ -358,10 +399,11 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       var unaSola = (vigentes.length === 1);
       var hayBucle = !unaSola && !reducedMotion;
 
-      function montarBoton(par, esClon) {
+      function montarBoton(par, esClon, indice) {
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'lista-item promo-item';
+        btn.className = 'lista-item promo-item' +
+                        ' promo-c' + (indice % PALETA_LARGO);
         btn.setAttribute('data-post', par.post.id);
 
         if (unaSola) {
@@ -396,15 +438,16 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
         return btn;
       }
 
-      vigentes.forEach(function (par) {
-        trackEl.appendChild(montarBoton(par, false));
+      vigentes.forEach(function (par, indice) {
+        trackEl.appendChild(montarBoton(par, false, indice));
       });
 
       /* Segunda vuelta exacta: es lo que hace que el envolvimiento
-         en anchoVuelta no tenga costura visible. */
+         en anchoVuelta no tenga costura visible. El clon lleva el
+         MISMO índice que su original (mismo color de paleta). */
       if (hayBucle) {
-        vigentes.forEach(function (par) {
-          trackEl.appendChild(montarBoton(par, true));
+        vigentes.forEach(function (par, indice) {
+          trackEl.appendChild(montarBoton(par, true, indice));
         });
       }
 

@@ -16,8 +16,12 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  cursos "pronto". R58: TÍTULO INICIAL grande del
                  header (.titulo-header, texto de la BD real en
                  app.tituloHeader).
-VERSIÓN:         1.7
-CAMBIOS:         R58: nuevo bloque .titulo-header — el texto
+VERSIÓN:         1.8
+CAMBIOS:         R60: .titulo-header gana aire y presencia —
+                 menos bold (800→700) y MÁS GRANDE (26→30px), con
+                 más padding arriba y abajo para que respire sin
+                 ruido.
+                 R58: nuevo bloque .titulo-header — el texto
                  grande de la pantalla principal: tinta #1f2937,
                  peso 800, dos líneas máximo, bajo la fila de
                  cabecera y sobre el encabezado de promos.
@@ -101,21 +105,23 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     TÍTULO INICIAL (R58) · texto grande que viene de la BD real
+     TÍTULO INICIAL (R60) · texto grande que viene de la BD real
      (ROOTJSON → app.tituloHeader, lo pinta Core_Script). Vive
-     DEBAJO de la fila de cabecera (ciudad + búsqueda + global)
-     y ENCIMA del encabezado de promos. Dos líneas máximo; si
-     la BD no lo trae, Core_Script lo deja oculto ([hidden]).
+     DEBAJO de la fila de cabecera (ciudad + menú global) y
+     ENCIMA del encabezado de promos. R60: menos bold (700) y
+     MÁS GRANDE (30px), con más padding arriba y abajo para
+     que respire sin ruido. Dos líneas máximo; si la BD no lo
+     trae, Core_Script lo deja oculto ([hidden]).
      ============================================================ */
   .titulo-header {
     flex-shrink: 0;
-    margin: 6px 16px 0;
-    padding: 0;
+    margin: 10px 16px 2px;
+    padding: 4px 0 8px;
 
     font-family: inherit;
-    font-size: 26px;
-    font-weight: 800;
-    line-height: 1.18;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.15;
     letter-spacing: -0.02em;
     color: #1f2937;
     text-align: left;
@@ -128,7 +134,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   .titulo-header[hidden] { display: none; }
 
   @media (max-width: 360px) {
-    .titulo-header { font-size: 23px; margin: 5px 14px 0; }
+    .titulo-header { font-size: 26px; margin: 8px 14px 0; padding: 4px 0 6px; }
   }
 
   /* ============================================================

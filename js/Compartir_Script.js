@@ -34,8 +34,17 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         1.4
-CAMBIOS:         R43: lista compartida — activarModo marca el body
+VERSIÓN:         1.5
+CAMBIOS:         R60: el modo compartido despliega la CÁPSULA
+                 bloqueada (clase .compartida también en la fila
+                 .filtros-fila: chips/lupa/compartir fuera, campo
+                 sin foco, solo "Limpiar filtro" activo) y el
+                 botón compartir vive a la derecha de la cápsula
+                 (mismo trabajo de siempre). "Limpiar filtro" lo
+                 liga Buscar_Script (delega en limpiar() cuando
+                 hay modo compartido) — aquí solo queda el binding
+                 del botón compartir.
+                 R43: lista compartida — activarModo marca el body
                  con compartido-lista / compartido-post y limpiar
                  los retira; con eso Chips_CSS devuelve el par
                  volver/título dentro de cada post de una lista
@@ -54,8 +63,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  Core_Script.html (llama pintar/recibir),
                  Social_Script.html (urlDePost), Chips_CSS.html
                  (.btn-compartir / .btn-limpiar / .compartida)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   window.Compartir = (function () {
 
     /* ============================================================
@@ -214,7 +223,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     var modoCompartido = null;   /* 'post' | 'lista' | null */
     var aplicando      = false;  /* guarda durante la recepción */
     var btn            = null;
-    var btnLimpiar     = null;
 
     function haptic(v) {
       if (navigator.vibrate) { try { navigator.vibrate(v); } catch (e) {} }
@@ -321,10 +329,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     function pintar() {
       if (window.__compartirBound === '1') return;
 
-      btn        = document.getElementById('btnCompartir');
-      btnLimpiar = document.getElementById('btnLimpiarBusqueda');
+      btn = document.getElementById('btnCompartir');
 
-      if (!btn || !btnLimpiar) return;
+      if (!btn) return;
 
       window.__compartirBound = '1';
 
@@ -334,10 +341,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       }
 
       btn.addEventListener('click', compartirLista);
-      btnLimpiar.addEventListener('click', function () {
-        haptic(10);
-        limpiar();
-      });
+      /* R60: "Limpiar filtro" lo liga Buscar_Script — en modo
+         compartido delega aquí (limpiar), en búsqueda normal
+         limpia y cierra la cápsula. */
     }
 
     document.addEventListener('buscar:estado', function (e) {
@@ -466,9 +472,15 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       modoCompartido = tipo;
 
       var wrap  = document.querySelector('.filtros-wrap');
+      var fila  = document.querySelector('.filtros-fila');
       var input = document.getElementById('buscarInput');
 
+      /* R60: la CÁPSULA queda desplegada y bloqueada — la clase
+         .compartida viste la fila (chips/lupa/compartir fuera,
+         solo "Limpiar filtro" activo) y la cabecera (menú global
+         fuera). */
       if (wrap) wrap.classList.add('compartida');
+      if (fila) fila.classList.add('compartida');
       if (input) {
         input.value = textoCampo || '';
         input.readOnly = true;
@@ -602,10 +614,12 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
        ============================================================ */
     function limpiar() {
       var wrap  = document.querySelector('.filtros-wrap');
+      var fila  = document.querySelector('.filtros-fila');
       var input = document.getElementById('buscarInput');
       var aviso = document.getElementById('buscarVacio');
 
-      if (wrap)  wrap.classList.remove('compartida');
+      if (wrap) wrap.classList.remove('compartida');
+      if (fila) fila.classList.remove('compartida');
       if (input) { input.value = ''; input.readOnly = false; }
       if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
 
@@ -658,3 +672,4 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     };
 
   })();
+

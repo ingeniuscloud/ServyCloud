@@ -2,34 +2,42 @@
 ARCHIVO:         Buscar_Script.html
 ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Buscador permanente en la fila de cabecera (R58):
-                 el campo vive SIEMPRE visible; el FOCO activa el
-                 estado .buscando (Compartir aparece inactivo, X y
-                 vecinos de fila según CSS) y marca body.en-busqueda
-                 (chips y rótulo "Explorar" fuera). Al escribir,
-                 emite 'buscar:change' con el término y el flag de
-                 límite alcanzado. La X limpia y sale. Límite: 40
-                 chars.
-VERSIÓN:         1.3
-CAMBIOS:         R58: el campo es permanente — la lupa ya no
-                 existe (su botón es opcional por compatibilidad),
-                 abrir() corre con el FOCO del input (sin limpiar
-                 lo escrito y sin forzar foco), cerrar() añade la
-                 salida de body.en-busqueda.
+RESPONSABILIDAD: Buscador CÁPSULA (R60): la LUPA circular vive a
+                 la derecha de los chips; al tocarla la fila añade
+                 .buscando y la CÁPSULA split pill se expande
+                 tapando los chips (lupa a la izquierda dentro,
+                 "Limpiar filtro" como segmento derecho, SIN X) y
+                 marca body.en-busqueda (rótulo "Explorar" fuera).
+                 El foco pasa al campo. Al escribir, emite
+                 'buscar:change' con el término y el flag de límite
+                 alcanzado. "Limpiar filtro" limpia y cierra (en
+                 modo compartido delega en Compartir.limpiar(), su
+                 trabajo de siempre). Límite: 40 chars.
+VERSIÓN:         1.4
+CAMBIOS:         R60: vuelve la LUPA (#btnBuscar a la derecha de
+                 los chips) y con ella abrir() por click (foco al
+                 campo tras expandir la cápsula); la X desaparece —
+                 el segmento "Limpiar filtro" de la split pill
+                 limpia y cierra (o delega en Compartir si el modo
+                 compartido está activo); abrir() se ignora en modo
+                 compartido (la cápsula ya está desplegada y
+                 bloqueada).
+                 R58: el campo era permanente y abría con el foco.
                  R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
-DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
+DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  Chips_Script.html (window.Chips), Lista_Script.html
-                 (window.Lista.getPostActivo)
+                 (window.Lista.getPostActivo),
+                 Compartir_Script.html (estaCompartido/limpiar)
 ════════════════════════════════════════════════════════════════════
 */
   window.Buscar = (function () {
 
-    var wrap      = null;
+    var fila      = null;
     var input     = null;
     var btnLupa   = null;
-    var btnCerrar = null;
+    var btnLimpiar = null;
 
     var abierto = false;
 
@@ -51,29 +59,38 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       }));
     }
 
-    /* R36: estado de la fila de búsqueda (abierta/cerrada) para
-       Compartir · el botón compartir aparece INACTIVO al abrir y
-       se oculta al cerrar. */
+    /* Estado de la búsqueda (abierta/cerrada) para Compartir ·
+       el botón compartir aparece INACTIVO al abrir y se oculta
+       al cerrar. */
     function emitirEstado(abierta) {
       document.dispatchEvent(new CustomEvent('buscar:estado', {
         detail: { abierta: abierta === true }
       }));
     }
 
+    function enModoCompartido() {
+      return document.body.classList.contains('modo-compartido');
+    }
+
     function abrir() {
       if (abierto) return;
-      if (!wrap) return;
+      if (!fila) return;
+      if (enModoCompartido()) return;   /* cápsula ya desplegada y bloqueada */
 
       abierto = true;
-      wrap.classList.add('buscando');
+      fila.classList.add('buscando');
       document.body.classList.add('en-busqueda');
 
       emitirEstado(true);
 
-      /* El foco ya viene puesto (abrir corre con el foco del
-         input): solo se asegura el estado visual. No se limpia
-         lo escrito ni se fuerza foco de nuevo. */
-      void input.offsetHeight;
+      /* El foco pasa al campo DESPUÉS de que la cápsula se
+         desplegó (display:none → flex): el rAF del navegador
+         garantiza que el input ya es enfocable. */
+      requestAnimationFrame(function () {
+        if (abierto && input) {
+          try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+        }
+      });
     }
 
     function cerrar() {
@@ -84,7 +101,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
 
       if (document.activeElement === input) input.blur();
 
-      wrap.classList.remove('buscando');
+      if (fila) fila.classList.remove('buscando');
       document.body.classList.remove('en-busqueda');
       input.value = '';
 
@@ -110,6 +127,19 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       emitir('', false);
     }
 
+    function onLimpiar() {
+      /* Trabajo de siempre: en modo compartido "Limpiar filtro"
+         libera la vista (Compartir.limpiar devuelve ciudades,
+         chips y listas); en búsqueda normal limpia y cierra. */
+      if (window.Compartir &&
+          typeof window.Compartir.estaCompartido === 'function' &&
+          window.Compartir.estaCompartido()) {
+        window.Compartir.limpiar();
+        return;
+      }
+      cerrar();
+    }
+
     function onInput() {
       var t = input.value.trim();
       var enLimite = input.value.length >= LIMITE_INPUT;
@@ -119,21 +149,21 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
     function pintar() {
       if (window.__buscarBound === '1') return;
 
-      wrap      = document.querySelector('.filtros-wrap');
-      btnLupa   = document.getElementById('btnBuscar');   /* R58: puede no existir */
-      btnCerrar = document.getElementById('btnBuscarCerrar');
-      input     = document.getElementById('buscarInput');
+      fila       = document.querySelector('.filtros-fila');
+      btnLupa    = document.getElementById('btnBuscar');
+      input      = document.getElementById('buscarInput');
+      btnLimpiar = document.getElementById('btnLimpiarBusqueda');
 
-      if (!wrap || !btnCerrar || !input) {
+      if (!fila || !btnLupa || !input || !btnLimpiar) {
         return;
       }
 
       window.__buscarBound = '1';
 
-      if (btnLupa) btnLupa.addEventListener('click', abrir);
-      btnCerrar.addEventListener('click', cerrar);
+      btnLupa.addEventListener('click', abrir);
+      btnLimpiar.addEventListener('click', onLimpiar);
       input.addEventListener('input', onInput);
-      input.addEventListener('focus', abrir);   /* R58: el campo vive siempre visible */
+      input.addEventListener('focus', abrir);   /* inofensivo: si ya está abierta no repite */
     }
 
     if (document.readyState === 'loading') {

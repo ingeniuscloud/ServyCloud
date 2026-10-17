@@ -5,18 +5,24 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
                  bottom sheet de selección. Botón COMPACTO dentro de
                  la fila de cabecera (R58): pin + "Estás viendo
-                 Ciudad" + chevron SVG, texto que recorta con
-                 elipsis. Lista con radio button nativo estilizado.
+                 Ciudad" + chevron SVG. R60: dentro de la fila de
+                 cabecera ocupa el ancho disponible con el texto
+                 COMPLETO (sin recortes) y el menú global a la
+                 derecha. Lista con radio button nativo estilizado.
                  Sheet al 90%. Modo bloqueado para primera selección
                  sin ciudad guardada. Aviso de cookies de esa
                  primera carga: icono a la izquierda del texto y
                  botón Aceptar debajo.
-VERSIÓN:         1.3
-CAMBIOS:         R58: la city-bar deja su fila propia y entra a la
+VERSIÓN:         1.4
+CAMBIOS:         R60: la city-bar recupera la UBICACIÓN COMPLETA
+                 como antes de R58: fuera el ancho acotado
+                 (max-width 46%) y la elipsis — el texto completo
+                 respira en la fila (la búsqueda ya no vive ahí) y
+                 el menú global queda a la derecha.
+                 R58: la city-bar deja su fila propia y entra a la
                  fila de cabecera junto a la búsqueda y el menú
                  global: pieza compacta (13px, pin 15px, chevron
-                 14px), ancho acotado y texto con elipsis para que
-                 la fila respire; misma pieza, mismos colores.
+                 14px), ancho acotado y texto con elipsis.
                  R38: estilos del aviso de cookies dentro del
                  sheet (.ciudad-cookies): icono, texto y botón
                  Aceptar centrados como puerta de entrada.
@@ -25,21 +31,20 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 ════════════════════════════════════════════════════════════════════
 */
   /* ============================================================
-     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R58)
+     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R60)
      Misma pieza de siempre (pin + "Estás viendo Ciudad" +
-     chevron), ahora compacta: comparte fila con el campo de
-     búsqueda y el menú global. El texto recorta con elipsis y
-     el ancho queda acotado para que la fila respire.
+     chevron). R60: UBICACIÓN COMPLETA como antes de R58 —
+     ocupa el ancho disponible de la fila (el menú global queda
+     a la derecha) y el texto NO se recorta.
      ============================================================ */
   .city-bar {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     min-width: 0;
 
     display: inline-flex;
     align-items: center;
     gap: 6px;
 
-    max-width: 46%;
     padding: 7px 6px 7px 12px;
     margin: 0;
 
@@ -88,8 +93,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   .city-bar .city-txt {
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
   }

@@ -2,45 +2,49 @@
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de la pantalla principal (R58): FILA DE
-                 CABECERA con ciudad + campo de búsqueda SIEMPRE
-                 visible (píldora, el foco activa .buscando) + menú
-                 global; botón COMPARTIR (píldora icono + texto
-                 "Compartir", glifo del post, naranja oficial al
-                 activarse) y X de cierre solo durante la búsqueda;
-                 "Limpiar filtro" del modo compartido. La FILA DE
-                 CHIPS (#filtros) es un bloque propio DEBAJO de las
-                 promos: control segmentado (contenedor claro,
-                 segmento activo blanco con texto naranja oficial).
-                 Modo compartida (recepción de un enlace):
-                 chips/compartir/menú global fuera, campo fijado sin
-                 foco; city-bar bloqueada vía body.modo-compartido.
-                 El header del detalle lo decide el TIPO de enlace
-                 (Compartir marca el body): un post compartido usa
-                 la fila compartida en lugar de volver/título; una
-                 lista compartida vuelve al par volver/título dentro
-                 de cada post. Línea de aviso cuando la búsqueda no
-                 da resultados.
-VERSIÓN:         1.6
-CAMBIOS:         R58: refactor de la pantalla principal — la
-                 ciudad entra a la fila de cabecera (pieza compacta);
-                 el campo de búsqueda es PERMANENTE (fuera la lupa,
-                 fuera el borde inferior: ahora es píldora clara;
-                 el foco activa .buscando y la X limpia); los chips
-                 salen del wrap y se pintan como CONTROL
-                 SEGMENTADO debajo de las promos (como la imagen
-                 del dueño); .buscando oculta ciudad/global y
-                 body.en-busqueda oculta la fila de chips y el
-                 rótulo "Explorar"; border-top del wrap fuera.
+RESPONSABILIDAD: CSS de la pantalla principal (R60): FILA DE
+                 CABECERA con la CIUDAD COMPLETA (sin recortes) a
+                 la izquierda y el MENÚ GLOBAL a la derecha; FILA
+                 DE CHIPS + BUSCAR (.filtros-fila debajo de las
+                 promos): chips en control segmentado y la LUPA
+                 circular a la derecha. Al abrir, la cápsula de
+                 búsqueda (SPLIT PILL: lupa + campo "buscar
+                 servicio o curso" + "Limpiar filtro", SIN X) se
+                 expande a todo el ancho tapando los chips y
+                 COMPARTIR aparece a su derecha. Modo compartido
+                 (recepción de un enlace): chips/lupa/compartir/menú
+                 global fuera, cápsula DESPLEGADA y BLOQUEADA con
+                 solo "Limpiar filtro" activo; city-bar bloqueada
+                 vía body.modo-compartido. El header del detalle lo
+                 decide el TIPO de enlace (Compartir marca el
+                 body): un post compartido usa la cápsula en lugar
+                 de volver/título; una lista compartida vuelve al
+                 par volver/título dentro de cada post. Línea de
+                 aviso cuando la búsqueda no da resultados.
+VERSIÓN:         1.7
+CAMBIOS:         R60: la cabecera queda con la ciudad completa +
+                 global (fuera campo y compartir); vuelve la LUPA
+                 circular (.btn-lupa) a la derecha de los chips y
+                 con ella la CÁPSULA .buscar-capsula SPLIT PILL
+                 (lupa + input + "Limpiar filtro" como segmento
+                 derecho con divisoria, SIN X) que se expande desde
+                 la derecha tapando los chips (animación scaleX);
+                 placeholder "buscar servicio o curso"; Compartir
+                 aparece a la derecha de la cápsula; compartida:
+                 cápsula desplegada y bloqueada (input sin foco,
+                 solo "Limpiar filtro" activo).
+                 R58: la ciudad entró a la fila de cabecera; los
+                 chips salieron del wrap como CONTROL SEGMENTADO
+                 debajo de las promos.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
 ════════════════════════════════════════════════════════════════════
 */
   /* ============================================================
-     WRAP · FILA DE CABECERA (R58)
-     Ciudad + campo de búsqueda + menú global en UNA fila.
-     En detalle muestra volver + título de categoría. Sin
-     border-top: es la primera fila del lienzo.
+     WRAP · FILA DE CABECERA (R60)
+     Ciudad COMPLETA a la izquierda + menú global a la derecha,
+     en UNA fila. En detalle muestra volver + título de
+     categoría. Sin border-top: es la primera fila del lienzo.
      ============================================================ */
   .filtros-wrap {
     flex-shrink: 0;
@@ -53,17 +57,32 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     FILTROS · control segmentado (R58)
-     Bloque propio DEBAJO de las promos: contenedor claro con
-     radio; cada chip es un segmento; el activo se pinta blanco
-     con el texto del naranja oficial de la app (como la imagen
-     del dueño). Con más segmentos de los que caben, la tira
-     hace scroll horizontal.
+     FILA DE CHIPS + BUSCAR (R60) · debajo de las promos
+     Cierra: [chips segmentados][lupa]. Abierta (.buscando):
+     [cápsula split pill][compartir] — los chips quedan tapados.
      ============================================================ */
-  .filtros {
+  .filtros-fila {
     flex-shrink: 0;
     width: auto;
     margin: 4px 14px 2px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ============================================================
+     FILTROS · control segmentado (R58)
+     Contenedor claro con radio; cada chip es un segmento; el
+     activo se pinta blanco con el texto del naranja oficial de
+     la app (como la imagen del dueño). Con más segmentos de los
+     que caben, la tira hace scroll horizontal. Los márgenes de
+     la fila los pone .filtros-fila.
+     ============================================================ */
+  .filtros {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
 
     display: flex;
     align-items: stretch;
@@ -122,7 +141,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     BOTÓN MENÚ GLOBAL
+     BOTÓN MENÚ GLOBAL · derecha de la cabecera
      ============================================================ */
   .menu-global {
     flex: 0 0 auto;
@@ -130,6 +149,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     width: 34px;
     height: 34px;
     padding: 0;
+    margin-left: auto;
     margin-right: 10px;
 
     border: 1.2px solid #475569;
@@ -157,17 +177,183 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
+     BOTÓN LUPA (R60) · vuelve junto a los chips
+     Círculo a la derecha de los chips (como antes de R58): al
+     tocarlo Buscar_Script añade .buscando a la fila y la
+     cápsula se expande desde SU posición (origen derecha).
+     ============================================================ */
+  .btn-lupa {
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+
+    border: 1.2px solid #475569;
+    border-radius: 50%;
+    background: transparent;
+
+    color: #475569;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-lupa:active { opacity: 0.5; }
+
+  .btn-lupa svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     CÁPSULA DE BÚSQUEDA · SPLIT PILL (R60)
+     Cerrada NO existe (display:none): la fila muestra chips +
+     lupa. Abierta se expande a TODO el ancho de la fila tapando
+     los chips (animación desde la derecha: la lupa que vive a
+     la izquierda del campo se desplaza hacia la izquierda con
+     la expansión — el efecto pedido). Split pill: [lupa+campo |
+     "Limpiar filtro"] divididos por una línea; SIN X (más claro
+     para quien no es técnico).
+     ============================================================ */
+  .buscar-capsula {
+    display: none;
+
+    flex: 1 1 auto;
+    min-width: 0;
+
+    height: 38px;
+
+    background: #f1f3f7;
+    border-radius: 50px;
+    overflow: hidden;
+  }
+
+  .filtros-fila.buscando .buscar-capsula {
+    display: flex;
+    align-items: center;
+
+    transform-origin: right center;
+    animation: abrirCapsula 0.28s ease;
+  }
+
+  @keyframes abrirCapsula {
+    from { transform: scaleX(0.22); opacity: 0; }
+    to   { transform: scaleX(1);    opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filtros-fila.buscando .buscar-capsula { animation: none; }
+  }
+
+  .buscar-input-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    height: 100%;
+    padding: 0 4px 0 14px;
+  }
+
+  .buscar-lupa {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #64748b;
+  }
+
+  .buscar-lupa svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .buscar-input {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 2px 0;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+    line-height: 1.1;
+  }
+
+  .buscar-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+
+  /* ============================================================
+     SPLIT PILL · segmento derecho "Limpiar filtro" (R60)
+     Vive DENTRO de la cápsula, separado del campo por una
+     divisoria. Durante la búsqueda limpia y cierra (sustituye a
+     la X); en modo compartido es el ÚNICO control activo.
+     ============================================================ */
+  .btn-limpiar {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    padding: 0 12px 0 10px;
+
+    border: none;
+    border-left: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 0 50px 50px 0;
+    background: transparent;
+
+    color: #475569;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-limpiar:active { opacity: 0.5; }
+
+  /* ============================================================
      BOTÓN COMPARTIR BÚSQUEDA
-     Píldora icono + texto "Compartir" (decisión del dueño R41:
-     la palabra junto al campo ya dice qué se comparte, y el
-     campo no pierde ancho). MISMO glifo que el botón compartir
-     del post (Iconos.html, data-glifo="share" en un SPAN
-     interno — pintarGlifos escribe el innerHTML del portador)
-     y MISMO trazo (stroke 1.05 como Social_CSS). Tipografía
-     igual que "Limpiar filtro" (13px/600): las dos píldoras
-     de la fila visten igual. Naranja oficial al activarse —
-     siendo un botón temporal, no pasa desapercibido — y gris
-     mientras está inactivo. Oculto por defecto ([hidden]
+     Píldora icono + texto "Compartir" a la DERECHA de la
+     cápsula (decisión del dueño R60: su trabajo es el mismo de
+     siempre). MISMO glifo que el botón compartir del post
+     (Iconos.html, data-glifo="share" en un SPAN interno —
+     pintarGlifos escribe el innerHTML del portador) y MISMO
+     trazo (stroke 1.05 como Social_CSS). Tipografía igual que
+     "Limpiar filtro" (13px/600). Naranja oficial al activarse y
+     gris mientras está inactivo. Oculto por defecto ([hidden]
      desde HTML); Buscar lo muestra INACTIVO al abrir la
      búsqueda y Lista lo activa cuando el filtro trae
      resultados. En modo compartida desaparece (no aplica).
@@ -177,8 +363,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
     height: 34px;
     padding: 0 12px;
-    margin-left: 2px;
-    margin-right: 8px;
+    margin-right: 0;
     gap: 6px;
 
     border: 1.2px solid #FA6A08;
@@ -237,152 +422,28 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
   .btn-compartir[disabled]:active { opacity: 0.6; }
 
-  /* Durante la búsqueda abierta, el campo va primero y el
-     botón compartir queda AL LADO DERECHO del campo. */
-  .filtros-wrap.buscando .btn-compartir { order: 10; }
-
   /* ============================================================
-     FILA DE BÚSQUEDA · PERMANENTE (R58)
-     El campo vive siempre visible dentro de la cabecera, como
-     píldora clara (antes: expandible con borde inferior).
-     El foco activa .buscando (Buscar_Script); la X limpia y
-     sale. Mientras no hay búsqueda, la X queda oculta.
+     ESTADO · buscando (la lupa activa)
+     La cápsula tapa los chips y la lupa del círculo desaparece
+     (la cápsula lleva la suya a la izquierda); el rótulo
+     "Explorar" se oculta (body.en-busqueda, lo marca
+     Buscar_Script junto con .buscando en la fila).
      ============================================================ */
-  .buscar-fila {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 0;
-
-    height: 38px;
-    padding: 0 4px 0 6px;
-
-    background: #f1f3f7;
-    border-radius: 12px;
-  }
-
-  .buscar-input-wrap {
-    flex: 1 1 auto;
-    min-width: 0;
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 0 2px 0 8px;
-    height: 100%;
-
-    border-radius: 12px;
-    transition: background 0.2s ease;
-  }
-
-  .buscar-input-wrap:focus-within {
-    background: rgba(15, 23, 42, 0.035);
-  }
-
-  .buscar-lupa {
-    flex-shrink: 0;
-    width: 17px;
-    height: 17px;
-    color: #64748b;
-  }
-
-  .buscar-lupa svg {
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .buscar-input {
-    flex: 1 1 auto;
-    min-width: 0;
-
-    border: none;
-    outline: none;
-    background: transparent;
-    padding: 2px 0;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    color: #1f2937;
-    line-height: 1.1;
-  }
-
-  .buscar-input::placeholder {
-    color: #94a3b8;
-    font-weight: 400;
-  }
-
-  .buscar-cerrar {
-    flex: 0 0 auto;
-    display: none;
-
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    margin-right: 0;
-
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    border-radius: 50%;
-    -webkit-tap-highlight-color: transparent;
-
-    transition: color 0.15s ease;
-  }
-
-  .buscar-cerrar:active { opacity: 0.5; }
-
-  .buscar-cerrar svg {
-    width: 17px;
-    height: 17px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
-     ESTADO · buscando (el foco activa)
-     Ciudad y menú global se retiran para dejarle sitio a
-     Compartir; la X aparece; la fila de chips y el rótulo
-     "Explorar" se ocultan (body.en-busqueda, lo marca
-     Buscar_Script junto con .buscando).
-     ============================================================ */
-  .filtros-wrap.buscando .city-bar,
-  .filtros-wrap.buscando .menu-global {
+  .filtros-fila.buscando .filtros,
+  .filtros-fila.buscando .btn-lupa {
     display: none;
   }
 
-  .filtros-wrap.buscando .buscar-cerrar {
-    display: flex;
-  }
-
-  body.en-busqueda .filtros,
   body.en-busqueda .lista-encabezado {
     display: none;
   }
 
   /* ============================================================
      ESTADO · compartida (recepción de un enlace)
-     Compartir y MENÚ GLOBAL fuera, fila de búsqueda visible con
-     el campo FIJADO sin foco (pointer-events none) — a la derecha
-     solo queda "Limpiar filtro". La ciudad queda visible pero
+     Cápsula DESPLEGADA y BLOQUEADA: chips, lupa y compartir
+     fuera; el campo fijado sin foco (pointer-events none) y
+     solo "Limpiar filtro" activo (trabajo de siempre, solo
+     cambió la estética). La ciudad queda visible pero
      BLOQUEADA vía body.modo-compartido (decisión del dueño).
      En modo detalle el header lo decide el TIPO de enlace
      (Compartir marca el body con compartido-post /
@@ -391,40 +452,50 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      LISTA compartida el post abre con volver/título normales y
      la fila solo cabecera la lista.
      ============================================================ */
-  .filtros-wrap.compartida .btn-compartir,
+  .filtros-fila.compartida .filtros,
+  .filtros-fila.compartida .btn-lupa,
+  .filtros-fila.compartida .btn-compartir {
+    display: none;
+  }
+
+  .filtros-fila.compartida .buscar-capsula {
+    display: flex;
+    align-items: center;
+  }
+
+  .filtros-fila.compartida .buscar-input {
+    pointer-events: none;
+  }
+
   .filtros-wrap.compartida .menu-global {
     display: none;
   }
 
-  .filtros-wrap.compartida .buscar-cerrar { display: none; }
-
-  .filtros-wrap.compartida .buscar-input {
-    pointer-events: none;
-  }
-
-  .filtros-wrap.compartida .buscar-input-wrap {
-    border-bottom-color: #cbd5e1;
-  }
-
   /* Post compartido: la app entra en modo detalle (Lista_CSS
-     oculta la fila de búsqueda con !important). En compartida la
-     fila ES el header: visible, y el par volver/título fuera. */
-  body.modo-detalle .filtros-wrap.compartida .buscar-fila {
+     oculta la fila con !important). En compartida la fila ES el
+     header: visible (con .compartida gana la especificidad), y
+     el par volver/título fuera. */
+  body.modo-detalle.compartido-post .filtros-fila.compartida {
     display: flex !important;
   }
 
-  body.modo-detalle .filtros-wrap.compartida .btn-volver,
-  body.modo-detalle .filtros-wrap.compartida .titulo-categoria {
+  body.modo-detalle.compartido-post .filtros-fila.compartida .buscar-capsula {
+    display: flex !important;
+  }
+
+  body.modo-detalle.compartido-post .filtros-wrap.compartida .btn-volver,
+  body.modo-detalle.compartido-post .filtros-wrap.compartida .titulo-categoria {
     display: none !important;
   }
 
   /* LISTA compartida: dentro del post el header vuelve al par
      volver/título — el receptor navega cada post de la lista con
-     "Volver" y regresa a la lista, donde sigue "Limpiar filtro".
-     Más específico que las reglas de arriba (compartido-lista en
-     el body) y con :not([hidden]) para respetar los estados que
-     Lista pinta al abrir/cerrar el detalle. */
-  body.modo-detalle.compartido-lista .filtros-wrap.compartida .buscar-fila {
+     "Volver" y regresa a la lista, donde sigue "Limpiar filtro"
+     en la cápsula. Más específico que las reglas de arriba
+     (compartido-lista en el body) y con :not([hidden]) para
+     respetar los estados que Lista pinta al abrir/cerrar el
+     detalle. */
+  body.modo-detalle.compartido-lista .filtros-fila {
     display: none !important;
   }
 
@@ -445,41 +516,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   body.modo-compartido .city-bar:active { background: transparent; }
-
-  /* ============================================================
-     BOTÓN LIMPIAR FILTRO · misma fila, lado derecho
-     Solo existe en modo compartida: devuelve la app a su estado
-     normal (ciudades, chips y todas las listas).
-     ============================================================ */
-  .btn-limpiar {
-    display: none;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-
-    height: 34px;
-    padding: 0 12px;
-
-    border: 1.2px solid #475569;
-    border-radius: 50px;
-    background: transparent;
-
-    color: #475569;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-
-    transition: opacity 0.15s ease;
-  }
-
-  .btn-limpiar:active { opacity: 0.5; }
-
-  .filtros-wrap.compartida .btn-limpiar { display: inline-flex; }
 
   /* ============================================================
      AVISO DE BÚSQUEDA SIN RESULTADOS
@@ -505,16 +541,20 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .filtros { gap: 3px; margin: 3px 12px 2px; padding: 3px; }
+    .filtros-fila { gap: 4px; margin: 3px 12px 2px; }
+    .filtros { gap: 3px; padding: 3px; }
     .chip    { font-size: 13px; min-width: 88px; padding: 8px 10px 9px; }
     .menu-global { width: 32px; height: 32px; margin-right: 8px; }
     .menu-global svg { width: 18px; height: 18px; }
-    .btn-compartir { height: 32px; padding: 0 10px; margin-right: 6px; }
+    .btn-lupa { width: 32px; height: 32px; }
+    .btn-lupa svg { width: 16px; height: 16px; }
+    .buscar-capsula { height: 34px; }
+    .buscar-input { font-size: 14px; }
+    .buscar-input-wrap { padding: 0 2px 0 12px; }
+    .btn-limpiar { padding: 0 10px 0 8px; font-size: 12px; }
+    .btn-compartir { height: 32px; padding: 0 10px; }
     .btn-compartir svg { width: 15px; height: 15px; }
     .btn-compartir-texto { font-size: 12px; }
-    .btn-limpiar { height: 32px; padding: 0 10px; font-size: 12px; }
-    .buscar-fila { height: 34px; }
-    .buscar-input { font-size: 14px; }
     .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
   }
 

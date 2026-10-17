@@ -28,8 +28,13 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  la misma anatomía de caja (solo si el POST
                  inicial aún está en vuelo cuando el usuario
                  elige ciudad).
-VERSIÓN:         1.8
-CAMBIOS:         R59: 3 ajustes del item — "Ver publicación" en
+VERSIÓN:         1.9
+CAMBIOS:         R60: el bloque modo-detalle oculta la FILA
+                 COMPLETA de chips + buscar (.filtros-fila —
+                 chips, lupa, cápsula y compartir son hijos de
+                 esa fila); la excepción del post compartido
+                 vive en Chips_CSS con mayor especificidad.
+                 R59: 3 ajustes del item — "Ver publicación" en
                  NARANJA oficial #f97316 (la flecha hereda por
                  currentColor); avatar del partner SIN BORDES
                  (el borde 1.5px de la regla global .partner-avatar
@@ -123,10 +128,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     display: none !important;
   }
 
-  body.modo-detalle .btn-lupa,
-  body.modo-detalle .btn-compartir,
-  body.modo-detalle .filtros,
-  body.modo-detalle .buscar-fila,
+  body.modo-detalle .filtros-fila,
   body.modo-detalle .titulo-header,
   body.modo-detalle .promo-encabezado,
   body.modo-detalle .city-bar,
