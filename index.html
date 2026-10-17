@@ -15,8 +15,14 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  La fila de filtros lleva lupa, COMPARTIR (píldora
                  icono + texto "Compartir", glifo del post vía
                  Iconos.js) y menú global.
-VERSIÓN:         1.7
-CAMBIOS:         R49: fila del partner .user-fila bajo la fila
+VERSIÓN:         1.8
+CAMBIOS:         R53: el teléfono inline de esta página se
+                 actualizó a la shell v1.2 del dueño (entra tal
+                 cual: cuerpo 242.39 mm, carcasa sin sombra,
+                 Safari blanco con bordes finos, tres puntos,
+                 URL real y reloj dinámico 12h). La estructura
+                 del Index 1.7 no cambia.
+                 R49: fila del partner .user-fila bajo la fila
                  CTA (estilo Instagram del dueño): círculo con
                  glifo user + punto como la campanita de la
                  promo, nombre del partner y su eslogan como
@@ -151,32 +157,42 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
     })();
   </script>
 
-  <script src="./js/Iconos.js"></script><!--
+  <script src="./js/Iconos.js"></script>
+<!--
 ════════════════════════════════════════════════════════════════════
 ARCHIVO:         Telefono.html
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Shell visual del iPhone 11. Barras superior e
-                 inferior en blanco #ffffff (igual que el menú tabs).
-                 NO define colores del área de trabajo.
-VERSIÓN:         1.0
-CAMBIOS:         R5: baseline de producción incorporado al espejo;
-                 encabezado normalizado al estándar ═══ (6 campos);
-                 PROYECTO unificado a "INGeniusCloud | ServyCloud".
+RESPONSABILIDAD: Shell visual del iPhone 11 con reloj dinámico en la
+                 barra de estado (formato 12h, se actualiza cada
+                 segundo). Barras superior e inferior en blanco
+                 #ffffff (igual que el menú tabs). NO define colores
+                 del área de trabajo.
+VERSIÓN:         1.2
+CAMBIOS:         R53: entra la shell del dueño TAL CUAL (Regla de
+                 Oro): cuerpo a 242.39 mm para más aire vertical del
+                 lienzo, carcasa sin sombra, barra de estado con la
+                 pila tipográfica del sistema, barra de Safari en
+                 blanco con bordes finos #e5e5ea (botones y cápsula),
+                 iconos grises #8e8e93 de trazo fino, icono de tres
+                 puntos a la derecha, URL real del proyecto en la
+                 cápsula y reloj dinámico 12h (#reloj-estado).
+                 Encabezado actualizado (solo info vigente).
 DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                  Core_Script.html y estilizado en modo móvil por
-                 Core_CSS.html)
+                 Core_CSS.html). El reloj solo escribe en
+                 #reloj-estado.
 ════════════════════════════════════════════════════════════════════
 -->
 
 <style>
   /* =========================================================
      CUERPO DEL IPHONE 11 — carcasa gris oscura
-     Ancho: 116,58 mm · Alto: 232,39 mm
+     Ancho: 116,58 mm · Alto: 242,39 mm
      ========================================================= */
   .phone {
     position: relative;
     width: 116.58mm;
-    height: 232.39mm;
+    height: 242.39mm;
     border-radius: 16.1mm;
     padding: 3.5mm;
     background: linear-gradient(150deg,
@@ -184,10 +200,6 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         #2b2b2d 20%,
         #1a1a1c 52%,
         #3f3f42 100%);
-    box-shadow:
-      0 35mm 63mm -16.8mm rgba(0,0,0,.85),
-      0 0 0 1.4px rgba(255,255,255,.10),
-      inset 0 0 0 1.4px rgba(255,255,255,.14);
     user-select: none;
   }
 
@@ -261,6 +273,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 4.48mm;
     font-weight: 600;
     color: #000;
@@ -347,19 +360,20 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     width: 9.8mm;
     height: 9.8mm;
     border-radius: 50%;
-    background: #e4e4e9;
+    background: #ffffff;
+    border: 0.2mm solid #e5e5ea;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #007aff;
-    box-shadow: inset 0 -0.28mm 0.7mm rgba(0,0,0,.05);
+    color: #8e8e93;
   }
+
   .circle-btn svg {
     width: 5.6mm;
     height: 5.6mm;
     stroke: currentColor;
     fill: none;
-    stroke-width: 3.36;
+    stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
@@ -368,17 +382,17 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     flex: 1;
     height: 9.8mm;
     border-radius: 4.9mm;
-    background: #e4e4e9;
+    background: #ffffff;
+    border: 0.2mm solid #e5e5ea;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 4.2mm;
     font-size: 4.34mm;
-    color: #1c1c1e;
+    color: #8e8e93;
     letter-spacing: -0.07mm;
     overflow: hidden;
     white-space: nowrap;
-    box-shadow: inset 0 -0.28mm 0.7mm rgba(0,0,0,.05);
   }
   .url-capsule svg {
     width: 3.92mm;
@@ -422,7 +436,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
 
     <!-- Barra de estado -->
     <div class="status">
-      <div class="left">9:41</div>
+      <div class="left" id="reloj-estado">9:41</div>
       <div class="right">
         <div class="signal"><i></i><i></i><i></i><i></i></div>
         <svg width="6.3mm" height="4.2mm" viewBox="0 0 17 12" fill="none"
@@ -454,13 +468,15 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             <rect x="5" y="11" width="14" height="10" rx="2"/>
             <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
           </svg>
-          apple.com
+          https://ingeniuscloud.github.io/ServyCloud/
         </div>
 
+        <!-- Icono de tres puntos: simples, finos y grises -->
         <div class="circle-btn" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <rect x="3" y="6" width="14" height="14" rx="2"/>
-            <path d="M9 3h9a2 2 0 0 1 2 2v9"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <circle cx="6" cy="12" r="0.9"/>
+            <circle cx="12" cy="12" r="0.9"/>
+            <circle cx="18" cy="12" r="0.9"/>
           </svg>
         </div>
       </div>
@@ -469,6 +485,39 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     </div>
   </div>
 </div>
+
+<!-- =========================================================
+     SCRIPT PARA LA HORA DINÁMICA (Formato 12h)
+     ========================================================= -->
+<script>
+  (function() {
+    function actualizarHora() {
+      var ahora = new Date();
+      var horas = ahora.getHours();
+      var minutos = ahora.getMinutes();
+
+      // Convertir a formato de 12 horas (1 a 12)
+      horas = horas % 12;
+      horas = horas ? horas : 12; // Si es 0 (medianoche), mostrar 12
+
+      // Formatear a 2 dígitos (ej. 9:05 -> 09:05)
+      horas = horas < 10 ? '0' + horas : horas;
+      minutos = minutos < 10 ? '0' + minutos : minutos;
+
+      var reloj = document.getElementById('reloj-estado');
+      if (reloj) {
+        reloj.textContent = horas + ':' + minutos;
+      }
+    }
+
+    // Ejecutar al cargar
+    actualizarHora();
+
+    // Actualizar cada segundo para mantener la precisión
+    setInterval(actualizarHora, 1000);
+  })();
+</script>
+
 
   <script>
     /* R26: la página es estática (GitHub Pages). La sesión llega
