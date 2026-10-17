@@ -12,13 +12,14 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  color normal (tinta/gris, SIN colorOficial) con
                  recorte a 2 líneas, línea divisora debajo del
                  subtítulo y fila del partner abajo: avatar
-                 circular con la INICIAL (fondo colorClaro del
-                 post, letra colorOficial) + nombre + glifo
-                 verificado (Iconos.html); a la derecha "Ver
-                 publicación →" en gris medio y peso normal. La
-                 estrella métrica pasiva se queda anclada a la
-                 esquina superior derecha (fila horizontal: glifo
-                 amarillo + contador a su derecha, oculta en 0).
+                 circular SIN BORDES con la INICIAL (fondo
+                 colorClaro del post, letra colorOficial) + nombre
+                 + glifo verificado (Iconos.html); a la derecha
+                 "Ver publicación →" en NARANJA oficial y peso
+                 normal. La estrella métrica pasiva se queda
+                 anclada a la esquina superior derecha (fila
+                 horizontal: glifo amarillo + contador a su
+                 derecha, oculta en 0).
                  Sin badge (vive en la promo y el post). La lista
                  es PLANA bajo el rótulo "Explorar" (el agrupado
                  por grupo vuelve como opción del filtro cuando
@@ -27,8 +28,15 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  la misma anatomía de caja (solo si el POST
                  inicial aún está en vuelo cuando el usuario
                  elige ciudad).
-VERSIÓN:         1.7
-CAMBIOS:         R58: item como CAJA — tarjeta blanca con radio
+VERSIÓN:         1.8
+CAMBIOS:         R59: 3 ajustes del item — "Ver publicación" en
+                 NARANJA oficial #f97316 (la flecha hereda por
+                 currentColor); avatar del partner SIN BORDES
+                 (el borde 1.5px de la regla global .partner-avatar
+                 de Partner_Sheet_CSS se colaba en el item y le
+                 quitaba protagonismo al título) y el check
+                 verificado más grande (15→17px).
+                 R58: item como CAJA — tarjeta blanca con radio
                  16px, sombra suave y franja colorOficial a
                  sangre en el borde izquierdo (::before con
                  var(--post-color)); título y subtítulo vuelven a
@@ -319,15 +327,19 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      Avatar circular con la PRIMERA letra de la marca del
      partner: fondo colorClaro del post (--post-claro) y letra
      colorOficial (--post-color), mismas variables que la
-     franja. Nombre en tinta semibold + glifo verificado verde
-     (Iconos.html). El texto "Responde en…" de la referencia NO
-     va (decisión del dueño).
+     franja. SIN BORDES (R59): la regla global .partner-avatar
+     de Partner_Sheet_CSS trae un borde 1.5px #475569 que se
+     colaba aquí y le quitaba protagonismo al título — el item
+     lo apaga. Nombre en tinta semibold + glifo verificado
+     verde (Iconos.html). El texto "Responde en…" de la
+     referencia NO va (decisión del dueño).
      ============================================================ */
   .lista-item .partner-avatar {
     flex: 0 0 auto;
     width: 34px;
     height: 34px;
     border-radius: 50%;
+    border: 0;
     background: var(--post-claro, #f1f5f9);
     color: var(--post-color, #475569);
     font-size: 14px;
@@ -346,10 +358,12 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     color: #1f2937;
     min-width: 0;
   }
+  /* Check verificado (R59): un poquito más grande (15→17px)
+     para que se lea junto al nombre sin taparlo. */
   .lista-item .marca .check {
     flex-shrink: 0;
-    width: 15px;
-    height: 15px;
+    width: 17px;
+    height: 17px;
     color: #059669;
     display: inline-flex;
   }
@@ -368,7 +382,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   /* Fila del partner (R58) · debajo de la divisoria: avatar +
    nombre/verificado a la izquierda y "Ver publicación →" a la
    derecha — mismo verbo de invitación, nuevo texto del dueño.
-   Peso NORMAL (R56) y gris medio #64748b (R52) intactos. */
+   NARANJA OFICIAL #f97316 (R59): el dueño lo pidió del color
+   de la app; la flecha hereda por currentColor. Peso NORMAL
+   (R56) intacto. */
   .lista-item .pie {
     display: flex;
     align-items: center;
@@ -384,7 +400,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     font-size: 13px;
     font-weight: 400;
     letter-spacing: 0.01em;
-    color: #64748b;
+    color: #f97316;
     white-space: nowrap;
   }
   .lista-item .ver-glifo {
