@@ -7,35 +7,28 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  semi-transparente (estilo Instagram del dueño)
                  y, cuando el post declara duda, la fila se
                  vuelve UNA sola píldora dividida (.segmentada):
-                 duda secundaria a la izquierda + CTA principal
+                 duda secundaria a la izquierda (texto gris
+                 medio que no compite con el CTA) + CTA principal
                  a la derecha, con borde hairline translúcido.
                  Incluye la fila del partner estilo Instagram
                  (divisoria a sangre, de borde a borde) y el
                  estado deshabilitado en naranja tenue para
                  cursos "pronto".
-VERSIÓN:         1.5
-CAMBIOS:         R51: la divisoria de la fila del partner va de
-                 borde a borde de la pantalla (la fila se hace
-                 full-width con padding interno) y se hace más
-                 sutil. El borde de la píldora dividida pasa a
-                 hairline: 1px del color del post al ~38% de
-                 opacidad (color-mix con fallback al color
-                 pleno) y sombra más suave. El título de la
-                 fila del partner lo pinta el CSS con el
-                 colorOficial del post (var --post-color).
-                 R50: CTA semi-transparente (referencia
-                 Instagram del dueño); con duda + CTA visibles
-                 la fila es UNA píldora dividida
-                 (.segmentada que pinta Core_Script): duda
-                 secundaria a la izquierda + CTA a la derecha.
-                 R49: fila .user-fila del partner bajo la fila
-                 CTA: avatar 44px con borde del color del post
-                 + glifo user + punto con anillo blanco (como
-                 la campanita de la promo), eslogan gris de
-                 subtítulo, sin chevron.
-                 R46: la duda no se deshabilita nunca y
-                 desaparece si el CTA es modo WhatsApp; fila y
-                 partner ocultas en modo lista.
+VERSIÓN:         1.6
+CAMBIOS:         R52: el texto "Consultar" de la duda sale en
+                 GRIS MEDIO (#64748b) en los dos estados (píldora
+                 segmentada y duda suelta) — ya NO usa el
+                 colorOficial del post, que cuando es resaltante
+                 competía con el CTA naranja. El borde hairline
+                 del color del post (R51) se queda igual.
+                 R51: divisoria del partner de borde a borde (5%)
+                 y borde hairline de la píldora (color-mix 38%).
+                 R50: CTA translúcido rgba(0.87) + píldora
+                 dividida (.segmentada que pinta Core_Script).
+                 R49: fila .user-fila del partner (avatar +
+                 punto + eslogan, sin chevron). R46: la duda
+                 nunca se deshabilita; fila y partner ocultas
+                 en modo lista.
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
 ════════════════════════════════════════════════════════════════════*/
@@ -213,8 +206,10 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      FILA CTA (R46) · duda a la izquierda + CTA a la derecha
      La fila toma el ancho/márgenes que antes tenía el CTA solo.
      La duda: outline FINO de 1px en el color del post, fondo
-     transparente, no se deshabilita nunca y no compite con el
-     CTA (si el post es modo WhatsApp, Core_Script la oculta).
+     transparente, TEXTO EN GRIS MEDIO (R52: no compite con el
+     CTA aunque el color del post sea resaltante), no se
+     deshabilita nunca (si el post es modo WhatsApp,
+     Core_Script la oculta).
      ============================================================ */
   .cta-fila {
     flex-shrink: 0;
@@ -238,7 +233,8 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      .segmentada y la fila se vuelve UN solo botón dividido
      (split pill del dueño): contenedor píldora con borde
      hairline del color del post; duda secundaria a la
-     IZQUIERDA (fondo transparente, texto del color del post)
+     IZQUIERDA (fondo transparente, texto GRIS MEDIO — R52:
+     sin el color del post para que no compita con el CTA)
      y CTA principal a la DERECHA. Los rellenos van rectos
      (radius 0) y el overflow del contenedor recorta las
      esquinas; el brillo naranja sube al contenedor para que
@@ -266,7 +262,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     border: none;
     border-radius: 0;
     background: transparent;
-    color: var(--post-color, #475569);
+    color: #64748b;
   }
 
   .cta-fila.segmentada .cta-reservar {
@@ -287,7 +283,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     border: 1px solid var(--post-color, #64748b);
     border-radius: 999px;
     background: transparent;
-    color: var(--post-color, #475569);
+    color: #64748b;
 
     font-family: inherit;
     font-size: 15px;
