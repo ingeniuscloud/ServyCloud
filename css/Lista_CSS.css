@@ -4,18 +4,29 @@ ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
-                 fade. Items transparentes con línea divisora.
-                 Badge a 11px.
+                 fade. Item de la vidriera: transparente con
+                 línea divisora, cinta lateral colorOficial
+                 (ancla visual a sangre), estrella métrica
+                 pasiva arriba a la derecha (oculta en 0) y pie
+                 con la marca a la izquierda y "Ver detalles →"
+                 a la derecha en gris medio. Sin avatar ni
+                 badge (el badge vive en la promo y el post).
                  Skeleton del detalle (primera carga de un post).
-                 Skeleton de lista (solo si el POST inicial aún
-                 está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         1.3
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+                 Skeleton de lista con la misma anatomía (solo
+                 si el POST inicial aún está en vuelo cuando el
+                 usuario elige ciudad).
+VERSIÓN:         1.4
+CAMBIOS:         R55: item de la vidriera — cinta lateral con
+                 var(--cinta-color), fuera el cuadrado avatar,
+                 el badge y el chevron; estrella pasiva con
+                 contador (glifo de Iconos) y pie con marca +
+                 "Ver detalles" (glifo flechaVer de Iconos, gris
+                 #64748b); skeleton de lista reescrito con la
+                 anatomía nueva; regla .badge migrada a
+                 Promo_CSS.html.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
-                 Promo_CSS.html)
+                 Promo_CSS.html, que aporta la regla .badge)
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -129,11 +140,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      LISTA ITEM
      ============================================================ */
   .lista-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 14px 16px;
-    border-bottom: 1px solid #e2e8f0;
     background: transparent;
     width: 100%;
     border: 0;
@@ -147,18 +158,54 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
   .lista-item:last-child { border-bottom: 0; }
 
-  .lista-item .avatar {
+  /* Cinta lateral · ancla visual del item (R55). Pegada al borde
+     izquierdo y de borde a borde en vertical, tocando las dos
+     divisorias. El color lo inyecta Lista_Script con la variable
+     --cinta-color (colorOficial del post). Excluye a la tarjeta
+     promo: ella ya viste los colores del post con la campana. */
+  .lista-item:not(.promo-item)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--cinta-color, #475569);
+  }
+
+  /* Estrella métrica (R55) · columna arriba a la derecha,
+     alineada con la parte más alta del texto. Métrica PASIVA:
+     no es botón ni pide tap — la validación se da en el detalle
+     con el corazón. Gris monocromo a propósito: dice "dato" y no
+     compite con la cinta colorOficial. Oculta con cero: la
+     prueba social nunca se muestra vacía. */
+  .lista-item .estrella-col {
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    align-self: flex-start;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.02em;
+    gap: 3px;
+    margin-top: 2px;
+    color: #94a3b8;
+  }
+  .lista-item .estrella-col[hidden] { display: none; }
+  .lista-item .estrella-glifo {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  .lista-item .estrella-glifo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .lista-item .estrella-num {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
   }
 
   .lista-item .body {
@@ -186,19 +233,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     min-width: 0;
   }
 
-  .lista-item .badge {
-    flex: 0 0 auto;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 9px;
-    border-radius: 999px;
-    border: 1.3px dashed currentColor;
-    line-height: 1;
-    letter-spacing: 0.01em;
-    background: transparent;
-    white-space: nowrap;
-  }
-
   .lista-item .tagline {
     display: block;
     font-size: 13px;
@@ -217,7 +251,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     font-size: 12px;
     font-weight: 500;
     color: #94a3b8;
-    margin-top: 4px;
+    min-width: 0;
   }
   .lista-item .marca .check {
     color: #059669;
@@ -230,12 +264,39 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     color: inherit;
   }
 
-  .lista-item .flecha {
+  /* Pie del item (R55) · fila inferior separada del texto:
+     marca a la izquierda (firma de quién ofrece) y "Ver
+     detalles →" a la derecha en gris medio — el verbo que
+     invita al tap, mismo idioma del CTA "Consultar" (R52). */
+  .lista-item .pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 9px;
+    min-width: 0;
+  }
+  .lista-item .ver-detalles {
     flex: 0 0 auto;
-    color: #FA6A08;
-    font-size: 30px;
-    font-weight: 700;
-    line-height: 1;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: #64748b;
+    white-space: nowrap;
+  }
+  .lista-item .ver-glifo {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+  .lista-item .ver-glifo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   /* ============================================================
@@ -345,6 +406,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   .lista-skeleton-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -353,19 +415,14 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
   .lista-skeleton-item:last-child { border-bottom: 0; }
 
-  .lista-skeleton-avatar {
-    flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: linear-gradient(
-      90deg,
-      rgba(15, 23, 42, 0.06) 0%,
-      rgba(15, 23, 42, 0.10) 50%,
-      rgba(15, 23, 42, 0.06) 100%
-    );
-    background-size: 200% 100%;
-    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  .lista-skeleton-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: rgba(15, 23, 42, 0.08);
   }
 
   .lista-skeleton-body {
@@ -393,9 +450,39 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .lista-skeleton-line.short  { width: 60%; height: 14px; }
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.medium { width: 40%; }
+  .lista-skeleton-line.ver    { width: 76px; flex: 0 0 auto; }
+
+  .lista-skeleton-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .lista-skeleton-estrella {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 2px;
+  }
+  .lista-skeleton-estrella .punto {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.08);
+  }
+  .lista-skeleton-estrella .barra {
+    width: 14px;
+    height: 9px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.06);
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .lista-skeleton-avatar,
     .lista-skeleton-line {
       animation: none;
       background: rgba(15, 23, 42, 0.08);
@@ -407,11 +494,13 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      ============================================================ */
   @media (max-width: 360px) {
     .lista-item { padding: 12px 14px; gap: 12px; }
-    .lista-item .avatar { width: 44px; height: 44px; font-size: 18px; border-radius: 12px; }
+    .lista-item .estrella-glifo { width: 14px; height: 14px; }
+    .lista-item .estrella-num { font-size: 11px; }
     .lista-item .titulo { font-size: 14px; font-weight: 500; }
     .lista-item .tagline { font-size: 12px; font-weight: 400; }
     .lista-item .marca { font-size: 11px; }
-    .lista-item .badge { font-size: 10px; padding: 3px 8px; }
+    .lista-item .ver-detalles { font-size: 12px; }
+    .lista-item .ver-glifo { width: 13px; height: 13px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -421,5 +510,5 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
 
     .lista-skeleton-item { padding: 12px 14px; gap: 12px; }
-    .lista-skeleton-avatar { width: 44px; height: 44px; border-radius: 12px; }
+    .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }

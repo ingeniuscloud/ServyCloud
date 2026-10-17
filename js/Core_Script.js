@@ -20,16 +20,12 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.12
-CAMBIOS:         R50: la fila CTA recibe la clase .segmentada
-                 mientras la duda esté visible (píldora única
-                 dividida; Core_CSS la pinta).
-                 R46: duda del post (.cta-duda): visible solo si
-                 meta.botonDuda trae texto y el CTA NO es modo
-                 WhatsApp; nunca deshabilitada; al pulsar abre el
-                 WhatsApp del partner con meta.mensajeDuda
-                 sustituyendo {titulo} por el título del post y
-                 dispara GA4 whatsapp_click con tipo "duda".
+VERSIÓN:         1.13
+CAMBIOS:         R55: el skeleton de lista replica la anatomía
+                 nueva del item de la vidriera (cinta lateral,
+                 sin avatar, pie con marca y "Ver detalles",
+                 columna de estrella) para que no haya salto
+                 visual al reemplazarse.
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
@@ -838,11 +834,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       for (var i = 0; i < 5; i++) {
         html +=
           '<div class="lista-skeleton-item">' +
-            '<div class="lista-skeleton-avatar"></div>' +
             '<div class="lista-skeleton-body">' +
               '<div class="lista-skeleton-line short"></div>' +
               '<div class="lista-skeleton-line long"></div>' +
-              '<div class="lista-skeleton-line medium"></div>' +
+              '<div class="lista-skeleton-pie">' +
+                '<div class="lista-skeleton-line medium"></div>' +
+                '<div class="lista-skeleton-line ver"></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="lista-skeleton-estrella" aria-hidden="true">' +
+              '<div class="punto"></div>' +
+              '<div class="barra"></div>' +
             '</div>' +
           '</div>';
       }

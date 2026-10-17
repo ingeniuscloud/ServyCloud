@@ -7,6 +7,14 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  cargada una sola vez. Emite 'post:change'.
                  Escucha 'chips:change', 'buscar:change' y
                  'ciudad:change'.
+                 Item de la vidriera: cinta lateral con el
+                 colorOficial (variable --cinta-color), texto
+                 protagonista y pie con la marca + "Ver
+                 detalles". Estrella métrica PASIVA con el
+                 contador de likes (oculta en 0; glifo de
+                 Iconos); al volver del detalle se
+                 re-sincroniza con TABLAS para que el número
+                 sea siempre el mismo que dejó el corazón.
                  Modo lista ↔ detalle con fade y botón volver.
                  Skeleton del detalle mientras carga la primera
                  vez un post (PostFull).
@@ -14,14 +22,21 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.5
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.6
+CAMBIOS:         R55: item de la vidriera — fuera el cuadrado
+                 avatar, el badge y el chevron; cinta lateral
+                 colorOficial vía --cinta-color, estrella
+                 métrica pasiva (glifo estrella de Iconos,
+                 oculta en 0) y pie con marca + "Ver detalles"
+                 (glifo flechaVer); sincronizarEstrellas()
+                 actualiza los contadores al cerrar el detalle;
+                 buscarBadge sale (el badge vive en la promo y
+                 el post).
 DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
                  (getActual, hayPendiente), Chips_Script.html
                  (getChipActivo, seleccionar), Core_Script.html
-                 (window.PostFull.obtener), Lista_CSS.html
+                 (window.PostFull.obtener), Iconos.html
+                 (window.pintarGlifos), Lista_CSS.html
 ════════════════════════════════════════════════════════════════════*/
 
   window.Lista = (function () {
@@ -56,18 +71,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       var partners = (window.TABLAS && window.TABLAS.partners) || [];
       for (var i = 0; i < partners.length; i++) {
         if (partners[i].id === idPartner) return partners[i];
-      }
-      return null;
-    }
-
-    function buscarBadge(idBadge) {
-      if (!idBadge) return null;
-      var badges = (window.SISTEMA && window.SISTEMA.badges) || [];
-      for (var i = 0; i < badges.length; i++) {
-        if (badges[i].idBadge === idBadge) {
-          if (badges[i].estado === false) return null;
-          return badges[i];
-        }
       }
       return null;
     }
@@ -268,6 +271,26 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       aviso.textContent = '';
     }
 
+    /* R55 · Al cerrar el detalle, las estrellas se re-leen de
+       TABLAS: si el usuario dio (o quitó) like con el corazón
+       flotante, el número de la fila queda IGUAL al que dejó
+       el corazón. Mismo dato, cero descuadre. */
+    function sincronizarEstrellas() {
+      var items = document.querySelectorAll('#listaWrap .lista-item');
+      for (var i = 0; i < items.length; i++) {
+        var post = buscarPost(items[i].getAttribute('data-post'));
+        if (!post) continue;
+
+        var col = items[i].querySelector('.estrella-col');
+        if (!col) continue;
+
+        var like = Number(post.like) || 0;
+        var num  = col.querySelector('.estrella-num');
+        if (num) num.textContent = String(like);
+        col.hidden = like <= 0;
+      }
+    }
+
     function setModo(nuevoModo) {
       if (modo === nuevoModo) return;
       modo = nuevoModo;
@@ -299,12 +322,11 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
       lista.forEach(function (post) {
         var partner = buscarPartner(post.idPartner);
-        var badge = buscarBadge(post.idBadge);
 
         var titulo  = post.titulo || post.boton || post.id;
         var tagline = post.tagline || '';
         var color   = post.colorOficial || '#475569';
-        var inicial = (titulo.charAt(0) || '?').toUpperCase();
+        var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
 
         var btn = document.createElement('button');
@@ -312,27 +334,38 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         btn.className = 'lista-item';
         btn.setAttribute('data-post', post.id);
 
+        /* R55 · cinta lateral: el colorOficial viaja como
+           variable CSS y la pinta el ::before de Lista_CSS. */
+        btn.style.setProperty('--cinta-color', color);
+
         var html = '';
-        html += '<span class="avatar" style="background:' + escapeHtml(color) + ';">' + escapeHtml(inicial) + '</span>';
         html += '<span class="body">';
         html +=   '<span class="fila-titulo">';
         html +=     '<span class="titulo">' + escapeHtml(titulo) + '</span>';
-        if (badge && badge.titulo) {
-          var bColor = badge.colorTextoBorde || '#475569';
-          html += '<span class="badge" style="color:' + escapeHtml(bColor) + ';">' + escapeHtml(badge.titulo) + '</span>';
-        }
         html +=   '</span>';
         if (tagline) {
           html += '<span class="tagline">' + escapeHtml(tagline) + '</span>';
         }
+        html +=   '<span class="pie">';
         if (marca) {
-          html += '<span class="marca"><span class="check">✓</span>' +
-                  '<span class="marca-texto">' + escapeHtml(marca) + '</span></span>';
+          html +=   '<span class="marca"><span class="check">✓</span>' +
+                    '<span class="marca-texto">' + escapeHtml(marca) + '</span></span>';
         }
+        html +=     '<span class="ver-detalles">Ver detalles' +
+                    '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
+        html +=   '</span>';
         html += '</span>';
-        html += '<span class="flecha">›</span>';
+        html += '<span class="estrella-col"' + (like > 0 ? '' : ' hidden') + '>';
+        html +=   '<span class="estrella-glifo" data-glifo="estrella" aria-hidden="true"></span>';
+        html +=   '<span class="estrella-num">' + like + '</span>';
+        html += '</span>';
 
         btn.innerHTML = html;
+
+        if (typeof window.pintarGlifos === 'function') {
+          window.pintarGlifos(btn);
+        }
+
         btn.addEventListener('click', function () {
           abrirDetalle(post.id);
         });
@@ -446,6 +479,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
       postActivoId = null;
       setModo('lista');
+      sincronizarEstrellas();
 
       var wrap = document.querySelector('.secciones-wrap');
       if (wrap) wrap.scrollTop = scrollListaPrevio;

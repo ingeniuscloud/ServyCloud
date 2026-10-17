@@ -9,12 +9,12 @@ RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  con [data-glifo="clave"]. Al cargar el DOM, pinta
                  todos los data-glifo del documento automáticamente.
 
-                 Catálogo: 21 glifos EN USO confirmado.
-VERSIÓN:         1.3
-CAMBIOS:         R39: pintarGlifos también pinta la raíz recibida
-                 si porta data-glifo (el botón compartir del
-                 header pasaba el botón como raíz y quedaba sin
-                 glifo: querySelectorAll no mira a la raíz).
+                 Catálogo: 23 glifos EN USO confirmado.
+VERSIÓN:         1.4
+CAMBIOS:         R55: glifos estrella (métrica pasiva de
+                 validación del item de la lista, gris) y
+                 flechaVer (flecha derecha del texto "Ver
+                 detalles", trazo fino en currentColor).
 DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
                  Global_Script.html, Social_Script.html,
                  Reserva_Script.html y Comenta_* vía DOM)
@@ -23,11 +23,12 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
   const IMAGENES = {
 
     /* ============================================================
-       ICONOS EN USO CONFIRMADO (21)
+       ICONOS EN USO CONFIRMADO (23)
        ============================================================ */
 
     /* ---------- Navegación ---------- */
     flecha:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
+    flechaVer:      "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     flechaAcordeon: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%2F%3E%3C%2Fsvg%3E",
 
     /* ---------- Contacto y redes ---------- */
@@ -54,7 +55,8 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
     candado:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%2218%22%20height%3D%2211%22%20x%3D%223%22%20y%3D%2211%22%20rx%3D%222%22%20ry%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%2011V7a5%205%200%200%201%2010%200v4%22%2F%3E%3C%2Fsvg%3E",
     campana:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%208a6%206%200%200%201%2012%200c0%207%203%209%203%209H3s3-2%203-9%22%2F%3E%3Cpath%20d%3D%22M10.3%2021a1.94%201.94%200%200%200%203.4%200%22%2F%3E%3C%2Fsvg%3E",
 
-    /* ---------- Social (like / comment / share) ---------- */
+    /* ---------- Social (like / estrella / comment / share) ---------- */
+    estrella:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M12%2017.27%2018.18%2021l-1.64-7.03L22%209.24l-7.19-.61L12%202%209.19%208.63%202%209.24l5.46%204.73L5.82%2021z%22/%3E%3C/svg%3E",
     like:           "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M20.84%204.61a5.5%205.5%200%200%200-7.78%200L12%205.67l-1.06-1.06a5.5%205.5%200%200%200-7.78%207.78l1.06%201.06L12%2021.23l7.78-7.78%201.06-1.06a5.5%205.5%200%200%200%200-7.78z%22%2F%3E%3C%2Fsvg%3E",
     comment:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M21%2011.5a8.38%208.38%200%200%201-.9%203.8%208.5%208.5%200%200%201-7.6%204.7%208.38%208.38%200%200%201-3.8-.9L3%2021l1.9-5.7a8.38%208.38%200%200%201-.9-3.8%208.5%208.5%200%200%201%204.7-7.6%208.38%208.38%200%200%201%203.8-.9h.5a8.48%208.48%200%200%201%208%208v.5z%22%2F%3E%3C%2Fsvg%3E",
     share:          "data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M%2030%2014%20L%2017%202%20L%2017%208%20C%207%208%202%2015%202%2029%20C%207%2020%2012%2018%2017%2018%20L%2017%2025%20Z%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E"

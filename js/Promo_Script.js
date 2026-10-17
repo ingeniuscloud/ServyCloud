@@ -29,11 +29,15 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-VERSIÓN:         1.7
-CAMBIOS:         R38: cada item viste los colores de SU post:
-                 título y flecha en colorOficial, y el círculo de
-                 la campana con borde colorPastel, fondo
-                 colorClaro y punto colorOficial.
+                 Pie de la tarjeta: marca a la izquierda y "Ver
+                 detalles" a la derecha (mismo patrón del item de
+                 la lista). El badge SIGUE en la promo.
+VERSIÓN:         1.8
+CAMBIOS:         R55: fuera la flecha "›"; el pie de la tarjeta
+                 lleva la marca a la izquierda y "Ver detalles →"
+                 a la derecha (glifo flechaVer de Iconos, mismo
+                 patrón del item de la lista); el badge queda
+                 intacto.
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                  Ciudad_Sheet_Script.html (getActual),
                  Chips_Script.html (getChipActivo, seleccionar),
@@ -186,14 +190,17 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
       }
       html +=   '</span>';
       html +=   '<span class="tagline">' + escapeHtml(item.texto) + '</span>';
+      html +=   '<span class="pie">';
       if (marca) {
-        html += '<span class="marca">' +
+        html +=   '<span class="marca">' +
                   '<span class="check">✓</span>' +
                   '<span class="marca-texto">' + marca + '</span>' +
                 '</span>';
       }
+      html +=     '<span class="ver-detalles">Ver detalles' +
+                  '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
+      html +=   '</span>';
       html += '</span>';
-      html += '<span class="flecha" style="color:' + oficial + '">›</span>';
 
       return html;
     }

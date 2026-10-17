@@ -12,21 +12,28 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  El círculo de la campana viste los colores del
                  post (borde pastel, fondo claro, punto oficial —
                  variable --promo-punto que pinta Promo_Script) y
-                 tagline y marca heredan los estilos del item de
-                 la lista (mismo color, tamaño y grosor).
+                 tagline, marca y pie heredan los estilos del item
+                 de la lista (mismo color, tamaño y grosor).
+                 El badge vive SOLO aquí y en el post: es la única
+                 diferencia visible de la promo dentro del sistema
+                 (regla .badge propia desde que salió de
+                 Lista_CSS). Sin cinta lateral (la campana ya
+                 viste los colores) y sin estrella (la métrica es
+                 solo del item de la lista).
                  Vive fuera del scroll en modo lista. Se oculta
                  en modo detalle.
-VERSIÓN:         1.9
-CAMBIOS:         R38: el punto del círculo toma el colorOficial
-                 del post vía var(--promo-punto); los overrides
-                 de tagline y marca salen — ahora son EXACTAMENTE
-                 los del item de la lista (Lista_CSS): tagline
-                 13px/400/#64748b y marca 12px/500/#94a3b8.
+VERSIÓN:         2.0
+CAMBIOS:         R55: la flecha "›" sale de la tarjeta; el pie
+                 lleva la marca a la izquierda y "Ver detalles →"
+                 a la derecha (heredado de Lista_CSS, mismo
+                 patrón del item de la lista); regla .badge
+                 migrada desde Lista_CSS (el badge vive en la
+                 promo y el post, fuera del item de la lista).
 DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
-                 .fila-titulo, .titulo, .badge, .tagline, .marca),
-                 Promo_Script.html (duplica los items para el bucle
-                 continuo y lleva el scrollLeft),
-                 Index.html (#promoSlot)
+                 .fila-titulo, .titulo, .tagline, .marca, .pie,
+                 .ver-detalles), Promo_Script.html (duplica los
+                 items para el bucle continuo y lleva el
+                 scrollLeft), Index.html (#promoSlot)
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -97,6 +104,24 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
 
   .lista-item.promo-item:active {
     background: #fffbf5;
+  }
+
+  /* ============================================================
+     BADGE · etiqueta del post (migrada de Lista_CSS en R55: el
+     badge vive SOLO en la promo y en el post, nunca en el item
+     de la lista). Valores EXACTOS de la regla original.
+     ============================================================ */
+  .lista-item.promo-item .badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1.3px dashed currentColor;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    background: transparent;
+    white-space: nowrap;
   }
 
   /* ============================================================
