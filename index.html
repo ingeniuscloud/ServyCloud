@@ -8,35 +8,28 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  La detección de móvil corre ANTES de renderizar
                  Telefono.html para evitar el flash del marco.
                  El título se compone desde ROOTJSON.
-                 Incluye #promoSlot (chrome, fuera del scroll) entre
-                 el header y la lista.
-                 Incluye botón de ciudad (.city-bar) encima de la
-                 fila de chips. Módulo Ciudad se encarga de todo.
-                 La fila de filtros lleva lupa, COMPARTIR (píldora
-                 icono + texto "Compartir", glifo del post vía
-                 Iconos.js) y menú global.
-VERSIÓN:         1.8
-CAMBIOS:         R53: el teléfono inline de esta página se
-                 actualizó a la shell v1.2 del dueño (entra tal
-                 cual: cuerpo 242.39 mm, carcasa sin sombra,
-                 Safari blanco con bordes finos, tres puntos,
-                 URL real y reloj dinámico 12h). La estructura
-                 del Index 1.7 no cambia.
-                 R49: fila del partner .user-fila bajo la fila
-                 CTA (estilo Instagram del dueño): círculo con
-                 glifo user + punto como la campanita de la
-                 promo, nombre del partner y su eslogan como
-                 subtítulo. Misma acción (Partner Sheet), sin
-                 chevron. Social_Script llena textos y decide
-                 visibilidad; oculta en modo lista y sin
-                 partner.
-                 R46: vuelve el botón de duda del post
-                 (meta.botonDuda "Consultar") en una fila .cta-fila:
-                 duda a la IZQUIERDA con borde fino de 1px en el
-                 color del post, CTA a la DERECHA igual que antes
-                 (texto a la izquierda + flecha a la derecha).
-                 La fila entera se oculta en modo lista y la duda
-                 desaparece si el CTA es modo WhatsApp.
+                 R58 · Pantalla principal refactorizada: la fila
+                 de cabecera reúne CIUDAD + campo de búsqueda
+                 (siempre visible) + menú global; debajo va el
+                 TÍTULO GRANDE del header (.titulo-header, texto
+                 que llega de la BD real en ROOTJSON
+                 app.tituloHeader y pinta Core_Script); encima de
+                 las promos el encabezado "Promos cerca de ti" +
+                 "Toca para conocer más"; la fila de chips (#filtros)
+                 vive DEBAJO de las promos; la lista abre con el
+                 rótulo "Explorar". COMPARTIR aparece durante la
+                 búsqueda; la fila de búsqueda lleva "Limpiar
+                 filtro" del modo compartido. Módulo Ciudad se
+                 encarga de la ciudad.
+VERSIÓN:         1.9
+CAMBIOS:         R58: la ciudad deja su fila propia y entra a la
+                 fila de cabecera junto al campo de búsqueda (que
+                 ahora es permanente, sin lupa) y al menú global;
+                 el título inicial es el texto grande
+                 app.tituloHeader (BD real) debajo de esa fila;
+                 encabezado de promos arriba de #promoSlot; chips
+                 debajo de las promos; rótulo "Explorar" sobre la
+                 lista. Mismo markup que Index.html 1.8 de GAS.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -533,21 +526,15 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
       <div class="area-contenido">
 
         <!-- ============================================================
-             BOTÓN DE CIUDAD
-             Fila propia encima de .filtros-wrap.
-             Texto: "Estás viendo <b>Ciudad</b>" + chevron SVG.
-             Bloqueado en modo detalle.
+             FILA DE CABECERA (R58)
+             CIUDAD + BÚSQUEDA + GLOBAL en una sola fila, encima
+             del título grande. La búsqueda ya no se abre con
+             lupa: el campo vive SIEMPRE visible y el foco activa
+             el estado .buscando (Compartir + X; vecinos de fila
+             fuera). En modo detalle la fila muestra volver +
+             título de categoría (ciudad/campo/global fuera vía
+             CSS).
              ============================================================ -->
-        <button type="button"
-                class="city-bar"
-                id="btnCiudad"
-                disabled
-                aria-label="Cambiar ciudad">
-          <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
-          <span class="city-txt">Estás viendo <b id="ciudadTxt">—</b></span>
-          <span class="city-chev" data-glifo="flechaAcordeon" aria-hidden="true"></span>
-        </button>
-
         <div class="filtros-wrap">
 
           <button type="button" class="btn-volver" id="btnVolver" aria-label="Volver" hidden>
@@ -556,39 +543,16 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
-          <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
-
           <div id="tituloCategoria" class="titulo-categoria" hidden></div>
 
-          <button type="button" class="btn-lupa" id="btnBuscar" aria-label="Buscar">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="7"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-
-          <!-- Compartir búsqueda · píldora icono + texto
-               "Compartir" (decisión del dueño: la palabra junto al
-               campo ya dice qué se comparte). El glifo es el MISMO
-               del botón compartir del post (Iconos.js,
-               data-glifo="share") pero en un SPAN INTERNO:
-               pintarGlifos escribe el innerHTML del portador y
-               borraría el texto si el botón fuera el portador.
-               Naranja oficial al activarse (Chips_CSS). Oculto por
-               defecto; Buscar y Lista lo activan con
-               buscar:estado / buscar:resultados. -->
-          <button type="button" class="btn-compartir" id="btnCompartir"
-                  aria-label="Compartir búsqueda" hidden disabled>
-            <span class="btn-compartir-glifo" data-glifo="share" aria-hidden="true"></span>
-            <span class="btn-compartir-texto">Compartir</span>
-          </button>
-
-          <button type="button" class="menu-global" aria-label="Menú">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="5"  cy="12" r="1.7"/>
-              <circle cx="12" cy="12" r="1.7"/>
-              <circle cx="19" cy="12" r="1.7"/>
-            </svg>
+          <button type="button"
+                  class="city-bar"
+                  id="btnCiudad"
+                  disabled
+                  aria-label="Cambiar ciudad">
+            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
+            <span class="city-txt">Estás viendo <b id="ciudadTxt">—</b></span>
+            <span class="city-chev" data-glifo="flechaAcordeon" aria-hidden="true"></span>
           </button>
 
           <div class="buscar-fila" id="buscarFila">
@@ -621,12 +585,62 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </button>
           </div>
 
+          <!-- Compartir búsqueda · píldora icono + texto
+               "Compartir" (decisión del dueño: la palabra junto al
+               campo ya dice qué se comparte). El glifo es el MISMO
+               del botón compartir del post (Iconos.js,
+               data-glifo="share") pero en un SPAN INTERNO:
+               pintarGlifos escribe el innerHTML del portador y
+               borraría el texto si el botón fuera el portador.
+               Naranja oficial al activarse (Chips_CSS). Oculto por
+               defecto; Buscar y Lista lo activan con
+               buscar:estado / buscar:resultados. -->
+          <button type="button" class="btn-compartir" id="btnCompartir"
+                  aria-label="Compartir búsqueda" hidden disabled>
+            <span class="btn-compartir-glifo" data-glifo="share" aria-hidden="true"></span>
+            <span class="btn-compartir-texto">Compartir</span>
+          </button>
+
+          <button type="button" class="menu-global" aria-label="Menú">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="5"  cy="12" r="1.7"/>
+              <circle cx="12" cy="12" r="1.7"/>
+              <circle cx="19" cy="12" r="1.7"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- ============================================================
+             TÍTULO INICIAL (R58) · texto grande que viene de la
+             BD real: ROOTJSON → app.tituloHeader. Core_Script lo
+             pinta al arrancar; si la BD no lo trae, queda oculto.
+             ============================================================ -->
+        <h1 class="titulo-header" id="tituloHeader" hidden></h1>
+
+        <!-- ============================================================
+             ENCABEZADO DE PROMOS (R58) · par título/subtítulo sobre
+             la marquesina; Promo_Script lo muestra cuando hay
+             promos vigentes y lo oculta cuando no.
+             ============================================================ -->
+        <div class="promo-encabezado" id="promoEncabezado" hidden>
+          <span class="promo-encabezado-titulo">Promos cerca de ti</span>
+          <span class="promo-encabezado-sub">Toca para conocer más</span>
         </div>
 
         <!-- Promo · chrome, fuera del scroll · oculto por defecto -->
         <div id="promoSlot" hidden></div>
 
+        <!-- ============================================================
+             FILA DE CHIPS (R58) · vive DEBAJO de las promos.
+             Chips_Script pinta aquí los segmentos.
+             ============================================================ -->
+        <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
+
         <div id="buscarVacio" class="buscar-vacio" hidden></div>
+
+        <!-- R58 · rótulo de la vidriera de items -->
+        <div class="lista-encabezado">Explorar</div>
 
         <div class="secciones-wrap">
           <div class="lista-wrap" id="listaWrap"></div>

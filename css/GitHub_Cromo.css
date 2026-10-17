@@ -7,19 +7,28 @@ RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
                  orbital y píldora "Instalar app". Nació con el
                  envoltorio (R26) y desde R29 vive como archivo
                  propio. El dueño no necesita tocarlo.
-VERSIÓN:         1.1
-CAMBIOS:         R57: el fondo del preloader (.preloader-overlay)
+VERSIÓN:         1.2
+CAMBIOS:         R58: el naranja oficial #f97316 de fondo le
+                 pareció OSCURO al dueño — el preloader viste un
+                 naranja CLARO y atractivo (degradado #fb923c →
+                 #fdba74, misma familia del oficial) y el anillo
+                 base de los orbitales pasa a blanco translúcido
+                 (el gris se veía sucio sobre naranja). Los
+                 orbitales azules, "Servy" y la marca quedan
+                 INTACTOS (su recolor es otra ronda).
+                 R57: el fondo del preloader (.preloader-overlay)
                  pasa al NARANJA OFICIAL de la app (#f97316) —
-                 antes #f8fafc. El interior del loader (orbitales
-                 y textos) queda intacto.
+                 antes #f8fafc.
                  R29: extraído del monolito v4.1 byte a byte.
 DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
                  #zona-instalar) · js/GitHub_Cromo.js
 ════════════════════════════════════════════════════════════════════
 */
     /* ═══ PRELOADER ORBITAL (mismo lenguaje visual de siempre;
-         R57: fondo NARANJA OFICIAL de la app — antes gris claro;
-         el interior del loader no se toca) ═══ */
+         R58: fondo NARANJA CLARO de la app (degradado de la
+         familia del oficial — el dueño lo pidió más claro y
+         atractivo); anillo base de los orbitales en blanco
+         translúcido; el interior azul ING no se toca) ═══ */
     .preloader-overlay {
       position: fixed;
       inset: 0;
@@ -27,7 +36,7 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f97316;
+      background: linear-gradient(180deg, #fb923c 0%, #fdba74 100%);
       opacity: 1;
       transition: opacity 0.32s ease;
       pointer-events: none;
@@ -58,7 +67,7 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
     .carga-orbital {
       position: absolute;
       border-radius: 50%;
-      border: 1px solid color-mix(in srgb, var(--border-input) 80%, transparent);
+      border: 1px solid rgba(255, 255, 255, 0.55);
     }
 
     .carga-orbital-1 {

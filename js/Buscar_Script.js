@@ -2,21 +2,28 @@
 ARCHIVO:         Buscar_Script.html
 ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Buscador in-place en la fila de chips. Al tocar
-                 la lupa, la fila se transforma en input y el
-                 foco va directo al campo (teclado se abre de
-                 inmediato). Al escribir, emite 'buscar:change'
-                 con el término y el flag de límite alcanzado.
-                 Límite: 40 chars.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+RESPONSABILIDAD: Buscador permanente en la fila de cabecera (R58):
+                 el campo vive SIEMPRE visible; el FOCO activa el
+                 estado .buscando (Compartir aparece inactivo, X y
+                 vecinos de fila según CSS) y marca body.en-busqueda
+                 (chips y rótulo "Explorar" fuera). Al escribir,
+                 emite 'buscar:change' con el término y el flag de
+                 límite alcanzado. La X limpia y sale. Límite: 40
+                 chars.
+VERSIÓN:         1.3
+CAMBIOS:         R58: el campo es permanente — la lupa ya no
+                 existe (su botón es opcional por compatibilidad),
+                 abrir() corre con el FOCO del input (sin limpiar
+                 lo escrito y sin forzar foco), cerrar() añade la
+                 salida de body.en-busqueda.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
                  Chips_Script.html (window.Chips), Lista_Script.html
                  (window.Lista.getPostActivo)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   window.Buscar = (function () {
 
     var wrap      = null;
@@ -59,18 +66,14 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
 
       abierto = true;
       wrap.classList.add('buscando');
-      input.value = '';
+      document.body.classList.add('en-busqueda');
 
       emitirEstado(true);
 
+      /* El foco ya viene puesto (abrir corre con el foco del
+         input): solo se asegura el estado visual. No se limpia
+         lo escrito ni se fuerza foco de nuevo. */
       void input.offsetHeight;
-      input.focus();
-
-      if (document.activeElement !== input) {
-        requestAnimationFrame(function () {
-          if (document.activeElement !== input) input.focus();
-        });
-      }
     }
 
     function cerrar() {
@@ -82,6 +85,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       if (document.activeElement === input) input.blur();
 
       wrap.classList.remove('buscando');
+      document.body.classList.remove('en-busqueda');
       input.value = '';
 
       var postActivo = (window.Lista && typeof window.Lista.getPostActivo === 'function')
@@ -116,19 +120,20 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
       if (window.__buscarBound === '1') return;
 
       wrap      = document.querySelector('.filtros-wrap');
-      btnLupa   = document.getElementById('btnBuscar');
+      btnLupa   = document.getElementById('btnBuscar');   /* R58: puede no existir */
       btnCerrar = document.getElementById('btnBuscarCerrar');
       input     = document.getElementById('buscarInput');
 
-      if (!wrap || !btnLupa || !btnCerrar || !input) {
+      if (!wrap || !btnCerrar || !input) {
         return;
       }
 
       window.__buscarBound = '1';
 
-      btnLupa.addEventListener('click', abrir);
+      if (btnLupa) btnLupa.addEventListener('click', abrir);
       btnCerrar.addEventListener('click', cerrar);
       input.addEventListener('input', onInput);
+      input.addEventListener('focus', abrir);   /* R58: el campo vive siempre visible */
     }
 
     if (document.readyState === 'loading') {
@@ -145,3 +150,4 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap),
     };
 
   })();
+

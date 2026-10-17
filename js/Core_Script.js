@@ -20,21 +20,22 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.14
-CAMBIOS:         R57: el fondo del lienzo de la pantalla
-                 principal (pintarAreaConPost sin post) deja el
-                 degradado azul #ecf3fd y viste su EQUIVALENTE
-                 NARANJA de la app (#fdf3ec — mismo peso del
-                 tinte, espejo del canal azul al naranja oficial
-                 #f97316); el skeleton de lista estrena la
-                 cabecera de grupo (barra gris arriba) para
-                 espejar la lista agrupada de Lista_Script 1.7.
+VERSIÓN:         1.15
+CAMBIOS:         R58: pantalla principal refactorizada — el
+                 TÍTULO INICIAL grande se pinta desde la BD real
+                 (SISTEMA.root → app.tituloHeader; si la BD no lo
+                 trae queda oculto) y el skeleton de lista
+                 replica la anatomía de CAJA del item nuevo
+                 (franja, divisoria, avatar del partner, "Ver
+                 publicación", estrella; fuera la cabecera de
+                 grupo). El fondo del lienzo #fdf3ec (R57)
+                 queda EXACTO.
                  R55: el skeleton de lista replica la anatomía
-                 nueva del item de la vidriera (sin avatar, pie
-                 con marca y "Ver detalles", estrella) para que
-                 no haya salto visual al reemplazarse.
+                 del item de la vidriera para que no haya salto
+                 visual al reemplazarse.
 DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
-                 (#canvas-content, SISTEMA, TABLAS, TOKEN, URL_EXEC),
+                 (#canvas-content, #tituloHeader, SISTEMA, TABLAS,
+                 TOKEN, URL_EXEC),
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
                  Chips_Script.html, Buscar_Script.html,
                  Promo_Script.html, Social_Script.html,
@@ -806,6 +807,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         .catch(function () { /* silencioso: la lista cacheada sigue en pantalla */ });
     }
 
+    /* ============================================================
+       TÍTULO INICIAL (R58) · el texto grande del header vive en
+       la BD real: ROOTJSON → app.tituloHeader (SISTEMA.root).
+       Si la BD no lo trae, el elemento queda oculto y el
+       header respira sin él. Se pinta una vez al montar el
+       lienzo.
+       ============================================================ */
+    function pintarTituloHeader() {
+      var el = document.getElementById('tituloHeader');
+      if (!el) return;
+
+      var root = (window.SISTEMA && window.SISTEMA.root) || {};
+      var app  = root.app || {};
+      var t = String(app.tituloHeader || '').trim();
+
+      if (t) {
+        el.textContent = t;
+        el.hidden = false;
+      } else {
+        el.hidden = true;
+      }
+    }
+
     function inyectarLienzo() {
       var lienzo = document.getElementById('lienzo');
       var plantilla = document.getElementById('canvas-content');
@@ -843,21 +867,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!wrap) return;
 
       var html = '<div class="lista-skeleton">';
-      /* R57 · cabecera de grupo esqueleto: la lista real abre con
-         un título de grupo, el skeleton lo espeja para que no
-         haya salto al reemplazarse. */
-      html +=
-        '<div class="lista-skeleton-grupo">' +
-          '<div class="lista-skeleton-line grupo"></div>' +
-        '</div>';
       for (var i = 0; i < 5; i++) {
         html +=
           '<div class="lista-skeleton-item">' +
             '<div class="lista-skeleton-body">' +
               '<div class="lista-skeleton-line short"></div>' +
               '<div class="lista-skeleton-line long"></div>' +
+              '<div class="lista-skeleton-line long"></div>' +
+              '<div class="lista-skeleton-divisoria"></div>' +
               '<div class="lista-skeleton-pie">' +
-                '<div class="lista-skeleton-line medium"></div>' +
+                '<div class="lista-skeleton-avatar"></div>' +
+                '<div class="lista-skeleton-line nombre"></div>' +
                 '<div class="lista-skeleton-line ver"></div>' +
               '</div>' +
             '</div>' +
@@ -928,6 +948,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         window.Compartir.pintar();
       }
 
+      pintarTituloHeader();
       pintarAreaConPost(null);
       actualizarTextoCTA();
     }

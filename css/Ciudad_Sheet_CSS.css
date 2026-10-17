@@ -3,33 +3,44 @@ ARCHIVO:         Ciudad_Sheet_CSS.html
 ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
-                 bottom sheet de selección. Botón auto-ancho con
-                 texto y chevron SVG. Lista con radio button
-                 nativo estilizado. Sheet al 90%. Modo bloqueado
-                 para primera selección sin ciudad guardada.
-                 Aviso de cookies de esa primera carga: icono a
-                 la izquierda del texto y botón Aceptar debajo.
-VERSIÓN:         1.2
-CAMBIOS:         R38: estilos del aviso de cookies dentro del
+                 bottom sheet de selección. Botón COMPACTO dentro de
+                 la fila de cabecera (R58): pin + "Estás viendo
+                 Ciudad" + chevron SVG, texto que recorta con
+                 elipsis. Lista con radio button nativo estilizado.
+                 Sheet al 90%. Modo bloqueado para primera selección
+                 sin ciudad guardada. Aviso de cookies de esa
+                 primera carga: icono a la izquierda del texto y
+                 botón Aceptar debajo.
+VERSIÓN:         1.3
+CAMBIOS:         R58: la city-bar deja su fila propia y entra a la
+                 fila de cabecera junto a la búsqueda y el menú
+                 global: pieza compacta (13px, pin 15px, chevron
+                 14px), ancho acotado y texto con elipsis para que
+                 la fila respire; misma pieza, mismos colores.
+                 R38: estilos del aviso de cookies dentro del
                  sheet (.ciudad-cookies): icono, texto y botón
                  Aceptar centrados como puerta de entrada.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html y pintados por Ciudad_Sheet_Script.html)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   /* ============================================================
-     BOTÓN CIUDAD · fila propia, encima de .filtros-wrap
+     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R58)
+     Misma pieza de siempre (pin + "Estás viendo Ciudad" +
+     chevron), ahora compacta: comparte fila con el campo de
+     búsqueda y el menú global. El texto recorta con elipsis y
+     el ancho queda acotado para que la fila respire.
      ============================================================ */
   .city-bar {
-    align-self: flex-start;
-    flex-shrink: 0;
+    flex: 0 1 auto;
+    min-width: 0;
 
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 
-    max-width: calc(100% - 24px);
-    padding: 8px 14px 8px 20px;
+    max-width: 46%;
+    padding: 7px 6px 7px 12px;
     margin: 0;
 
     border: none;
@@ -37,7 +48,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     border-radius: 10px;
 
     font-family: inherit;
-    font-size: 17px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -59,8 +70,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .city-bar .city-pin {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     color: #475569;
     display: flex;
     align-items: center;
@@ -89,13 +100,13 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .city-bar .city-chev {
     flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     color: #94a3b8;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 2px;
+    margin-left: 0;
   }
   .city-bar .city-chev svg {
     width: 100%;
@@ -419,3 +430,4 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .cookies-icono { width: 26px; height: 26px; }
     .cookies-texto { font-size: 13px; }
   }
+

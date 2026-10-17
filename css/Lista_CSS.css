@@ -4,40 +4,47 @@ ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
-                 fade. Item de la vidriera: FONDO BLANCO con
-                 línea divisora, título del colorOficial del
-                 post (variable --post-color que pinta
-                 Lista_Script) y estrella métrica pasiva
-                 anclada a la esquina superior derecha (fila
-                 horizontal: glifo amarillo + contador a su
-                 derecha, oculta en 0 — no reserva carril).
-                 Pie con la marca a la izquierda y "Ver
-                 detalles →" a la derecha en peso normal, al ras
-                 del borde. Sin avatar, sin cinta lateral y sin
-                 badge (el badge vive en la promo y el post).
-                 Los items se agrupan por título de grupo
-                 (.lista-grupo): cabecera gris sobre el lienzo y
-                 bloque blanco de items debajo. Skeleton del
-                 detalle (primera carga de un post). Skeleton de
-                 lista con la misma anatomía (solo si el POST
+                 fade. Item de la vidriera (R58 · CAJA como la
+                 imagen del dueño): TARJETA BLANCA con radio y
+                 sombra suave, franja del colorOficial a sangre
+                 en el borde izquierdo (variable --post-color que
+                 pinta Lista_Script), título y subtítulo en su
+                 color normal (tinta/gris, SIN colorOficial) con
+                 recorte a 2 líneas, línea divisora debajo del
+                 subtítulo y fila del partner abajo: avatar
+                 circular con la INICIAL (fondo colorClaro del
+                 post, letra colorOficial) + nombre + glifo
+                 verificado (Iconos.html); a la derecha "Ver
+                 publicación →" en gris medio y peso normal. La
+                 estrella métrica pasiva se queda anclada a la
+                 esquina superior derecha (fila horizontal: glifo
+                 amarillo + contador a su derecha, oculta en 0).
+                 Sin badge (vive en la promo y el post). La lista
+                 es PLANA bajo el rótulo "Explorar" (el agrupado
+                 por grupo vuelve como opción del filtro cuando
+                 el dueño lo ordene). Skeleton del detalle
+                 (primera carga de un post). Skeleton de lista con
+                 la misma anatomía de caja (solo si el POST
                  inicial aún está en vuelo cuando el usuario
                  elige ciudad).
-VERSIÓN:         1.6
-CAMBIOS:         R57: fuera la cinta lateral (::before
-                 eliminado — el color lo lleva ahora el título);
-                 item con FONDO BLANCO (la tarjeta promo conserva
-                 su regla propia); título del colorOficial vía
-                 var(--post-color) con fallback #1f2937;
-                 agrupación por título de grupo (.lista-grupo +
-                 .lista-grupo-titulo, gris sobre el lienzo); el
-                 divisor cierra CADA bloque blanco (fuera la
-                 excepción :last-child); skeleton espeja: cabecera
-                 de grupo + items blancos sin banda.
+VERSIÓN:         1.7
+CAMBIOS:         R58: item como CAJA — tarjeta blanca con radio
+                 16px, sombra suave y franja colorOficial a
+                 sangre en el borde izquierdo (::before con
+                 var(--post-color)); título y subtítulo vuelven a
+                 su color normal (#1f2937/#64748b, fuera
+                 var(--post-color) del título) con recorte a 2
+                 líneas; divisoria interna debajo del subtítulo;
+                 partner con avatar circular de la inicial
+                 (--post-claro/--post-color) + glifo verificado;
+                 "Ver detalles" pasa a "Ver publicación" (mismo
+                 gris medio, sin bold, glifo flechaVer); fuera la
+                 agrupación por grupos (lista plana bajo el
+                 rótulo "Explorar"); skeleton espeja la caja.
                  R56: estrella en fila horizontal (glifo +
                  contador a su derecha) y amarilla #fbbf24,
                  anclada absolute a la esquina — deja de reservar
-                 carril y "Ver detalles" llega al ras del borde
-                 derecho; "Ver detalles" en peso normal (sin
+                 carril; "Ver detalles" en peso normal (sin
                  bold); la fila del título reserva 44px para no
                  chocar con la estrella (la promo no reserva).
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
@@ -111,7 +118,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   body.modo-detalle .btn-lupa,
   body.modo-detalle .btn-compartir,
   body.modo-detalle .filtros,
-  body.modo-detalle .buscar-fila {
+  body.modo-detalle .buscar-fila,
+  body.modo-detalle .titulo-header,
+  body.modo-detalle .promo-encabezado,
+  body.modo-detalle .city-bar,
+  body.modo-detalle .lista-encabezado {
     display: none !important;
   }
 
@@ -153,18 +164,27 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .secciones-track[hidden] { display: none !important; }
 
   /* ============================================================
-     LISTA ITEM
+     LISTA ITEM · CAJA (R58)
+     Tarjeta blanca con radio, borde y sombra suave, separada
+     por aire (sin divisoria entre items: las cajas se
+     sostienen solas). La FRANJA del colorOficial vuelve a
+     sangre en el borde izquierdo (::before con la variable
+     --post-color que pinta Lista_Script); overflow hidden la
+     recorta con el radio de la tarjeta. La promo no lleva
+     franja (su tarjeta es propia de Promo_CSS).
      ============================================================ */
   .lista-item {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
+    padding: 14px 16px 14px 21px;
     background: #ffffff;
     width: 100%;
-    border: 0;
-    border-bottom: 1px solid #e2e8f0;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    margin-bottom: 10px;
+    overflow: hidden;
     font-family: inherit;
     text-align: left;
     cursor: pointer;
@@ -173,35 +193,38 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
 
+  .lista-item:not(.promo-item)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--post-color, #cbd5e1);
+  }
+
   /* ============================================================
-     GRUPOS (R57) · la lista se organiza por título de grupo:
-     cabecera gris sobre el lienzo (señala la sección) y bloque
-     blanco de items debajo. La cabecera no es botón: es
-     etiqueta. Cada bloque blanco cierra con su divisoria (no
-     hay excepción :last-child: el hairline remata la tarjeta).
+     RÓTULO "EXPLORAR" (R58) · etiqueta de la vidriera, sobre
+     la lista plana (la imagen del dueño). La fila "Relevantes"
+     del filtro es PENDIENTE (el dueño lo anotó para después).
      ============================================================ */
-  .lista-grupo { display: block; }
-  .lista-grupo-titulo {
-    display: block;
-    padding: 16px 16px 8px;
-    font-size: 12px;
-    font-weight: 700;
+  .lista-encabezado {
+    flex-shrink: 0;
+    padding: 12px 16px 10px;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1.2;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
     color: #64748b;
   }
-  .lista-grupo-items { display: block; }
 
   /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
      glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
-     esquina para NO reservar carril — así el pie llega al ras del
-     borde derecho y "Ver detalles" se ve totalmente a la derecha.
-     Métrica PASIVA: no es botón ni pide tap — la validación se da
-     en el detalle con el corazón. Amarillo de valoración
-     (#fbbf24): el idioma universal de las estrellas; el contador
-     sigue en gris tinta. Oculta con cero: la prueba social nunca
-     se muestra vacía. */
+     esquina para NO reservar carril. Métrica PASIVA: no es botón
+     ni pide tap — la validación se da en el detalle con el
+     corazón. Amarillo de valoración (#fbbf24): el idioma
+     universal de las estrellas; el contador sigue en gris tinta.
+     Oculta con cero: la prueba social nunca se muestra vacía. */
   .lista-item .estrella-col {
     position: absolute;
     top: 15px;
@@ -251,46 +274,89 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding-right: 44px;
   }
 
-  /* Título del colorOficial del post (R57): la variable la pone
-     Lista_Script en cada botón (--post-color) y el CSS la
-     consume aquí. Fallback tinta si el post no trae color. La
-     promo no usa esta vía: su título va pintado inline por
-     Promo_Script y gana sobre esta regla. */
+  /* Título y subtítulo en su COLOR NORMAL (R58): tinta para el
+     título, gris para el subtítulo — el colorOficial vuelve a
+     vivir SOLO en la franja y en el avatar del partner. Recorte
+     a 2 líneas en ambos, como la imagen del dueño. La promo no
+     usa estas vías: su tarjeta se pinta entera en Promo_CSS. */
   .lista-item .titulo {
     font-size: 15px;
-    font-weight: 500;
-    color: var(--post-color, #1f2937);
+    font-weight: 600;
+    color: #1f2937;
     letter-spacing: -0.01em;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     flex: 1;
     min-width: 0;
   }
 
   .lista-item .tagline {
-    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: 13px;
     line-height: 1.35;
     font-weight: 400;
     color: #64748b;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* Divisora INTERNA debajo del subtítulo (R58): separa el
+     texto de la fila del partner, como la imagen del dueño. */
+  .lista-item .item-divisoria {
+    display: block;
+    height: 1px;
+    background: #eef2f7;
+    margin: 10px 0;
+  }
+
+  /* ============================================================
+     PARTNER · avatar de la inicial + nombre + verificado (R58)
+     Avatar circular con la PRIMERA letra de la marca del
+     partner: fondo colorClaro del post (--post-claro) y letra
+     colorOficial (--post-color), mismas variables que la
+     franja. Nombre en tinta semibold + glifo verificado verde
+     (Iconos.html). El texto "Responde en…" de la referencia NO
+     va (decisión del dueño).
+     ============================================================ */
+  .lista-item .partner-avatar {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--post-claro, #f1f5f9);
+    color: var(--post-color, #475569);
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .lista-item .marca {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #94a3b8;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
     min-width: 0;
   }
   .lista-item .marca .check {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
     color: #059669;
-    font-weight: 700;
+    display: inline-flex;
+  }
+  .lista-item .marca .check svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   .lista-item .marca .marca-texto {
     overflow: hidden;
@@ -299,19 +365,14 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     color: inherit;
   }
 
-  /* Pie del item (R55) · fila inferior separada del texto:
-     marca a la izquierda (firma de quién ofrece) y "Ver
-     detalles →" a la derecha — el verbo que invita al tap,
-     mismo idioma del CTA "Consultar" (R52). Peso NORMAL (R56):
-     sin bold, la invitación se lee ligera; con la estrella
-     anclada a la esquina, el texto llega al ras del borde
-     derecho del item. */
+  /* Fila del partner (R58) · debajo de la divisoria: avatar +
+   nombre/verificado a la izquierda y "Ver publicación →" a la
+   derecha — mismo verbo de invitación, nuevo texto del dueño.
+   Peso NORMAL (R56) y gris medio #64748b (R52) intactos. */
   .lista-item .pie {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    margin-top: 9px;
     min-width: 0;
   }
   .lista-item .ver-detalles {
@@ -447,16 +508,26 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     position: relative;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
+    padding: 14px 16px 14px 21px;
     background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    margin-bottom: 10px;
+    overflow: hidden;
   }
 
-  /* Espejo de la cabecera de grupo (R57): barra gris arriba de
-     los items, mismo padding que .lista-grupo-titulo. */
-  .lista-skeleton-grupo { padding: 16px 16px 8px; }
-  .lista-skeleton-line.grupo { width: 34%; height: 12px; }
+  /* Espejo de la franja colorOficial (R58): banda neutra a
+     sangre en el borde izquierdo. */
+  .lista-skeleton-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #eef2f7;
+  }
 
   .lista-skeleton-body {
     flex: 1;
@@ -483,15 +554,33 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .lista-skeleton-line.short  { width: 60%; height: 14px; }
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.medium { width: 40%; }
-  .lista-skeleton-line.ver    { width: 76px; flex: 0 0 auto; }
+  .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
+  /* Espejo de la divisoria interna (R58). */
+  .lista-skeleton-divisoria {
+    height: 1px;
+    background: #eef2f7;
+    margin: 4px 0;
+  }
+
+  /* Espejo de la fila del partner (R58): avatar circular +
+   barra del nombre + barra del "Ver publicación" a la derecha. */
   .lista-skeleton-pie {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    margin-top: 4px;
+    margin-top: 2px;
   }
+
+  .lista-skeleton-avatar {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  .lista-skeleton-line.nombre { width: 110px; }
 
   /* Espejo de la estrella real (R56): fila horizontal anclada a
      la esquina — punto (glifo) + barra (contador) a su derecha. */
@@ -528,15 +617,16 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .lista-item { padding: 12px 14px; gap: 12px; }
+    .lista-item { padding: 12px 14px 12px 19px; }
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
     .lista-item .estrella-num { font-size: 11px; }
-    .lista-item .titulo { font-size: 14px; font-weight: 500; }
+    .lista-item .titulo { font-size: 14px; font-weight: 600; }
     .lista-item .tagline { font-size: 12px; font-weight: 400; }
-    .lista-item .marca { font-size: 11px; }
+    .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
-    .lista-grupo-titulo { font-size: 11px; padding: 14px 14px 6px; }
+    .lista-item .partner-avatar { width: 30px; height: 30px; font-size: 13px; }
+    .lista-encabezado { padding: 10px 14px 8px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -545,8 +635,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .skeleton-detalle .skeleton-identidad { padding: 0 22px; }
     .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
 
-    .lista-skeleton-item { padding: 12px 14px; gap: 12px; }
-    .lista-skeleton-grupo { padding: 14px 14px 6px; }
+    .lista-skeleton-item { padding: 12px 14px 12px 19px; }
+    .lista-skeleton-avatar { width: 30px; height: 30px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }
 

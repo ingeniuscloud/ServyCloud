@@ -7,20 +7,25 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  cargada una sola vez. Emite 'post:change'.
                  Escucha 'chips:change', 'buscar:change' y
                  'ciudad:change'.
-                 Item de la vidriera: fondo blanco con divisoria,
-                 título del colorOficial (variable --post-color),
-                 texto protagonista y pie con la marca + "Ver
-                 detalles". Estrella métrica PASIVA con el
-                 contador de likes (oculta en 0; glifo de
-                 Iconos); al volver del detalle se
-                 re-sincroniza con TABLAS para que el número
-                 sea siempre el mismo que dejó el corazón.
-                 Los items se AGRUPAN POR TÍTULO DE GRUPO
-                 (R57): cada post cuelga de su primer grupo
-                 (idGrupo[0], misma convención del header del
-                 detalle); los grupos se ordenan como vienen en
-                 SISTEMA.grupoJson y posts sin grupo van al
-                 final sin cabecera — nadie desaparece.
+                 Item de la vidriera (R58 · CAJA): tarjeta blanca
+                 con franja del colorOficial a la izquierda
+                 (variables --post-color/--post-claro), título y
+                 subtítulo en su color normal, divisoria bajo el
+                 subtítulo y fila del partner: avatar circular
+                 con la INICIAL de la marca (fondo colorClaro del
+                 post, letra colorOficial) + nombre + glifo
+                 verificado (Iconos); a la derecha "Ver
+                 publicación" (glifo flechaVer, gris medio, sin
+                 bold). Estrella métrica PASIVA con el contador
+                 de likes (oculta en 0; glifo de Iconos); al
+                 volver del detalle se re-sincroniza con TABLAS
+                 para que el número sea siempre el mismo que dejó
+                 el corazón.
+                 La lista es PLANA (R58, como la imagen del
+                 dueño): el orden es el de la hoja y el rótulo
+                 "Explorar" vive en Index.html. El agrupado por
+                 grupo vuelve como opción del FILTRO cuando el
+                 dueño lo ordene (pendiente anotado).
                  Modo lista ↔ detalle con fade y botón volver.
                  Skeleton del detalle mientras carga la primera
                  vez un post (PostFull).
@@ -28,24 +33,21 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         1.7
-CAMBIOS:         R57: la lista se AGRUPA por título de grupo
-                 (secciones .lista-grupo pintadas por
-                 pintarLista; orden del grupoJson; posts sin
-                 grupo al final sin cabecera); la cinta lateral
-                 sale y su variable --cinta-color se convierte
-                 en --post-color, que ahora pinta el TÍTULO del
-                 item (el CSS lo consume). Fuera de eso, el item
-                 queda EXACTO (estrella, pie, sincronizar
-                 Estrellas intactos).
-                 R55: item de la vidriera — fuera el cuadrado
-                 avatar, el badge y el chevron; estrella
-                 métrica pasiva (glifo estrella de Iconos,
-                 oculta en 0) y pie con marca + "Ver detalles"
-                 (glifo flechaVer); sincronizarEstrellas()
-                 actualiza los contadores al cerrar el detalle;
-                 buscarBadge sale (el badge vive en la promo y
-                 el post).
+VERSIÓN:         1.8
+CAMBIOS:         R58: item como CAJA — franja colorOficial
+                 (--post-color) y avatar del partner (--post-claro
+                 + inicial); título/subtítulo en color normal;
+                 divisoria bajo el subtítulo; glifo verificado;
+                 "Ver detalles" pasa a "Ver publicación"; la
+                 lista se pinta PLANA (fuera la agrupación por
+                 grupos de R57 — vuelve como filtro pendiente);
+                 montarItem deja de setear el título con el color
+                 y pasa a vestir franja+avatar.
+                 R55: fuera el cuadrado avatar, el badge y el
+                 chevron; estrella métrica pasiva (glifo estrella
+                 de Iconos, oculta en 0);
+                 sincronizarEstrellas() actualiza los contadores
+                 al cerrar el detalle.
 DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
                  (getActual, hayPendiente), Chips_Script.html
                  (getChipActivo, seleccionar), Core_Script.html
@@ -334,29 +336,32 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
       var frag = document.createDocumentFragment();
 
-      /* Construye el botón de UN post (anatomía R55/R56/R57:
-         fondo blanco, título colorOficial, estrella pasiva y
-         pie con marca + "Ver detalles"). */
+      /* Construye el botón de UN post (anatomía R58 · CAJA:
+         franja colorOficial, título/subtítulo en color normal,
+         divisoria y partner con inicial + verificado + "Ver
+         publicación"). */
       function montarItem(post) {
         var partner = buscarPartner(post.idPartner);
 
         var titulo  = post.titulo || post.boton || post.id;
         var tagline = post.tagline || '';
         var color   = post.colorOficial || '#475569';
+        var claro   = post.colorClaro || '#f1f5f9';
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
+        var inicial = marca ? marca.charAt(0).toUpperCase() : 'S';
 
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'lista-item';
         btn.setAttribute('data-post', post.id);
 
-        /* R57 · el colorOficial viaja como variable CSS: el
-           título del item lo consume Lista_CSS
-           (var --post-color). Antes era la cinta
-           (--cinta-color); la cinta murió y el color se
-           mudó al título. */
+        /* R58 · el colorOficial viste la FRANJA y la letra del
+           avatar; el colorClaro el fondo del avatar (el título
+           volvió a su color normal). El CSS de Lista_CSS
+           consume ambas variables. */
         btn.style.setProperty('--post-color', color);
+        btn.style.setProperty('--post-claro', claro);
 
         var html = '';
         html += '<span class="body">';
@@ -366,12 +371,17 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         if (tagline) {
           html += '<span class="tagline">' + escapeHtml(tagline) + '</span>';
         }
+        html +=   '<span class="item-divisoria" aria-hidden="true"></span>';
         html +=   '<span class="pie">';
+        html +=     '<span class="partner-avatar" aria-hidden="true">' +
+                    escapeHtml(inicial) + '</span>';
         if (marca) {
-          html +=   '<span class="marca"><span class="check">✓</span>' +
-                    '<span class="marca-texto">' + escapeHtml(marca) + '</span></span>';
+          html +=   '<span class="marca">' +
+                    '<span class="marca-texto">' + escapeHtml(marca) + '</span>' +
+                    '<span class="check" data-glifo="verificado" aria-hidden="true"></span>' +
+                    '</span>';
         }
-        html +=     '<span class="ver-detalles">Ver detalles' +
+        html +=     '<span class="ver-detalles">Ver publicación' +
                     '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
         html +=   '</span>';
         html += '</span>';
@@ -393,70 +403,17 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         return btn;
       }
 
-      /* R57 · AGRUPAR POR TÍTULO DE GRUPO. Cada post cuelga de
-         su PRIMER grupo (idGrupo[0], la misma convención que
-         usa el header del detalle). Los grupos se ordenan como
-         vienen en SISTEMA.grupoJson (el orden de la hoja) y los
-         que no estén ahí (id colgante) se rescatan al final en
-         orden de aparición — NINGÚN post desaparece. Los posts
-         sin grupo cierran la lista sin cabecera: si nadie
-         tiene grupos, la lista se ve plana como siempre. */
-      var porGrupo = {};
-      var ordenIds = [];
-      var sinGrupo = [];
-
-      lista.forEach(function (post) {
-        var idG = (post.idGrupo && post.idGrupo.length)
-          ? String(post.idGrupo[0]).trim() : '';
-        if (!idG) { sinGrupo.push(post); return; }
-        if (!porGrupo[idG]) { porGrupo[idG] = []; ordenIds.push(idG); }
-        porGrupo[idG].push(post);
-      });
-
-      var idsOrdenados = [];
-      var gruposSistema = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
-      gruposSistema.forEach(function (g) {
-        var id = (g && g.idGrupo != null) ? String(g.idGrupo).trim() : '';
-        if (id && porGrupo[id] && porGrupo[id].length) {
-          idsOrdenados.push(id);
-        }
-      });
-      ordenIds.forEach(function (id) {
-        if (idsOrdenados.indexOf(id) === -1) idsOrdenados.push(id);
-      });
-
+      /* R58 · LISTA PLANA: el orden es el de la hoja (TABLAS),
+         sin cabeceras de grupo — el rótulo "Explorar" (Index)
+         encabeza la vidriera y el agrupado por grupo volverá
+         como opción del FILTRO (pendiente del dueño). Nadie
+         desaparece: se renderiza TODO lo que llega del filtro. */
       var renderizados = [];
 
-      idsOrdenados.forEach(function (idG) {
-        var sec = document.createElement('div');
-        sec.className = 'lista-grupo';
-
-        var titulo = nombreGrupo(idG) || idG;
-        var cab = document.createElement('div');
-        cab.className = 'lista-grupo-titulo';
-        cab.textContent = titulo;
-        sec.appendChild(cab);
-
-        var bloque = document.createElement('div');
-        bloque.className = 'lista-grupo-items';
-        porGrupo[idG].forEach(function (post) {
-          bloque.appendChild(montarItem(post));
-          renderizados.push(post);
-        });
-        sec.appendChild(bloque);
-
-        frag.appendChild(sec);
+      lista.forEach(function (post) {
+        frag.appendChild(montarItem(post));
+        renderizados.push(post);
       });
-
-      if (sinGrupo.length) {
-        var bloque = document.createElement('div');
-        bloque.className = 'lista-grupo-items';
-        sinGrupo.forEach(function (post) {
-          bloque.appendChild(montarItem(post));
-          renderizados.push(post);
-        });
-        frag.appendChild(bloque);
-      }
 
       cont.appendChild(frag);
 

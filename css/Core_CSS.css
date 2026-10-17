@@ -13,9 +13,15 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  Incluye la fila del partner estilo Instagram
                  (divisoria a sangre, de borde a borde) y el
                  estado deshabilitado en naranja tenue para
-                 cursos "pronto".
-VERSIÓN:         1.6
-CAMBIOS:         R52: el texto "Consultar" de la duda sale en
+                 cursos "pronto". R58: TÍTULO INICIAL grande del
+                 header (.titulo-header, texto de la BD real en
+                 app.tituloHeader).
+VERSIÓN:         1.7
+CAMBIOS:         R58: nuevo bloque .titulo-header — el texto
+                 grande de la pantalla principal: tinta #1f2937,
+                 peso 800, dos líneas máximo, bajo la fila de
+                 cabecera y sobre el encabezado de promos.
+                 R52: el texto "Consultar" de la duda sale en
                  GRIS MEDIO (#64748b) en los dos estados (píldora
                  segmentada y duda suelta) — ya NO usa el
                  colorOficial del post, que cuando es resaltante
@@ -31,8 +37,8 @@ CAMBIOS:         R52: el texto "Consultar" de la duda sale en
                  en modo lista.
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   *{ box-sizing: border-box; }
 
   html, body {
@@ -92,6 +98,37 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     min-height: 0;
     display: flex;
     flex-direction: column;
+  }
+
+  /* ============================================================
+     TÍTULO INICIAL (R58) · texto grande que viene de la BD real
+     (ROOTJSON → app.tituloHeader, lo pinta Core_Script). Vive
+     DEBAJO de la fila de cabecera (ciudad + búsqueda + global)
+     y ENCIMA del encabezado de promos. Dos líneas máximo; si
+     la BD no lo trae, Core_Script lo deja oculto ([hidden]).
+     ============================================================ */
+  .titulo-header {
+    flex-shrink: 0;
+    margin: 6px 16px 0;
+    padding: 0;
+
+    font-family: inherit;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    color: #1f2937;
+    text-align: left;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .titulo-header[hidden] { display: none; }
+
+  @media (max-width: 360px) {
+    .titulo-header { font-size: 23px; margin: 5px 14px 0; }
   }
 
   /* ============================================================
@@ -432,3 +469,4 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     .user-avatar { width: 40px; height: 40px; }
     .user-avatar svg { width: 20px; height: 20px; }
   }
+

@@ -29,20 +29,27 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Pie de la tarjeta: marca a la izquierda y "Ver
-                 detalles" a la derecha del colorOficial del post
-                 (mismo patrón del item de la lista). El badge
-                 SIGUE en la promo.
-VERSIÓN:         1.9
-CAMBIOS:         R56: "Ver detalles" de la promo se pinta del
-                 colorOficial del post (inline, misma variable
-                 que el título) y en peso normal (el peso lo
-                 corrige Lista_CSS 1.5); el badge queda intacto.
-DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
+                 Tarjeta (R58): BADGE arriba (blanco sobre el
+                 naranja), título grande, partner debajo y botón
+                 circular de flecha a la derecha — como la imagen
+                 del dueño. El encabezado "Promos cerca de ti" +
+                 "Toca para conocer más" se muestra/oculta junto
+                 con el slot.
+VERSIÓN:         2.0
+CAMBIOS:         R58: contenido nuevo de la tarjeta — fuera la
+                 campana, el tagline y el pie "Ver detalles";
+                 entra badge blanco + promo-titulo +
+                 promo-partner + promo-flecha (glifo flechaVer);
+                 el color del badge lo manda Promo_CSS (blanco);
+                 #promoEncabezado se enciende/apaga con el slot.
+                 R56: "Ver detalles" del colorOficial del post y
+                 en peso normal (esa pieza desaparece en R58).
+DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
+                 #promoEncabezado),
                  Ciudad_Sheet_Script.html (getActual),
                  Chips_Script.html (getChipActivo, seleccionar),
                  Iconos.html (pintarGlifos), Promo_CSS.html,
-                 Lista_CSS.html (clases .lista-item compartidas)
+                 Lista_CSS.html (clase .lista-item compartida)
 ════════════════════════════════════════════════════════════════════
 */
   window.Promo = (function () {
@@ -168,39 +175,21 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
       var partner = buscarPartner(post.idPartner) || {};
       var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
 
-      /* Colores del post (mismo contrato que el avatar de la
-         lista: colorOficial con fallback). Pastel y claro
-         alimentan el círculo de la campana; el punto usa el
-         oficial vía --promo-punto (variable CSS). */
-      var oficial = escapeHtml(post.colorOficial || '#475569');
-      var pastel  = escapeHtml(post.colorPastel || post.colorClaro || '#e2e8f0');
-      var claro   = escapeHtml(post.colorClaro || '#f4f6fc');
-
+      /* R58 · Tarjeta naranja de contenido blanco: badge arriba
+         (el color blanco lo manda Promo_CSS), título grande,
+         partner debajo y flecha circular a la derecha. Fuera la
+         campana, el tagline y el pie "Ver detalles". */
       var html = '';
-      html += '<span class="promo-campana" data-glifo="campana" aria-hidden="true" ' +
-              'style="border-color:' + pastel +
-              '; background:' + claro +
-              '; --promo-punto:' + oficial + ';"></span>';
-      html += '<span class="body">';
-      html +=   '<span class="fila-titulo">';
-      html +=     '<span class="titulo" style="color:' + oficial + '">' + titulo + '</span>';
       if (badge && badge.titulo) {
-        var bColor = badge.colorTextoBorde || '#475569';
-        html += '<span class="badge" style="color:' + escapeHtml(bColor) + ';">' + escapeHtml(badge.titulo) + '</span>';
+        html += '<span class="badge">' + escapeHtml(badge.titulo) + '</span>';
       }
-      html +=   '</span>';
-      html +=   '<span class="tagline">' + escapeHtml(item.texto) + '</span>';
-      html +=   '<span class="pie">';
+      html += '<span class="promo-titulo">' + titulo + '</span>';
       if (marca) {
-        html +=   '<span class="marca">' +
-                  '<span class="check">✓</span>' +
-                  '<span class="marca-texto">' + marca + '</span>' +
-                '</span>';
+        html += '<span class="promo-partner">' + marca + '</span>';
       }
-      html +=     '<span class="ver-detalles" style="color:' + oficial + '">Ver detalles' +
-                  '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
-      html +=   '</span>';
-      html += '</span>';
+      html += '<span class="promo-flecha" aria-hidden="true">' +
+              '<span class="promo-flecha-glifo" data-glifo="flechaVer"></span>' +
+              '</span>';
 
       return html;
     }
@@ -325,10 +314,12 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
       if (reanudarTimer) { clearTimeout(reanudarTimer); reanudarTimer = null; }
 
       var slot = document.getElementById('promoSlot');
+      var encabezado = document.getElementById('promoEncabezado');
       if (!slot) return;
 
       slot.innerHTML = '';
       slot.hidden = true;
+      if (encabezado) encabezado.hidden = true;
 
       var promo = window.SISTEMA && window.SISTEMA.promo;
       if (!promo || promo.activo === false) return;
@@ -419,6 +410,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
 
       slot.appendChild(trackEl);
       slot.hidden = false;
+      if (encabezado) encabezado.hidden = false;
 
       if (typeof window.pintarGlifos === 'function') {
         window.pintarGlifos(slot);
@@ -484,3 +476,4 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
     return { construir: construir };
 
   })();
+

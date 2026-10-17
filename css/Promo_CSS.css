@@ -3,55 +3,110 @@ ARCHIVO:         Promo_CSS.html
 ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
-                 #promoSlot es TRANSPARENTE: deja ver el fondo del
-                 lienzo y cada promo es una TARJETA BLANCA con radio,
-                 borde y sombra propios (se sostiene sin banda).
-                 El avance continuo lo lleva
-                 Promo_Script (rAF sobre scrollLeft) y el asomo de
-                 la tarjeta siguiente es la señal de que hay más.
-                 El círculo de la campana viste los colores del
-                 post (borde pastel, fondo claro, punto oficial —
-                 variable --promo-punto que pinta Promo_Script) y
-                 tagline, marca y pie heredan los estilos del item
-                 de la lista (mismo color, tamaño y grosor).
-                 El badge vive SOLO aquí y en el post: es la única
-                 diferencia visible de la promo dentro del sistema
-                 (regla .badge propia desde que salió de
-                 Lista_CSS). Sin cinta lateral (la campana ya
-                 viste los colores) y sin estrella (la métrica es
-                 solo del item de la lista).
+                 #promoSlot es TRANSPARENTE sobre el lienzo y cada
+                 promo es una TARJETA NARANJA (R58, como la imagen
+                 del dueño): degradado del naranja de la app, radio,
+                 sombra propia y contenido en blanco — badge
+                 PROMOCIONADO arriba, título grande, partner debajo
+                 y botón circular de flecha a la derecha. Encabezado
+                 propio ("Promos cerca de ti" + "Toca para conocer
+                 más") y FADE a los laterales de la marquesina hacia
+                 el color del lienzo. El avance continuo lo lleva
+                 Promo_Script (rAF sobre scrollLeft). El badge vive
+                 SOLO aquí y en el post: es la única diferencia
+                 visible de la promo dentro del sistema. Sin
+                 estrella (la métrica es solo del item de la lista).
                  Vive fuera del scroll en modo lista. Se oculta
                  en modo detalle.
-VERSIÓN:         2.0
-CAMBIOS:         R55: la flecha "›" sale de la tarjeta; el pie
-                 lleva la marca a la izquierda y "Ver detalles →"
-                 a la derecha (heredado de Lista_CSS, mismo
-                 patrón del item de la lista); regla .badge
-                 migrada desde Lista_CSS (el badge vive en la
-                 promo y el post, fuera del item de la lista).
-DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
-                 .fila-titulo, .titulo, .tagline, .marca, .pie,
-                 .ver-detalles), Promo_Script.html (duplica los
-                 items para el bucle continuo y lleva el
-                 scrollLeft), Index.html (#promoSlot)
-════════════════════════════════════════════════════════════════════*/
-
+VERSIÓN:         2.1
+CAMBIOS:         R58: la promo viste NARANJA (degradado de la
+                 familia del oficial #f97316) con contenido
+                 blanco como la imagen del dueño: badge blanco
+                 (borde dashed intacto), título 2 líneas y
+                 partner debajo, botón circular translúcido con
+                 flecha a la derecha; fuera la campana y el pie
+                 "Ver detalles"; encabezado "Promos cerca de
+                 ti / Toca para conocer más" sobre la marquesina
+                 (lo muestra Promo_Script) y FADES laterales
+                 hacia el lienzo #fdf3ec en #promoSlot.
+DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
+                 botón), Promo_Script.html (duplica los items
+                 para el bucle continuo y lleva el scrollLeft),
+                 Index.html (#promoSlot, #promoEncabezado)
+════════════════════════════════════════════════════════════════════
+*/
   /* ============================================================
      SLOT · contenedor de la marquesina
      SIN fondo a propósito: transparente para que se vea el
-     fondo del lienzo detrás. Las tarjetas blancas llevan
-     borde, radio y sombra propias: no necesitan banda.
+     lienzo detrás. R58: FADE a los laterales — las tarjetas se
+     disuelven hacia el color del lienzo (#fdf3ec) al llegar a
+     los bordes (dos velos con degradado, sin pointer-events:
+     el dedo sigue arrastrando). Necesita position:relative
+     para anclar los velos.
      ============================================================ */
   #promoSlot {
+    position: relative;
     flex-shrink: 0;
     background: transparent;
-    padding: 12px 0;
+    padding: 4px 0 12px;
     overflow: hidden;
   }
   #promoSlot[hidden] { display: none !important; }
 
   body.modo-detalle #promoSlot {
     display: none !important;
+  }
+
+  #promoSlot::before,
+  #promoSlot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #promoSlot::before {
+    left: 0;
+    background: linear-gradient(90deg, #fdf3ec 0%, rgba(253, 243, 236, 0) 100%);
+  }
+  #promoSlot::after {
+    right: 0;
+    background: linear-gradient(270deg, #fdf3ec 0%, rgba(253, 243, 236, 0) 100%);
+  }
+
+  /* ============================================================
+     ENCABEZADO DE PROMOS (R58) · "Promos cerca de ti" +
+     "Toca para conocer más", el par de la imagen del dueño.
+     Promo_Script lo muestra/oculta con el slot.
+     ============================================================ */
+  .promo-encabezado {
+    flex-shrink: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 16px 0;
+  }
+  .promo-encabezado[hidden] { display: none; }
+
+  body.modo-detalle .promo-encabezado { display: none !important; }
+
+  .promo-encabezado-titulo {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+  }
+
+  .promo-encabezado-sub {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: #94a3b8;
+    white-space: nowrap;
   }
 
   /* ============================================================
@@ -89,27 +144,39 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
   }
 
   /* ============================================================
-     ITEM PROMO · tarjeta BLANCA sobre el fondo del lienzo
-     Especificidad doble para ganar a .lista-item, que trae
-     border-bottom y fondo transparente.
+     ITEM PROMO · TARJETA NARANJA (R58)
+     Especificidad doble para ganar a .lista-item. Degradado de
+     la familia del naranja oficial #f97316 (como la imagen del
+     dueño), contenido blanco en columna: badge arriba, título
+     grande, partner debajo y botón circular de flecha anclado
+     a la derecha. Sin franja, sin estrella, sin "Ver detalles"
+     (la flecha circular es la invitación).
      ============================================================ */
   .lista-item.promo-item {
-    background: #ffffff;
-    border: 1px solid #f1f5f9;
-    border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    background: linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.30);
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 13px 62px 14px 16px;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-align: left;
   }
 
-  .lista-item.promo-item:active {
-    background: #fffbf5;
-  }
+  .lista-item.promo-item:active { filter: brightness(0.96); }
 
   /* ============================================================
-     BADGE · etiqueta del post (migrada de Lista_CSS en R55: el
-     badge vive SOLO en la promo y en el post, nunca en el item
-     de la lista). Valores EXACTOS de la regla original.
+     BADGE · etiqueta del post (vive SOLO en la promo y en el
+     post). Valores EXACTOS de la regla original; en la tarjeta
+     naranja se pinta BLANCO (borde dashed y texto), como la
+     imagen del dueño — el color de la BD queda reservado al
+     badge del post.
      ============================================================ */
   .lista-item.promo-item .badge {
     flex: 0 0 auto;
@@ -122,78 +189,72 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item, .body,
     letter-spacing: 0.01em;
     background: transparent;
     white-space: nowrap;
+    color: #ffffff;
+    margin-bottom: 3px;
   }
 
-  /* ============================================================
-     TAGLINE y MARCA · SIN overrides a propósito: heredan las
-     reglas de .lista-item (Lista_CSS) y quedan IDÉNTICAS al
-     item de la lista en color, tamaño y grosor (petición del
-     dueño). Solo la campana tiene estilo propio aquí abajo.
-     ============================================================ */
+  /* Título de la promo: grande, blanco, hasta 2 líneas. */
+  .lista-item.promo-item .promo-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
-  /* ============================================================
-     CAMPANA · círculo que viste los colores del post.
-     Promo_Script pinta en línea el borde (colorPastel), el
-     fondo (colorClaro) y la variable --promo-punto
-     (colorOficial) que consume el punto ::after. Los valores
-     fijos de esta regla son solo el respaldo si el post no
-     trae colores.
-     ============================================================ */
-  .promo-campana {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+  /* Partner debajo del título: blanco suavizado. */
+  .lista-item.promo-item .promo-partner {
+    max-width: 100%;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.85);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Flecha circular (R58): el botón-invitación de la tarjeta,
+     anclado a la derecha y centrado verticalmente. */
+  .lista-item.promo-item .promo-flecha {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    border: 1.2px solid #f97316;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    color: #f97316;
   }
 
-  .promo-campana svg {
-    width: 22px;
-    height: 22px;
+  .lista-item.promo-item .promo-flecha svg {
+    width: 18px;
+    height: 18px;
     display: block;
-    stroke: currentColor;
     fill: none;
-    transform-origin: 50% 10%;
-    animation: promoShake 5s ease-in-out infinite;
-  }
-
-  @keyframes promoShake {
-    0%, 80%, 100% { transform: rotate(0deg); }
-    84%           { transform: rotate(-12deg); }
-    87%           { transform: rotate(10deg); }
-    90%           { transform: rotate(-8deg); }
-    93%           { transform: rotate(6deg); }
-    96%           { transform: rotate(-3deg); }
-  }
-
-  .promo-campana::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--promo-punto, #f97316);
-    box-shadow: 0 0 0 2px #ffffff;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   /* ============================================================
      RESPONSIVE · ≤360px
      ============================================================ */
   @media (max-width: 360px) {
-    .promo-campana { width: 44px; height: 44px; }
-    .promo-campana svg { width: 20px; height: 20px; }
+    .promo-encabezado { padding: 8px 14px 0; }
+    .promo-encabezado-titulo { font-size: 16px; }
+    .lista-item.promo-item .promo-titulo { font-size: 15px; }
+    .lista-item.promo-item .promo-flecha { width: 32px; height: 32px; right: 12px; }
+    .lista-item.promo-item .promo-flecha svg { width: 16px; height: 16px; }
+    #promoSlot::before, #promoSlot::after { width: 22px; }
   }
 
-  /* La marquesina la mueve Promo_Script por JS: si el sistema pide
-     menos movimiento, el script no arranca el bucle. */
-  @media (prefers-reduced-motion: reduce) {
-    .promo-campana svg { animation: none; }
-  }
