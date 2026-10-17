@@ -30,21 +30,21 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
                  Pie de la tarjeta: marca a la izquierda y "Ver
-                 detalles" a la derecha (mismo patrón del item de
-                 la lista). El badge SIGUE en la promo.
-VERSIÓN:         1.8
-CAMBIOS:         R55: fuera la flecha "›"; el pie de la tarjeta
-                 lleva la marca a la izquierda y "Ver detalles →"
-                 a la derecha (glifo flechaVer de Iconos, mismo
-                 patrón del item de la lista); el badge queda
-                 intacto.
+                 detalles" a la derecha del colorOficial del post
+                 (mismo patrón del item de la lista). El badge
+                 SIGUE en la promo.
+VERSIÓN:         1.9
+CAMBIOS:         R56: "Ver detalles" de la promo se pinta del
+                 colorOficial del post (inline, misma variable
+                 que el título) y en peso normal (el peso lo
+                 corrige Lista_CSS 1.5); el badge queda intacto.
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                  Ciudad_Sheet_Script.html (getActual),
                  Chips_Script.html (getChipActivo, seleccionar),
                  Iconos.html (pintarGlifos), Promo_CSS.html,
                  Lista_CSS.html (clases .lista-item compartidas)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   window.Promo = (function () {
 
     var track = null;
@@ -197,7 +197,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot),
                   '<span class="marca-texto">' + marca + '</span>' +
                 '</span>';
       }
-      html +=     '<span class="ver-detalles">Ver detalles' +
+      html +=     '<span class="ver-detalles" style="color:' + oficial + '">Ver detalles' +
                   '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
       html +=   '</span>';
       html += '</span>';

@@ -6,29 +6,32 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
                  fade. Item de la vidriera: transparente con
                  línea divisora, cinta lateral colorOficial
-                 (ancla visual a sangre), estrella métrica
-                 pasiva arriba a la derecha (oculta en 0) y pie
-                 con la marca a la izquierda y "Ver detalles →"
-                 a la derecha en gris medio. Sin avatar ni
-                 badge (el badge vive en la promo y el post).
-                 Skeleton del detalle (primera carga de un post).
-                 Skeleton de lista con la misma anatomía (solo
-                 si el POST inicial aún está en vuelo cuando el
-                 usuario elige ciudad).
-VERSIÓN:         1.4
-CAMBIOS:         R55: item de la vidriera — cinta lateral con
-                 var(--cinta-color), fuera el cuadrado avatar,
-                 el badge y el chevron; estrella pasiva con
-                 contador (glifo de Iconos) y pie con marca +
-                 "Ver detalles" (glifo flechaVer de Iconos, gris
-                 #64748b); skeleton de lista reescrito con la
-                 anatomía nueva; regla .badge migrada a
-                 Promo_CSS.html.
+                 (ancla visual a sangre) y estrella métrica
+                 pasiva anclada a la esquina superior derecha
+                 (fila horizontal: glifo amarillo + contador a
+                 su derecha, oculta en 0 — no reserva carril).
+                 Pie con la marca a la izquierda y "Ver
+                 detalles →" a la derecha en peso normal, al ras
+                 del borde. Sin avatar ni badge (el badge vive en
+                 la promo y el post). Skeleton del detalle
+                 (primera carga de un post). Skeleton de lista
+                 con la misma anatomía (solo si el POST inicial
+                 aún está en vuelo cuando el usuario elige
+                 ciudad).
+VERSIÓN:         1.5
+CAMBIOS:         R56: estrella en fila horizontal (glifo +
+                 contador a su derecha) y amarilla #fbbf24,
+                 anclada absolute a la esquina — deja de reservar
+                 carril y "Ver detalles" llega al ras del borde
+                 derecho; "Ver detalles" en peso normal (sin
+                 bold); la fila del título reserva 44px para no
+                 chocar con la estrella (la promo no reserva);
+                 skeleton de lista espeja la anatomía nueva.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html, que aporta la regla .badge)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   /* ============================================================
      BOTÓN VOLVER
      ============================================================ */
@@ -173,21 +176,24 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     background: var(--cinta-color, #475569);
   }
 
-  /* Estrella métrica (R55) · columna arriba a la derecha,
-     alineada con la parte más alta del texto. Métrica PASIVA:
-     no es botón ni pide tap — la validación se da en el detalle
-     con el corazón. Gris monocromo a propósito: dice "dato" y no
-     compite con la cinta colorOficial. Oculta con cero: la
-     prueba social nunca se muestra vacía. */
+  /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
+     glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
+     esquina para NO reservar carril — así el pie llega al ras del
+     borde derecho y "Ver detalles" se ve totalmente a la derecha.
+     Métrica PASIVA: no es botón ni pide tap — la validación se da
+     en el detalle con el corazón. Amarillo de valoración
+     (#fbbf24): el idioma universal de las estrellas; el contador
+     sigue en gris tinta. Oculta con cero: la prueba social nunca
+     se muestra vacía. */
   .lista-item .estrella-col {
-    flex: 0 0 auto;
-    align-self: flex-start;
+    position: absolute;
+    top: 15px;
+    right: 16px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 3px;
-    margin-top: 2px;
-    color: #94a3b8;
+    gap: 4px;
+    color: #fbbf24;
   }
   .lista-item .estrella-col[hidden] { display: none; }
   .lista-item .estrella-glifo {
@@ -219,6 +225,13 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     gap: 8px;
     margin-bottom: 3px;
     min-width: 0;
+  }
+  /* La estrella vive en la esquina (absolute): la fila del
+     título reserva su espacio para que el texto nunca corra por
+     debajo (glifo 16px + hueco 4px + contador hasta 3 dígitos).
+     La promo no reserva: ella no lleva estrella. */
+  .lista-item:not(.promo-item) .fila-titulo {
+    padding-right: 44px;
   }
 
   .lista-item .titulo {
@@ -266,8 +279,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   /* Pie del item (R55) · fila inferior separada del texto:
      marca a la izquierda (firma de quién ofrece) y "Ver
-     detalles →" a la derecha en gris medio — el verbo que
-     invita al tap, mismo idioma del CTA "Consultar" (R52). */
+     detalles →" a la derecha — el verbo que invita al tap,
+     mismo idioma del CTA "Consultar" (R52). Peso NORMAL (R56):
+     sin bold, la invitación se lee ligera; con la estrella
+     anclada a la esquina, el texto llega al ras del borde
+     derecho del item. */
   .lista-item .pie {
     display: flex;
     align-items: center;
@@ -283,7 +299,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     gap: 4px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 400;
     letter-spacing: 0.01em;
     color: #64748b;
     white-space: nowrap;
@@ -460,14 +476,16 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     margin-top: 4px;
   }
 
+  /* Espejo de la estrella real (R56): fila horizontal anclada a
+     la esquina — punto (glifo) + barra (contador) a su derecha. */
   .lista-skeleton-estrella {
-    flex: 0 0 auto;
-    align-self: flex-start;
+    position: absolute;
+    top: 15px;
+    right: 16px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 3px;
-    margin-top: 2px;
+    gap: 4px;
   }
   .lista-skeleton-estrella .punto {
     width: 16px;
