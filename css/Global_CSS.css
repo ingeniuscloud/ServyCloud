@@ -13,8 +13,15 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.4
-CAMBIOS:         R64: entra .pwa-instalada-aviso (banner verde
+VERSIÓN:         1.5
+CAMBIOS:         R66: los CÍRCULOS NUMERADOS del timeline de la
+                 ayuda de instalación quedan SIN FONDO (orden del
+                 dueño: el relleno naranja se veía saturado) —
+                 solo el círculo: aro fino #f97316, número en
+                 naranja y fondo blanco (necesario para tapar la
+                 línea del timeline que pasa por detrás); fuera
+                 el brillo naranja del box-shadow.
+                 R64: entra .pwa-instalada-aviso (banner verde
                  suave con el check verificado de Iconos — el
                  aviso de app ya instalada vive DENTRO de la
                  ayuda, nunca la tapa) y .pwa-instalar pasa a
@@ -719,6 +726,11 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     .sheet-pwa .pwa-instalar { transition: none; }
   }
 
+  /* R66 · SIN FONDO de color (orden del dueño): el relleno
+     naranja saturaba el timeline. Queda el CÍRCULO y su número:
+     aro fino naranja + número naranja sobre blanco — el blanco
+     solo cumple el trabajo técnico de tapar la línea vertical
+     que pasa por detrás del punto. Sin brillo. */
   .sheet-pwa .pwa-paso-punto {
     flex-shrink: 0;
     position: relative;
@@ -728,8 +740,9 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     height: 30px;
     border-radius: 50%;
 
-    background: #f97316;
-    color: #ffffff;
+    background: #ffffff;
+    border: 2px solid #f97316;
+    color: #f97316;
     font-size: 0.8rem;
     font-weight: 800;
     line-height: 1;
@@ -737,9 +750,6 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     display: flex;
     align-items: center;
     justify-content: center;
-
-    box-shadow: 0 0 0 3px #ffffff,
-                0 2px 6px rgba(249, 115, 22, 0.35);
   }
   .sheet-pwa .pwa-paso-contenido {
     flex: 1;

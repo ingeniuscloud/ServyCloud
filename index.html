@@ -16,12 +16,16 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                  · FILA 1: campo BUSCAR EXPANDIDO de una vez
                    (lupa + input + X circular naranja para
                    limpiar el campo, visible al escribir) y el
-                   BOTÓN FILTRO a su derecha (glifo de Iconos,
-                   sin acción por ahora).
+                   BOTÓN ORDENAR a su derecha (glifo de Iconos;
+                   abre el sheet de ordenamiento — R66).
                  · FILA 2: los CHIPS (botones independientes con
                    su icono, activo en NARANJA oficial) y el
                    BOTÓN CIUDAD (pin + nombre) repartiéndose la
                    fila en partes iguales.
+                 ORDENAMIENTO (R66): el botón abre el SHEET DE
+                 ORDENAMIENTO (Filtros_Sheet_Script): nombre
+                 A-Z/Z-A, por categoría, más compartidos y mejor
+                 valorados.
                  BLOQUE DE ITEMS (R65): dentro de .secciones-wrap
                  viven, ENCIMA de la lista, "Compartir lista" (R65
                  ya no es sección filtro: se muda al bloque de
@@ -34,8 +38,17 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                  El placeholder del campo llega de la BD real
                  (ROOTJSON app.placeholderBuscar, lo pinta
                  Core_Script).
-VERSIÓN:         1.14
-CAMBIOS:         R65: "Compartir lista" se MUDA al bloque de
+VERSIÓN:         1.15
+CAMBIOS:         R66: el BOTÓN FILTRO pasa a ser el BOTÓN ORDENAR
+                 (#btnOrdenar, .btn-ordenar, aria "Ordenar") con
+                 el glifo ordenar de Iconos (3 líneas, diseño del
+                 dueño); abre el SHEET DE ORDENAMIENTO
+                 (Filtros_Sheet_Script). La X de limpiar del
+                 campo sube su glifo (líneas estiradas al doble,
+                 span 12/24). Entran los archivos Filtros_Sheet_CSS
+                 y Filtros_Sheet_Script del espejo. Mismo markup
+                 que Index.html 1.15 de GAS.
+                 R65: "Compartir lista" se MUDA al bloque de
                  items — el botón y el aviso "No se encontraron
                  resultados" viven DENTRO de .secciones-wrap,
                  encima de la lista (fuera de la sección filtro,
@@ -52,7 +65,8 @@ CAMBIOS:         R65: "Compartir lista" se MUDA al bloque de
                  R60: cabecera con volver + título + menú global.
                  Módulo Ciudad se encarga de la ciudad.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
-                 Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
+                 Filtros_Sheet_CSS.html, Seccion_CSS.html,
+                 Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
                  Reserva_CSS.html, Reserva_Exito_CSS.html, Lista_CSS.html,
                  Partner_Sheet_CSS.html.
@@ -65,8 +79,8 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Reserva_Sheet_Script.html, Reserva_OTP_Script.html,
                  Reserva_Dato_Script.html, Reserva_Exito_Script.html,
                  Reserva_Script.html, Partner_Sheet_Script.html,
-                 Ciudad_Sheet_Script.html, Compartir_Script.html,
-                 Core_Script.html.
+                 Ciudad_Sheet_Script.html, Filtros_Sheet_Script.html,
+                 Compartir_Script.html, Core_Script.html.
                  Servido por 00 DoGet.gs (include + inyección).
 ════════════════════════════════════════════════════════════════════
 -->
@@ -107,7 +121,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ServyCloud</title>
 
-  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
+  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Filtros_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
   <!-- ═══ R26 · CROMO DEL ENVOLTORIO (antes vivía en la página
        envoltorio con iframe; ahora acompaña a la app en ESTA
        página estática) ═══ -->
@@ -553,8 +567,9 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
              fila: en modo lista el título vive a la IZQUIERDA y
              el menú global a la DERECHA (lista ganada); en modo
              detalle el título se oculta y entran volver +
-             título de categoría. El menú global se oculta en
-             modo compartido.
+             título de categoría. La ciudad sigue en la fila de
+             filtros (debajo). El menú global se oculta en modo
+             compartido.
              ============================================================ -->
         <div class="filtros-wrap">
 
@@ -601,7 +616,9 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
              FILA 1: campo BUSCAR expandido de una vez (lupa +
              input + X circular naranja para limpiar, visible al
              escribir) + BOTÓN FILTRO a la derecha (glifo de
-             Iconos — sin acción todavía).
+             Iconos — sin acción todavía). Buscar_Script enlaza
+             el campo y la X (en modo compartido la X libera la
+             vista vía Compartir.limpiar).
              ============================================================ -->
         <div class="filtros-fila" id="filtrosFila">
 
@@ -620,30 +637,38 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                      autocapitalize="off" spellcheck="false">
               <!-- R64 · X circular naranja DENTRO del campo:
                    aparece al escribir y limpia el campo. En modo
-                   compartido queda fija (libera la vista). -->
+                   compartido queda fija (libera la vista).
+                   R66 · el glifo se ESTIRA (span 12/24 del
+                   viewBox): a líneas de 6/24 la X se veía
+                   diminuta dentro del círculo. -->
               <button type="button" class="buscar-limpiar" id="btnLimpiarCampo"
                       aria-label="Limpiar el campo">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
               </button>
             </div>
           </div>
 
-          <!-- BOTÓN FILTRO · a la derecha del campo: círculo con
-               el glifo filtro de Iconos (3 líneas con su
-               deslizador, diseño del dueño). Sin handler
-               todavía (el dueño lo pidió sin acción por ahora). -->
-          <button type="button" class="btn-filtro" id="btnFiltro" aria-label="Filtrar">
-            <span data-glifo="filtro" aria-hidden="true"></span>
+          <!-- BOTÓN ORDENAR (R66) · a la derecha del campo:
+               círculo con el glifo ordenar de Iconos (3 líneas
+               que se acortan, diseño del dueño). ABRE EL SHEET
+               DE ORDENAMIENTO (Filtros_Sheet_Script): nombre
+               A-Z/Z-A, categoría, más compartidos y mejor
+               valorados. Se retira en modo compartido. -->
+          <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar">
+            <span data-glifo="ordenar" aria-hidden="true"></span>
           </button>
 
         </div>
 
         <!-- ============================================================
              FILA 2 (R64) · CHIPS + CIUDAD repartiéndose la fila
-             en partes iguales, sin números de items.
+             en partes iguales, sin números de items. Chips_Script
+             pinta los botones chip (con su icono) en #filtros;
+             el BOTÓN CIUDAD (#btnCiudad, pin + nombre) cierra la
+             fila. En modo compartido esta fila se retira.
              ============================================================ -->
         <div class="filtros-fila-dos" id="filtrosFilaDos">
 
@@ -651,7 +676,8 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
 
           <!-- BOTÓN CIUDAD · pin + nombre de la ciudad, sin
                fondo (solo el borde suave) y sin más texto que
-               la ciudad. -->
+               la ciudad. El módulo Ciudad lo pinta y lo enlaza
+               (ids intactos). -->
           <button type="button"
                   class="city-bar"
                   id="btnCiudad"
@@ -663,11 +689,12 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
 
         </div>
 
-        <!-- R65 · BLOQUE DE ITEMS · "Compartir lista" y el aviso
-             sin resultados viven DENTRO del bloque de los items
-             (scrollean con la lista): ya no son sección filtro.
-             Lista_Script enciende el botón con items y le
-             escribe la cantidad; Compartir_Script lleva el envío. -->
+        <!-- R65 · BLOQUE DE ITEMS · el botón "Compartir lista"
+             y el aviso sin resultados viven DENTRO del bloque de
+             los items (scrollean con la lista): ya no son sección
+             filtro. Lista_Script enciende el botón con items y le
+             escribe la cantidad; Compartir_Script lleva el envío.
+             En modo compartido no aplica. -->
         <div class="secciones-wrap">
           <button type="button" class="btn-compartir" id="btnCompartir"
                   aria-label="Compartir lista" hidden disabled>
@@ -730,7 +757,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Filtros_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>

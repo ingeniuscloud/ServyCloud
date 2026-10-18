@@ -25,16 +25,36 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  lista pinta items, se OCULTA cuando no y en cada
                  repintado le escribe la CANTIDAD de items al
                  lado (Compartir_Script lleva el envío).
-                 La lista es PLANA (R58): el orden es el de la
-                 hoja. Modo lista ↔ detalle con fade y botón
+                 ORDENAMIENTO (R66): la lista ya no es siempre
+                 plana — escucha 'orden:change' (lo emite
+                 Ordenar, el sheet del botón ordenar) y aplica
+                 el orden elegido a lo que llegue del filtro:
+                 recomendado (el orden de la hoja, el de
+                 siempre), nombre A→Z / Z→A (título), categoría
+                 (agrupa por su GRUPO con cabecera visible entre
+                 bloques), más compartidos (post.comparte, ceros
+                 al final) y mejor valorados (post.like, ceros
+                 al final). El orden es de sesión.
+                 Modo lista ↔ detalle con fade y botón
                  volver. Skeleton del detalle mientras carga la
                  primera vez un post (PostFull). Precarga del
                  primer post de la lista filtrada para que el
                  primer tap sea instantáneo. Los posts que están
                  activos como promo siguen apareciendo en la
                  lista (no se excluyen).
-VERSIÓN:         2.4
-CAMBIOS:         R65: actualizarCompartir(cantidad) ahora también
+VERSIÓN:         2.5
+CAMBIOS:         R66: entra el ORDENAMIENTO — escuchar 'orden:change'
+                 (Ordenar, Filtros_Sheet_Script) y aplicar el
+                 orden en cada repintado: aplicarOrden() ordena
+                 lo que llegue del filtro (recomendado = el
+                 orden de la hoja; nombre A→Z/Z→A por título;
+                 categoría agrupa por SU GRUPO e intercala la
+                 cabecera .lista-grupo-header — estilos en
+                 Lista_CSS — entre bloques; más compartidos por
+                 post.comparte y mejor valorados por post.like,
+                 ambos con ceros al final); el orden es de
+                 SESIÓN (sin storage) y el API expone getOrden().
+                 R65: actualizarCompartir(cantidad) ahora también
                  ESCRIBE la cantidad en el botón — "Compartir
                  lista (N)" — y el botón/aviso viven en el BLOQUE
                  de items (el markup se movió a .secciones-wrap
@@ -81,6 +101,12 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     var chipActivoActual = null;
     var modo = 'lista';
 
+    /* R66 · ORDEN ACTIVO de la vidriera ('recomendado' = el
+       orden de la hoja). Lo fija el sheet de ordenamiento vía
+       'orden:change'. Es de SESIÓN: al recargar vuelve al
+       recomendado. */
+    var ordenActual = 'recomendado';
+
     var scrollListaPrevio = 0;
 
     var DURACION_FADE_MS = 200;
@@ -125,6 +151,71 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         if (grupos[i].idGrupo === idGrupo) return grupos[i].titulo || '';
       }
       return '';
+    }
+
+    /* R66 · Título del PRIMER grupo del post ('' si no
+       tiene) — la clave del orden por categoría. */
+    function tituloGrupoDe(post) {
+      var grupos = post && post.idGrupo;
+      if (!grupos || !grupos.length) return '';
+      return nombreGrupo(grupos[0]);
+    }
+
+    function tituloDe(post) {
+      return String((post && (post.titulo || post.boton || post.id)) || '');
+    }
+
+    function compararTexto(a, b) {
+      return a.localeCompare(b, 'es', { sensitivity: 'base' });
+    }
+
+    /* ============================================================
+       ORDENAMIENTO (R66) · aplica el orden activo a lo que
+       llegue del filtro (chip o búsqueda). El array original
+       NUNCA se muta (se ordena una copia) y 'recomendado'
+       devuelve el orden tal cual (el de la hoja).
+       · nombre-asc / nombre-desc: por título (es, sin acentos).
+       · categoria: por SU GRUPO (A→Z); los sin grupo van al
+         final, y dentro de cada bloque manda el título.
+       · compartido: post.comparte MAYOR→menor (ceros quedan
+         al final solos, orden del dueño).
+       · valoracion: post.like MAYOR→menor (ceros al final).
+       ============================================================ */
+    function aplicarOrden(arr) {
+      if (!arr || arr.length < 2) return arr;
+
+      if (ordenActual === 'nombre-asc' || ordenActual === 'nombre-desc') {
+        var dir = (ordenActual === 'nombre-asc') ? 1 : -1;
+        return arr.slice().sort(function (a, b) {
+          return dir * compararTexto(tituloDe(a), tituloDe(b));
+        });
+      }
+
+      if (ordenActual === 'categoria') {
+        return arr.slice().sort(function (a, b) {
+          var ga = tituloGrupoDe(a);
+          var gb = tituloGrupoDe(b);
+          if (ga && !gb) return -1;
+          if (!ga && gb) return 1;
+          var g = compararTexto(ga, gb);
+          if (g !== 0) return g;
+          return compararTexto(tituloDe(a), tituloDe(b));
+        });
+      }
+
+      if (ordenActual === 'compartido') {
+        return arr.slice().sort(function (a, b) {
+          return (Number(b.comparte) || 0) - (Number(a.comparte) || 0);
+        });
+      }
+
+      if (ordenActual === 'valoracion') {
+        return arr.slice().sort(function (a, b) {
+          return (Number(b.like) || 0) - (Number(a.like) || 0);
+        });
+      }
+
+      return arr;   /* recomendado · el orden de la hoja */
     }
 
     function marcaDePartner(partner) {
@@ -376,9 +467,13 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       if (wrap) wrap.scrollTop = 0;
     }
 
-    function pintarLista(lista, modoBusqueda, enLimite) {
+    function pintarLista(listaParam, modoBusqueda, enLimite) {
       var cont = document.getElementById('listaWrap');
       if (!cont) return;
+
+      /* R66 · el orden activo se aplica SIEMPRE (recomendado
+         deja el array tal cual): chip y búsqueda pasan por aquí. */
+      var lista = aplicarOrden(listaParam);
 
       /* R64 · compartir vive con items: visible solo si la
          lista trae algo (chip o búsqueda, da igual el modo). */
@@ -457,14 +552,28 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         return btn;
       }
 
-      /* R58 · LISTA PLANA: el orden es el de la hoja (TABLAS),
-         sin cabeceras de grupo — el rótulo "Explorar" (Index)
-         encabeza la vidriera y el agrupado por grupo volverá
-         como opción del FILTRO (pendiente del dueño). Nadie
-         desaparece: se renderiza TODO lo que llega del filtro. */
+      /* R66 · se renderiza TODO lo que llega del filtro, con el
+         ORDEN activo aplicado. Con "Por categoría" el agrupado
+         ES el orden: se intercala una cabecera
+         .lista-grupo-header al abrir cada bloque de grupo (los
+         sin grupo van bajo "Otros", al final). */
       var renderizados = [];
+      var bloqueActual = null;
+      var agrupando = (ordenActual === 'categoria');
 
       lista.forEach(function (post) {
+        if (agrupando) {
+          var grupo = tituloGrupoDe(post) || 'Otros';
+          if (grupo !== bloqueActual) {
+            bloqueActual = grupo;
+
+            var h = document.createElement('div');
+            h.className = 'lista-grupo-header';
+            h.textContent = grupo;
+            frag.appendChild(h);
+          }
+        }
+
         frag.appendChild(montarItem(post));
         renderizados.push(post);
       });
@@ -635,6 +744,10 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
     function getModo() { return modo; }
 
+    /* R66 · orden activo de la vidriera ('recomendado' al
+       arrancar; lo fija el sheet de ordenamiento). */
+    function getOrden() { return ordenActual; }
+
     /* ============================================================
        Eventos
        ============================================================ */
@@ -660,6 +773,26 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       /* R64: el estado .buscando murió (el campo vive expandido):
          basta con que el campo tenga texto para repintar la
          búsqueda en la ciudad nueva. */
+      var input = document.getElementById('buscarInput');
+      if (input && input.value.trim()) {
+        pintarBusqueda(input.value.trim(), false);
+      } else {
+        pintar(chipActivoActual, null);
+      }
+    });
+
+    /* ============================================================
+       R66 · ORDEN:change · el sheet de ordenamiento fijó otro
+       orden: se recuerda y se repinta la vista VIVA (búsqueda
+       si el campo tiene texto, chip si no) — mismo patrón de
+       ciudad:change. Con detalle abierto, el detalle se cierra
+       (la lista es la que ordena).
+       ============================================================ */
+    document.addEventListener('orden:change', function (e) {
+      ordenActual = (e.detail && e.detail.orden) || 'recomendado';
+
+      if (modo === 'detalle') cerrarDetalle(false);
+
       var input = document.getElementById('buscarInput');
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
@@ -699,6 +832,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       seleccionar:    seleccionar,
       getPostActivo:  getPostActivo,
       getModo:        getModo,
+      getOrden:       getOrden,
       abrirDetalle:   abrirDetalle,
       cerrarDetalle:  cerrarDetalle
     };

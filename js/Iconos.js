@@ -9,9 +9,22 @@ RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  con [data-glifo="clave"]. Al cargar el DOM, pinta
                  todos los data-glifo del documento automáticamente.
 
-                 Catálogo: 27 glifos EN USO confirmado.
-VERSIÓN:         1.9
-CAMBIOS:         R64: FUERA campana (su consumidor, la campanita
+                 Catálogo: 30 glifos EN USO confirmado.
+VERSIÓN:         2.0
+CAMBIOS:         R66: entra ORDENAR — el glifo del botón que abre
+                 el sheet de ordenamiento (3 líneas horizontales
+                 que se acortan, SVG que trajo el dueño); FUERA el
+                 glifo filtro (su único consumidor era #btnFiltro
+                 y el término se jubiló con la ronda: ahora es
+                 #btnOrdenar). Entran con él los glifos de las
+                 OPCIONES del sheet: alfabeto (flechas sube/baja
+                 para Nombre A→Z y Z→A), grupos (rejilla 2×2 para
+                 Por categoría) y lista (3 líneas iguales para
+                 Recomendado, el orden original). El check de la
+                 opción activa reutiliza verificado; Más
+                 compartidos reutiliza share y Mejor valorados
+                 reutiliza estrella.
+                 R64: FUERA campana (su consumidor, la campanita
                  de la promo card, murió en R62 — nadie la llama);
                  verificado cambió de consumidor: ahora viste el
                  banner "app ya instalada" de la ayuda de
@@ -25,15 +38,12 @@ CAMBIOS:         R64: FUERA campana (su consumidor, la campanita
                  ayuda de instalación del menú global — el dueño
                  pidió la guía en sus 2 versiones).
                  R62: entran servicio y cursos (iconos de los
-                 chips de la vidriera) y filtro (el botón de
-                 filtros: 3 líneas verticales con su deslizador,
-                 diseño del dueño; #btnFiltro lo llama con
-                 data-glifo — fuera el svg hardcodeado de Index).
-                 Salen vistaLista y vistaMiniatura (la fila
-                 "Explorar" y sus tipos de vista se eliminaron en
-                 esa ronda) y flechaAcordeon (su último consumidor
-                 era el chevron del botón ciudad, retirado
-                 también en R62).
+                 chips de la vidriera). Salen vistaLista y
+                 vistaMiniatura (la fila "Explorar" y sus tipos
+                 de vista se eliminaron en esa ronda) y
+                 flechaAcordeon (su último consumidor era el
+                 chevron del botón ciudad, retirado también en
+                 R62).
                  R58: glifo verificado — círculo relleno en
                  currentColor con palomita blanca.
                  R55: glifos estrella (métrica pasiva de
@@ -55,10 +65,19 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
     flecha:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     flechaVer:      "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
 
-    /* ---------- Chips de la vidriera y filtros (R62) ---------- */
+    /* ---------- Chips de la vidriera (R62) ---------- */
     servicio:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.7%206.3a1%201%200%200%200%200%201.4l1.6%201.6a1%201%200%200%200%201.4%200l3.77-3.77a6%206%200%200%201-7.94%207.94l-6.91%206.91a2.12%202.12%200%200%201-3-3l6.91-6.91a6%206%200%200%201%207.94-7.94l-3.76%203.76z%22%2F%3E%3C%2Fsvg%3E",
     cursos:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%203h6a4%204%200%200%201%204%204v14a3%203%200%200%200-3-3H2z%22%2F%3E%3Cpath%20d%3D%22M22%203h-6a4%204%200%200%200-4%204v14a3%203%200%200%201%203-3h7z%22%2F%3E%3C%2Fsvg%3E",
-    filtro:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%224%22%20y1%3D%2221%22%20x2%3D%224%22%20y2%3D%2214%22%2F%3E%3Cline%20x1%3D%224%22%20y1%3D%2210%22%20x2%3D%224%22%20y2%3D%223%22%2F%3E%3Ccircle%20cx%3D%224%22%20cy%3D%2212%22%20r%3D%222%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%2221%22%20x2%3D%2212%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%228%22%20x2%3D%2212%22%20y2%3D%223%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2210%22%20r%3D%222%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22%2F%3E%3Cline%20x1%3D%2220%22%20y1%3D%2221%22%20x2%3D%2220%22%20y2%3D%2216%22%2F%3E%3Cline%20x1%3D%2220%22%20y1%3D%2212%22%20x2%3D%2220%22%20y2%3D%223%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2214%22%20r%3D%222%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22%2F%3E%3C%2Fsvg%3E",
+    /* ---------- Ordenamiento (R66) ---------- */
+    /* ordenar: botón #btnOrdenar (SVG del dueño: 3 líneas que
+       se acortan). lista/grupos/alfabeto: opciones del sheet
+       de ordenamiento (Recomendado / Por categoría / Nombre
+       A-Z y Z-A). El check activo reutiliza verificado; las
+       métricas reutilizan share y estrella. */
+    ordenar:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%223%22%20y1%3D%226%22%20x2%3D%2221%22%20y2%3D%226%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%2212%22%20x2%3D%2218%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2218%22%20x2%3D%2214%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",
+    lista:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%224%22%20y1%3D%226%22%20x2%3D%2220%22%20y2%3D%226%22%2F%3E%3Cline%20x1%3D%224%22%20y1%3D%2212%22%20x2%3D%2220%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%224%22%20y1%3D%2218%22%20x2%3D%2220%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",
+    grupos:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%227%22%20height%3D%227%22%20x%3D%223%22%20y%3D%223%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%227%22%20x%3D%2214%22%20y%3D%223%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%227%22%20x%3D%2214%22%20y%3D%2214%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%227%22%20x%3D%223%22%20y%3D%2214%22%20rx%3D%221%22%2F%3E%3C%2Fsvg%3E",
+    alfabeto:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m21%2016-4%204-4-4%22%2F%3E%3Cpath%20d%3D%22M17%2020V4%22%2F%3E%3Cpath%20d%3D%22m3%208%204-4%204%204%22%2F%3E%3Cpath%20d%3D%22M7%204v16%22%2F%3E%3C%2Fsvg%3E",
 
     /* ---------- Contacto y redes ---------- */
     whatsapp:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.472%2014.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94%201.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198%200-.52.074-.792.372-.272.297-1.04%201.016-1.04%202.479%200%201.462%201.065%202.875%201.213%203.074.149.198%202.096%203.2%205.077%204.487.709.306%201.262.489%201.694.625.712.227%201.36.195%201.871.118.571-.085%201.758-.719%202.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421%207.403h-.004a9.87%209.87%200%2001-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86%209.86%200%2001-1.51-5.26c.001-5.45%204.436-9.884%209.888-9.884%202.64%200%205.122%201.03%206.988%202.898a9.825%209.825%200%20012.893%206.994c-.003%205.45-4.437%209.884-9.885%209.884m8.413-18.297A11.815%2011.815%200%200012.05%200C5.495%200%20.16%205.335.157%2011.892c0%202.096.547%204.142%201.588%205.945L.057%2024l6.305-1.654a11.882%2011.882%200%20005.683%201.448h.005c6.554%200%2011.89-5.335%2011.893-11.893a11.821%2011.821%200%2000-3.48-8.413z%22/%3E%3C/svg%3E",

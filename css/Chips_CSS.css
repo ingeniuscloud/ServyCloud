@@ -11,29 +11,40 @@ RESPONSABILIDAD: CSS de la pantalla principal. FILA DE CABECERA
                  · FILA 1: campo BUSCAR EXPANDIDO de una vez
                    (blanco, cápsula redonda con lupa dentro y la
                    X circular NARANJA para limpiar, que solo se
-                   ve al escribir) + BOTÓN FILTRO a la derecha
-                   (círculo con el glifo de Iconos, sin acción
-                   por ahora).
+                   ve al escribir) + BOTÓN ORDENAR a la derecha
+                   (círculo con el glifo de Iconos; abre el
+                   sheet de ordenamiento — R66).
                  · FILA 2: los CHIPS (botones independientes, el
                    SELECCIONADO con fondo NARANJA oficial y los
                    otros sin fondo) y el BOTÓN CIUDAD
                    (pin + nombre, en Ciudad_Sheet_CSS)
                    repartiéndose la fila en partes iguales, SIN
                    números de items.
-                 Debajo, en el respiro entre filtros y lista, el
-                 TEXTO "Compartir lista filtrada" (Lista_Script
-                 lo muestra cuando la lista trae items). Aviso de
-                 búsqueda sin resultados. Modo compartido
-                 (recepción de un enlace): chips/ciudad/filtro y
-                 compartir fuera, campo fijado SIN foco y la X
-                 libera la vista (Compartir.limpiar). El header
+                 El bloque de items (Compartir lista + aviso sin
+                 resultados) vive en .secciones-wrap desde R65:
+                 sus estilos están en Lista_CSS. Modo compartido
+                 (recepción de un enlace): chips/ciudad/ordenar
+                 fuera, campo fijado SIN foco y la X libera la vista (Compartir.limpiar). El header
                  del detalle lo decide el TIPO de enlace
                  (Compartir marca el body): un post compartido
                  usa el campo en lugar de volver/título; una
                  lista compartida vuelve al par volver/título
                  dentro de cada post.
-VERSIÓN:         2.2
-CAMBIOS:         R65: el borde del MENÚ GLOBAL vuelve al suyo
+VERSIÓN:         2.3
+CAMBIOS:         R66: el BOTÓN FILTRO se jubila con su término —
+                 ahora es el BOTÓN ORDENAR (.btn-ordenar,
+                 #btnOrdenar): mismo círculo, glifo nuevo (3
+                 líneas que se acortan) y acción real: abre el
+                 sheet de ordenamiento (Filtros_Sheet_Script);
+                 cuando hay un orden distinto del original luce
+                 el PUNTO NARANJA (.con-orden) como lo hacen las
+                 apps populares. La X de limpiar SUBE SU GLIFO:
+                 el trazo dentro del círculo pasa de 16 a 18px
+                 (el dueño: "la X de adentro se ve muy pequeña").
+                 La sección filtro RESPIRA: la fila 1 baja su
+                 margen superior a 14px y la fila 2 estira su
+                 respiro inferior a 16px.
+                 R65: el borde del MENÚ GLOBAL vuelve al suyo
                  (1.2px #475569 — era especial y R64 se lo llevó
                  el barrido de bordes suaves); los bordes de los
                  OTROS botones suben un tono (#cbd5e1) porque en
@@ -63,15 +74,6 @@ CAMBIOS:         R65: el borde del MENÚ GLOBAL vuelve al suyo
                  R63: .filtros-fila ganó espacio de respiro
                  abajo (los botones ya no quedan pegados a los
                  items).
-                 R62: los chips son botones independientes (sin
-                 cápsula contenedora), cada uno con su ICONO; el
-                 BOTÓN FILTRO lleva el glifo filtro de Iconos
-                 (fuera el svg hardcodeado); la ciudad se retiró
-                 de la cabecera hacia la sección de filtros.
-                 R61: COMPARTIR como TEXTO con subrayado
-                 punteado (fuera de la fila).
-                 R58: los chips salieron del wrap como control
-                 debajo de las promos.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; .city-bar vive en Ciudad_Sheet_CSS)
 ════════════════════════════════════════════════════════════════════*/
@@ -132,15 +134,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     SECCIÓN FILTROS · FILA 1 (R64) · campo buscar + filtro
+     SECCIÓN FILTROS · FILA 1 (R64) · campo buscar + ordenar
      El campo vive EXPANDIDO de una vez (sin estados de
-     apertura) y el botón filtro lo escolta a la derecha.
+     apertura) y el botón ordenar lo escolta a la derecha.
      Aire arriba (bajo las promos) y abajo (antes de la fila 2).
      ============================================================ */
   .filtros-fila {
     flex-shrink: 0;
     width: auto;
-    margin: 8px 14px 0;
+    margin: 14px 14px 0;
 
     display: flex;
     align-items: center;
@@ -160,7 +162,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .filtros-fila-dos {
     flex-shrink: 0;
     width: auto;
-    margin: 8px 14px 12px;
+    margin: 8px 14px 16px;
 
     display: flex;
     align-items: stretch;
@@ -260,13 +262,18 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     BOTÓN FILTRO (R64) · derecha del campo buscar
-     Círculo con embudo, misma altura que el campo. SIN acción
-     todavía (el dueño lo pidió así); en modo compartido se
-     retira junto con la fila 2.
+     BOTÓN ORDENAR (R66) · derecha del campo buscar
+     Círculo con el glifo ordenar (3 líneas que se acortan,
+     SVG del dueño). ABRE el sheet de ordenamiento
+     (Filtros_Sheet_Script). Cuando el orden activo NO es el
+     original, el PUNTO naranja (.con-orden, lo enciende
+     Ordenar) avisa como en las apps populares. En modo
+     compartido se retira junto con la fila 2.
      ============================================================ */
-  .btn-filtro {
+  .btn-ordenar {
     flex: 0 0 auto;
+
+    position: relative;
 
     width: 42px;
     height: 42px;
@@ -288,12 +295,34 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     transition: opacity 0.15s ease;
   }
 
-  .btn-filtro:active { opacity: 0.5; }
+  .btn-ordenar:active { opacity: 0.5; }
 
-  /* El glifo filtro vive en Iconos y se autoviste (sus líneas
-     y su deslizador traen fill/stroke propios en el data URL)
-     — aquí SOLO se mide, sin forzar fill/stroke. */
-  .btn-filtro svg {
+  /* Punto indicador · hay un orden distinto del original */
+  .btn-ordenar::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+
+    background: #f97316;
+    border: 2px solid #ffffff;
+
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .btn-ordenar.con-orden::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* El glifo ordenar vive en Iconos y se autoviste (trae
+     stroke propio en el data URL) — aquí SOLO se mide. */
+  .btn-ordenar svg {
     width: 17px;
     height: 17px;
     display: block;
@@ -415,8 +444,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .buscar-limpiar:active { opacity: 0.75; }
 
   .buscar-limpiar svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     fill: none;
     stroke: #ffffff;
     stroke-width: 2.4;
@@ -445,7 +474,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      ============================================================ */
   body.modo-compartido .filtros-fila-dos { display: none !important; }
 
-  .filtros-fila.compartida .btn-filtro { display: none; }
+  .filtros-fila.compartida .btn-ordenar { display: none; }
 
   .filtros-fila.compartida .buscar-capsula {
     border-color: #cbd5e1;
@@ -494,18 +523,19 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .filtros-fila     { gap: 6px; margin: 6px 12px 0; }
-    .filtros-fila-dos { gap: 6px; margin: 7px 12px 10px; }
+    .filtros-fila     { gap: 6px; margin: 10px 12px 0; }
+    .filtros-fila-dos { gap: 6px; margin: 7px 12px 13px; }
     .filtros { gap: 6px; flex-basis: calc((100% - 12px) / 3 * 2 + 6px); }
     .chip    { font-size: 12.5px; padding: 8px 8px 9px; }
     .chip .chip-icono { width: 14px; height: 14px; }
     .menu-global { width: 32px; height: 32px; margin-right: 8px; }
     .menu-global svg { width: 18px; height: 18px; }
-    .btn-filtro { width: 38px; height: 38px; }
-    .btn-filtro svg { width: 15px; height: 15px; }
+    .btn-ordenar { width: 38px; height: 38px; }
+    .btn-ordenar svg { width: 15px; height: 15px; }
+    .btn-ordenar::after { width: 8px; height: 8px; top: 3px; right: 3px; }
     .buscar-capsula { height: 38px; }
     .buscar-input { font-size: 14px; }
     .buscar-input-wrap { padding: 0 6px 0 12px; }
     .buscar-limpiar { width: 25px; height: 25px; }
-    .buscar-limpiar svg { width: 14px; height: 14px; }
+    .buscar-limpiar svg { width: 16px; height: 16px; }
   }

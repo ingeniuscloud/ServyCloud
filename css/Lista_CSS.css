@@ -27,8 +27,14 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.3
-CAMBIOS:         R65: el bloque de items RECIBE a dos piezas que
+VERSIÓN:         2.4
+CAMBIOS:         R66: entra la CABECERA DE GRUPO (.lista-grupo-
+                 header): con el orden "Por categoría"
+                 (Filtros_Sheet) Lista_Script intercala el
+                 rótulo del grupo al abrir cada bloque —
+                 mayúsculas pequeñas, gris tenue, sin ruido; el
+                 primero no necesita aire arriba.
+                 R65: el bloque de items RECIBE a dos piezas que
                  ya no son sección filtro: "Compartir lista"
                  (antes "Compartir lista filtrada", en Chips_CSS)
                  con la CANTIDAD de items al lado — Compartir
@@ -261,6 +267,28 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .btn-compartir { font-size: 13px; padding: 3px 4px 5px 16px; }
     .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
   }
+
+  /* ============================================================
+     CABECERA DE GRUPO (R66) · con el orden "Por categoría"
+     Lista_Script intercala esta etiqueta al abrir cada bloque
+     de grupo: ROTULO pequeño, en mayúsculas y gris tenue —
+     separa bloques sin hacer ruido (mismo idioma discreto de
+     la línea tenue de los items). El primer rótulo no necesita
+     aire arriba: la lista ya lo trae.
+     ============================================================ */
+  .lista-grupo-header {
+    padding: 12px 18px 4px;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    text-align: left;
+
+    user-select: none;
+  }
+  .lista-grupo-header:first-child { padding-top: 4px; }
 
   /* ============================================================
      LISTA ITEM · LIMPIO (R64)

@@ -20,8 +20,11 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.20
-CAMBIOS:         R65: el DEGRADADO de la pantalla principal se
+VERSIÓN:         1.21
+CAMBIOS:         R66: arrancarComponentes() liga #btnOrdenar —
+                 window.Ordenar.engancharBoton() (el sheet de
+                 ordenamiento del botón de la fila 1).
+                 R65: el DEGRADADO de la pantalla principal se
                  corta donde termina la sección filtro — blanco
                  arriba (0–5%), tinte #fdf3ec en su pico (15%)
                  y desde la zona de filtros vuelve a degradar a
@@ -1009,6 +1012,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     function arrancarComponentes() {
       if (window.Ciudad && typeof window.Ciudad.engancharBoton === 'function') {
         window.Ciudad.engancharBoton();
+      }
+
+      /* R66: liga #btnOrdenar (abre el sheet de ordenamiento) */
+      if (window.Ordenar && typeof window.Ordenar.engancharBoton === 'function') {
+        window.Ordenar.engancharBoton();
       }
 
       if (window.Chips && typeof window.Chips.pintar === 'function') {
