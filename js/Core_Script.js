@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_Script.html
-ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                  WhatsApp o el sheet de reserva.
@@ -20,8 +20,19 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.21
-CAMBIOS:         R66: arrancarComponentes() liga #btnOrdenar —
+VERSIÓN:         1.22
+CAMBIOS:         R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
+                 a petición del dueño): el clarito #fdf3ec
+                 COMIENZA en la parte superior de la pantalla
+                 principal (0–12% plano) y degrada a BLANCO
+                 terminando debajo de las promos (~34%); blanco
+                 puro hasta la franja de abajo del navegador. En
+                 PWA la misma condición (manifest + theme-color
+                 a juego, en Index/manifest). El degradado
+                 anterior (R65/R66) queda COMENTADO dentro de
+                 pintarAreaConPost para revertirlo en una
+                 jugada. Stops calibrados en laboratorio (390px).
+                 R66: arrancarComponentes() liga #btnOrdenar —
                  window.Ordenar.engancharBoton() (el sheet de
                  ordenamiento del botón de la fila 1).
                  R65: el DEGRADADO de la pantalla principal se
@@ -499,14 +510,30 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!area) return;
 
       if (!post) {
-        /* R65 · fondo de la PANTALLA PRINCIPAL: la subida
-           blanco → tinte #fdf3ec queda EXACTA como estaba
-           (franja blanca 0–5%, pico del tinte al 15%) y lo
-           NUEVO es la bajada: desde la zona de la sección
-           filtro el tinte vuelve a degradar a BLANCO (24–36%)
-           y ese blanco queda para el resto de la pantalla
-           (orden del dueño: el naranja ya no se estira hasta
-           abajo). El detalle sigue con su colorClaro. */
+        /* R67 · EXPERIMENTO LIENZO CASHEA/YUMMY (reversible):
+           el clarito #fdf3ec COMIENZA en la parte superior
+           (0–12% plano, como el clarito de Cashea/Yummy detrás
+           de su cabecera) y DEGRADA a BLANCO terminando debajo
+           de las promos (34%); de ahí en adelante blanco puro
+           hasta la franja de abajo del navegador (el body
+           is-mobile ya es blanco y viewport-fit=cover lo
+           estira bajo la home bar). En PWA la misma condición:
+           manifest theme_color #fdf3ec + splash blanco.
+           REVERSIÓN (si el dueño lo pide): devolver el
+           degradado de R65/R66 que está COMENTADO abajo —
+           una línea, sin tocar nada más. Stops calibrados
+           en el laboratorio (390×844): promos 5–21%,
+           filtros 22–27%, items 34% → el clarito acompaña
+           cabecera + promos + filtros y alcanza el BLANCO
+           justo antes de la lista. El detalle sigue con su
+           colorClaro (intacto). */
+        area.style.background =
+          'linear-gradient(180deg, ' +
+            '#fdf3ec 0%, ' +
+            '#fdf3ec 10%, ' +
+            '#ffffff 28%, ' +
+            '#ffffff 100%)';
+        /* REVERSIÓN R65/R66 (blanco arriba → tinte en filtros):
         area.style.background =
           'linear-gradient(180deg, ' +
             '#ffffff 0%, ' +
@@ -515,6 +542,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
             '#fdf3ec 24%, ' +
             '#ffffff 36%, ' +
             '#ffffff 100%)';
+        */
         area.style.removeProperty('--post-color');
         return;
       }

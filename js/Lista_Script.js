@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_Script.html
-ESPEJO GITHUB:   js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  ciudad activa + chip activo, sobre TABLAS.posts
@@ -42,9 +42,11 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  primer tap sea instantáneo. Los posts que están
                  activos como promo siguen apareciendo en la
                  lista (no se excluyen).
-VERSIÓN:         2.5
-CAMBIOS:         R66: entra el ORDENAMIENTO — escuchar 'orden:change'
-                 (Ordenar, Filtros_Sheet_Script) y aplicar el
+VERSIÓN:         2.6
+CAMBIOS:         R67: comentario — el sheet se renombra a
+                 Orden_Sheet_* (orden del dueño). Sin lógica.
+                 R66: entra el ORDENAMIENTO — escuchar 'orden:change'
+                 (Ordenar, Orden_Sheet_Script) y aplicar el
                  orden en cada repintado: aplicarOrden() ordena
                  lo que llegue del filtro (recomendado = el
                  orden de la hoja; nombre A→Z/Z→A por título;

@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Chips_CSS.html
-ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS de la pantalla principal. FILA DE CABECERA
                  (R63): volver + TÍTULO DEL HEADER + título de
@@ -30,12 +30,15 @@ RESPONSABILIDAD: CSS de la pantalla principal. FILA DE CABECERA
                  usa el campo en lugar de volver/título; una
                  lista compartida vuelve al par volver/título
                  dentro de cada post.
-VERSIÓN:         2.3
-CAMBIOS:         R66: el BOTÓN FILTRO se jubila con su término —
+VERSIÓN:         2.4
+CAMBIOS:         R67: el sheet del ordenamiento se renombra:
+                 Filtros_Sheet_* pasa a Orden_Sheet_* (orden del
+                 dueño). Aquí solo cambia el comentario.
+                 R66: el BOTÓN FILTRO se jubila con su término —
                  ahora es el BOTÓN ORDENAR (.btn-ordenar,
                  #btnOrdenar): mismo círculo, glifo nuevo (3
                  líneas que se acortan) y acción real: abre el
-                 sheet de ordenamiento (Filtros_Sheet_Script);
+                 sheet de ordenamiento (Orden_Sheet_Script);
                  cuando hay un orden distinto del original luce
                  el PUNTO NARANJA (.con-orden) como lo hacen las
                  apps populares. La X de limpiar SUBE SU GLIFO:
@@ -265,7 +268,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      BOTÓN ORDENAR (R66) · derecha del campo buscar
      Círculo con el glifo ordenar (3 líneas que se acortan,
      SVG del dueño). ABRE el sheet de ordenamiento
-     (Filtros_Sheet_Script). Cuando el orden activo NO es el
+     (Orden_Sheet_Script). Cuando el orden activo NO es el
      original, el PUNTO naranja (.con-orden, lo enciende
      Ordenar) avisa como en las apps populares. En modo
      compartido se retira junto con la fila 2.

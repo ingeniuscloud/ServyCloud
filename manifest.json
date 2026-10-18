@@ -1,13 +1,13 @@
 {
-  "_version": "2.0",
+  "_version": "2.1",
   "name": "ServyCloud",
   "short_name": "ServyCloud",
   "description": "ServyCloud en tu teléfono",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#ffffff",
+  "theme_color": "#fdf3ec",
   "icons": [
     {
       "src": "./icon-192.png",

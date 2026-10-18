@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_CSS.html
-ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
@@ -27,10 +27,12 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.4
-CAMBIOS:         R66: entra la CABECERA DE GRUPO (.lista-grupo-
+VERSIÓN:         2.5
+CAMBIOS:         R67: comentario — el sheet se renombra a
+                 Orden_Sheet_* (orden del dueño). Sin estilos.
+                 R66: entra la CABECERA DE GRUPO (.lista-grupo-
                  header): con el orden "Por categoría"
-                 (Filtros_Sheet) Lista_Script intercala el
+                 (Orden_Sheet) Lista_Script intercala el
                  rótulo del grupo al abrir cada bloque —
                  mayúsculas pequeñas, gris tenue, sin ruido; el
                  primero no necesita aire arriba.

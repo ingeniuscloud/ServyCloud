@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Promo_Script.html
-ESPEJO GITHUB:   js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   github/js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  del scroll en modo lista. Se oculta en modo
@@ -46,8 +46,14 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  cambie de color). El encabezado "Promos cerca de
                  ti" + "Toca para conocer más" se muestra/oculta
                  junto con el slot.
-VERSIÓN:         2.3
-CAMBIOS:         R62: el DEGRADADO sale del colorOficial del
+VERSIÓN:         2.4
+CAMBIOS:         R67: FIX del pool de promos — el PROMOJSON real
+                 trae porCiudad como OBJETO (idPostActual, la
+                 rotación la lleva el backend) y construir()
+                 esperaba un ARRAY: la marquesina se apagaba en
+                 silencio con la hoja actual. Ahora se normaliza
+                 el formato antes de filtrar.
+                 R62: el DEGRADADO sale del colorOficial del
                  post — estiloDegradado() deriva claro/oscuro
                  desde el hex de la BD (mix con blanco/negro) y
                  pinta background + boxShadow en línea; FUERA la
@@ -70,8 +76,8 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  Chips_Script.html (getChipActivo, seleccionar),
                  Iconos.html (pintarGlifos), Promo_CSS.html,
                  Lista_CSS.html (clase .lista-item compartida)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
+
   window.Promo = (function () {
 
     var track = null;
@@ -245,7 +251,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     /* TEXTO DE LA PROMO (R60) · la esencia del mensaje. Se lee
        del item de PROMOJSON (texto, con variantes por si la hoja
        usa otro nombre) y como respaldo del promoTexto que el
-       índice del catálogo trae desde PostDetalle (Cache.gs).
+       índice del catálogo trae desde PostDetalle (02 Cache.gs).
        R61: este texto ES el título de la tarjeta. */
     function textoDePromo(item, post) {
       var campos = ['texto', 'promoTexto', 'descripcion', 'mensaje'];
@@ -440,15 +446,29 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       var ciudad = ciudadActiva();
       if (!ciudad) return;
 
-      var pool = (promo.porCiudad && promo.porCiudad[ciudad]) || [];
+      var raw  = (promo.porCiudad && promo.porCiudad[ciudad]) || null;
+      /* R67 · FIX: el PROMOJSON real de la hoja trae porCiudad
+         como OBJETO (idPostActual + proximaRotación — la rotación
+         la lleva el backend), no como array. Antes el pool
+         quedaba en el objeto y la marquesina se APAGABA en
+         silencio (if (!pool.length) return). Se normalizan los
+         DOS formatos antes de filtrar vigentes. */
+      var pool = [];
+      if (Array.isArray(raw)) {
+        pool = raw;
+      } else if (raw && (raw.idPost || raw.idPostActual)) {
+        pool = [raw];
+      }
       if (!pool.length) return;
 
       /* Filtrar por fecha + estado del post */
       var vigentes = [];
       pool.forEach(function (item) {
-        if (!item || !item.idPost) return;
+        if (!item) return;
+        var idPost = item.idPost || item.idPostActual;
+        if (!idPost) return;
         if (!estaVigente(item)) return;
-        var post = buscarPost(item.idPost);
+        var post = buscarPost(idPost);
         if (!post) return;
         if (post.estado !== 'activo') return;
         vigentes.push({ item: item, post: post });

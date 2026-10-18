@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Ciudad_Sheet_Script.html
-ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  localStorage (app_ciudad). Si no existe, abre
@@ -25,8 +25,15 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  Promos destacada); al tocar, aplicar + cerrar
                  como siempre. Las métricas siguen calculándose
                  con TABLAS.posts y SISTEMA.promo.
-VERSIÓN:         1.7
-CAMBIOS:         R65: pintarContenido() cambia de MODELO — fuera
+VERSIÓN:         1.8
+CAMBIOS:         R67: FIX de métricas — el PROMOJSON real trae
+                 porCiudad como OBJETO (idPostActual, el mismo
+                 que lee Promo_Script) y metricasDe llamaba
+                 forEach sobre él: la excepción congelaba el
+                 sheet (aviso de cookies pegado, sin lista de
+                 ciudades). Ahora se normaliza el formato (array
+                 u objeto) antes de contar.
+                 R65: pintarContenido() cambia de MODELO — fuera
                  la rejilla 2 columnas con punto de selección
                  (el dueño lo vio plano); entra el stack
                  vertical: .ciudad-card-top con nombre en
@@ -181,13 +188,28 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
     function metricasDe(idCiudad) {
       var posts = (window.TABLAS && window.TABLAS.posts) || [];
       var promo = (window.SISTEMA && window.SISTEMA.promo) || {};
-      var pool  = (promo.porCiudad && promo.porCiudad[idCiudad]) || [];
+      var raw   = (promo.porCiudad && promo.porCiudad[idCiudad]) || null;
+      /* R67 · FIX: el PROMOJSON real de la hoja trae porCiudad
+         como OBJETO (idPostActual + proximaRotación, el mismo
+         que lee Promo_Script), no como array. Antes se llamaba
+         pool.forEach sobre el objeto y la excepción congelaba
+         el repintado del sheet (el aviso de cookies quedaba
+         pegado). Se normalizan los DOS formatos: array de
+         promos o objeto de una promo. */
+      var pool  = [];
+      if (Array.isArray(raw)) {
+        pool = raw;
+      } else if (raw) {
+        pool = [raw];
+      }
 
       var promos = {};
       pool.forEach(function (item) {
-        if (!item || !item.idPost) return;
+        if (!item) return;
+        var idPost = item.idPost || item.idPostActual;
+        if (!idPost) return;
         if (!promoVigente(item)) return;
-        promos[item.idPost] = 1;
+        promos[idPost] = 1;
       });
 
       var m = { servicios: 0, cursos: 0, promos: 0 };

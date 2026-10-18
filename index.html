@@ -23,7 +23,7 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                    BOTÓN CIUDAD (pin + nombre) repartiéndose la
                    fila en partes iguales.
                  ORDENAMIENTO (R66): el botón abre el SHEET DE
-                 ORDENAMIENTO (Filtros_Sheet_Script): nombre
+                 ORDENAMIENTO (Orden_Sheet_Script): nombre
                  A-Z/Z-A, por categoría, más compartidos y mejor
                  valorados.
                  BLOQUE DE ITEMS (R65): dentro de .secciones-wrap
@@ -38,15 +38,23 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                  El placeholder del campo llega de la BD real
                  (ROOTJSON app.placeholderBuscar, lo pinta
                  Core_Script).
-VERSIÓN:         1.15
-CAMBIOS:         R66: el BOTÓN FILTRO pasa a ser el BOTÓN ORDENAR
+VERSIÓN:         1.16
+CAMBIOS:         R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
+                 a petición del dueño): theme-color pasa a
+                 #fdf3ec para que la franja superior del
+                 navegador se funda con el clarito del degradado
+                 nuevo (lo pinta Core_Script 1.22). Los dos
+                 archivos del sheet se RENOMBRAN: Filtros_Sheet_*
+                 → Orden_Sheet_* (corrección de nombre del
+                 dueño). Mismo markup que Index.html 1.16 de GAS.
+                 R66: el BOTÓN FILTRO pasa a ser el BOTÓN ORDENAR
                  (#btnOrdenar, .btn-ordenar, aria "Ordenar") con
                  el glifo ordenar de Iconos (3 líneas, diseño del
                  dueño); abre el SHEET DE ORDENAMIENTO
-                 (Filtros_Sheet_Script). La X de limpiar del
+                 (Orden_Sheet_Script). La X de limpiar del
                  campo sube su glifo (líneas estiradas al doble,
-                 span 12/24). Entran los archivos Filtros_Sheet_CSS
-                 y Filtros_Sheet_Script del espejo. Mismo markup
+                 span 12/24). Entran los archivos Orden_Sheet_CSS
+                 y Orden_Sheet_Script del espejo. Mismo markup
                  que Index.html 1.15 de GAS.
                  R65: "Compartir lista" se MUDA al bloque de
                  items — el botón y el aviso "No se encontraron
@@ -65,7 +73,7 @@ CAMBIOS:         R66: el BOTÓN FILTRO pasa a ser el BOTÓN ORDENAR
                  R60: cabecera con volver + título + menú global.
                  Módulo Ciudad se encarga de la ciudad.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
-                 Filtros_Sheet_CSS.html, Seccion_CSS.html,
+                 Orden_Sheet_CSS.html, Seccion_CSS.html,
                  Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
                  Reserva_CSS.html, Reserva_Exito_CSS.html, Lista_CSS.html,
@@ -79,7 +87,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Reserva_Sheet_Script.html, Reserva_OTP_Script.html,
                  Reserva_Dato_Script.html, Reserva_Exito_Script.html,
                  Reserva_Script.html, Partner_Sheet_Script.html,
-                 Ciudad_Sheet_Script.html, Filtros_Sheet_Script.html,
+                 Ciudad_Sheet_Script.html, Orden_Sheet_Script.html,
                  Compartir_Script.html, Core_Script.html.
                  Servido por 00 DoGet.gs (include + inyección).
 ════════════════════════════════════════════════════════════════════
@@ -121,11 +129,11 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ServyCloud</title>
 
-  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Filtros_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
+  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Orden_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
   <!-- ═══ R26 · CROMO DEL ENVOLTORIO (antes vivía en la página
        envoltorio con iframe; ahora acompaña a la app en ESTA
        página estática) ═══ -->
-  <meta name="theme-color" content="#f8fafc">
+  <meta name="theme-color" content="#fdf3ec">
   <link rel="manifest" href="./manifest.json">
   <link id="pagina-icono" rel="icon" href="./icon-192.png">
 
@@ -654,7 +662,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           <!-- BOTÓN ORDENAR (R66) · a la derecha del campo:
                círculo con el glifo ordenar de Iconos (3 líneas
                que se acortan, diseño del dueño). ABRE EL SHEET
-               DE ORDENAMIENTO (Filtros_Sheet_Script): nombre
+               DE ORDENAMIENTO (Orden_Sheet_Script): nombre
                A-Z/Z-A, categoría, más compartidos y mejor
                valorados. Se retira en modo compartido. -->
           <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar">
@@ -757,7 +765,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Filtros_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Orden_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>
