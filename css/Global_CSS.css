@@ -1,5 +1,4 @@
-/*
-════════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Global_CSS.html
 ESPEJO GITHUB:   css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -7,27 +6,35 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "Acerca de" con jerarquía: marca de la app arriba
                  (protagonista) y crédito INGeniusCloud abajo.
                  Ítem "asesor" destacado con borde dashed naranja.
-                 Ayuda de instalación (R63): pestañas
+                 Ayuda de instalación (R63/R64): pestañas
                  ANDROID / IPHONE y TIMELINE de pasos — puntos
                  numerados sobre línea vertical, entrada escalonada
-                 y NARANJA OFICIAL en toda la guía.
-VERSIÓN:         1.3
-CAMBIOS:         R63: la guía de instalación viste el naranja
+                 y NARANJA OFICIAL en toda la guía; banner interno
+                 "app ya instalada" (R64: el aviso vive DENTRO de
+                 la pantalla) y botón manual de instalación con
+                 glifo.
+VERSIÓN:         1.4
+CAMBIOS:         R64: entra .pwa-instalada-aviso (banner verde
+                 suave con el check verificado de Iconos — el
+                 aviso de app ya instalada vive DENTRO de la
+                 ayuda, nunca la tapa) y .pwa-instalar pasa a
+                 botón manual SIEMPRE visible en Android con su
+                 glifo download dentro (flex + gap).
+                 R63: la guía de instalación viste el naranja
                  oficial y TIMELINE — .pwa-tabs (píldoras Android/
                  iPhone con glifo, activa en naranja), .pwa-timeline
                  (línea vertical con degradado naranja + puntos
                  numerados 30px) y .pwa-instalar (botón naranja
                  pleno); cada paso entra con .pwaPasoIn escalonado
                  (animation-delay por --i, "los puntos tienen
-                 vida"). FUERA .pwa-plataforma y .pwa-pasos (sus
-                 consumidores murieron con la guía nueva — código
-                 muerto fuera). .pwa-nota pasa a la familia naranja.
+                 vida"). .pwa-nota pasa a la familia naranja.
                  R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
                  Comenta_CSS.html y Reserva_CSS.html)
 ════════════════════════════════════════════════════════════════════*/
+
   /* ============================================================
      CONTENEDOR RAÍZ
      ============================================================ */
@@ -754,9 +761,50 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     line-height: 1.45;
   }
 
-  /* ---------- Botón instalar (solo con boleto real) ---------- */
-  .sheet-pwa .pwa-instalar {
+  /* ---------- Banner "app ya instalada" (R64) ----------
+     El aviso vive DENTRO de la ayuda (nunca la tapa): verde
+     suave de éxito con el check verificado de Iconos. */
+  .sheet-pwa .pwa-instalada-aviso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 11px 14px;
+    margin: 14px 0 16px;
+
+    background: #ecfdf5;
+    border: 1px solid rgba(5, 150, 105, 0.22);
+    border-radius: 12px;
+  }
+
+  .sheet-pwa .pwa-instalada-glifo {
+    flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    color: #059669;
+    display: inline-flex;
+  }
+  .sheet-pwa .pwa-instalada-glifo svg {
+    width: 100%;
+    height: 100%;
     display: block;
+  }
+
+  .sheet-pwa .pwa-instalada-texto {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #065f46;
+    line-height: 1.35;
+  }
+
+  /* ---------- Botón manual de instalación (R64) ----------
+     SIEMPRE visible en Android: glifo download + texto, con
+     boleto abre el diálogo nativo y sin boleto avisa el camino. */
+  .sheet-pwa .pwa-instalar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
 
     margin: 16px 0 4px;
@@ -782,6 +830,17 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   .sheet-pwa .pwa-instalar:active {
     transform: scale(0.98);
     background: #EA580C;
+  }
+  .sheet-pwa .pwa-instalar-icono {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    display: inline-flex;
+  }
+  .sheet-pwa .pwa-instalar-icono svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   /* ---------- Nota por versión (familia naranja) ---------- */

@@ -2,47 +2,58 @@
 ════════════════════════════════════════════════════════════════════
 ARCHIVO:         Index.html
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
-                 se inyectan en el HTML. TABLAS se carga en
-                 runtime por POST (evita el caché de Apps Script).
-                 La detección de móvil corre ANTES de renderizar
+RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
+                 DATOS (abrirSesion vía POST al /exec). La
+                 detección de móvil corre ANTES de renderizar
                  Telefono.html para evitar el flash del marco.
-                 El título se compone desde ROOTJSON.
-                 R61 · Junto a la LUPA entra el BOTÓN FILTRO
-                 (círculo, sin acción por ahora). La fila de
-                 "Explorar" NO se oculta al abrir la búsqueda y
-                 lleva CONTADOR de items + modo de VISTA (lista /
-                 miniatura en cápsula, seleccionable, sin acción).
-                 El COMPARTIR deja de ser botón: es un TEXTO
-                 SUBLINADO PUNTEADO bajo el campo que dice
-                 "Compartir lista filtrada". La ciudad dice
-                 "Estás viendo EN Ciudad" (17px). El placeholder
-                 del campo llega de la BD real (ROOTJSON
-                 app.placeholderBuscar, lo pinta Core_Script).
-                 R62 · FILA DE FILTROS (debajo de las promos):
-                 CHIPS botones independientes (icono + contador) |
-                 CIUDAD (pin + nombre, solo bordes) | BUSCAR
-                 (lupa → cápsula con CANCELAR fuera y CONTADOR de
-                 filtrados dentro) | FILTRO (glifo de Iconos, sin
-                 acción). La fila "Explorar" con sus tipos de
-                 vista se ELIMINÓ. El título grande sale de
-                 app.tituloHeader — ahora VECTOR: una frase al
-                 azar por carga. El preloader (GitHub_Cromo) sale
-                 DENTRO del marco del teléfono en PC.
-VERSIÓN:         1.12
-CAMBIOS:         R62: mismo markup que Index.html 1.11 de GAS —
-                 ciudad a la fila de filtros (pin + nombre, sin
-                 chevron ni "Estás viendo en"); chips
-                 independientes (fuera la cápsula .filtros);
-                 botón filtro con data-glifo (fuera el svg
-                 hardcodeado); CANCELAR sustituye a "Limpiar
-                 filtro"; contador de filtrados (#buscarContador)
-                 dentro del campo; fuera la fila "Explorar" y sus
-                 glifos de vista.
-                 R60: cabecera con volver + título + menú global;
-                 la búsqueda vive en LUPA en la fila de filtros
-                 y se expande a CÁPSULA. Módulo Ciudad se encarga
-                 de la ciudad.
+                 El título se compone desde ROOTJSON (R63:
+                 app.tituloHeader es un VECTOR — una frase al azar
+                 por carga; lo pinta Core_Script y VIVE EN LA FILA
+                 DE CABECERA: título a la izquierda y MENÚ GLOBAL
+                 a la derecha).
+                 SECCIÓN FILTROS (R64, debajo de las promos) en
+                 DOS filas de bordes suaves y delgados:
+                 · FILA 1: campo BUSCAR EXPANDIDO de una vez
+                   (lupa + input + X circular naranja para
+                   limpiar el campo, visible al escribir) y el
+                   BOTÓN FILTRO a su derecha (glifo de Iconos,
+                   sin acción por ahora).
+                 · FILA 2: los CHIPS (botones independientes con
+                   su icono, activo en NARANJA oficial) y el
+                   BOTÓN CIUDAD (pin + nombre) repartiéndose la
+                   fila en partes iguales.
+                 Debajo, en el respiro entre filtros y lista,
+                 vive el TEXTO "Compartir lista filtrada" (R64:
+                 como el rótulo "Explorar" de antes; Lista_Script
+                 lo muestra siempre que la lista traiga items).
+                 En modo compartido el campo queda desplegado y
+                 bloqueado: la X libera la vista (Compartir).
+                 El placeholder del campo llega de la BD real
+                 (ROOTJSON app.placeholderBuscar, lo pinta
+                 Core_Script).
+VERSIÓN:         1.13
+CAMBIOS:         R64: la sección filtros se REORDENA — campo
+                 buscar EXPANDIDO de una vez en la fila 1 con el
+                 botón filtro a su derecha (FUERA la lupa-botón
+                 y su expansión, y el texto CANCELAR); la X
+                 circular NARANJA dentro del campo limpia (en
+                 compartida libera la vista, el trabajo que
+                 hacía CANCELAR); fila 2 con chips + ciudad
+                 repartidos en partes iguales y SIN números de
+                 items (fuera los contadores de chips y del
+                 campo); "Compartir lista filtrada" se muda al
+                 respiro entre filtros y lista, visible siempre
+                 que la lista traiga items (Lista_Script
+                 decide). Mismo markup que Index.html 1.13 de
+                 GAS.
+                 R63: el TÍTULO DEL HEADER entra a la FILA DE
+                 CABECERA (título a la izquierda + menú global
+                 a la derecha; en detalle lo toman volver +
+                 título de categoría). El preloader
+                 (GitHub_Cromo) sale DENTRO del marco del
+                 teléfono en PC y a pantalla completa en móvil.
+                 R60: cabecera con volver + título + menú global.
+                 Módulo Ciudad se encarga de la ciudad.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -57,8 +68,9 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Reserva_Sheet_Script.html, Reserva_OTP_Script.html,
                  Reserva_Dato_Script.html, Reserva_Exito_Script.html,
                  Reserva_Script.html, Partner_Sheet_Script.html,
-                 Ciudad_Sheet_Script.html, Core_Script.html.
-                 Servido por DoGet.gs (include + inyección).
+                 Ciudad_Sheet_Script.html, Compartir_Script.html,
+                 Core_Script.html.
+                 Servido por 00 DoGet.gs (include + inyección).
 ════════════════════════════════════════════════════════════════════
 -->
 
@@ -587,43 +599,14 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         <div id="promoSlot" hidden></div>
 
         <!-- ============================================================
-             FILA DE FILTROS (R62) · vive DEBAJO de las promos.
-             Cada pieza es un BOTÓN INDEPENDIENTE con su icono:
-             chips (icono + contador) | ciudad (pin + nombre) |
-             buscar (lupa → cápsula con CANCELAR fuera y contador
-             de filtrados dentro) | filtro (glifo de Iconos, sin
-             acción por ahora). En modo compartido la cápsula
-             queda desplegada y bloqueada (solo CANCELAR activo).
+             SECCIÓN FILTROS (R64) · vive DEBAJO de las promos,
+             en DOS filas de bordes suaves y delgados.
+             FILA 1: campo BUSCAR expandido de una vez (lupa +
+             input + X circular naranja para limpiar, visible al
+             escribir) + BOTÓN FILTRO a la derecha (glifo de
+             Iconos — sin acción todavía).
              ============================================================ -->
         <div class="filtros-fila" id="filtrosFila">
-
-          <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
-
-          <!-- R62 · BOTÓN CIUDAD · un botón independiente más:
-               pin + nombre de la ciudad, sin fondo (solo
-               bordes) y sin más texto que la ciudad. -->
-          <button type="button"
-                  class="city-bar"
-                  id="btnCiudad"
-                  disabled
-                  aria-label="Cambiar ciudad">
-            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
-            <span class="city-txt" id="ciudadTxt">—</span>
-          </button>
-
-          <button type="button" class="btn-lupa" id="btnBuscar" aria-label="Buscar">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="7"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-
-          <!-- R62 · BOTÓN FILTRO · círculo con el glifo filtro
-               de Iconos (3 líneas con su deslizador, diseño del
-               dueño). Sin handler todavía. -->
-          <button type="button" class="btn-filtro" id="btnFiltro" aria-label="Filtrar">
-            <span data-glifo="filtro" aria-hidden="true"></span>
-          </button>
 
           <div class="buscar-capsula" id="buscarFila">
             <div class="buscar-input-wrap">
@@ -638,29 +621,55 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                      maxlength="40"
                      autocomplete="off" autocorrect="off"
                      autocapitalize="off" spellcheck="false">
-              <!-- R62 · CONTADOR de items filtrados (lo pinta
-                   Lista_Script; el CSS lo muestra solo en
-                   búsqueda/compartida). -->
-              <span class="buscar-contador" id="buscarContador" hidden>0</span>
+              <!-- R64 · X circular naranja DENTRO del campo:
+                   aparece al escribir y limpia el campo. En modo
+                   compartido queda fija (libera la vista). -->
+              <button type="button" class="buscar-limpiar" id="btnLimpiarCampo"
+                      aria-label="Limpiar el campo">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+              </button>
             </div>
           </div>
 
-          <!-- R62 · CANCELAR · FUERA del campo, a la derecha
-               (patrón Cashea/ML del dueño): al tocar, el campo
-               se cierra solo. El trabajo que hacía "Limpiar
-               filtro", retirado aquí. -->
-          <button type="button" class="btn-cancelar" id="btnCancelarBusqueda">
-            Cancelar
+          <!-- BOTÓN FILTRO · a la derecha del campo: círculo con
+               el glifo filtro de Iconos (3 líneas con su
+               deslizador, diseño del dueño). Sin handler
+               todavía (el dueño lo pidió sin acción por ahora). -->
+          <button type="button" class="btn-filtro" id="btnFiltro" aria-label="Filtrar">
+            <span data-glifo="filtro" aria-hidden="true"></span>
           </button>
 
         </div>
 
-        <!-- R61 · COMPARTIR LISTA FILTRADA · deja de ser botón
-             píldora: es un TEXTO bajo el campo, a la izquierda,
-             un poco más grande y con SUBLINADO PUNTEADO. El
-             binding y los estados los lleva Compartir_Script con
-             buscar:estado / buscar:resultados (IDs y clases
-             intactos). -->
+        <!-- ============================================================
+             FILA 2 (R64) · CHIPS + CIUDAD repartiéndose la fila
+             en partes iguales, sin números de items.
+             ============================================================ -->
+        <div class="filtros-fila-dos" id="filtrosFilaDos">
+
+          <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
+
+          <!-- BOTÓN CIUDAD · pin + nombre de la ciudad, sin
+               fondo (solo el borde suave) y sin más texto que
+               la ciudad. -->
+          <button type="button"
+                  class="city-bar"
+                  id="btnCiudad"
+                  disabled
+                  aria-label="Cambiar ciudad">
+            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
+            <span class="city-txt" id="ciudadTxt">—</span>
+          </button>
+
+        </div>
+
+        <!-- R64 · COMPARTIR LISTA FILTRADA · vive en el respiro
+             entre la sección filtros y el primer item de la
+             lista. Lista_Script lo muestra siempre que la lista
+             traiga items; Compartir_Script lleva el envío. -->
         <button type="button" class="btn-compartir" id="btnCompartir"
                 aria-label="Compartir lista filtrada" hidden disabled>
           Compartir lista filtrada

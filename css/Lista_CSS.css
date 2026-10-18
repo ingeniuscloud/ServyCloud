@@ -1,64 +1,59 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_CSS.html
-ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
-                 fade. Item de la vidriera (R58 · CAJA como la
-                 imagen del dueño): TARJETA BLANCA con radio y
-                 sombra suave (R62: SIN la franja del colorOficial
-                 a la izquierda — el dueño la quitó por
-                 fricción), título y subtítulo en su color normal
-                 (tinta/gris, SIN colorOficial) con recorte a 2
-                 líneas, línea divisora debajo del subtítulo y
-                 fila del partner abajo: avatar circular SIN
-                 BORDES con la INICIAL (fondo colorClaro del
-                 post, letra colorOficial) + nombre (R62: peso
-                 normal) + glifo verificado (Iconos.html); a la
-                 derecha "Ver publicación →" en NARANJA oficial y
-                 peso normal. El TÍTULO del item (R62) recibe el
-                 mismo tratamiento que el de las promos: sin bold
-                 y más grande. La estrella métrica pasiva se
-                 queda anclada a la esquina superior derecha
-                 (fila horizontal: glifo amarillo + contador a su
-                 derecha, oculta en 0).
-                 R62: la fila "Explorar" con su contador y la
-                 cápsula de modo de vista se ELIMINARON (el
-                 dueño no va a aplicar los tipos de vista; el
-                 contador de filtrados vive ahora dentro del
-                 campo buscar, #buscarContador en Chips_CSS).
-                 Sin badge (vive en la promo y el post). La lista
-                 es PLANA. Skeleton del detalle (primera carga de
-                 un post). Skeleton de lista con la misma anatomía
-                 de caja (solo si el POST inicial aún está en
-                 vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.1
-CAMBIOS:         R62: FUERA la franja colorOficial (el ::before
-                 de .lista-item y su espejo del skeleton — el
-                 padding izquierdo vuelve a 16px); título del
-                 item sin bold y más grande (15px/600 →
-                 16px/400, mismo tratamiento que el de las
-                 promos); nombre del partner sin bold (600→400,
-                 la tercera fila); FUERA la fila "Explorar"
-                 (.lista-encabezado, .lista-contador, .modo-vista
-                 y .mv-btn con todo su responsive — el toggle
-                 lista/miniatura no se va a aplicar).
+                 fade. Item de la vidriera (R64 · LIMPIO):
+                 SIN BORDES y fondo transparente — la división
+                 entre items es una LINEA TENUDE que no hace
+                 ruido. Primera fila: título + estrella métrica
+                 (como estaba). La segunda fila (subtítulo) y su
+                 divisoria interna DESAPARECIERON; la fila del
+                 partner sigue: avatar circular con la INICIAL
+                 de la marca (fondo colorClaro del post, letra
+                 colorOficial) + nombre — SIN el check verde —
+                 y a la derecha "Ver publicación →" en NARANJA
+                 oficial y peso normal. El título sin bold y
+                 más grande (R62). Espaciados sutiles: la
+                 división indica el corte pero todo se siente
+                 parte del mismo item. La estrella métrica
+                 pasiva se queda anclada a la esquina superior
+                 derecha (fila horizontal: glifo amarillo +
+                 contador a su derecha, oculta en 0).
+                 R62: la fila "Explorar" se ELIMINÓ. Sin badge
+                 (vive en la promo y el post). La lista es
+                 PLANA. Skeleton del detalle (primera carga de
+                 un post). Skeleton de lista con la misma
+                 anatomía de fila (solo si el POST inicial aún
+                 está en vuelo cuando el usuario elige ciudad).
+VERSIÓN:         2.2
+CAMBIOS:         R64: item LIMPIO — fuera la caja (background
+                 transparente, sin borde, sin sombra, sin radio
+                 y sin separación por aire): la división entre
+                 items es una línea tenue (border-bottom #eef2f7
+                 y el último item sin línea); FUERA la segunda
+                 fila (el subtítulo y su divisoria interna
+                 murieron con todo su CSS y el espejo del
+                 skeleton) y FUERA el check verificado verde del
+                 partner; padding simétrico sutil (13px) para
+                 que la división se note sin separar el item de
+                 sí mismo.
+                 R62: sin franja colorOficial (fuera el ::before
+                 y su espejo del skeleton); título del item sin
+                 bold y más grande (16px/400, mismo tratamiento
+                 que el de las promos); nombre del partner sin
+                 bold (600→400); FUERA la fila "Explorar"
+                 (.lista-encabezado, .lista-contador,
+                 .modo-vista y .mv-btn con todo su responsive).
                  R60: el bloque modo-detalle oculta la FILA
                  COMPLETA de filtros (.filtros-fila — chips,
-                 ciudad, lupa, cápsula y compartir son hijos de
-                 esa fila); la excepción del post compartido
-                 vive en Chips_CSS con mayor especificidad.
+                 ciudad, campo y filtro son hijos de esas
+                 filas); la excepción del post compartido vive
+                 en Chips_CSS con mayor especificidad.
                  R59: "Ver publicación" en NARANJA oficial
                  #f97316 (la flecha hereda por currentColor);
-                 avatar del partner SIN BORDES y el check
-                 verificado más grande (15→17px).
-                 R58: item como CAJA — tarjeta blanca con radio
-                 16px, sombra suave; título y subtítulo en color
-                 normal (#1f2937/#64748b) con recorte a 2 líneas;
-                 divisoria interna; partner con avatar circular
-                 de la inicial + glifo verificado; "Ver
-                 publicación" (mismo gris medio, sin bold, glifo
-                 flechaVer); lista plana; skeleton espeja la caja.
+                 avatar del partner SIN BORDES.
                  R56: estrella en fila horizontal (glifo +
                  contador a su derecha) y amarilla #fbbf24,
                  anclada absolute a la esquina — deja de reservar
@@ -68,8 +63,8 @@ CAMBIOS:         R62: FUERA la franja colorOficial (el ::before
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html, que aporta la regla .badge)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
+
   /* ============================================================
      BOTÓN VOLVER
      ============================================================ */
@@ -134,6 +129,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   body.modo-detalle .filtros-fila,
+  body.modo-detalle .filtros-fila-dos,
+  body.modo-detalle .btn-compartir,
   body.modo-detalle .titulo-header,
   body.modo-detalle .promo-encabezado {
     display: none !important;
@@ -177,25 +174,25 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .secciones-track[hidden] { display: none !important; }
 
   /* ============================================================
-     LISTA ITEM · CAJA (R58 · R62 sin franja)
-     Tarjeta blanca con radio, borde y sombra suave, separada
-     por aire (sin divisoria entre items: las cajas se
-     sostienen solas). La FRANJA del colorOficial salió en R62
-     (fricción, orden del dueño): el padding izquierdo volvió a
-     16px. La promo no lleva esta caja (su tarjeta es propia de
-     Promo_CSS).
+     LISTA ITEM · LIMPIO (R64)
+     Sin bordes y fondo transparente: la división entre items
+     es una LINEA TENUDE (border-bottom) que no hace ruido
+     visual. El padding simétrico da el respiro sutil: la línea
+     indica el corte pero todo sigue sintiéndose parte del
+     mismo item. La promo no lleva esta fila (su tarjeta es
+     propia de Promo_CSS).
      ============================================================ */
   .lista-item {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 14px 16px;
-    background: #ffffff;
+    padding: 13px 16px;
+    background: transparent;
     width: 100%;
-    border: 1px solid #f1f5f9;
-    border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-    margin-bottom: 10px;
+    border: none;
+    border-bottom: 1px solid #eef2f7;
+    border-radius: 0;
+    margin-bottom: 0;
     overflow: hidden;
     font-family: inherit;
     text-align: left;
@@ -203,6 +200,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     -webkit-tap-highlight-color: transparent;
     transition: background 0.12s ease;
   }
+  /* El último item no pinta línea: la lista termina en aire. */
+  .lista-item:last-child { border-bottom: none; }
+
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
 
   /* ============================================================
@@ -256,7 +256,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
     min-width: 0;
   }
   /* La estrella vive en la esquina (absolute): la fila del
@@ -268,10 +268,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* Título (R62) · MISMO TRATAMIENTO que el título de las
-     promos: SIN bold y más grande. Subtítulo en su COLOR
-     NORMAL (tinta/gris). Recorte a 2 líneas en ambos, como la
-     imagen del dueño. La promo no usa estas vías: su tarjeta
-     se pinta entera en Promo_CSS. */
+     promos: SIN bold y más grande. Recorte a 2 líneas. La
+     segunda fila (el subtítulo) DESAPARECIÓ en R64: la fila
+     del título es la única del texto. La promo no usa esta
+     vía: su tarjeta se pinta entera en Promo_CSS. */
   .lista-item .titulo {
     font-size: 16px;
     font-weight: 400;
@@ -286,38 +286,16 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     min-width: 0;
   }
 
-  .lista-item .tagline {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: 13px;
-    line-height: 1.35;
-    font-weight: 400;
-    color: #64748b;
-    margin-top: 2px;
-  }
-
-  /* Divisora INTERNA debajo del subtítulo (R58): separa el
-     texto de la fila del partner, como la imagen del dueño. */
-  .lista-item .item-divisoria {
-    display: block;
-    height: 1px;
-    background: #eef2f7;
-    margin: 10px 0;
-  }
-
   /* ============================================================
-     PARTNER · avatar de la inicial + nombre + verificado (R58)
+     PARTNER · avatar de la inicial + nombre (R64 sin check)
      Avatar circular con la PRIMERA letra de la marca del
      partner: fondo colorClaro del post (--post-claro) y letra
-     colorOficial (--post-color), mismas variables que la
-     franja. SIN BORDES (R59): la regla global .partner-avatar
-     de Partner_Sheet_CSS trae un borde 1.5px #475569 que se
-     colaba aquí y le quitaba protagonismo al título — el item
-     lo apaga. Nombre en tinta semibold + glifo verificado
-     verde (Iconos.html). El texto "Responde en…" de la
-     referencia NO va (decisión del dueño).
+     colorOficial (--post-color). SIN BORDES (R59): la regla
+     global .partner-avatar de Partner_Sheet_CSS trae un borde
+     1.5px #475569 que se colaba aquí y le quitaba
+     protagonismo al título — el item lo apaga. Nombre en peso
+     normal. El CHECK verificado verde SALIÓ en R64 (orden del
+     dueño: la fila queda limpia).
      ============================================================ */
   .lista-item .partner-avatar {
     flex: 0 0 auto;
@@ -343,20 +321,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     color: #1f2937;
     min-width: 0;
   }
-  /* Check verificado (R59): un poquito más grande (15→17px)
-     para que se lea junto al nombre sin taparlo. */
-  .lista-item .marca .check {
-    flex-shrink: 0;
-    width: 17px;
-    height: 17px;
-    color: #059669;
-    display: inline-flex;
-  }
-  .lista-item .marca .check svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
   .lista-item .marca .marca-texto {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -364,8 +328,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     color: inherit;
   }
 
-  /* Fila del partner (R58) · debajo de la divisoria: avatar +
-   nombre/verificado a la izquierda y "Ver publicación →" a la
+  /* Fila del partner (R58) · la ÚNICA fila bajo el título:
+   avatar + nombre a la izquierda y "Ver publicación →" a la
    derecha — mismo verbo de invitación, nuevo texto del dueño.
    NARANJA OFICIAL #f97316 (R59): el dueño lo pidió del color
    de la app; la flecha hereda por currentColor. Peso NORMAL
@@ -509,16 +473,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     position: relative;
     display: flex;
     align-items: center;
-    padding: 14px 16px;
-    background: #ffffff;
-    border: 1px solid #f1f5f9;
-    border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-    margin-bottom: 10px;
+    padding: 13px 16px;
+    background: transparent;
+    border-bottom: 1px solid #eef2f7;
+    border-radius: 0;
+    margin-bottom: 0;
     overflow: hidden;
   }
 
-  /* (R62) La franja del skeleton murió con la franja real. */
+  .lista-skeleton-item:last-child { border-bottom: none; }
 
   .lista-skeleton-body {
     flex: 1;
@@ -544,15 +507,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .lista-skeleton-line.short  { width: 60%; height: 14px; }
   .lista-skeleton-line.long   { width: 90%; }
-  .lista-skeleton-line.medium { width: 40%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
-
-  /* Espejo de la divisoria interna (R58). */
-  .lista-skeleton-divisoria {
-    height: 1px;
-    background: #eef2f7;
-    margin: 4px 0;
-  }
 
   /* Espejo de la fila del partner (R58): avatar circular +
    barra del nombre + barra del "Ver publicación" a la derecha. */
@@ -560,7 +515,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 2px;
   }
 
   .lista-skeleton-avatar {
@@ -612,7 +566,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
     .lista-item .estrella-num { font-size: 11px; }
     .lista-item .titulo { font-size: 15px; }
-    .lista-item .tagline { font-size: 12px; font-weight: 400; }
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }

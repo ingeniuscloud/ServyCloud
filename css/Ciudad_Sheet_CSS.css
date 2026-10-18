@@ -1,64 +1,68 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Ciudad_Sheet_CSS.html
-ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R62: vive
-                 en la FILA DE FILTROS como un botón independiente
-                 más — pin + nombre de la ciudad, SIN fondo, solo
-                 bordes como la lupa y el filtro, SIN chevron y
-                 SIN el texto "Estás viendo en") y del bottom
-                 sheet de selección (R62: TARJETAS en rejilla de
-                 dos columnas — nombre de la ciudad arriba con su
-                 punto de selección a la derecha y, debajo, las
-                 tres métricas de items activos: Servicios,
-                 Cursos y Promos; la tarjeta activa viste NARANJA
-                 oficial, jamás azul). Sheet al 90%. Modo
-                 bloqueado para primera selección sin ciudad
-                 guardada. Aviso de cookies de esa primera carga:
-                 icono a la izquierda del texto y botón Aceptar
-                 debajo.
-VERSIÓN:         1.6
-CAMBIOS:         R62: el botón ciudad entra a la fila de filtros
-                 (Index.html) como botón compacto: borde 1.2px
-                 #475569, cápsula redonda, fondo transparente,
-                 pin 15px + nombre (sin bold, sin chevron, sin
-                 "Estás viendo en"); el sheet convierte la lista
-                 de radios en TARJETAS (fuera .ciudad-radio y su
-                 AZUL #1d4ed8 — el color oficial es el naranja):
-                 rejilla 2 columnas, punto de selección, métricas
+RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
+                 en la FILA 2 de la sección de filtros como un
+                 botón independiente más — pin + nombre de la
+                 ciudad, SIN fondo, borde suave y delgado, y
+                 reparte la fila con los chips en partes
+                 iguales) y del bottom sheet de selección (R62:
+                 TARJETAS en rejilla de dos columnas — nombre de
+                 la ciudad arriba con su punto de selección a la
+                 derecha y, debajo, las tres métricas de items
+                 activos: Servicios, Cursos y Promos; la tarjeta
+                 activa viste NARANJA oficial, jamás azul). Sheet
+                 al 90%. Modo bloqueado para primera selección
+                 sin ciudad guardada. Aviso de cookies de esa
+                 primera carga: icono a la izquierda del texto y
+                 botón Aceptar debajo.
+VERSIÓN:         1.7
+CAMBIOS:         R64: el botón ciudad entra a la FILA 2 de la
+                 sección de filtros (con los chips): borde suave
+                 y delgado (1px #e2e8f0, estilo 2026 — fuera el
+                 1.2px #475569) y reparte la fila en partes
+                 iguales (flex 1, texto centrado), sin números
+                 de items.
+                 R62: el botón ciudad entra a la sección de
+                 filtros como botón compacto (cápsula redonda,
+                 fondo transparente, pin 15px + nombre — sin
+                 bold, sin chevron, sin "Estás viendo en"); el
+                 sheet convierte la lista de radios en TARJETAS
+                 (fuera .ciudad-radio y su AZUL #1d4ed8 — el
+                 color oficial es el naranja): rejilla 2
+                 columnas, punto de selección, métricas
                  Servicios/Cursos/Promos con cifras tabulares,
                  activa con borde y tinte naranja.
-                 R61: la ubicación subía al TAMAÑO del encabezado
-                 de promos (17px).
-                 R60: la city-bar recuperaba la UBICACIÓN COMPLETA
-                 en la fila de cabecera.
                  R38: estilos del aviso de cookies dentro del
                  sheet (.ciudad-cookies): icono, texto y botón
                  Aceptar centrados como puerta de entrada.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html y pintados por Ciudad_Sheet_Script.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
+
   /* ============================================================
-     BOTÓN CIUDAD (R62) · en la FILA DE FILTROS
-     Un botón independiente más (como la lupa y el filtro):
-     cápsula con borde 1.2px #475569, fondo transparente, pin +
-     nombre de la ciudad — sin fondo (solo bordes), sin
-     chevron y sin más texto que la ciudad, como pidió el
-     dueño. En modo detalle lo esconde la fila completa.
+     BOTÓN CIUDAD (R64) · FILA 2 de la sección de filtros
+     Un botón independiente más (como los chips): cápsula con
+     borde suave y delgado (1px #e2e8f0), fondo transparente,
+     pin + nombre de la ciudad — sin fondo, sin chevron y sin
+     más texto que la ciudad. Reparte la fila con los chips en
+     partes iguales (flex 1, texto centrado). En modo detalle
+     lo esconde la fila completa.
      ============================================================ */
   .city-bar {
-    flex: 0 0 auto;
+    flex: 1 1 0;
     min-width: 0;
 
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
 
-    padding: 8px 14px 9px;
+    padding: 9px 12px 10px;
     margin: 0;
 
-    border: 1.2px solid #475569;
+    border: 1px solid #e2e8f0;
     background: transparent;
     border-radius: 999px;
 
@@ -68,7 +72,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     line-height: 1.1;
     letter-spacing: -0.01em;
     color: #475569;
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
 
     cursor: pointer;
