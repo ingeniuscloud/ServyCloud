@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Ciudad_Sheet_Script.html
-ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  localStorage (app_ciudad). Si no existe, abre
@@ -9,7 +9,7 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  lista. En esa primera carga el sheet muestra
                  PRIMERO el aviso de cookies (key
                  localStorage: app_cookies; el TEXTO llega servido
-                 en SISTEMA.avisos.cookies — Constantes.gs —, no
+                 en SISTEMA.avisos.cookies — 03 Constantes.gs —, no
                  vive aquí): hasta pulsar
                  Aceptar no se ve la lista de ciudades, y tras
                  aceptar el aviso desaparece y la selección
@@ -17,31 +17,38 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  la fila de filtros desde R62) y emite
                  'ciudad:change' cuando cambia.
                  Ordena las ciudades alfabéticamente por título.
-                 R62: el sheet pinta TARJETAS (rejilla de 2
-                 columnas) con las métricas de items ACTIVOS por
-                 ciudad — Servicios, Cursos y Promos — calculadas
-                 con TABLAS.posts y SISTEMA.promo (mismas reglas
-                 de vigencia de la marquesina). Chevron SVG desde
-                 Iconos.html (flechaAcordeon).
-VERSIÓN:         1.6
-CAMBIOS:         R62: la lista de radios se convierte en
-                 TARJETAS seleccionables — metricasDe(idCiudad)
-                 cuenta posts activos por ciudad y los clasifica
-                 por chip (cursos manda: un post con chip de
-                 curso cuenta como curso, CANON 3; servicio si
-                 solo tiene chip de servicio) y promoVigente()
-                 reutiliza las reglas de fecha de la marquesina
-                 (inicia/termina + post activo); fuera el input
-                 radio y su azul.
+                 R65: el sheet pinta el STACK NATIVO que trajo el
+                 dueño de referencia — tarjetas apiladas (una por
+                 fila): nombre en negrita + badge "Activo"
+                 (solo la activa lo muestra) y pills horizontales
+                 "N Servicios · N Cursos · N Promos" (la de
+                 Promos destacada); al tocar, aplicar + cerrar
+                 como siempre. Las métricas siguen calculándose
+                 con TABLAS.posts y SISTEMA.promo.
+VERSIÓN:         1.7
+CAMBIOS:         R65: pintarContenido() cambia de MODELO — fuera
+                 la rejilla 2 columnas con punto de selección
+                 (el dueño lo vio plano); entra el stack
+                 vertical: .ciudad-card-top con nombre en
+                 negrita + .ciudad-card-badge "Activo"; pills
+                 .ciudad-card-metrica (la de Promos con clase
+                 .destacada); sin radio, sin punto, sin chevron.
+                 R62: las métricas de items ACTIVOS por ciudad —
+                 Servicios, Cursos y Promos — se calculan con
+                 metricasDe(idCiudad) sobre TABLAS.posts y
+                 SISTEMA.promo (mismas reglas de vigencia de la
+                 marquesina; cursos manda: un post con chip de
+                 curso cuenta como curso, CANON 3) y
+                 promoVigente() reutiliza las reglas de fecha.
                  R40: el texto del aviso de cookies ya no vive
                  aquí: llega en SISTEMA.avisos.cookies
-                 (Constantes.gs, única fuente de los textos);
+                 (03 Constantes.gs, única fuente de los textos);
                  sin texto disponible el aviso muestra solo el
                  icono y Aceptar.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
+
   window.Ciudad = (function () {
 
     var KEY_CIUDAD = 'app_ciudad';
@@ -297,7 +304,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
     function pintarCookies() {
       if (!content) return;
 
-      /* Texto servido en SISTEMA.avisos (Constantes.gs). Sin
+      /* Texto servido en SISTEMA.avisos (03 Constantes.gs). Sin
          texto (backend viejo o sin avisos) el aviso sigue
          funcionando: icono + Aceptar, sin párrafo. */
       var texto = '';
@@ -409,10 +416,12 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
     }
 
     /* ============================================================
-       TARJETAS DE CIUDADES (R62) · rejilla seleccionable con
-       métricas de items activos (Servicios / Cursos / Promos).
-       La tarjeta activa viste NARANJA oficial. Al tocar, el
-       MISMO camino de siempre: haptic + aplicar + cerrar.
+       TARJETAS DE CIUDADES (R65) · STACK NATIVO (modelo del dueño)
+       Una tarjeta POR FILA, apiladas: nombre en negrita con el
+       badge "Activo" a la derecha (SOLO la activa lo muestra)
+       y, debajo, las tres métricas en pills horizontales — la
+       de PROMOS con la clase .destacada. Al tocar, el MISMO
+       camino de siempre: haptic + aplicar + cerrar.
        ============================================================ */
     function pintarContenido() {
       if (!content) return;
@@ -431,7 +440,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
             (esActual ? 'true' : 'false') + '">' +
             '<span class="ciudad-card-top">' +
               '<span class="ciudad-card-nombre">' + escapeHtml(c.titulo) + '</span>' +
-              '<span class="ciudad-card-punto" aria-hidden="true"></span>' +
+              '<span class="ciudad-card-badge" aria-hidden="true">Activo</span>' +
             '</span>' +
             '<span class="ciudad-card-metricas">' +
               '<span class="ciudad-card-metrica">' +
@@ -442,7 +451,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                 '<span class="ciudad-card-num">' + m.cursos + '</span>' +
                 '<span class="ciudad-card-etiqueta">Cursos</span>' +
               '</span>' +
-              '<span class="ciudad-card-metrica">' +
+              '<span class="ciudad-card-metrica destacada">' +
                 '<span class="ciudad-card-num">' + m.promos + '</span>' +
                 '<span class="ciudad-card-etiqueta">Promos</span>' +
               '</span>' +

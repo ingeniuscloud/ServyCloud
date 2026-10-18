@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Promo_CSS.html
-ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE sobre el lienzo y cada
@@ -30,8 +30,15 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  sistema. Sin estrella (la métrica es solo del
                  item de la lista). Vive fuera del scroll en modo
                  lista. Se oculta en modo detalle.
-VERSIÓN:         2.4
-CAMBIOS:         R62: tarjeta compacta al pie del dueño — MENOS
+VERSIÓN:         2.5
+CAMBIOS:         R65: "Promos cerca de ti" al COLOR DE TEXTO
+                 NORMAL (#64748B, el .t-body del sistema de
+                 texto) — ya no compite con el tituloHeader
+                 (#1f2937, el color de título del par).
+                 Reparado de paso: el selector
+                 .promo-encabezado[hidden] venía incompleto y
+                 el ocultamiento por atributo no aplicaba.
+                 R62: tarjeta compacta al pie del dueño — MENOS
                  ALTO (padding 11/12 y gap 3), FLECHA a la
                  esquina inferior derecha (top 50% → bottom),
                  BADGE a la fila del título alineado a la derecha
@@ -67,8 +74,8 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
                  botón), Promo_Script.html (duplica los items
                  para el bucle continuo y lleva el scrollLeft),
                  Index.html (#promoSlot, #promoEncabezado)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
+
   /* ============================================================
      SLOT · contenedor de la marquesina
      SIN fondo a propósito: transparente para que se vea el
@@ -132,7 +139,11 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     font-weight: 400;
     line-height: 1.2;
     letter-spacing: -0.01em;
-    color: #1f2937;
+    /* R65 · COLOR DE TEXTO NORMAL (#64748B, el .t-body del
+       sistema de texto): ya no compite con el tituloHeader
+       (#1f2937) — el par título/subtítulo queda en su peso
+       real: subtítulo él, texto normal su compañero. */
+    color: #64748B;
   }
 
   .promo-encabezado-sub {

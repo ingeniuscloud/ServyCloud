@@ -22,30 +22,27 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                    su icono, activo en NARANJA oficial) y el
                    BOTÓN CIUDAD (pin + nombre) repartiéndose la
                    fila en partes iguales.
-                 Debajo, en el respiro entre filtros y lista,
-                 vive el TEXTO "Compartir lista filtrada" (R64:
-                 como el rótulo "Explorar" de antes; Lista_Script
-                 lo muestra siempre que la lista traiga items).
-                 En modo compartido el campo queda desplegado y
-                 bloqueado: la X libera la vista (Compartir).
+                 BLOQUE DE ITEMS (R65): dentro de .secciones-wrap
+                 viven, ENCIMA de la lista, "Compartir lista" (R65
+                 ya no es sección filtro: se muda al bloque de
+                 items con la CANTIDAD de items al lado —
+                 Lista_Script la escribe en cada repintado) y el
+                 aviso "No se encontraron resultados" (mismo slot
+                 del bloque de items). En modo compartido el
+                 campo queda desplegado y bloqueado: la X libera
+                 la vista (Compartir).
                  El placeholder del campo llega de la BD real
                  (ROOTJSON app.placeholderBuscar, lo pinta
                  Core_Script).
-VERSIÓN:         1.13
-CAMBIOS:         R64: la sección filtros se REORDENA — campo
-                 buscar EXPANDIDO de una vez en la fila 1 con el
-                 botón filtro a su derecha (FUERA la lupa-botón
-                 y su expansión, y el texto CANCELAR); la X
-                 circular NARANJA dentro del campo limpia (en
-                 compartida libera la vista, el trabajo que
-                 hacía CANCELAR); fila 2 con chips + ciudad
-                 repartidos en partes iguales y SIN números de
-                 items (fuera los contadores de chips y del
-                 campo); "Compartir lista filtrada" se muda al
-                 respiro entre filtros y lista, visible siempre
-                 que la lista traiga items (Lista_Script
-                 decide). Mismo markup que Index.html 1.13 de
-                 GAS.
+VERSIÓN:         1.14
+CAMBIOS:         R65: "Compartir lista" se MUDA al bloque de
+                 items — el botón y el aviso "No se encontraron
+                 resultados" viven DENTRO de .secciones-wrap,
+                 encima de la lista (fuera de la sección filtro,
+                 que se queda todo el respiro); el botón pasa a
+                 llamarse "Compartir lista" y Lista_Script le
+                 escribe la CANTIDAD de items al lado. Mismo
+                 markup que Index.html 1.14 de GAS.
                  R63: el TÍTULO DEL HEADER entra a la FILA DE
                  CABECERA (título a la izquierda + menú global
                  a la derecha; en detalle lo toman volver +
@@ -666,18 +663,19 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
 
         </div>
 
-        <!-- R64 · COMPARTIR LISTA FILTRADA · vive en el respiro
-             entre la sección filtros y el primer item de la
-             lista. Lista_Script lo muestra siempre que la lista
-             traiga items; Compartir_Script lleva el envío. -->
-        <button type="button" class="btn-compartir" id="btnCompartir"
-                aria-label="Compartir lista filtrada" hidden disabled>
-          Compartir lista filtrada
-        </button>
-
-        <div id="buscarVacio" class="buscar-vacio" hidden></div>
-
+        <!-- R65 · BLOQUE DE ITEMS · "Compartir lista" y el aviso
+             sin resultados viven DENTRO del bloque de los items
+             (scrollean con la lista): ya no son sección filtro.
+             Lista_Script enciende el botón con items y le
+             escribe la cantidad; Compartir_Script lleva el envío. -->
         <div class="secciones-wrap">
+          <button type="button" class="btn-compartir" id="btnCompartir"
+                  aria-label="Compartir lista" hidden disabled>
+            Compartir lista
+          </button>
+
+          <div id="buscarVacio" class="buscar-vacio" hidden></div>
+
           <div class="lista-wrap" id="listaWrap"></div>
           <div class="secciones-track" id="seccionesTrack" hidden></div>
         </div>

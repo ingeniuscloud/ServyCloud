@@ -37,3 +37,118 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  Compartir_Script.html (estaCompartido/limpiar)
 ════════════════════════════════════════════════════════════════════*/
 
+  window.Buscar = (function () {
+
+    var capsula  = null;
+    var input    = null;
+    var btnLimpiar = null;
+
+    var LIMITE_INPUT = 40;
+
+    function normalizar(s) {
+      return String(s == null ? '' : s)
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function emitir(termino, enLimite) {
+      document.dispatchEvent(new CustomEvent('buscar:change', {
+        detail: {
+          termino:  termino  || '',
+          enLimite: enLimite === true
+        }
+      }));
+    }
+
+    function enModoCompartido() {
+      return document.body.classList.contains('modo-compartido');
+    }
+
+    /* ============================================================
+       X DE LIMPIAR (R64) · dentro del campo, a la derecha
+       Búsqueda normal: borra el texto y repinta la lista del
+       chip (con cross-sell activo restaura el chip del post,
+       como hacía CANCELAR). Modo compartido: libera la vista
+       vía Compartir.limpiar (mismo trabajo de siempre).
+       ============================================================ */
+    function limpiarCampo() {
+      haptic(8);
+
+      if (window.Compartir &&
+          typeof window.Compartir.estaCompartido === 'function' &&
+          window.Compartir.estaCompartido()) {
+        window.Compartir.limpiar();
+        return;
+      }
+
+      input.value = '';
+      capsula.classList.remove('con-texto');
+
+      var postActivo = (window.Lista && typeof window.Lista.getPostActivo === 'function')
+        ? window.Lista.getPostActivo()
+        : null;
+
+      var chipActual = (window.Chips && typeof window.Chips.getChipActivo === 'function')
+        ? window.Chips.getChipActivo()
+        : null;
+
+      if (postActivo && postActivo.idChips && postActivo.idChips.length) {
+        var chipDelPost = postActivo.idChips[0];
+
+        if (chipDelPost !== chipActual) {
+          if (window.Chips && typeof window.Chips.seleccionar === 'function') {
+            window.Chips.seleccionar(chipDelPost);
+          }
+          emitir('', false);
+          return;
+        }
+      }
+
+      emitir('', false);
+
+      try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+    }
+
+    function onInput() {
+      var t = input.value.trim();
+      var enLimite = input.value.length >= LIMITE_INPUT;
+      capsula.classList.toggle('con-texto', input.value.length > 0);
+      emitir(t, enLimite);
+    }
+
+    function haptic(ms) {
+      if (navigator.vibrate) {
+        try { navigator.vibrate(ms); } catch (_) {}
+      }
+    }
+
+    function pintar() {
+      if (window.__buscarBound === '1') return;
+
+      capsula    = document.getElementById('buscarFila');
+      input      = document.getElementById('buscarInput');
+      btnLimpiar = document.getElementById('btnLimpiarCampo');
+
+      if (!capsula || !input || !btnLimpiar) {
+        return;
+      }
+
+      window.__buscarBound = '1';
+
+      btnLimpiar.addEventListener('click', limpiarCampo);
+      input.addEventListener('input', onInput);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', pintar);
+    } else {
+      pintar();
+    }
+
+    return {
+      pintar:     pintar,
+      normalizar: normalizar
+    };
+
+  })();

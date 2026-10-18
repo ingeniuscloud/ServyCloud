@@ -27,8 +27,17 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.2
-CAMBIOS:         R64: item LIMPIO — fuera la caja (background
+VERSIÓN:         2.3
+CAMBIOS:         R65: el bloque de items RECIBE a dos piezas que
+                 ya no son sección filtro: "Compartir lista"
+                 (antes "Compartir lista filtrada", en Chips_CSS)
+                 con la CANTIDAD de items al lado — Compartir
+                 lista (8) — y el aviso "No se encontraron
+                 resultados". Ambos viven DENTRO de .secciones-
+                 wrap, encima de la lista (scroll con los items,
+                 como el bloque que son); en modo detalle se
+                 ocultan con el resto.
+                 R64: item LIMPIO — fuera la caja (background
                  transparente, sin borde, sin sombra, sin radio
                  y sin separación por aire): la división entre
                  items es una línea tenue (border-bottom #eef2f7
@@ -131,6 +140,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   body.modo-detalle .filtros-fila,
   body.modo-detalle .filtros-fila-dos,
   body.modo-detalle .btn-compartir,
+  body.modo-detalle .buscar-vacio,
   body.modo-detalle .titulo-header,
   body.modo-detalle .promo-encabezado {
     display: none !important;
@@ -172,6 +182,85 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      ============================================================ */
   .lista-wrap[hidden] { display: none; }
   .secciones-track[hidden] { display: none !important; }
+
+  /* ============================================================
+     BLOQUE DE ITEMS (R65) · las dos piezas que viven ENCIMA
+     de la lista, DENTRO de .secciones-wrap (scrollean con los
+     items: son parte del bloque, no de la sección filtro):
+
+     · COMPARTIR LISTA — el botón de siempre (antes "Compartir
+       lista filtrada" en la sección filtro). TEXTO naranja
+       oficial con subrayado punteado + la CANTIDAD de items
+       junto al verbo: Compartir lista (8). Lista_Script lo
+       enciende con items y le escribe la cantidad en cada
+       repintado; Compartir_Script lleva el envío.
+     · AVISO SIN RESULTADOS — el mensaje de la búsqueda vacía
+       aparece JUSTO donde va Compartir lista (mismo slot:
+       nunca los dos a la vez).
+     ============================================================ */
+  .btn-compartir {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+
+    padding: 4px 4px 6px 18px;
+    margin: 2px 0 6px;
+
+    border: none;
+    background: transparent;
+
+    color: #FA6A08;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    text-align: left;
+    white-space: nowrap;
+
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-compartir:active { opacity: 0.5; }
+
+  /* [hidden] DEBE ganar sobre display:inline-flex (lección del
+     estándar: sin esto el botón se vería siempre). */
+  .btn-compartir[hidden] { display: none; }
+
+  .btn-compartir .btn-compartir-num {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .buscar-vacio {
+    flex-shrink: 0;
+
+    padding: 8px 16px 10px;
+
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+    color: #94a3b8;
+
+    background: transparent;
+    text-align: left;
+  }
+
+  .buscar-vacio[hidden] { display: none; }
+
+  @media (max-width: 360px) {
+    .btn-compartir { font-size: 13px; padding: 3px 4px 5px 16px; }
+    .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
+  }
 
   /* ============================================================
      LISTA ITEM · LIMPIO (R64)

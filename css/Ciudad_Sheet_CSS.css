@@ -7,18 +7,36 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
                  botón independiente más — pin + nombre de la
                  ciudad, SIN fondo, borde suave y delgado, y
                  reparte la fila con los chips en partes
-                 iguales) y del bottom sheet de selección (R62:
-                 TARJETAS en rejilla de dos columnas — nombre de
-                 la ciudad arriba con su punto de selección a la
-                 derecha y, debajo, las tres métricas de items
-                 activos: Servicios, Cursos y Promos; la tarjeta
-                 activa viste NARANJA oficial, jamás azul). Sheet
-                 al 90%. Modo bloqueado para primera selección
-                 sin ciudad guardada. Aviso de cookies de esa
-                 primera carga: icono a la izquierda del texto y
-                 botón Aceptar debajo.
-VERSIÓN:         1.7
-CAMBIOS:         R64: el botón ciudad entra a la FILA 2 de la
+                 iguales) y del bottom sheet de selección (R65:
+                 STACK VERTICAL de tarjetas nativas — diseño que
+                 trajo el dueño de una app popular —: nombre en
+                 negrita con el badge "Activo" a la derecha y,
+                 debajo, las tres etiquetas de métricas en pills
+                 horizontales (8 Servicios · 7 Cursos · 5
+                 Promos, la de Promos destacada); la tarjeta
+                 activa viste degradado tinte→blanco + borde
+                 NARANJA oficial + badge visible + pills
+                 naranjas; feedback táctil de rebote
+                 (scale 0.97). Jamás azul). Sheet al 90%. Modo
+                 bloqueado para primera selección sin ciudad
+                 guardada. Aviso de cookies de esa primera
+                 carga: icono a la izquierda del texto y botón
+                 Aceptar debajo.
+VERSIÓN:         1.8
+CAMBIOS:         R65: el sheet de ciudad cambia de MODELO —
+                 fuera la rejilla de 2 columnas con punto de
+                 selección (el dueño: se veía plano); entra el
+                 stack vertical de tarjetas nativas que trajo
+                 de referencia: cards de esquinas 18px con
+                 borde fino #eef0f2, nombre 17px en negrita,
+                 badge "Activo" (solo la activa lo muestra),
+                 pills horizontales con la cifra en negrita y
+                 la de Promos destacada; activa = degradado
+                 tinte naranja→blanco + borde #f97316 + pills
+                 naranjas; al tocar, la tarjeta se encoge 3%
+                 (rebote nativo); handle 36×5 #dee2e6 y título
+                 20px centrado (mismos valores del modelo).
+                 R64: el botón ciudad entra a la FILA 2 de la
                  sección de filtros (con los chips): borde suave
                  y delgado (1px #e2e8f0, estilo 2026 — fuera el
                  1.2px #475569) y reparte la fila en partes
@@ -62,7 +80,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding: 9px 12px 10px;
     margin: 0;
 
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
     background: transparent;
     border-radius: 999px;
 
@@ -187,10 +205,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .ciudad-handle-area:active { cursor: grabbing; }
 
   .ciudad-handle {
-    width: 38px;
-    height: 4px;
-    background-color: #cbd5e1;
-    border-radius: 999px;
+    width: 36px;
+    height: 5px;
+    background-color: #dee2e6;
+    border-radius: 3px;
     transition: background-color 0.2s ease, width 0.2s ease;
   }
   .ciudad-handle-area:active .ciudad-handle {
@@ -256,11 +274,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .ciudad-content::-webkit-scrollbar { display: none; }
 
   .ciudad-titulo {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    color: #0f172a;
-    margin: 4px 0 14px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: #121214;
+    margin: 2px 0 22px;
     text-align: center;
   }
 
@@ -329,53 +347,56 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     TARJETAS DE CIUDADES (R62) · rejilla seleccionable
-     Cada ciudad es una TARJETA: nombre arriba con el punto de
-     selección a la derecha y, debajo, las tres métricas de
-     items activos (Servicios / Cursos / Promos). El color
-     oficial es el NARANJA — la tarjeta activa viste borde y
-     tinte naranja (jamás azul: el azul del radio viejo murió
-     con esta regla). Las métricas las calcula
-     Ciudad_Sheet_Script con TABLAS + SISTEMA.promo.
+     TARJETAS DE CIUDADES (R65) · STACK NATIVO (modelo del dueño)
+     Tarjetas apiladas verticalmente (flex column, gap 12):
+     blanca, borde fino #eef0f2, esquinas 18px, padding 16.
+     Arriba: nombre en NEGRITA (17px) + badge "Activo" naranja
+     (SOLO la activa lo muestra). Debajo: pills horizontales
+     "N Servicios · N Cursos · N Promos" — cifra en negrita
+     dentro del pill, la de PROMOS es la destacada. ACTIVA:
+     degradado tinte naranja→blanco + borde #f97316 + nombre
+     y pills naranjas (NARANJA OFICIAL, jamás azul). Táctil:
+     al presionar la tarjeta se encoge 3% (rebote nativo,
+     sin el recuadro gris de Android/Safari). Las métricas
+     las calcula Ciudad_Sheet_Script con TABLAS +
+     SISTEMA.promo.
      ============================================================ */
   .ciudad-tarjetas {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .ciudad-card {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: block;
+    width: 100%;
 
-    padding: 12px 13px 13px;
+    padding: 16px;
 
     background: #ffffff;
-    border: 1px solid #f1f5f9;
-    border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    border: 1px solid #eef0f2;
+    border-radius: 18px;
 
     font-family: inherit;
     text-align: left;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 
-    transition: border-color 0.15s ease, background 0.15s ease,
-                box-shadow 0.15s ease;
+    transition: transform 0.1s ease, background 0.2s ease,
+                border-color 0.2s ease;
   }
 
-  .ciudad-card:active {
-    background: #fff7ed;
-    border-color: #fdba74;
-  }
+  /* FEEDBACK TÁCTIL NATIVO (modelo del dueño): se encoge un
+     3% al poner el pulgar encima. */
+  .ciudad-card:active { transform: scale(0.97); }
 
-  /* Tarjeta ACTIVA · naranja oficial (sin azul) */
+  /* Tarjeta ACTIVA · degradado tinte→blanco + borde naranja */
   .ciudad-card.activa {
-    border: 1.6px solid #f97316;
-    background: #fff7ed;
-    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.16);
+    background: linear-gradient(145deg, rgba(249, 115, 22, 0.05) 0%, #ffffff 100%);
+    border-color: #f97316;
   }
 
   .ciudad-card-top {
@@ -383,10 +404,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    min-width: 0;
+    margin-bottom: 12px;
   }
 
-  /* Nombre SIN bold (R62: la ciudad en peso normal) */
+  /* Nombre EN NEGRITA (17px, como el modelo) */
   .ciudad-card-nombre {
     flex: 1;
     min-width: 0;
@@ -394,73 +415,78 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    font-size: 15px;
-    font-weight: 500;
+    margin: 0;
+
+    font-size: 17px;
+    font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.01em;
-    color: #1f2937;
+    letter-spacing: -0.3px;
+    color: #121214;
   }
-  .ciudad-card.activa .ciudad-card-nombre { color: #c2410c; }
+  .ciudad-card.activa .ciudad-card-nombre { color: #f97316; }
 
-  /* Punto de selección (el "O" del mockup del dueño): círculo
-     fino; activo, relleno naranja. */
-  .ciudad-card-punto {
+  /* Badge "Activo" · SOLO visible en la tarjeta activa
+     (naranja oficial, píldora blanca rellena). */
+  .ciudad-card-badge {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    border: 1.6px solid #cbd5e1;
-    border-radius: 50%;
-    background: transparent;
-    position: relative;
-    transition: border-color 0.15s ease;
-  }
-  .ciudad-card.activa .ciudad-card-punto {
-    border-color: #f97316;
-  }
-  .ciudad-card.activa .ciudad-card-punto::after {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-    background: #f97316;
-  }
 
+    display: none;
+
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.01em;
+
+    background: #f97316;
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+  .ciudad-card.activa .ciudad-card-badge { display: inline-block; }
+
+  /* Pills de métricas · fila horizontal con wrap por si la
+     pantalla es muy pequeña. Fondo gris suave, cifra en
+     negrita tinta. La de PROMOS es la destacada. */
   .ciudad-card-metricas {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .ciudad-card-metrica {
-    display: flex;
+    display: inline-flex;
     align-items: baseline;
-    gap: 8px;
-    min-width: 0;
-  }
+    gap: 2px;
 
-  /* Cifra alineada en columna (como el mockup): número
-     tabular + etiqueta gris. Sin bold. */
-  .ciudad-card-num {
-    flex: 0 0 auto;
-    min-width: 26px;
-    text-align: right;
+    background: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 10px;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1.2;
-    color: #1f2937;
+    color: #495057;
+  }
+
+  .ciudad-card-num {
+    font-weight: 700;
+    color: #121214;
+    margin-right: 2px;
     font-variant-numeric: tabular-nums;
   }
-  .ciudad-card.activa .ciudad-card-num { color: #c2410c; }
 
   .ciudad-card-etiqueta {
-    flex: 1;
-    min-width: 0;
+    font-weight: 500;
+    color: inherit;
+  }
 
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.3;
-    color: #64748b;
+  /* ACTIVA · pills de Promos visten la familia naranja */
+  .ciudad-card.activa .ciudad-card-metrica.destacada {
+    background: rgba(249, 115, 22, 0.10);
+    color: #f97316;
+  }
+  .ciudad-card.activa .ciudad-card-metrica.destacada .ciudad-card-num {
+    color: #f97316;
   }
 
   /* ============================================================
@@ -470,12 +496,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .city-bar { padding: 7px 12px 8px; font-size: 12.5px; gap: 5px; }
     .city-bar .city-pin { width: 14px; height: 14px; }
     .ciudad-content { padding: 4px 18px 22px; }
-    .ciudad-tarjetas { gap: 8px; }
-    .ciudad-card { padding: 11px 12px 12px; }
-    .ciudad-card-nombre { font-size: 14px; }
-    .ciudad-card-num { font-size: 13px; min-width: 22px; }
-    .ciudad-card-etiqueta { font-size: 11.5px; }
-    .ciudad-titulo { font-size: 1.02rem; }
+    .ciudad-tarjetas { gap: 10px; }
+    .ciudad-card { padding: 14px; }
+    .ciudad-card-nombre { font-size: 16px; }
+    .ciudad-card-metrica { font-size: 12px; padding: 5px 10px; }
+    .ciudad-titulo { font-size: 18px; }
     .ciudad-cookies { max-width: 280px; }
     .cookies-icono { width: 26px; height: 26px; }
     .cookies-texto { font-size: 13px; }
