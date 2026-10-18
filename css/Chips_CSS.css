@@ -1,19 +1,23 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de la pantalla principal (R62): FILA DE
-                 CABECERA con volver + título de categoría + MENÚ
-                 GLOBAL (la ciudad salió de aquí: es un botón más
-                 de la fila de filtros); FILA DE FILTROS
-                 (.filtros-fila debajo de las promos): CHIPS como
-                 BOTONES INDEPENDIENTES (cápsula contenedora
-                 eliminada; borde del mismo color y grosor que el
-                 botón buscar, esquinas redondas; activo con FONDO
-                 BLANCO, inactivo transparente) cada uno con su
-                 icono y su CONTADOR de items, el BOTÓN CIUDAD
-                 (pin + nombre, sin fondo, solo bordes), la LUPA y
-                 el BOTÓN FILTRO (círculos, sin acción por ahora).
+RESPONSABILIDAD: CSS de la pantalla principal (R63): FILA DE
+                 CABECERA con volver + TÍTULO DEL HEADER + título
+                 de categoría + MENÚ GLOBAL (la ciudad salió de
+                 aquí: es un botón más de la fila de filtros);
+                 FILA DE FILTROS (.filtros-fila debajo de las
+                 promos): CHIPS como BOTONES INDEPENDIENTES
+                 (cápsula contenedora eliminada; borde del mismo
+                 color y grosor que el botón buscar, esquinas
+                 redondas; activo con FONDO BLANCO, inactivo
+                 transparente) cada uno con su icono y su CONTADOR
+                 de items, el BOTÓN CIUDAD (pin + nombre, sin
+                 fondo, solo bordes), la LUPA y el BOTÓN FILTRO
+                 (círculos, sin acción por ahora) — con ESPACIO
+                 DE RESPIRO abajo (R63: los botones ya no quedan
+                 pegados a los items).
                  Al abrir la búsqueda la CÁPSULA BLANCA se expande
                  tapando el resto de la fila y aparece CANCELAR
                  fuera del campo, a la derecha (texto naranja con
@@ -32,8 +36,12 @@ RESPONSABILIDAD: CSS de la pantalla principal (R62): FILA DE
                  de volver/título; una lista compartida vuelve al
                  par volver/título dentro de cada post. Línea de
                  aviso cuando la búsqueda no da resultados.
-VERSIÓN:         1.9
-CAMBIOS:         R62: la cápsula contenedora de los chips
+VERSIÓN:         2.0
+CAMBIOS:         R63: .filtros-fila gana su ESPACIO DE RESPIRO
+                 abajo (margin-bottom 2→10px, y en pantallas
+                 cortas 2→8px): los botones ya no quedan pegados
+                 a los items de la lista (orden del dueño).
+                 R62: la cápsula contenedora de los chips
                  (.filtros con fondo gris) se ELIMINA — los chips
                  son botones independientes: borde 1.2px #475569
                  (el del botón buscar), esquinas redondas,
@@ -69,8 +77,7 @@ CAMBIOS:         R62: la cápsula contenedora de los chips
                  debajo de las promos.
 DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   /* ============================================================
      WRAP · FILA DE CABECERA (R60)
      Ciudad COMPLETA a la izquierda + menú global a la derecha,
@@ -97,7 +104,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .filtros-fila {
     flex-shrink: 0;
     width: auto;
-    margin: 4px 14px 2px;
+    margin: 4px 14px 10px;   /* R63: 2→10px, espacio de respiro */
 
     display: flex;
     align-items: center;
@@ -664,7 +671,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .filtros-fila { gap: 4px; margin: 3px 12px 2px; }
+    .filtros-fila { gap: 4px; margin: 3px 12px 8px; }
     .filtros { gap: 4px; }
     .chip    { font-size: 12.5px; padding: 7px 10px 8px; }
     .chip .chip-icono { width: 14px; height: 14px; }

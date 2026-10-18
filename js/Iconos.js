@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Iconos.html
 ESPEJO GITHUB:   js/Iconos.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -9,9 +10,12 @@ RESPONSABILIDAD: Depósito de glifos SVG inline. Expone IMAGENES
                  con [data-glifo="clave"]. Al cargar el DOM, pinta
                  todos los data-glifo del documento automáticamente.
 
-                 Catálogo: 26 glifos EN USO confirmado.
-VERSIÓN:         1.7
-CAMBIOS:         R62: entran servicio y cursos (iconos de los
+                 Catálogo: 28 glifos EN USO confirmado.
+VERSIÓN:         1.8
+CAMBIOS:         R63: entran android y apple (las pestañas de la
+                 ayuda de instalación del menú global — el dueño
+                 pidió la guía en sus 2 versiones).
+                 R62: entran servicio y cursos (iconos de los
                  chips de la vidriera) y filtro (el botón de
                  filtros de la fila: 3 líneas verticales con su
                  deslizador, diseño del dueño; #btnFiltro lo
@@ -32,8 +36,7 @@ CAMBIOS:         R62: entran servicio y cursos (iconos de los
 DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
                  Global_Script.html, Social_Script.html,
                  Reserva_Script.html y Comenta_* vía DOM)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   const IMAGENES = {
 
     /* ============================================================
@@ -67,6 +70,8 @@ DEPENDENCIAS:    Ninguna (window.pintarGlifos es consumido por
     building:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2022V4a2%202%200%200%201%202-2h8a2%202%200%200%201%202%202v18%22%2F%3E%3Cpath%20d%3D%22M2%2022h20%22%2F%3E%3Cpath%20d%3D%22M10%206h4%22%2F%3E%3Cpath%20d%3D%22M10%2010h4%22%2F%3E%3Cpath%20d%3D%22M10%2014h4%22%2F%3E%3Cpath%20d%3D%22M10%2018h4%22%2F%3E%3C%2Fsvg%3E",
 
     /* ---------- Menú global, legal y promo ---------- */
+    android:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2011a7%207%200%200%201%2014%200v5a2%202%200%200%201-2%202H7a2%202%200%200%201-2-2z%22/%3E%3Cline%20x1%3D%228%22%20y1%3D%226.5%22%20x2%3D%226.5%22%20y2%3D%224.5%22/%3E%3Cline%20x1%3D%2216%22%20y1%3D%226.5%22%20x2%3D%2217.5%22%20y2%3D%224.5%22/%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%2212.5%22%20r%3D%220.75%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22/%3E%3Ccircle%20cx%3D%2214.5%22%20cy%3D%2212.5%22%20r%3D%220.75%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22/%3E%3C/svg%3E",
+    apple:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%2020.94c1.5%200%202.75%201.06%204%201.06%203%200%206-8%206-12.22A4.91%204.91%200%200%200%2017%205c-2.22%200-4%201.44-5%202-1-.56-2.78-2-5-2a4.9%204.9%200%200%200-5%204.78C2%2014%205%2022%208%2022c1.25%200%202.5-1.06%204-1.06Z%22/%3E%3Cpath%20d%3D%22M10%202c1%20.5%202%202%202%205%22/%3E%3C/svg%3E",
     cookie:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202a10%2010%200%201%200%2010%2010%209%209%200%200%201-9-9%2010%2010%200%200%200-1-1z%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%2214%22%20r%3D%221%22%20fill%3D%22currentColor%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2217%22%20r%3D%221%22%20fill%3D%22currentColor%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2213%22%20r%3D%221%22%20fill%3D%22currentColor%22%2F%3E%3C%2Fsvg%3E",
     download:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%2015v4a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2v-4%22%2F%3E%3Cpolyline%20points%3D%227%2010%2012%2015%2017%2010%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%2215%22%20x2%3D%2212%22%20y2%3D%223%22%2F%3E%3C%2Fsvg%3E",
     info:           "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Cpath%20d%3D%22M12%2016v-4%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%228%22%20r%3D%220.6%22%20fill%3D%22currentColor%22%2F%3E%3C%2Fsvg%3E",

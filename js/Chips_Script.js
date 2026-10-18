@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Chips_Script.html
 ESPEJO GITHUB:   js/Chips_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -15,8 +16,20 @@ RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
                  Al cambiar de chip emite 'chips:change' con
                  { idChip } para que Lista reaccione. La ciudad
                  vive fuera de los chips, en Ciudad_Sheet_Script.
-VERSIÓN:         1.2
-CAMBIOS:         R62: cada chip lleva ICONO + CONTADOR —
+                 R63: resetearVista() — cada cambio de ciudad cae
+                 al chip de SERVICIOS por defecto (orden del
+                 dueño: Irapa sin cursos no puede dejar la lista
+                 vacía).
+VERSIÓN:         1.3
+CAMBIOS:         R63: entra resetearVista() (y chipServicio(),
+                 que resuelve el id del chip servicio por su
+                 texto/idChip, sin hardcodear ids): escribe la
+                 vista guardada con el chip servicio para que la
+                 restauración no reviva el chip anterior; si los
+                 botones ya están pintados, activa y emite
+                 chips:change. Core_Script lo llama en
+                 'ciudad:change'.
+                 R62: cada chip lleva ICONO + CONTADOR —
                  glifoDeChip() resuelve el glifo (servicio /
                  cursos) por el titulo y el idChip (sin svg
                  hardcodeado: los glifos viven en Iconos);
@@ -29,8 +42,7 @@ CAMBIOS:         R62: cada chip lleva ICONO + CONTADOR —
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   window.Chips = (function () {
 
     var KEY_VISTA  = 'app_vista';
@@ -246,6 +258,38 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
     document.addEventListener('ciudad:change', actualizarContadores);
 
     /* ============================================================
+       RESET A SERVICIO (R63) · el dueño: cada cambio de ciudad
+       muestra por defecto el chip de SERVICIOS — evita aterrizar
+       en un chip vacío (Irapa no tiene cursos y la lista salía
+       en blanco). chipServicio() resuelve el id por el texto/
+       idChip (mismo idioma de glifoDeChip; sin hardcodear ids:
+       si la hoja renombra, sigue funcionando y cae al primero).
+       resetearVista() escribe la vista guardada para que la
+       restauración no reviva el chip anterior; si los botones
+       ya están pintados, activa el chip y emite chips:change.
+       Core_Script lo llama en 'ciudad:change'.
+       ============================================================ */
+    function chipServicio() {
+      var chips = chipsDisponibles();
+      for (var i = 0; i < chips.length; i++) {
+        if (glifoDeChip(chips[i]) === 'servicio') return chips[i].idChip;
+      }
+      return chips.length ? chips[0].idChip : null;
+    }
+
+    function resetearVista() {
+      var idServicio = chipServicio();
+      if (!idServicio) return;
+
+      escribirVista(idServicio);
+
+      var contenedor = document.getElementById('filtros');
+      if (!contenedor || !contenedor.querySelector('.chip')) return;
+
+      activarChip(idServicio);
+    }
+
+    /* ============================================================
        API pública
        ============================================================ */
     function seleccionar(catId) {
@@ -267,7 +311,8 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
     return {
       pintar:        pintar,
       seleccionar:   seleccionar,
-      getChipActivo: getChipActivo
+      getChipActivo: getChipActivo,
+      resetearVista: resetearVista
     };
 
   })();

@@ -95,7 +95,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
 <head>
   <base target="_top">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ServyCloud</title>
 
   <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
@@ -539,11 +539,13 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
       <div class="area-contenido">
 
         <!-- ============================================================
-             FILA DE CABECERA (R62) · volver + título de categoría
-             + MENÚ GLOBAL. La ciudad salió de aquí: es un botón
-             independiente de la fila de filtros (debajo). En
-             modo lista solo se ve el menú global. El menú global
-             se oculta en modo compartido.
+             FILA DE CABECERA (R63) · volver + TÍTULO DEL HEADER
+             + título de categoría + MENÚ GLOBAL, TODO en una
+             fila: en modo lista el título vive a la IZQUIERDA y
+             el menú global a la DERECHA (lista ganada); en modo
+             detalle el título se oculta y entran volver +
+             título de categoría. El menú global se oculta en
+             modo compartido.
              ============================================================ -->
         <div class="filtros-wrap">
 
@@ -552,6 +554,12 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
               <polyline points="15 18 9 12 15 6"/>
             </svg>
           </button>
+
+          <!-- R63 · TÍTULO DEL HEADER · frase de la BD real
+               (ROOTJSON → app.tituloHeader, un vector: UNA al
+               azar por carga). Mismo tamaño de fila que el
+               menú global; Core_Script lo pinta al arrancar. -->
+          <h1 class="titulo-header" id="tituloHeader" hidden></h1>
 
           <div id="tituloCategoria" class="titulo-categoria" hidden></div>
 
@@ -564,14 +572,6 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           </button>
 
         </div>
-
-        <!-- ============================================================
-             TÍTULO INICIAL (R58 · R62 VECTOR) · frase grande que
-             viene de la BD real: ROOTJSON → app.tituloHeader (un
-             vector: UNA al azar por carga). Core_Script lo pinta
-             al arrancar; si la BD no lo trae, queda oculto.
-             ============================================================ -->
-        <h1 class="titulo-header" id="tituloHeader" hidden></h1>
 
         <!-- ============================================================
              ENCABEZADO DE PROMOS (R58) · par título/subtítulo sobre

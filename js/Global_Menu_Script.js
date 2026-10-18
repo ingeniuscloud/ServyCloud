@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Global_Menu_Script.html
 ESPEJO GITHUB:   js/Global_Menu_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -6,18 +7,31 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  jerarquía (marca de la app protagonista arriba,
                  crédito de INGeniusCloud abajo) y subvistas
                  "Acerca de", "Términos y condiciones", "Privacidad"
-                 y "Cookies" interpolando datos de ROOTJSON
-                 (marcaApp, marcaEmpresa, correo, whatsapp), más la
-                 guía PWA y el drag de cierre.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 y "Cookies" interpolando datos de ROOTJSON, más la
+                 ayuda de instalación (R63: guía con pestañas
+                 ANDROID / IPHONE y TIMELINE animado de pasos — las
+                 2 versiones juntas, vistiendo el color oficial)
+                 y el drag de cierre.
+VERSIÓN:         1.3
+CAMBIOS:         R63: la subvista PWA se reconstruye — pestañas
+                 Android/iPhone (glifos android/apple de Iconos) con
+                 la del dispositivo activa por defecto, TIMELINE de
+                 pasos (puntos numerados + línea vertical, entrada
+                 escalonada — "los puntos tienen vida") todo en el
+                 NARANJA oficial, botón "Instalar ahora" solo cuando
+                 hay boleto real (Android), nota por versión. La
+                 guía ya no depende de la plataforma del usuario:
+                 muestra AMBAS versiones y el dueño las ve de una
+                 vez. Compatibilidad: si la BD solo trae una
+                 plataforma, sale una sola pestaña; si no trae
+                 pwa, "Próximamente" como siempre.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
 ════════════════════════════════════════════════════════════════════*/
-
   /* ============================================================
      MÓDULO GLOBAL · Menú (bottom sheet)
      ============================================================ */
@@ -58,6 +72,11 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
        estilos inline para no tocar ningún CSS.
        ============================================================ */
     var avisoPwaTimer = null;
+
+    /* R63 · pestaña activa de la ayuda de instalación
+       ('android' | 'ios'). Arranca en la plataforma del
+       dispositivo; las pestañas la cambian. */
+    var pwaTab = null;
 
     function _renderMarcaApp(marca) {
       var s = String(marca || '');
@@ -399,13 +418,91 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       navegar('pwa');
     }
 
+    /* ============================================================
+       AYUDA DE INSTALACIÓN (R63) · las 2 versiones del dueño
+       Pestañas ANDROID / IPHONE (glifos de Iconos) + TIMELINE de
+       pasos en el naranja oficial con entrada escalonada. La
+       pestaña inicial es la del dispositivo. Si la BD solo trae
+       una plataforma, esa sale sola (sin pestañas); si no trae
+       pwa, "Próximamente" (compatibilidad de siempre).
+       ============================================================ */
+    function pwaPlataformas() {
+      var cfg = window.SISTEMA && window.SISTEMA.pwa;
+      var lista = [];
+      if (cfg && cfg.android) lista.push('android');
+      if (cfg && cfg.ios)     lista.push('ios');
+      return lista;
+    }
+
+    function pwaDatosTab(plataforma) {
+      var cfg = window.SISTEMA && window.SISTEMA.pwa;
+      if (!cfg) return null;
+      return cfg[plataforma] || cfg.otro || null;
+    }
+
+    function pwaCuerpoHTML(plataforma) {
+      var cfg = window.SISTEMA && window.SISTEMA.pwa;
+      if (!cfg) return '';
+
+      var data = pwaDatosTab(plataforma);
+      if (!data) return '';
+
+      var html = '<ol class="pwa-timeline">';
+
+      var pasos = data.pasos || [];
+      pasos.forEach(function (p, i) {
+        html +=
+          '<li class="pwa-paso" style="--i:' + i + '">' +
+            '<span class="pwa-paso-punto" aria-hidden="true">' + (i + 1) + '</span>' +
+            '<span class="pwa-paso-contenido">' +
+              '<span class="pwa-paso-titulo">' + (p.titulo || '') + '</span>' +
+              (p.detalle
+                ? '<span class="pwa-paso-detalle">' + p.detalle + '</span>'
+                : '') +
+            '</span>' +
+          '</li>';
+      });
+
+      html += '</ol>';
+
+      /* R63 · botón "Instalar ahora": SOLO con boleto real en la
+         mano (Android, página estática). En iPhone no existe el
+         boleto: la guía ES el camino. Si no hay boleto, el botón
+         no sale y los pasos mandan. */
+      var boleto = null;
+      try { boleto = window.__servyBoleto || null; } catch (_) {}
+      if (plataforma === 'android' && boleto &&
+          typeof boleto.prompt === 'function') {
+        html += '<button type="button" class="pwa-instalar">' +
+                'Instalar ahora</button>';
+      }
+
+      if (data.nota) {
+        html += '<p class="pwa-nota">' + data.nota + '</p>';
+      }
+
+      return html;
+    }
+
     function getPWAHTML() {
       var cfg = window.SISTEMA && window.SISTEMA.pwa;
       if (!cfg) return '<h2 class="sheet-titulo">Próximamente</h2>';
 
-      var plataforma = getPlataformaUsuario();
-      var data = cfg[plataforma] || cfg.otro;
-      if (!data) return '<h2 class="sheet-titulo">Próximamente</h2>';
+      /* Pestañas: las plataformas que la BD traiga. Si ninguna,
+         fallback cfg.otro con una sola guía (compatibilidad). */
+      var plataformas = pwaPlataformas();
+      if (!plataformas.length && cfg.otro) {
+        plataformas = ['android'];
+      }
+      if (!plataformas.length) {
+        return '<h2 class="sheet-titulo">Próximamente</h2>';
+      }
+
+      /* Pestaña inicial: la del dispositivo si está; si no, la
+         primera. */
+      var delEquipo = getPlataformaUsuario();
+      pwaTab = (plataformas.indexOf(delEquipo) !== -1)
+        ? delEquipo : plataformas[0];
 
       var html = '<div class="sheet-pwa">';
 
@@ -420,28 +517,70 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
         html += '<p class="pwa-sub">' + cfg.subtitulo + '</p>';
       }
 
-      if (data.plataforma) {
-        html += '<span class="pwa-plataforma">' + data.plataforma + '</span>';
-      }
-
-      var pasos = data.pasos || [];
-      if (pasos.length > 0) {
-        html += '<ol class="pwa-pasos">';
-        pasos.forEach(function (p) {
-          html += '<li>';
-          html += '<span class="pwa-paso-titulo">' + p.titulo + '</span>';
-          if (p.detalle) html += '<span class="pwa-paso-detalle">' + p.detalle + '</span>';
-          html += '</li>';
+      if (plataformas.length > 1) {
+        html += '<div class="pwa-tabs" role="tablist" ' +
+                'aria-label="Elegir tu teléfono">';
+        plataformas.forEach(function (p) {
+          var esIOS = (p === 'ios');
+          html +=
+            '<button type="button" role="tab" ' +
+              'class="pwa-tab' + (p === pwaTab ? ' activa' : '') + '" ' +
+              'data-tab="' + p + '" ' +
+              'aria-selected="' + (p === pwaTab ? 'true' : 'false') + '">' +
+              '<span class="pwa-tab-icono" data-glifo="' +
+                (esIOS ? 'apple' : 'android') + '" aria-hidden="true"></span>' +
+              '<span>' + (esIOS ? 'iPhone' : 'Android') + '</span>' +
+            '</button>';
         });
-        html += '</ol>';
+        html += '</div>';
       }
 
-      if (data.nota) {
-        html += '<p class="pwa-nota">' + data.nota + '</p>';
-      }
+      html += '<div class="pwa-cuerpo">' +
+              pwaCuerpoHTML(pwaTab) + '</div>';
 
       html += '</div>';
       return html;
+    }
+
+    /* Enganche de la subvista PWA: pestañas + botón instalar. */
+    function engancharPWA() {
+      if (!content) return;
+
+      var tabs = content.querySelectorAll('.pwa-tab');
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].addEventListener('click', function () {
+          var nueva = this.getAttribute('data-tab');
+          if (!nueva || nueva === pwaTab) return;
+          pwaTab = nueva;
+
+          var activos = content.querySelectorAll('.pwa-tab');
+          for (var j = 0; j < activos.length; j++) {
+            var esEsta = activos[j].getAttribute('data-tab') === nueva;
+            activos[j].classList.toggle('activa', esEsta);
+            activos[j].setAttribute('aria-selected', esEsta ? 'true' : 'false');
+          }
+
+          var cuerpo = content.querySelector('.pwa-cuerpo');
+          if (!cuerpo) return;
+          cuerpo.innerHTML = pwaCuerpoHTML(nueva);
+          if (typeof window.pintarGlifos === 'function') {
+            window.pintarGlifos(cuerpo);
+          }
+          engancharInstalar();
+        });
+      }
+
+      engancharInstalar();
+    }
+
+    function engancharInstalar() {
+      var btn = content && content.querySelector('.pwa-instalar');
+      if (!btn || btn.dataset.bound === '1') return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function () {
+        haptic(10);
+        instalarPwa();
+      });
     }
 
     function getContenido(k) {
@@ -519,6 +658,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
         window.pintarGlifos(content);
       }
       if (k === 'menu') engancharMenu();
+      if (k === 'pwa')  engancharPWA();
 
       actualizarGradientePrivacidad();
     }
@@ -535,6 +675,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
           window.pintarGlifos(content);
         }
         if (k === 'menu') engancharMenu();
+        if (k === 'pwa')  engancharPWA();
 
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {

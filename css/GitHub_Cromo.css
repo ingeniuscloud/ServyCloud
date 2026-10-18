@@ -4,17 +4,26 @@ ARCHIVO:         GitHub_Cromo.css
 ESPEJO GITHUB:   css/GitHub_Cromo.css (SOLO-GitHub: no existe en GAS)
 PROYECTO:        ServyCloud | App en GitHub Pages
 RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
-                 orbital (R62: DENTRO del marco del teléfono en
-                 PC — overlay absoluto sobre el lienzo, no sobre
-                 toda la pantalla) y píldora "Instalar app". Nació
-                 con el envoltorio (R26) y desde R29 vive como
+                 orbital (R63: en PC DENTRO del marco del teléfono
+                 — overlay absoluto sobre el lienzo; en MÓVIL a
+                 TODA la pantalla, incluidas las franjas superior e
+                 inferior del sistema) y píldora "Instalar app".
+                 Nació con el envoltorio (R26) y desde R29 vive como
                  archivo propio. El dueño no necesita tocarlo.
-VERSIÓN:         1.4
-CAMBIOS:         R62: .preloader-overlay pasa de position fixed
+VERSIÓN:         1.5
+CAMBIOS:         R63: en móvil (body.is-mobile) el overlay pasa a
+                 POSITION FIXED con inset 0 — cubre TODA la pantalla
+                 del teléfono; con el viewport-fit=cover del
+                 index.html llega hasta las franjas del sistema y el
+                 theme-color naranja (lo pinta GitHub_Cromo.js
+                 mientras carga) viste la franja superior/inferior
+                 del mismo naranja (el dueño las veía blancas). En
+                 PC sigue ABSOLUTE dentro de #lienzo (R62): sale
+                 dentro de la carcasa.
+                 R62: .preloader-overlay pasa de position fixed
                  (toda la pantalla) a ABSOLUTE dentro de #lienzo —
                  en PC el preloader sale dentro del marco del
-                 teléfono (orden del dueño); en móvil el lienzo es
-                 full screen y el efecto no cambia.
+                 teléfono (orden del dueño).
                  R59: interior del preloader corregido DE UNA VEZ
                  (orden del dueño): el anillo base de los
                  orbitales se funde con el fondo (transparente —
@@ -58,6 +67,18 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
     }
     .preloader-overlay.saliendo { opacity: 0; }
     .preloader-overlay[hidden]  { display: none; }
+
+    /* R63 · MÓVIL: preloader a TODA la pantalla (orden del dueño).
+       En el teléfono body.is-mobile aplana la shell; el overlay
+       fixed con inset 0 cubre el documento completo y, con
+       viewport-fit=cover, también las franjas del sistema (el
+       theme-color naranja viste la superior/inferior durante la
+       carga). En PC la regla no aplica: overlay absoluto dentro
+       del lienzo (carcasa). */
+    body.is-mobile .preloader-overlay {
+      position: fixed;
+      inset: 0;
+    }
 
     .carga-preloader {
       --text-primary: #ffffff;

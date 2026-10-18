@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -13,11 +14,20 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  Incluye la fila del partner estilo Instagram
                  (divisoria a sangre, de borde a borde) y el
                  estado deshabilitado en naranja tenue para
-                 cursos "pronto". R62: TÍTULO INICIAL en peso
-                 LIGERO (300) — el dueño lo veía todavía rústico:
-                 a 36px, la letra fina se ve elegante.
-VERSIÓN:         2.0
-CAMBIOS:         R62: .titulo-header pierde TODO el grosor que
+                 cursos "pronto". R63: el TÍTULO INICIAL vive en
+                 la MISMA FILA que el menú global (título a la
+                 izquierda, menú a la derecha) y un 15% MÁS
+                 PEQUEÑO — la fila entera gana aire para la
+                 lista.
+VERSIÓN:         2.1
+CAMBIOS:         R63: .titulo-header baja de fila propia a la
+                 FILA DE CABECERA (h1 dentro de .filtros-wrap,
+                 flex 1): 36→30.6px (−15%, orden del dueño), peso
+                 300 intacto, clamp a 2 líneas intacto; en modo
+                 detalle sigue oculto (regla de Lista_CSS) y el
+                 par volver/título toma la fila. El hueco que
+                 dejaba su fila propia es LISTA GANADA.
+                 R62: .titulo-header pierde TODO el grosor que
                  le quedaba (400→300): a su tamaño, el peso
                  ligero es lo elegante (orden del dueño: "aun se
                  nota muy rustico").
@@ -48,8 +58,7 @@ CAMBIOS:         R62: .titulo-header pierde TODO el grosor que
                  en modo lista.
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   *{ box-sizing: border-box; }
 
   html, body {
@@ -112,24 +121,27 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     TÍTULO INICIAL (R62 · PESO LIGERO) · la frase grande que
-     viene de la BD real (ROOTJSON → app.tituloHeader — ahora
-     un VECTOR: una frase al azar por carga, lo pinta
-     Core_Script). Vive DEBAJO de la fila de cabecera y ENCIMA
-     del encabezado de promos. R62: 400→300 — a 36px el peso
-     ligero es lo elegante (el dueño lo seguía viendo rústico).
-     Dos líneas máximo; si la BD no lo trae, Core_Script lo
-     deja oculto ([hidden]).
+     TÍTULO INICIAL (R63 · EN LA FILA DE CABECERA) · la frase
+     que viene de la BD real (ROOTJSON → app.tituloHeader — un
+     VECTOR: una frase al azar por carga, lo pinta
+     Core_Script). VIVE DENTRO de .filtros-wrap: título a la
+     izquierda y MENÚ GLOBAL a la derecha en UNA sola fila —
+     el hueco de su fila propia es lista ganada. R63: 36→30.6px
+     (−15%, orden del dueño); peso 300 intacto. Dos líneas
+     máximo; si la BD no lo trae, Core_Script lo deja oculto
+     ([hidden]). En modo detalle queda oculto (Lista_CSS) y la
+     fila la toman volver + título de categoría.
      ============================================================ */
   .titulo-header {
-    flex-shrink: 0;
-    margin: 10px 16px 2px;
-    padding: 4px 0 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 2px 0 2px 8px;
 
     font-family: inherit;
-    font-size: 36px;
+    font-size: 30.6px;
     font-weight: 300;
-    line-height: 1.2;
+    line-height: 1.15;
     letter-spacing: -0.01em;
     color: #1f2937;
     text-align: left;
@@ -142,7 +154,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   .titulo-header[hidden] { display: none; }
 
   @media (max-width: 360px) {
-    .titulo-header { font-size: 31px; margin: 8px 14px 0; padding: 4px 0 6px; }
+    .titulo-header { font-size: 26.4px; padding-left: 6px; }
   }
 
   /* ============================================================

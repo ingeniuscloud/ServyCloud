@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_Script.html
 ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -20,15 +21,16 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.17
-CAMBIOS:         R62: app.tituloHeader es un VECTOR de frases —
-                 pintarTituloHeader() elige UNA AL AZAR en cada
-                 carga de la app (fraseAleatoria(); un texto único
-                 de la BD sigue funcionando, compatibilidad); el
-                 LIENZO recibe pintarGlifos al montarse (los
-                 glifos del template — ubicación, filtro — se
-                 pintan ahí: el pintado automático de Iconos corrió
-                 antes de que el lienzo existiera).
+VERSIÓN:         1.18
+CAMBIOS:         R63: (1) 'ciudad:change' cae al chip de SERVICIOS
+                 por defecto (Chips.resetearVista — orden del
+                 dueño: Irapa sin cursos no puede dejar la lista
+                 vacía, y el retorno a Güiria ya no aterriza en
+                 cursos); (2) pintarTituloHeader() acepta el
+                 VECTOR aunque la hoja lo guarde como TEXTO con
+                 formato JSON (parse defensivo): la frase al azar
+                 de cada carga ya no depende de cómo lo guarde el
+                 Setup (el dueño lo veía repetido).
                  R61: el PLACEHOLDER del buscador se pinta desde
                  la BD real (SISTEMA.root →
                  app.placeholderBuscar; si la BD no lo trae queda
@@ -54,8 +56,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  Global_Menu_Script.html (window.Global), Lista_Script.html,
                  Seccion_Script.html, Comenta_Script.html,
                  Compartir_Script.html (recibir/pintar)
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   /* ============================================================
      CACHEL2 · capa del dispositivo (R21 · Propuesta 1 del dueño)
      La sesión ya tenía L1 en memoria (PostFull._cache). L2
@@ -853,6 +854,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         t = fraseAleatoria(t);
       } else {
         t = String(t || '').trim();
+
+        /* R63 · si el Setup guardó el vector como TEXTO (string
+           con formato JSON), se parsea aquí: la frase al azar
+           de cada carga ya no depende de cómo lo guarde la
+           hoja (el dueño veía siempre la misma). */
+        if (t.charAt(0) === '[' && t.charAt(t.length - 1) === ']') {
+          try {
+            var v = JSON.parse(t);
+            if (Object.prototype.toString.call(v) === '[object Array]') {
+              t = fraseAleatoria(v);
+            }
+          } catch (_) {}
+        }
       }
 
       if (t) {
@@ -1022,6 +1036,20 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (window.Lista && typeof window.Lista.getModo === 'function' &&
           window.Lista.getModo() === 'detalle') {
         window.Lista.cerrarDetalle(true);
+      }
+
+      /* R63 · el dueño: cada cambio de ciudad cae al chip de
+         SERVICIOS por defecto (Irapa sin cursos no puede dejar
+         la lista vacía, y el retorno a Güiria ya no aterriza en
+         cursos). Chips.resetearVista escribe la vista guardada
+         para que la restauración no reviva el chip anterior;
+         sin el módulo nuevo (archivo viejo), borrar la vista
+         logra el mismo efecto con el chip 1. */
+      if (window.Chips &&
+          typeof window.Chips.resetearVista === 'function') {
+        window.Chips.resetearVista();
+      } else {
+        try { localStorage.removeItem('app_vista'); } catch (_) {}
       }
 
       repintarCuandoHayaDatos();

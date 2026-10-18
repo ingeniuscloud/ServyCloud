@@ -1,4 +1,5 @@
-/*════════════════════════════════════════════════════════════════════
+/*
+════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_Script.html
 ESPEJO GITHUB:   js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -36,8 +37,13 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         2.1
-CAMBIOS:         R62: el CONTADOR vive en el campo buscar —
+VERSIÓN:         2.2
+CAMBIOS:         R63: respirarScroll() — cada repintado de la lista
+                 recoloca el contenedor arriba y re-evalúa su
+                 scroll (cura el "se queda pegado" del teléfono al
+                 regresar a Güiria tras cambiar de ciudad; la
+                 restauración del detalle no pasa por aquí).
+                 R62: el CONTADOR vive en el campo buscar —
                  actualizarContador() escribe #buscarContador
                  (Chips_CSS) y lo enciende solo cuando el pintado
                  es de búsqueda; FUERA el modo de vista
@@ -67,8 +73,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
                  (getChipActivo, seleccionar), Core_Script.html
                  (window.PostFull.obtener), Iconos.html
                  (window.pintarGlifos), Lista_CSS.html
-════════════════════════════════════════════════════════════════════
-*/
+════════════════════════════════════════════════════════════════════*/
   window.Lista = (function () {
 
     var _popstateEsperado = false;   /* R19: popstate propio de history.back() */
@@ -352,6 +357,20 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       }
     }
 
+    /* ============================================================
+       RESPIRO DE SCROLL (R63) · tras un repintado (cambio de
+       ciudad o de chip) el contenedor de la lista vuelve arriba
+       y re-evalúa su scroll: cura el "se queda pegado" que el
+       dueño vio en el teléfono al regresar a Güiria (scroll
+       interno muerto tras repintar la lista con contenido nuevo).
+       La restauración del detalle NO pasa por aquí
+       (cerrarDetalle recoloca su scroll aparte).
+       ============================================================ */
+    function respirarScroll() {
+      var wrap = document.querySelector('.secciones-wrap');
+      if (wrap) wrap.scrollTop = 0;
+    }
+
     function pintarLista(lista, modoBusqueda, enLimite) {
       var cont = document.getElementById('listaWrap');
       if (!cont) return;
@@ -364,6 +383,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       if (!lista || lista.length === 0) {
         postActivoId = null;
         actualizarAvisoBusqueda(modoBusqueda, enLimite);
+        respirarScroll();
         return;
       }
 
@@ -451,6 +471,10 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       });
 
       cont.appendChild(frag);
+
+      /* R63 · el contenedor re-evalúa su scroll con contenido
+         nuevo (cura el scroll pegado tras cambiar de ciudad). */
+      respirarScroll();
 
       /* Precarga del PRIMER post renderizado · si el usuario
          toca ese item (el más probable), ya está en caché y el
