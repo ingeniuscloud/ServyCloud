@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Global_CSS.html
-ESPEJO GITHUB:   css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "Acerca de" con jerarquía: marca de la app arriba
@@ -13,8 +13,12 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.5
-CAMBIOS:         R66: los CÍRCULOS NUMERADOS del timeline de la
+VERSIÓN:         1.6
+CAMBIOS:         R68: solo comentario — la mención del menú global
+                 pasa a Global_Sheet_Script (renombrado R68). Ni
+                 una regla tocada; la base .sheet (altura 90%)
+                 queda intacta.
+                 R66: los CÍRCULOS NUMERADOS del timeline de la
                  ayuda de instalación quedan SIN FONDO (orden del
                  dueño: el relleno naranja se veía saturado) —
                  solo el círculo: aro fino #f97316, número en
@@ -705,7 +709,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     padding: 0 0 18px 0;
 
     /* R63 · "los puntos tienen vida": entrada escalonada por
-       --i (índice del paso, lo pinta Global_Menu_Script). */
+       --i (índice del paso, lo pinta Global_Sheet_Script). */
     opacity: 0;
     animation: pwaPasoIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     animation-delay: calc(var(--i, 0) * 90ms);

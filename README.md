@@ -36,20 +36,21 @@ de GAS**: lo que pruebas en GAS se paga en el archivo gemelo de GitHub.
 | `icon-512.png`  | Icono PWA 512×512 (mismo arte) |
 | `README.md`     | Este archivo |
 
-**Carpeta `css/` (14):** los 13 estilos de GAS (Core_CSS, Chips_CSS,
-Ciudad_Sheet_CSS, Seccion_CSS, Seccion_Imagen_CSS, Promo_CSS,
-Social_CSS, Comenta_CSS, Global_CSS, Reserva_CSS, Reserva_Exito_CSS,
-Lista_CSS, Partner_Sheet_CSS) + `GitHub_Cromo.css` (preloader y
-píldora, solo-GitHub).
+**Carpeta `css/` (15):** los 14 estilos de GAS (Core_CSS, Chips_CSS,
+Ciudad_Sheet_CSS, Orden_Sheet_CSS, Seccion_CSS, Seccion_Imagen_CSS,
+Promo_CSS, Social_CSS, Comenta_CSS, Global_CSS, Reserva_CSS,
+Reserva_Exito_CSS, Lista_CSS, Partner_Sheet_CSS) + `GitHub_Cromo.css`
+(preloader y píldora, solo-GitHub).
 
-**Carpeta `js/` (21):** los 19 scripts de GAS (Global_Script,
-Global_Menu_Script, Chips_Script, Buscar_Script, Lista_Script,
+**Carpeta `js/` (23):** los 21 scripts de GAS (Global_Script,
+Global_Sheet_Script, Chips_Script, Buscar_Script, Lista_Script,
 Seccion_Imagen_Script, Seccion_Script, Promo_Script, Social_Script,
 Comenta_Script, Reserva_Valida_Script, Reserva_Sheet_Script,
 Reserva_OTP_Script, Reserva_Dato_Script, Reserva_Exito_Script,
 Reserva_Script, Partner_Sheet_Script, Ciudad_Sheet_Script,
-Core_Script) + `Iconos.js` + `GitHub_Cromo.js` (puente local,
-sesión→ciudad y registro del SW; solo-GitHub, cargar SIEMPRE último).
+Orden_Sheet_Script, Compartir_Script, Core_Script) + `Iconos.js` +
+`GitHub_Cromo.js` (puente local, sesión→ciudad y registro del SW;
+solo-GitHub, cargar SIEMPRE último).
 
 `Telefono.html` (el marco del iPhone) viaja **dentro** de `index.html`
 porque es HTML del cuerpo, no un archivo css/js.

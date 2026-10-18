@@ -1,7 +1,6 @@
-/*
-════════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_CSS.html
-ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  dinámico) + fila CTA del post: píldora naranja
@@ -19,8 +18,17 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  izquierda, menú a la derecha) y un 15% MÁS
                  PEQUEÑO — la fila entera gana aire para la
                  lista.
-VERSIÓN:         2.1
-CAMBIOS:         R63: .titulo-header baja de fila propia a la
+VERSIÓN:         2.2
+CAMBIOS:         R68: .area-contenido respira con las SAFE-AREAS:
+                 padding-top env(safe-area-inset-top) y
+                 padding-bottom env(safe-area-inset-bottom). Con
+                 las metas apple (black-translucent) de la página
+                 de GitHub, el DEGRADADO del lienzo pinta DETRÁS
+                 de la barra de estado en la PWA (clarito arriba,
+                 orden del dueño) y el blanco llega hasta la
+                 franja de abajo (home bar). En Safari/Chrome del
+                 navegador ambas medidas son 0: ni se enteran.
+                 R63: .titulo-header baja de fila propia a la
                  FILA DE CABECERA (h1 dentro de .filtros-wrap,
                  flex 1): 36→30.6px (−15%, orden del dueño), peso
                  300 intacto, clamp a 2 líneas intacto; en modo
@@ -59,6 +67,7 @@ CAMBIOS:         R63: .titulo-header baja de fila propia a la
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
 ════════════════════════════════════════════════════════════════════*/
+
   *{ box-sizing: border-box; }
 
   html, body {
@@ -164,6 +173,13 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
      pintado del lienzo. Ahora respalda con el TINTE del
      lienzo (#fdf3ec, R57) — Core_Script pinta encima su
      degradado (blanco 0–5% + tinte) en el arranque.
+     R68 · SAFE-AREAS: en la PWA de iOS (black-translucent)
+     el lienzo sube hasta la barra de estado — el clarito
+     pinta detrás de ella y el contenido empuja hacia abajo
+     con env(safe-area-inset-top); abajo el blanco llega a la
+     franja del sistema con env(safe-area-inset-bottom). En
+     el navegador (Safari/Chrome móvil y PC) ambas env() son
+     0: ni se enteran.
      ============================================================ */
   .area-contenido {
     flex: 1 1 auto;
@@ -174,6 +190,9 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
 
     display: flex;
     flex-direction: column;
+
+    padding-top:    env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 
     transition: background 0.35s ease;
   }

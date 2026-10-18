@@ -17,12 +17,21 @@ RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  se encoge 3% al presionar (rebote nativo, sin el
                  recuadro gris de Android/Safari) y las opciones
                  entran escalonadas (puntos con vida, R63).
-                 Altura AJUSTADA al contenido (máx 90%): el sheet
-                 mide lo que ocupan sus 6 opciones, no más.
+                 Altura FIJA al 90% (R68): abre a la MISMA altura
+                 que el sheet de reserva (.sheet, Global_CSS) y el
+                 de ciudad — la fila de opciones queda arriba y el
+                 resto del sheet es blanco; el contenido scrollea
+                 si hiciera falta (.ordenar-content).
                  La estructura raíz/backdrop/handle/close replica
                  a Ciudad_Sheet_CSS (módulos hermanos).
-VERSIÓN:         1.1
-CAMBIOS:         R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
+VERSIÓN:         1.2
+CAMBIOS:         R68: UNIFORMIDAD DE SHEETS (orden del dueño: los
+                 4 sheets abren a la misma altura): .ordenar-sheet
+                 pasa de max-height 90% (altura ajustada al
+                 contenido, ~72%) a height FIJA 90% — la altura de
+                 apertura queda idéntica a Reserva y Ciudad. Ni
+                 una regla más tocada.
+                 R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
                  pasa a Orden_Sheet_* (el sheet es de ordenamiento,
                  no de filtro — corrección de nombre del dueño).
                  Ni una regla de estilo tocada.
@@ -72,14 +81,14 @@ DEPENDENCIAS:    Iconos.html (glifos lista/grupos/alfabeto/share/
   }
 
   /* ============================================================
-     SHEET · altura ajustada al contenido (máx 90%)
+     SHEET · ALTURA FIJA 90% (R68 · igual que Reserva y Ciudad)
      ============================================================ */
   .ordenar-sheet {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 90%;
+    height: 90%;
     background-color: #ffffff;
     border-radius: 22px 22px 0 0;
     display: flex;

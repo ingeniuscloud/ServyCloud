@@ -20,8 +20,12 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.22
-CAMBIOS:         R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
+VERSIÓN:         1.23
+CAMBIOS:         R68: solo encabezado — la mención del menú global
+                 pasa a Global_Sheet_Script (renombrado R68). Ni
+                 una línea de código tocada; el lienzo y el
+                 preloader-evento quedan intactos.
+                 R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
                  a petición del dueño): el clarito #fdf3ec
                  COMIENZA en la parte superior de la pantalla
                  principal (0–12% plano) y degrada a BLANCO
@@ -71,7 +75,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
                  Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
                  Chips_Script.html, Buscar_Script.html,
                  Promo_Script.html, Social_Script.html,
-                 Global_Menu_Script.html (window.Global), Lista_Script.html,
+                 Global_Sheet_Script.html (window.Global), Lista_Script.html,
                  Seccion_Script.html, Comenta_Script.html,
                  Compartir_Script.html (recibir/pintar)
 ════════════════════════════════════════════════════════════════════*/

@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Global_Script.html
-ESPEJO GITHUB:   js/Global_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Global_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Timeout de 12s por intento (GAS tiene arranques en
@@ -18,9 +18,12 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
                  y aplicarPlaceholders.
                  El módulo window.Global (menú + subvistas) vive en
-                 Global_Menu_Script.html.
-VERSIÓN:         1.6
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 Global_Sheet_Script.html.
+VERSIÓN:         1.7
+CAMBIOS:         R68: solo encabezado — la mención del menú global
+                 pasa a Global_Sheet_Script (renombrado R68). Ni
+                 una línea de código tocada.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)

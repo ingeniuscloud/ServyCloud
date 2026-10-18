@@ -38,8 +38,17 @@ RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
                  El placeholder del campo llega de la BD real
                  (ROOTJSON app.placeholderBuscar, lo pinta
                  Core_Script).
-VERSIÓN:         1.16
-CAMBIOS:         R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
+VERSIÓN:         1.17
+CAMBIOS:         R68: los 4 SHEETS IDENTIFICADOS Y A LA MISMA
+                 ALTURA: entran las metas apple (capable,
+                 status-bar-style black-translucent, title) para
+                 que en la PWA de iOS el lienzo pinte DETRÁS de
+                 la barra de estado — el clarito alcanza la
+                 franja de arriba también instalada; el script
+                 del menú global pasa a js/Global_Sheet_Script.js
+                 (renombrado). Mismo markup que Index.html 1.17
+                 de GAS.
+                 R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
                  a petición del dueño): theme-color pasa a
                  #fdf3ec para que la franja superior del
                  navegador se funda con el clarito del degradado
@@ -79,7 +88,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Reserva_CSS.html, Reserva_Exito_CSS.html, Lista_CSS.html,
                  Partner_Sheet_CSS.html.
                  Estructura: Iconos.html, Telefono.html.
-                 JS: Global_Script.html, Global_Menu_Script.html,
+                 JS: Global_Script.html, Global_Sheet_Script.html,
                  Chips_Script.html, Buscar_Script.html, Lista_Script.html,
                  Seccion_Imagen_Script.html, Seccion_Script.html,
                  Promo_Script.html, Social_Script.html,
@@ -134,6 +143,14 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
        envoltorio con iframe; ahora acompaña a la app en ESTA
        página estática) ═══ -->
   <meta name="theme-color" content="#fdf3ec">
+  <!-- R68 · PWA iOS: el lienzo pinta DETRÁS de la barra de
+       estado (black-translucent + viewport-fit=cover + los
+       safe-areas de Core_CSS) — el clarito alcanza la franja
+       de arriba también instalada. En Safari/Chrome del
+       navegador las metas no estorban. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServyCloud">
   <link rel="manifest" href="./manifest.json">
   <link id="pagina-icono" rel="icon" href="./icon-192.png">
 
@@ -765,7 +782,7 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Menu_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Orden_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Sheet_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Orden_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>

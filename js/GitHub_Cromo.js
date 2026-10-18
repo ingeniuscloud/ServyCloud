@@ -14,18 +14,27 @@ RESPONSABILIDAD: Cromo de la página estática: preloader orbital
                  píldora "Instalar app" (Android) y registro del
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
-VERSIÓN:         1.3
-CAMBIOS:         R63: THEME-COLOR DINÁMICO mientras carga: meta
+VERSIÓN:         1.4
+CAMBIOS:         R68: la franja superior VUELVE AL CLARITO al
+                 retirarse el preloader: theme-color pasa a
+                 #fdf3ec (el clarito del lienzo R67) y NO al
+                 #f8fafc casi blanco que traía de R63 — ese
+                 remanente pintaba la franja de BLANCO apenas
+                 cargaba la app, en Safari y en la PWA (el dueño
+                 lo capturó). Durante la carga sigue el naranja
+                 claro del preloader (#fb923c). Misma línea
+                 reversible del experimento R67.
+                 R63: THEME-COLOR DINÁMICO mientras carga: meta
                  theme-color pasa a naranja claro (#fb923c, el del
-                 preloader) y al retirarse vuelve a #f8fafc — las
-                 franjas superior e inferior del teléfono se ven
-                 naranjas durante la carga (el dueño las veía
-                 blancas). El preloader se ancla DENTRO de #lienzo
-                 en PC; en móvil el overlay es FIXED (css) y cubre
-                 todo (index.html porta viewport-fit=cover).
+                 preloader) y al retirarse vuelve a su color de
+                 reposo — las franjas superior e inferior del
+                 teléfono acompañan cada fase. El preloader se
+                 ancla DENTRO de #lienzo en PC; en móvil el
+                 overlay es FIXED (css) y cubre todo (index.html
+                 porta viewport-fit=cover).
                  R33: el boleto de instalación se comparte en
                  window.__servyBoleto para que el ítem "Instalar la
-                 app" del menú (Global_Menu_Script) pueda abrir el
+                 app" del menú (Global_Sheet_Script) pueda abrir el
                  diálogo nativo sin capturarlo de nuevo; la píldora
                  consume con try/catch porque el menú puede canjear
                  el boleto primero.
@@ -81,15 +90,19 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
 
           // R63 · THEME-COLOR dinámico: durante la carga las
           // franjas del sistema (superior/inferior) visten el
-          // naranja claro del preloader; al retirarse vuelven al
-          // color de siempre. Sin meta (imprevisto), no-op.
+          // naranja claro del preloader. R68 · al retirarse ya NO
+          // vuelve al #f8fafc casi blanco (remanente de R63 que
+          // pintaba la franja de blanco con la app ya cargada):
+          // queda el CLARITO #fdf3ec del lienzo (R67) — la franja
+          // superior se funde con el degradado en Safari, Chrome
+          // y la PWA. Sin meta (imprevisto), no-op.
           (function () {
               try {
                   var meta = document.querySelector('meta[name="theme-color"]');
                   if (!meta) return;
                   meta.setAttribute('content', '#fb923c');
                   document.addEventListener('preloader-retirado', function () {
-                      meta.setAttribute('content', '#f8fafc');
+                      meta.setAttribute('content', '#fdf3ec');
                   });
               } catch (err) {}
           })();
