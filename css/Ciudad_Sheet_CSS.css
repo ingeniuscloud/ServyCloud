@@ -1,37 +1,37 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Ciudad_Sheet_CSS.html
-ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del botón de ciudad (city-bar) y del
-                 bottom sheet de selección. Botón dentro de
-                 la fila de cabecera (R58): pin + "Estás viendo
-                 en Ciudad" + chevron SVG. R61: al TAMAÑO de
-                 "Promos cerca de ti" (17px) — ahora con la
-                 búsqueda fuera de la fila hay espacio de sobra.
-                 R60: dentro de la fila de cabecera ocupa el ancho
-                 disponible con el texto COMPLETO (sin recortes) y
-                 el menú global a la derecha. Lista con radio
-                 button nativo estilizado. Sheet al 90%. Modo
+RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R62: vive
+                 en la FILA DE FILTROS como un botón independiente
+                 más — pin + nombre de la ciudad, SIN fondo, solo
+                 bordes como la lupa y el filtro, SIN chevron y
+                 SIN el texto "Estás viendo en") y del bottom
+                 sheet de selección (R62: TARJETAS en rejilla de
+                 dos columnas — nombre de la ciudad arriba con su
+                 punto de selección a la derecha y, debajo, las
+                 tres métricas de items activos: Servicios,
+                 Cursos y Promos; la tarjeta activa viste NARANJA
+                 oficial, jamás azul). Sheet al 90%. Modo
                  bloqueado para primera selección sin ciudad
                  guardada. Aviso de cookies de esa primera carga:
                  icono a la izquierda del texto y botón Aceptar
                  debajo.
-VERSIÓN:         1.5
-CAMBIOS:         R61: la ubicación sube al TAMAÑO del encabezado
-                 de promos — 13→17px (el dueño: "mismo tamaño de
-                 'promos cerca de ti', ahora sí tiene espacio
-                 suficiente"); pin 15→16px y chevron 14→15px para
-                 acompañar al texto. El EN lo lleva el markup
-                 (Index.html: "Estás viendo en Ciudad").
-                 R60: la city-bar recupera la UBICACIÓN COMPLETA
-                 como antes de R58: fuera el ancho acotado
-                 (max-width 46%) y la elipsis — el texto completo
-                 respira en la fila (la búsqueda ya no vive ahí) y
-                 el menú global queda a la derecha.
-                 R58: la city-bar deja su fila propia y entra a la
-                 fila de cabecera junto a la búsqueda y el menú
-                 global: pieza compacta (13px, pin 15px, chevron
-                 14px), ancho acotado y texto con elipsis.
+VERSIÓN:         1.6
+CAMBIOS:         R62: el botón ciudad entra a la fila de filtros
+                 (Index.html) como botón compacto: borde 1.2px
+                 #475569, cápsula redonda, fondo transparente,
+                 pin 15px + nombre (sin bold, sin chevron, sin
+                 "Estás viendo en"); el sheet convierte la lista
+                 de radios en TARJETAS (fuera .ciudad-radio y su
+                 AZUL #1d4ed8 — el color oficial es el naranja):
+                 rejilla 2 columnas, punto de selección, métricas
+                 Servicios/Cursos/Promos con cifras tabulares,
+                 activa con borde y tinte naranja.
+                 R61: la ubicación subía al TAMAÑO del encabezado
+                 de promos (17px).
+                 R60: la city-bar recuperaba la UBICACIÓN COMPLETA
+                 en la fila de cabecera.
                  R38: estilos del aviso de cookies dentro del
                  sheet (.ciudad-cookies): icono, texto y botón
                  Aceptar centrados como puerta de entrada.
@@ -40,44 +40,43 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 ════════════════════════════════════════════════════════════════════
 */
   /* ============================================================
-     BOTÓN CIUDAD · dentro de la FILA DE CABECERA (R61)
-     Misma pieza de siempre (pin + "Estás viendo en Ciudad" +
-     chevron). R60: UBICACIÓN COMPLETA como antes de R58 —
-     ocupa el ancho disponible de la fila (el menú global queda
-     a la derecha) y el texto NO se recorta.
-     R61: al TAMAÑO de "Promos cerca de ti" (17px, el dueño
-     pidió igualarlos y ahora hay espacio de sobra); el pin y
-     el chevron crecen un punto para acompañar al texto.
+     BOTÓN CIUDAD (R62) · en la FILA DE FILTROS
+     Un botón independiente más (como la lupa y el filtro):
+     cápsula con borde 1.2px #475569, fondo transparente, pin +
+     nombre de la ciudad — sin fondo (solo bordes), sin
+     chevron y sin más texto que la ciudad, como pidió el
+     dueño. En modo detalle lo esconde la fila completa.
      ============================================================ */
   .city-bar {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-width: 0;
 
     display: inline-flex;
     align-items: center;
     gap: 6px;
 
-    padding: 6px 6px 6px 12px;
+    padding: 8px 14px 9px;
     margin: 0;
 
-    border: none;
+    border: 1.2px solid #475569;
     background: transparent;
-    border-radius: 10px;
+    border-radius: 999px;
 
     font-family: inherit;
-    font-size: 17px;
+    font-size: 13.5px;
     font-weight: 500;
-    line-height: 1.2;
+    line-height: 1.1;
     letter-spacing: -0.01em;
-    color: #64748b;
+    color: #475569;
     text-align: left;
+    white-space: nowrap;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: background 0.12s ease, opacity 0.2s ease;
   }
 
-  .city-bar:active { background: rgba(15,23,42,.04); }
+  .city-bar:active { opacity: 0.7; }
 
   .city-bar:disabled {
     cursor: not-allowed;
@@ -87,8 +86,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .city-bar .city-pin {
     flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     color: #475569;
     display: flex;
     align-items: center;
@@ -105,33 +104,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   .city-bar .city-txt {
-    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-width: 0;
-  }
-  .city-bar .city-txt b {
-    color: #1f2937;
-    font-weight: 700;
-  }
-
-  .city-bar .city-chev {
-    flex-shrink: 0;
-    width: 15px;
-    height: 15px;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 0;
-  }
-  .city-bar .city-chev svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   /* ============================================================
@@ -350,100 +325,154 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
 
   /* ============================================================
-     LISTA DE CIUDADES · radio button nativo
+     TARJETAS DE CIUDADES (R62) · rejilla seleccionable
+     Cada ciudad es una TARJETA: nombre arriba con el punto de
+     selección a la derecha y, debajo, las tres métricas de
+     items activos (Servicios / Cursos / Promos). El color
+     oficial es el NARANJA — la tarjeta activa viste borde y
+     tinte naranja (jamás azul: el azul del radio viejo murió
+     con esta regla). Las métricas las calcula
+     Ciudad_Sheet_Script con TABLAS + SISTEMA.promo.
      ============================================================ */
-  .ciudad-lista {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .ciudad-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .ciudad-card {
     display: flex;
     flex-direction: column;
-  }
+    gap: 10px;
 
-  .ciudad-lista li {
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .ciudad-lista li:last-child { border-bottom: none; }
+    padding: 12px 13px 13px;
 
-  .ciudad-option {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 8px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #1f2937;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+
+    font-family: inherit;
+    text-align: left;
+
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.12s ease;
-  }
-  .ciudad-option:active { background-color: #f8fafc; }
 
-  /* Radio nativo · appearance none + estilos */
-  .ciudad-radio {
-    appearance: none;
-    -webkit-appearance: none;
-    flex-shrink: 0;
-
-    width: 20px;
-    height: 20px;
-    margin: 0;
-    padding: 0;
-
-    border: 1.6px solid #cbd5e1;
-    border-radius: 50%;
-    background-color: #ffffff;
-    cursor: pointer;
-    position: relative;
-    transition: border-color 0.18s ease;
+    transition: border-color 0.15s ease, background 0.15s ease,
+                box-shadow 0.15s ease;
   }
 
-  .ciudad-radio:checked {
-    border-color: #1d4ed8;
-    border-width: 1.8px;
+  .ciudad-card:active {
+    background: #fff7ed;
+    border-color: #fdba74;
   }
 
-  .ciudad-radio:checked::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #1d4ed8;
+  /* Tarjeta ACTIVA · naranja oficial (sin azul) */
+  .ciudad-card.activa {
+    border: 1.6px solid #f97316;
+    background: #fff7ed;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.16);
   }
 
-  .ciudad-nombre {
+  .ciudad-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  /* Nombre SIN bold (R62: la ciudad en peso normal) */
+  .ciudad-card-nombre {
     flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #1f2937;
+  }
+  .ciudad-card.activa .ciudad-card-nombre { color: #c2410c; }
+
+  /* Punto de selección (el "O" del mockup del dueño): círculo
+     fino; activo, relleno naranja. */
+  .ciudad-card-punto {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1.6px solid #cbd5e1;
+    border-radius: 50%;
+    background: transparent;
+    position: relative;
+    transition: border-color 0.15s ease;
+  }
+  .ciudad-card.activa .ciudad-card-punto {
+    border-color: #f97316;
+  }
+  .ciudad-card.activa .ciudad-card-punto::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #f97316;
   }
 
-  .ciudad-radio:checked + .ciudad-nombre {
-    color: #1d4ed8;
-    font-weight: 700;
+  .ciudad-card-metricas {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .ciudad-card-metrica {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  /* Cifra alineada en columna (como el mockup): número
+     tabular + etiqueta gris. Sin bold. */
+  .ciudad-card-num {
+    flex: 0 0 auto;
+    min-width: 26px;
+    text-align: right;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #1f2937;
+    font-variant-numeric: tabular-nums;
+  }
+  .ciudad-card.activa .ciudad-card-num { color: #c2410c; }
+
+  .ciudad-card-etiqueta {
+    flex: 1;
+    min-width: 0;
+
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #64748b;
   }
 
   /* ============================================================
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .city-bar {
-      padding: 6px 12px 6px 14px;
-      font-size: 16px;
-      gap: 5px;
-    }
-    .city-bar .city-pin { width: 15px; height: 15px; }
-    .city-bar .city-chev { width: 14px; height: 14px; }
+    .city-bar { padding: 7px 12px 8px; font-size: 12.5px; gap: 5px; }
+    .city-bar .city-pin { width: 14px; height: 14px; }
     .ciudad-content { padding: 4px 18px 22px; }
-    .ciudad-option { font-size: 14px; padding: 13px 6px; }
+    .ciudad-tarjetas { gap: 8px; }
+    .ciudad-card { padding: 11px 12px 12px; }
+    .ciudad-card-nombre { font-size: 14px; }
+    .ciudad-card-num { font-size: 13px; min-width: 22px; }
+    .ciudad-card-etiqueta { font-size: 11.5px; }
     .ciudad-titulo { font-size: 1.02rem; }
     .ciudad-cookies { max-width: 280px; }
     .cookies-icono { width: 26px; height: 26px; }
     .cookies-texto { font-size: 13px; }
   }
-

@@ -1,40 +1,38 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Buscar_Script.html
-ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Buscador CÁPSULA (R61): la LUPA circular vive a
-                 la derecha de los chips y, a su derecha, el BOTÓN
-                 FILTRO (sin acción todavía). Al tocarla la fila
-                 añade .buscando y la CÁPSULA split pill se
-                 expande tapando SOLO los chips (lupa a la
-                 izquierda dentro, "Limpiar filtro" como segmento
-                 derecho, SIN X) y marca body.en-busqueda — la
-                 fila "Explorar" SE QUEDA VIVA (R61: solo se tapan
-                 los chips). El placeholder lo pinta Core_Script
-                 desde la BD real (app.placeholderBuscar). El foco
-                 pasa al campo. Al escribir, emite
-                 'buscar:change' con el término y el flag de límite
-                 alcanzado. "Limpiar filtro" limpia y cierra (en
-                 modo compartido delega en Compartir.limpiar(), su
-                 trabajo de siempre). Límite: 40 chars.
-VERSIÓN:         1.5
-CAMBIOS:         R61: comentario al día — la fila "Explorar" ya no
-                 se oculta en búsqueda (fuera el efecto de
-                 body.en-busqueda sobre el rótulo, R61) y el
-                 placeholder lo pinta Core_Script desde
-                 app.placeholderBuscar. Código intacto: abrir()
-                 sigue marcando body.en-busqueda (la cápsula y el
-                 retiro de chips dependen de él) y el binding
-                 completo de siempre.
-                 R60: vuelve la LUPA (#btnBuscar a la derecha de
-                 los chips) y con ella abrir() por click (foco al
-                 campo tras expandir la cápsula); la X desaparece —
-                 el segmento "Limpiar filtro" de la split pill
-                 limpia y cierra (o delega en Compartir si el modo
-                 compartido está activo); abrir() se ignora en modo
-                 compartido (la cápsula ya está desplegada y
-                 bloqueada).
-                 R58: el campo era permanente y abría con el foco.
+RESPONSABILIDAD: Buscador CÁPSULA (R62): la LUPA circular vive en
+                 la fila de filtros junto a la ciudad y el botón
+                 filtro. Al tocarla la fila añade .buscando, la
+                 CÁPSULA se expande tapando el resto de la fila y
+                 aparece CANCELAR fuera del campo, a la derecha
+                 (patrón Cashea/ML del dueño: al tocar, el campo
+                 se cierra solo). El placeholder lo pinta
+                 Core_Script desde la BD real
+                 (app.placeholderBuscar). El foco pasa al campo.
+                 Al escribir, emite 'buscar:change' con el término
+                 y el flag de límite alcanzado. CANCELAR limpia y
+                 cierra (en modo compartido delega en
+                 Compartir.limpiar(), su trabajo de siempre — era
+                 el trabajo de "Limpiar filtro", retirado en R62).
+                 Límite: 40 chars.
+VERSIÓN:         1.6
+CAMBIOS:         R62: CANCELAR (#btnCancelarBusqueda) sustituye a
+                 "Limpiar filtro" (#btnLimpiarBusqueda, fuera con
+                 su split pill): mismo trabajo, nueva pieza fuera
+                 del campo; fuera el marcaje body.en-busqueda
+                 (nadie lo consume desde que la fila "Explorar"
+                 se retiró en esta misma ronda).
+                 R61: el placeholder lo pinta Core_Script desde
+                 app.placeholderBuscar.
+                 R60: vuelve la LUPA (#btnBuscar) y abrir() por
+                 click (foco al campo tras expandir la cápsula);
+                 la X desaparece — el segmento "Limpiar filtro"
+                 de la split pill limpia y cierra (o delega en
+                 Compartir si el modo compartido está activo);
+                 abrir() se ignora en modo compartido (la cápsula
+                 ya está desplegada y bloqueada).
                  R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
@@ -46,10 +44,10 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
 */
   window.Buscar = (function () {
 
-    var fila      = null;
-    var input     = null;
-    var btnLupa   = null;
-    var btnLimpiar = null;
+    var fila       = null;
+    var input      = null;
+    var btnLupa    = null;
+    var btnCancelar = null;
 
     var abierto = false;
 
@@ -91,7 +89,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
 
       abierto = true;
       fila.classList.add('buscando');
-      document.body.classList.add('en-busqueda');
 
       emitirEstado(true);
 
@@ -114,7 +111,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
       if (document.activeElement === input) input.blur();
 
       if (fila) fila.classList.remove('buscando');
-      document.body.classList.remove('en-busqueda');
       input.value = '';
 
       var postActivo = (window.Lista && typeof window.Lista.getPostActivo === 'function')
@@ -139,10 +135,11 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
       emitir('', false);
     }
 
-    function onLimpiar() {
-      /* Trabajo de siempre: en modo compartido "Limpiar filtro"
-         libera la vista (Compartir.limpiar devuelve ciudades,
-         chips y listas); en búsqueda normal limpia y cierra. */
+    function onCancelar() {
+      /* Trabajo de siempre (antes "Limpiar filtro"): en modo
+         compartido CANCELAR libera la vista (Compartir.limpiar
+         devuelve ciudades, chips y listas); en búsqueda normal
+         limpia y cierra. */
       if (window.Compartir &&
           typeof window.Compartir.estaCompartido === 'function' &&
           window.Compartir.estaCompartido()) {
@@ -161,19 +158,19 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
     function pintar() {
       if (window.__buscarBound === '1') return;
 
-      fila       = document.querySelector('.filtros-fila');
-      btnLupa    = document.getElementById('btnBuscar');
-      input      = document.getElementById('buscarInput');
-      btnLimpiar = document.getElementById('btnLimpiarBusqueda');
+      fila        = document.querySelector('.filtros-fila');
+      btnLupa     = document.getElementById('btnBuscar');
+      input       = document.getElementById('buscarInput');
+      btnCancelar = document.getElementById('btnCancelarBusqueda');
 
-      if (!fila || !btnLupa || !input || !btnLimpiar) {
+      if (!fila || !btnLupa || !input || !btnCancelar) {
         return;
       }
 
       window.__buscarBound = '1';
 
       btnLupa.addEventListener('click', abrir);
-      btnLimpiar.addEventListener('click', onLimpiar);
+      btnCancelar.addEventListener('click', onCancelar);
       input.addEventListener('input', onInput);
       input.addEventListener('focus', abrir);   /* inofensivo: si ya está abierta no repite */
     }
@@ -192,4 +189,3 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
     };
 
   })();
-

@@ -1,22 +1,36 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Chips_Script.html
-ESPEJO GITHUB:   js/Chips_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Chips_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
-                 window.SISTEMA.chips ({ idChip, titulo, estado }).
-                 Filtra los que tengan estado === false. Al arrancar
-                 restaura el chip guardado en localStorage (app_vista)
-                 o cae a default (chip 1). Al cambiar de chip emite
-                 'chips:change' con { idChip } para que Lista
-                 reaccione. La ciudad vive fuera de los chips, en
-                 Ciudad_Sheet_Script.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+                 window.SISTEMA.chips ({ idChip, titulo, estado })
+                 como BOTONES INDEPENDIENTES (R62: sin cápsula
+                 contenedora), cada uno con su icono (glifos
+                 servicio/cursos de Iconos, resueltos por el
+                 titulo/idChip) y su CONTADOR de items activos en
+                 la ciudad actual (lo recalcula cuando cambia la
+                 ciudad). Filtra los que tengan estado === false.
+                 Al arrancar restaura el chip guardado en
+                 localStorage (app_vista) o cae a default (chip 1).
+                 Al cambiar de chip emite 'chips:change' con
+                 { idChip } para que Lista reaccione. La ciudad
+                 vive fuera de los chips, en Ciudad_Sheet_Script.
+VERSIÓN:         1.2
+CAMBIOS:         R62: cada chip lleva ICONO + CONTADOR —
+                 glifoDeChip() resuelve el glifo (servicio /
+                 cursos) por el titulo y el idChip (sin svg
+                 hardcodeado: los glifos viven en Iconos);
+                 contarItems(idChip) cuenta los posts ACTIVOS del
+                 chip en la ciudad activa (mismas reglas del
+                 filtro de Lista); actualizarContadores() repinta
+                 las cifras sin desmontar los botones y se liga
+                 a 'ciudad:change'.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   window.Chips = (function () {
 
     var KEY_VISTA  = 'app_vista';
@@ -53,6 +67,73 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
       return todos.filter(function (c) {
         return c && c.idChip && c.estado !== false;
       });
+    }
+
+    /* ============================================================
+       Glifo del chip (R62) · resuelve el icono por el titulo y
+       el idChip (minúsculas): 'curso' → cursos, 'servic' →
+       servicio. Los glifos viven en Iconos.html (regla del
+       dueño: cero svg hardcodeado). Sin coincidencia → null
+       (el chip sale solo con su texto).
+       ============================================================ */
+    function glifoDeChip(chip) {
+      var texto = ((chip && (chip.idChip || '')) + ' ' +
+                   (chip && (chip.titulo || ''))).toLowerCase();
+      if (texto.indexOf('curso') !== -1) return 'cursos';
+      if (texto.indexOf('servic') !== -1) return 'servicio';
+      return null;
+    }
+
+    /* ============================================================
+       CONTADOR de items del chip (R62) · posts ACTIVOS del chip
+       en la ciudad activa — las MISMAS reglas del filtro de la
+       lista (estado, membresía del chip y ciudad).
+       ============================================================ */
+    function contarItems(idChip) {
+      var posts = (window.TABLAS && window.TABLAS.posts) || [];
+      if (!posts.length) return null;
+
+      var ciudad = null;
+      if (window.Ciudad && typeof window.Ciudad.getActual === 'function') {
+        var c = window.Ciudad.getActual();
+        ciudad = c ? c.idCiudad : null;
+      }
+
+      var total = 0;
+      posts.forEach(function (p) {
+        if (!p || !p.id) return;
+        if (p.estado === 'inactivo' || p.estado === 'pausado') return;
+
+        var chips = p.idChips || [];
+        if (chips.indexOf(idChip) === -1) return;
+
+        if (ciudad) {
+          var ciudades = p.idCiudad || [];
+          if (ciudades.indexOf(ciudad) === -1) return;
+        }
+
+        total++;
+      });
+      return total;
+    }
+
+    /* Repinta SOLO las cifras (no desmonta botones ni toca el
+       chip activo). Se liga a 'ciudad:change': al cambiar de
+       ciudad, los contadores siguen siendo reales. */
+    function actualizarContadores() {
+      var contenedor = document.getElementById('filtros');
+      if (!contenedor) return;
+
+      var chips = contenedor.querySelectorAll('.chip');
+      for (var i = 0; i < chips.length; i++) {
+        var idChip = chips[i].getAttribute(ATTR_CLAVE);
+        var cifra  = chips[i].querySelector('.chip-contador');
+        if (!cifra) continue;
+
+        var n = contarItems(idChip);
+        if (n === null) { cifra.textContent = ''; continue; }
+        cifra.textContent = String(n);
+      }
     }
 
     /* ============================================================
@@ -96,8 +177,26 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
         var chip = document.createElement('button');
         chip.type = 'button';
         chip.className = 'chip';
-        chip.textContent = op.titulo;
         chip.setAttribute(ATTR_CLAVE, op.idChip);
+
+        /* R62 · icono + texto + contador */
+        var glifo = glifoDeChip(op);
+        if (glifo) {
+          var icono = document.createElement('span');
+          icono.className = 'chip-icono';
+          icono.setAttribute('data-glifo', glifo);
+          icono.setAttribute('aria-hidden', 'true');
+          chip.appendChild(icono);
+        }
+
+        var texto = document.createElement('span');
+        texto.className = 'chip-texto';
+        texto.textContent = op.titulo;
+        chip.appendChild(texto);
+
+        var cifra = document.createElement('span');
+        cifra.className = 'chip-contador';
+        chip.appendChild(cifra);
 
         if (op.idChip === idChipActivo) chip.classList.add('activo');
 
@@ -108,6 +207,12 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
 
         contenedor.appendChild(chip);
       });
+
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(contenedor);
+      }
+
+      actualizarContadores();
 
       emitirCambio(idChipActivo);
     }
@@ -135,6 +240,10 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía DoGet.gs)
         detail: { idChip: idChip }
       }));
     }
+
+    /* R62 · la ciudad mandó: las cifras de los chips se
+       recalculan (mismas reglas del filtro de la lista). */
+    document.addEventListener('ciudad:change', actualizarContadores);
 
     /* ============================================================
        API pública

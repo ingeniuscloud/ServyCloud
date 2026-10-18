@@ -1,33 +1,29 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_Script.html
-ESPEJO GITHUB:   js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  ciudad activa + chip activo, sobre TABLAS.posts
                  cargada una sola vez. Emite 'post:change'.
                  Escucha 'chips:change', 'buscar:change' y
-                 'ciudad:change'. R61: pinta el CONTADOR de
-                 items del rótulo "Explorar" (#listaContador, la
-                 cantidad exacta que trae el filtro) y liga el
-                 MODO DE VISTA (lista / miniatura): seleccionable
-                 sin acción de render todavía. R60: el estado
-                 abierto de la búsqueda se lee en la FILA de
-                 chips + buscar (.filtros-fila.buscando, casa de
-                 la cápsula split pill).
-                 Item de la vidriera (R58 · CAJA): tarjeta blanca
-                 con franja del colorOficial a la izquierda
-                 (variables --post-color/--post-claro), título y
-                 subtítulo en su color normal, divisoria bajo el
-                 subtítulo y fila del partner: avatar circular
-                 con la INICIAL de la marca (fondo colorClaro del
-                 post, letra colorOficial) + nombre + glifo
-                 verificado (Iconos); a la derecha "Ver
-                 publicación" (glifo flechaVer, gris medio, sin
-                 bold). Estrella métrica PASIVA con el contador
-                 de likes (oculta en 0; glifo de Iconos); al
-                 volver del detalle se re-sincroniza con TABLAS
-                 para que el número sea siempre el mismo que dejó
-                 el corazón.
+                 'ciudad:change'. R62: pinta el CONTADOR de items
+                 filtrados dentro del campo buscar
+                 (#buscarContador en Chips_CSS: la cantidad
+                 exacta que trae el filtro, visible solo cuando
+                 la fila está en búsqueda o compartida — la fila
+                 "Explorar" se retiró en esta ronda). Item de la
+                 vidriera (R58 · CAJA): tarjeta blanca con
+                 título y subtítulo en su color normal, divisoria
+                 bajo el subtítulo y fila del partner: avatar
+                 circular con la INICIAL de la marca (fondo
+                 colorClaro del post, letra colorOficial) +
+                 nombre + glifo verificado (Iconos); a la derecha
+                 "Ver publicación" (glifo flechaVer, naranja
+                 oficial, sin bold). Estrella métrica PASIVA con
+                 el contador de likes (oculta en 0; glifo de
+                 Iconos); al volver del detalle se re-sincroniza
+                 con TABLAS para que el número sea siempre el
+                 mismo que dejó el corazón.
                  La lista es PLANA (R58, como la imagen del
                  dueño): el orden es el de la hoja y el rótulo
                  "Explorar" vive en Index.html. El agrupado por
@@ -40,29 +36,27 @@ RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
                  para que el primer tap sea instantáneo.
                  Los posts que están activos como promo siguen
                  apareciendo en la lista (no se excluyen).
-VERSIÓN:         2.0
-CAMBIOS:         R61: CONTADOR de items — actualizarContador() escribe
-                 #listaContador en cada repintado (la cantidad que
-                 trae el filtro, incluido el 0 de la búsqueda
-                 vacía); MODO DE VISTA — pintarVista() pinta los
-                 glifos (vistaLista/vistaMiniatura) y liga el
-                 toggle .activo entre #mvLista y #mvMiniatura,
-                 SIN acción de render todavía (decisión del
-                 dueño); se llama al inicio de pintarLista, cuando
-                 el lienzo ya está inyectado.
+VERSIÓN:         2.1
+CAMBIOS:         R62: el CONTADOR vive en el campo buscar —
+                 actualizarContador() escribe #buscarContador
+                 (Chips_CSS) y lo enciende solo cuando el pintado
+                 es de búsqueda; FUERA el modo de vista
+                 (pintarVista/vistaLigada murieron con la fila
+                 "Explorar" — el toggle lista/miniatura no se va
+                 a aplicar). montarItem ya no viste la franja
+                 (la variable --post-color queda para la letra
+                 del avatar; el colorClaro para su fondo).
                  R60: el selector del estado abierto de la
                  búsqueda pasa de .filtros-wrap.buscando a
                  .filtros-fila.buscando (la cápsula vive en la
-                 fila de chips, no en la cabecera).
-                 R58: item como CAJA — franja colorOficial
-                 (--post-color) y avatar del partner (--post-claro
-                 + inicial); título/subtítulo en color normal;
-                 divisoria bajo el subtítulo; glifo verificado;
-                 "Ver detalles" pasa a "Ver publicación"; la
-                 lista se pinta PLANA (fuera la agrupación por
-                 grupos de R57 — vuelve como filtro pendiente);
-                 montarItem deja de setear el título con el color
-                 y pasa a vestir franja+avatar.
+                 fila de filtros, no en la cabecera).
+                 R58: item como CAJA — avatar del partner
+                 (--post-claro + inicial); título/subtítulo en
+                 color normal; divisoria bajo el subtítulo; glifo
+                 verificado; "Ver detalles" pasa a "Ver
+                 publicación"; la lista se pinta PLANA (fuera la
+                 agrupación por grupos de R57 — vuelve como
+                 filtro pendiente).
                  R55: fuera el cuadrado avatar, el badge y el
                  chevron; estrella métrica pasiva (glifo estrella
                  de Iconos, oculta en 0);
@@ -308,51 +302,21 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     }
 
     /* ============================================================
-       CONTADOR DE EXPLORAR (R61) · la cantidad de items que
-       contiene la vidriera, junto al rótulo. Se pinta en cada
+       CONTADOR DE FILTRADOS (R62) · la cantidad de items que
+       contiene el filtro, DENTRO del campo buscar
+       (#buscarContador en Chips_CSS). Se pinta en cada
        repintado: la cifra SIEMPRE es la de la lista en pantalla
        (ciudad + chip o filtro de búsqueda, incluido el 0).
+       Visible solo cuando la fila está en búsqueda o compartida
+       (el CSS de Chips_CSS decide); [hidden] cuando el pintado
+       no es de búsqueda (la cifra de un chip no va en el campo).
        ============================================================ */
-    function actualizarContador(cantidad) {
-      var el = document.getElementById('listaContador');
-      if (el) el.textContent = String(cantidad);
-    }
+    function actualizarContador(cantidad, esBusqueda) {
+      var el = document.getElementById('buscarContador');
+      if (!el) return;
 
-    /* ============================================================
-       MODO DE VISTA (R61) · cápsula lista / miniatura
-       Pinta los glifos (Iconos.html) y liga la SELECCIÓN: un
-       solo botón activo a la vez. SIN acción de render todavía
-       (el dueño la pidió seleccionable, no funcional — la
-       vidriera en miniatura llegará cuando la ordene).
-       Se llama desde pintarLista: el lienzo ya está inyectado
-       y los botones existen.
-       ============================================================ */
-    var vistaLigada = false;
-
-    function pintarVista() {
-      var mvLista = document.getElementById('mvLista');
-      var mvMini  = document.getElementById('mvMiniatura');
-      if (!mvLista || !mvMini) return;
-
-      if (typeof window.pintarGlifos === 'function') {
-        window.pintarGlifos(mvLista);
-        window.pintarGlifos(mvMini);
-      }
-
-      if (vistaLigada) return;
-      vistaLigada = true;
-
-      mvLista.addEventListener('click', function () {
-        if (mvLista.classList.contains('activo')) return;
-        mvLista.classList.add('activo');
-        mvMini.classList.remove('activo');
-      });
-
-      mvMini.addEventListener('click', function () {
-        if (mvMini.classList.contains('activo')) return;
-        mvMini.classList.add('activo');
-        mvLista.classList.remove('activo');
-      });
+      el.textContent = String(cantidad || 0);
+      el.hidden = !esBusqueda;
     }
 
     /* R55 · Al cerrar el detalle, las estrellas se re-leen de
@@ -392,10 +356,8 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       var cont = document.getElementById('listaWrap');
       if (!cont) return;
 
-      /* R61 · contador + ligadura del modo de vista (primera
-         pasada con el lienzo vivo). */
-      pintarVista();
-      actualizarContador(lista ? lista.length : 0);
+      /* R62 · contador de filtrados dentro del campo buscar. */
+      actualizarContador(lista ? lista.length : 0, modoBusqueda === true);
 
       cont.innerHTML = '';
 
@@ -724,4 +686,3 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     };
 
   })();
-

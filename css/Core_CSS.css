@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_CSS.html
-ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  dinámico) + fila CTA del post: píldora naranja
@@ -13,26 +13,25 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  Incluye la fila del partner estilo Instagram
                  (divisoria a sangre, de borde a borde) y el
                  estado deshabilitado en naranja tenue para
-                 cursos "pronto". R58: TÍTULO INICIAL grande del
-                 header (.titulo-header, texto de la BD real en
-                 app.tituloHeader).
-VERSIÓN:         1.9
-CAMBIOS:         R61: .titulo-header gana el TAMAÑO DEFINITIVO del
-                 dueño — +20% (30→36px) y la MITAD de bold
-                 (700→400, font simple pero grande), mismo aire
-                 arriba/abajo de R60; .area-contenido pierde el
-                 GRIS BÁSICO #e5e7eb del respaldo (la caja donde
+                 cursos "pronto". R62: TÍTULO INICIAL en peso
+                 LIGERO (300) — el dueño lo veía todavía rústico:
+                 a 36px, la letra fina se ve elegante.
+VERSIÓN:         2.0
+CAMBIOS:         R62: .titulo-header pierde TODO el grosor que
+                 le quedaba (400→300): a su tamaño, el peso
+                 ligero es lo elegante (orden del dueño: "aun se
+                 nota muy rustico").
+                 R61: .titulo-header ganó el TAMAÑO DEFINITIVO
+                 del dueño — +20% (30→36px) y la mitad de bold
+                 (700→400); .area-contenido perdió el GRIS
+                 BÁSICO #e5e7eb del respaldo (la caja donde
                  viven las promos se veía gris antes del pintado
                  del lienzo) y ahora respalda con el tinte
                  #fdf3ec del lienzo R57.
-                 R60: .titulo-header gana aire y presencia —
-                 menos bold (800→700) y MÁS GRANDE (26→30px), con
-                 más padding arriba y abajo para que respire sin
-                 ruido.
-                 R58: nuevo bloque .titulo-header — el texto
-                 grande de la pantalla principal: tinta #1f2937,
-                 peso 800, dos líneas máximo, bajo la fila de
-                 cabecera y sobre el encabezado de promos.
+                 R60: .titulo-header ganó aire y presencia —
+                 menos bold (800→700) y MÁS GRANDE (26→30px),
+                 con más padding arriba y abajo para que respire
+                 sin ruido.
                  R52: el texto "Consultar" de la duda sale en
                  GRIS MEDIO (#64748b) en los dos estados (píldora
                  segmentada y duda suelta) — ya NO usa el
@@ -113,13 +112,14 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     TÍTULO INICIAL (R61) · texto grande que viene de la BD real
-     (ROOTJSON → app.tituloHeader, lo pinta Core_Script). Vive
-     DEBAJO de la fila de cabecera (ciudad + menú global) y
-     ENCIMA del encabezado de promos. R61: +20% de tamaño
-     (30→36px) y la mitad de bold (700→400) — font SIMPLE pero
-     GRANDE, con el aire de R60 intacto. Dos líneas máximo; si
-     la BD no lo trae, Core_Script lo deja oculto ([hidden]).
+     TÍTULO INICIAL (R62 · PESO LIGERO) · la frase grande que
+     viene de la BD real (ROOTJSON → app.tituloHeader — ahora
+     un VECTOR: una frase al azar por carga, lo pinta
+     Core_Script). Vive DEBAJO de la fila de cabecera y ENCIMA
+     del encabezado de promos. R62: 400→300 — a 36px el peso
+     ligero es lo elegante (el dueño lo seguía viendo rústico).
+     Dos líneas máximo; si la BD no lo trae, Core_Script lo
+     deja oculto ([hidden]).
      ============================================================ */
   .titulo-header {
     flex-shrink: 0;
@@ -128,7 +128,7 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
 
     font-family: inherit;
     font-size: 36px;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: #1f2937;
@@ -488,4 +488,3 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     .user-avatar { width: 40px; height: 40px; }
     .user-avatar svg { width: 20px; height: 20px; }
   }
-

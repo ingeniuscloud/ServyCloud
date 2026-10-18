@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Ciudad_Sheet_Script.html
-ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  localStorage (app_ciudad). Si no existe, abre
@@ -13,21 +13,35 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  vive aquí): hasta pulsar
                  Aceptar no se ve la lista de ciudades, y tras
                  aceptar el aviso desaparece y la selección
-                 obligatoria sigue. Pinta el botón .city-bar y
-                 emite 'ciudad:change' cuando cambia.
+                 obligatoria sigue. Pinta el botón .city-bar (en
+                 la fila de filtros desde R62) y emite
+                 'ciudad:change' cuando cambia.
                  Ordena las ciudades alfabéticamente por título.
-                 Lista con radio button nativo.
-                 Chevron SVG desde Iconos.html (flechaAcordeon).
-VERSIÓN:         1.5
-CAMBIOS:         R40: el texto del aviso de cookies ya no vive
+                 R62: el sheet pinta TARJETAS (rejilla de 2
+                 columnas) con las métricas de items ACTIVOS por
+                 ciudad — Servicios, Cursos y Promos — calculadas
+                 con TABLAS.posts y SISTEMA.promo (mismas reglas
+                 de vigencia de la marquesina). Chevron SVG desde
+                 Iconos.html (flechaAcordeon).
+VERSIÓN:         1.6
+CAMBIOS:         R62: la lista de radios se convierte en
+                 TARJETAS seleccionables — metricasDe(idCiudad)
+                 cuenta posts activos por ciudad y los clasifica
+                 por chip (cursos manda: un post con chip de
+                 curso cuenta como curso, CANON 3; servicio si
+                 solo tiene chip de servicio) y promoVigente()
+                 reutiliza las reglas de fecha de la marquesina
+                 (inicia/termina + post activo); fuera el input
+                 radio y su azul.
+                 R40: el texto del aviso de cookies ya no vive
                  aquí: llega en SISTEMA.avisos.cookies
                  (Constantes.gs, única fuente de los textos);
                  sin texto disponible el aviso muestra solo el
                  icono y Aceptar.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
-════════════════════════════════════════════════════════════════════*/
-
+════════════════════════════════════════════════════════════════════
+*/
   window.Ciudad = (function () {
 
     var KEY_CIUDAD = 'app_ciudad';
@@ -109,6 +123,83 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
         return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
       });
+    }
+
+    /* ============================================================
+       MÉTRICAS POR CIUDAD (R62) · items ACTIVOS para las
+       tarjetas del sheet. Servicios y Cursos se leen de los
+       chips del post (cursos manda: si el post lleva chip de
+       curso cuenta como curso — CANON 3 —, si no, servicio).
+       Promos = posts con promo VIGENTE en esa ciudad (mismas
+       reglas de la marquesina: fecha del PROMOJSON + post
+       activo).
+       ============================================================ */
+    function hoyISO() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = ('0' + (d.getMonth() + 1)).slice(-2);
+      var dd = ('0' + d.getDate()).slice(-2);
+      return y + '-' + m + '-' + dd;
+    }
+
+    function tipoDePost(post) {
+      var chips = (post && post.idChips) || [];
+      if (!chips.length) return '';
+
+      var catalogo = (window.SISTEMA && window.SISTEMA.chips) || [];
+      var texto = '';
+
+      chips.forEach(function (id) {
+        for (var i = 0; i < catalogo.length; i++) {
+          if (catalogo[i].idChip === id) {
+            texto += ' ' + String(catalogo[i].titulo || '') + ' ' + id;
+            break;
+          }
+        }
+      });
+
+      texto = texto.toLowerCase();
+      if (texto.indexOf('curso') !== -1) return 'curso';
+      if (texto.indexOf('servic') !== -1) return 'servicio';
+      return '';
+    }
+
+    function promoVigente(item) {
+      var hoy = hoyISO();
+      if (item.inicia && item.inicia > hoy) return false;
+      if (item.termina && item.termina < hoy) return false;
+      return true;
+    }
+
+    function metricasDe(idCiudad) {
+      var posts = (window.TABLAS && window.TABLAS.posts) || [];
+      var promo = (window.SISTEMA && window.SISTEMA.promo) || {};
+      var pool  = (promo.porCiudad && promo.porCiudad[idCiudad]) || [];
+
+      var promos = {};
+      pool.forEach(function (item) {
+        if (!item || !item.idPost) return;
+        if (!promoVigente(item)) return;
+        promos[item.idPost] = 1;
+      });
+
+      var m = { servicios: 0, cursos: 0, promos: 0 };
+
+      posts.forEach(function (p) {
+        if (!p || !p.id) return;
+        if (p.estado !== 'activo') return;
+
+        var ciudades = p.idCiudad || [];
+        if (ciudades.indexOf(idCiudad) === -1) return;
+
+        var tipo = tipoDePost(p);
+        if (tipo === 'curso') m.cursos++;
+        else if (tipo === 'servicio') m.servicios++;
+
+        if (promos[p.id]) m.promos++;
+      });
+
+      return m;
     }
 
     /* ============================================================
@@ -317,37 +408,59 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       cerrar();
     }
 
+    /* ============================================================
+       TARJETAS DE CIUDADES (R62) · rejilla seleccionable con
+       métricas de items activos (Servicios / Cursos / Promos).
+       La tarjeta activa viste NARANJA oficial. Al tocar, el
+       MISMO camino de siempre: haptic + aplicar + cerrar.
+       ============================================================ */
     function pintarContenido() {
       if (!content) return;
 
       var html = '<h2 class="ciudad-titulo">Selecciona tu ciudad</h2>';
-      html += '<ul class="ciudad-lista">';
+      html += '<div class="ciudad-tarjetas">';
 
       lista.forEach(function (c) {
         var esActual = actual && actual.idCiudad === c.idCiudad;
-        html += '<li>' +
-                  '<label class="ciudad-option">' +
-                    '<input type="radio" name="ciudad" class="ciudad-radio" ' +
-                           'value="' + escapeHtml(c.idCiudad) + '"' +
-                           (esActual ? ' checked' : '') + '>' +
-                    '<span class="ciudad-nombre">' + escapeHtml(c.titulo) + '</span>' +
-                  '</label>' +
-                '</li>';
+        var m = metricasDe(c.idCiudad);
+
+        html +=
+          '<button type="button" class="ciudad-card' +
+            (esActual ? ' activa' : '') + '" data-ciudad="' +
+            escapeHtml(c.idCiudad) + '" aria-pressed="' +
+            (esActual ? 'true' : 'false') + '">' +
+            '<span class="ciudad-card-top">' +
+              '<span class="ciudad-card-nombre">' + escapeHtml(c.titulo) + '</span>' +
+              '<span class="ciudad-card-punto" aria-hidden="true"></span>' +
+            '</span>' +
+            '<span class="ciudad-card-metricas">' +
+              '<span class="ciudad-card-metrica">' +
+                '<span class="ciudad-card-num">' + m.servicios + '</span>' +
+                '<span class="ciudad-card-etiqueta">Servicios</span>' +
+              '</span>' +
+              '<span class="ciudad-card-metrica">' +
+                '<span class="ciudad-card-num">' + m.cursos + '</span>' +
+                '<span class="ciudad-card-etiqueta">Cursos</span>' +
+              '</span>' +
+              '<span class="ciudad-card-metrica">' +
+                '<span class="ciudad-card-num">' + m.promos + '</span>' +
+                '<span class="ciudad-card-etiqueta">Promos</span>' +
+              '</span>' +
+            '</span>' +
+          '</button>';
       });
 
-      html += '</ul>';
+      html += '</div>';
       content.innerHTML = html;
 
-      content.querySelectorAll('.ciudad-radio').forEach(function (radio) {
-        radio.addEventListener('change', function () {
-          var id = this.value;
-          var c = buscarPorId(id);
-          if (c) {
-            haptic(10);
-            aplicar(c);
-            pendienteSeleccion = false;
-            cerrar();
-          }
+      content.querySelectorAll('.ciudad-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+          var c = buscarPorId(this.getAttribute('data-ciudad'));
+          if (!c) return;
+          haptic(10);
+          aplicar(c);
+          pendienteSeleccion = false;
+          cerrar();
         });
       });
     }

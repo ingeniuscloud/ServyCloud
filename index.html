@@ -19,34 +19,30 @@ RESPONSABILIDAD: Estructura principal. SISTEMA, TOKEN y URL_EXEC
                  "Estás viendo EN Ciudad" (17px). El placeholder
                  del campo llega de la BD real (ROOTJSON
                  app.placeholderBuscar, lo pinta Core_Script).
-                 R60 · La fila de cabecera queda LIMPIA: CIUDAD
-                 COMPLETA a la izquierda y MENÚ GLOBAL a la derecha.
-                 La búsqueda vive en LUPA: botón circular a la
-                 derecha de los chips (.filtros-fila debajo de las
-                 promos); al tocarla se expande a CÁPSULA que tapa
-                 los chips (lupa a la izquierda dentro, botón
-                 "Limpiar filtro" como SPLIT PILL a la derecha,
-                 sin X). En modo compartido la cápsula queda
-                 desplegada y bloqueada: solo "Limpiar filtro"
-                 está activo. Debajo va el TÍTULO GRANDE del header
-                 (.titulo-header, texto que llega de la BD real en
-                 ROOTJSON app.tituloHeader y pinta Core_Script);
-                 encima de las promos el encabezado "Promos cerca
-                 de ti" + "Toca para conocer más". Módulo Ciudad
-                 se encarga de la ciudad.
-VERSIÓN:         1.11
-CAMBIOS:         R61: mismo markup que Index.html 1.10 de GAS —
-                 BOTÓN FILTRO (#btnFiltro) a la derecha de la
-                 lupa; fila "Explorar" viva en búsqueda con
-                 CONTADOR (#listaContador) y modo de VISTA
-                 (.modo-vista, seleccionable sin acción);
-                 COMPARTIR como TEXTO "Compartir lista filtrada"
-                 bajo el campo; ciudad "Estás viendo EN Ciudad".
-                 R60: cabecera con ciudad completa + menú global
-                 (fuera campo y compartir); vuelve la LUPA a la
-                 derecha de los chips (#filtros en .filtros-fila)
-                 y con ella la CÁPSULA split pill (lupa + campo +
-                 Limpiar filtro, sin X).
+                 R62 · FILA DE FILTROS (debajo de las promos):
+                 CHIPS botones independientes (icono + contador) |
+                 CIUDAD (pin + nombre, solo bordes) | BUSCAR
+                 (lupa → cápsula con CANCELAR fuera y CONTADOR de
+                 filtrados dentro) | FILTRO (glifo de Iconos, sin
+                 acción). La fila "Explorar" con sus tipos de
+                 vista se ELIMINÓ. El título grande sale de
+                 app.tituloHeader — ahora VECTOR: una frase al
+                 azar por carga. El preloader (GitHub_Cromo) sale
+                 DENTRO del marco del teléfono en PC.
+VERSIÓN:         1.12
+CAMBIOS:         R62: mismo markup que Index.html 1.11 de GAS —
+                 ciudad a la fila de filtros (pin + nombre, sin
+                 chevron ni "Estás viendo en"); chips
+                 independientes (fuera la cápsula .filtros);
+                 botón filtro con data-glifo (fuera el svg
+                 hardcodeado); CANCELAR sustituye a "Limpiar
+                 filtro"; contador de filtrados (#buscarContador)
+                 dentro del campo; fuera la fila "Explorar" y sus
+                 glifos de vista.
+                 R60: cabecera con volver + título + menú global;
+                 la búsqueda vive en LUPA en la fila de filtros
+                 y se expande a CÁPSULA. Módulo Ciudad se encarga
+                 de la ciudad.
 DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
                  Seccion_CSS.html, Seccion_Imagen_CSS.html, Promo_CSS.html,
                  Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
@@ -543,13 +539,11 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
       <div class="area-contenido">
 
         <!-- ============================================================
-             FILA DE CABECERA (R60 · R61 el texto "en")
-             CIUDAD COMPLETA + MENÚ GLOBAL en una sola fila, encima
-             del título grande. Ciudad: "Estás viendo en
-             <b>Ciudad</b>" (el EN lo pide el dueño R61) + chevron
-             SVG. La búsqueda es la LUPA junto a los chips (más
-             abajo). En modo detalle la fila muestra volver +
-             título de categoría (ciudad/global fuera vía CSS).
+             FILA DE CABECERA (R62) · volver + título de categoría
+             + MENÚ GLOBAL. La ciudad salió de aquí: es un botón
+             independiente de la fila de filtros (debajo). En
+             modo lista solo se ve el menú global. El menú global
+             se oculta en modo compartido.
              ============================================================ -->
         <div class="filtros-wrap">
 
@@ -560,16 +554,6 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
           </button>
 
           <div id="tituloCategoria" class="titulo-categoria" hidden></div>
-
-          <button type="button"
-                  class="city-bar"
-                  id="btnCiudad"
-                  disabled
-                  aria-label="Cambiar ciudad">
-            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
-            <span class="city-txt">Estás viendo en <b id="ciudadTxt">—</b></span>
-            <span class="city-chev" data-glifo="flechaAcordeon" aria-hidden="true"></span>
-          </button>
 
           <button type="button" class="menu-global" aria-label="Menú">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -582,9 +566,10 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         </div>
 
         <!-- ============================================================
-             TÍTULO INICIAL (R58) · texto grande que viene de la
-             BD real: ROOTJSON → app.tituloHeader. Core_Script lo
-             pinta al arrancar; si la BD no lo trae, queda oculto.
+             TÍTULO INICIAL (R58 · R62 VECTOR) · frase grande que
+             viene de la BD real: ROOTJSON → app.tituloHeader (un
+             vector: UNA al azar por carga). Core_Script lo pinta
+             al arrancar; si la BD no lo trae, queda oculto.
              ============================================================ -->
         <h1 class="titulo-header" id="tituloHeader" hidden></h1>
 
@@ -602,21 +587,29 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         <div id="promoSlot" hidden></div>
 
         <!-- ============================================================
-             FILA DE CHIPS + BUSCAR + FILTRO (R60 · R61 el filtro)
-             vive DEBAJO de las promos. Chips_Script pinta los
-             segmentos en #filtros; a la derecha quedan la LUPA
-             circular (#btnBuscar) y, a su derecha, el BOTÓN
-             FILTRO (#btnFiltro, círculo con embudo — R61: SIN
-             acción todavía). Al tocar la lupa Buscar_Script añade
-             .buscando a la fila: los chips se tapan y la CÁPSULA
-             (split pill: lupa + campo + "Limpiar filtro", SIN X)
-             se expande a todo el ancho. En modo compartido la
-             cápsula queda desplegada y bloqueada (solo "Limpiar
-             filtro" activo).
+             FILA DE FILTROS (R62) · vive DEBAJO de las promos.
+             Cada pieza es un BOTÓN INDEPENDIENTE con su icono:
+             chips (icono + contador) | ciudad (pin + nombre) |
+             buscar (lupa → cápsula con CANCELAR fuera y contador
+             de filtrados dentro) | filtro (glifo de Iconos, sin
+             acción por ahora). En modo compartido la cápsula
+             queda desplegada y bloqueada (solo CANCELAR activo).
              ============================================================ -->
         <div class="filtros-fila" id="filtrosFila">
 
           <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
+
+          <!-- R62 · BOTÓN CIUDAD · un botón independiente más:
+               pin + nombre de la ciudad, sin fondo (solo
+               bordes) y sin más texto que la ciudad. -->
+          <button type="button"
+                  class="city-bar"
+                  id="btnCiudad"
+                  disabled
+                  aria-label="Cambiar ciudad">
+            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
+            <span class="city-txt" id="ciudadTxt">—</span>
+          </button>
 
           <button type="button" class="btn-lupa" id="btnBuscar" aria-label="Buscar">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -625,14 +618,11 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
             </svg>
           </button>
 
-          <!-- R61 · BOTÓN FILTRO · círculo con embudo a la derecha
-               de la lupa. Sin handler todavía (el dueño lo pidió
-               sin acción por ahora); se comporta como la lupa en
-               los estados buscando/compartida (se retira). -->
+          <!-- R62 · BOTÓN FILTRO · círculo con el glifo filtro
+               de Iconos (3 líneas con su deslizador, diseño del
+               dueño). Sin handler todavía. -->
           <button type="button" class="btn-filtro" id="btnFiltro" aria-label="Filtrar">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-            </svg>
+            <span data-glifo="filtro" aria-hidden="true"></span>
           </button>
 
           <div class="buscar-capsula" id="buscarFila">
@@ -648,18 +638,20 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                      maxlength="40"
                      autocomplete="off" autocorrect="off"
                      autocapitalize="off" spellcheck="false">
+              <!-- R62 · CONTADOR de items filtrados (lo pinta
+                   Lista_Script; el CSS lo muestra solo en
+                   búsqueda/compartida). -->
+              <span class="buscar-contador" id="buscarContador" hidden>0</span>
             </div>
-
-            <!-- SPLIT PILL · segmento derecho de la cápsula.
-                 Durante la búsqueda limpia y cierra (sustituye a
-                 la X, más claro para quien no es técnico); en modo
-                 compartido es el ÚNICO control activo: libera la
-                 vista y devuelve el acceso normal a ciudades,
-                 chips y listas. -->
-            <button type="button" class="btn-limpiar" id="btnLimpiarBusqueda">
-              Limpiar filtro
-            </button>
           </div>
+
+          <!-- R62 · CANCELAR · FUERA del campo, a la derecha
+               (patrón Cashea/ML del dueño): al tocar, el campo
+               se cierra solo. El trabajo que hacía "Limpiar
+               filtro", retirado aquí. -->
+          <button type="button" class="btn-cancelar" id="btnCancelarBusqueda">
+            Cancelar
+          </button>
 
         </div>
 
@@ -675,28 +667,6 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
         </button>
 
         <div id="buscarVacio" class="buscar-vacio" hidden></div>
-
-        <!-- ============================================================
-             RÓTULO DE LA VIDRIERA (R58 · R61 contador + modo vista)
-             "Explorar" con el CONTADOR de items que pinta
-             Lista_Script (#listaContador), y a la derecha la
-             CÁPSULA de modo de vista (.modo-vista: lista /
-             miniatura), el mismo idioma visual del menú de chips.
-             Seleccionable pero SIN acción todavía (decisión del
-             dueño R61). Esta fila NO se oculta al abrir la
-             búsqueda: lo único que se tapa es el menú chips.
-             ============================================================ -->
-        <div class="lista-encabezado">
-          <span class="lista-encabezado-texto">Explorar<span class="lista-contador" id="listaContador">0</span></span>
-          <div class="modo-vista" role="group" aria-label="Modo de vista">
-            <button type="button" class="mv-btn activo" id="mvLista" aria-label="Ver como lista">
-              <span data-glifo="vistaLista" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="mv-btn" id="mvMiniatura" aria-label="Ver como miniatura">
-              <span data-glifo="vistaMiniatura" aria-hidden="true"></span>
-            </button>
-          </div>
-        </div>
 
         <div class="secciones-wrap">
           <div class="lista-wrap" id="listaWrap"></div>

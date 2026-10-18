@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Promo_Script.html
-ESPEJO GITHUB:   js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  del scroll en modo lista. Se oculta en modo
@@ -29,36 +29,33 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Tarjeta (R61): BADGE arriba (blanco), TÍTULO =
-                 TEXTO DE LA PROMO (la esencia del mensaje:
-                 item.texto de PROMOJSON, con respaldo en el
-                 promoTexto del post — grande y sin bold),
-                 SUBTÍTULO = título del post, y TERCERA FILA =
-                 partner con el CHECK DE CERTIFICADO en blanco a
-                 la derecha (glifo badgeCheck). Botón circular de
-                 flecha a la derecha. Cada tarjeta lleva su COLOR
-                 de la paleta (promo-c0…c5, por índice — el
-                 naranja oficial es el 0); los clones del bucle
-                 llevan el MISMO índice que su original para que
-                 la vuelta no cambie de color. El encabezado
-                 "Promos cerca de ti" + "Toca para conocer más" se
-                 muestra/oculta junto con el slot.
-VERSIÓN:         2.2
-CAMBIOS:         R61: la tarjeta cambia de anatomía — el TÍTULO
-                 de la promo ES el texto de PROMOJSON
-                 (textoDePromo) y el título del post baja a
-                 .promo-sub; la fila del partner lleva .promo-check
-                 (badgeCheck, blanco — el color lo pinta
-                 Promo_CSS). Si la promo no trae texto, el título
-                 del post sube y no hay subtítulo (sin duplicar).
-                 R60: entra el texto de la promo al HTML de la
-                 tarjeta (.promo-texto) — se lee de PROMOJSON
-                 (item.texto, con variantes promoTexto/
-                 descripcion/mensaje) y como respaldo del
-                 promoTexto que el índice del catálogo lleva
-                 desde PostDetalle (Cache.gs); entra la PALETA:
-                 cada tarjeta pinta promo-c{indice % 6} y el clon
-                 hereda el índice de su original.
+                 Tarjeta (R62): FILA DEL TÍTULO con el BADGE a la
+                 derecha (el texto de la promo manda, el badge lo
+                 acompaña), TÍTULO = TEXTO DE LA PROMO (la
+                 esencia del mensaje: item.texto de PROMOJSON,
+                 con respaldo en el promoTexto del post — grande
+                 y sin bold), SUBTÍTULO = título del post, y
+                 TERCERA FILA = partner con el CHECK DE
+                 CERTIFICADO en blanco a la derecha (glifo
+                 badgeCheck). Flecha circular a la esquina
+                 inferior derecha. Cada tarjeta lleva el
+                 DEGRADADO de su colorOficial (R62: estilo
+                 inline 2026 — diagonal 135°, claro → base →
+                 oscuro — y su sombra; los clones llevan el MISMO
+                 estilo que su original para que la vuelta no
+                 cambie de color). El encabezado "Promos cerca de
+                 ti" + "Toca para conocer más" se muestra/oculta
+                 junto con el slot.
+VERSIÓN:         2.3
+CAMBIOS:         R62: el DEGRADADO sale del colorOficial del
+                 post — estiloDegradado() deriva claro/oscuro
+                 desde el hex de la BD (mix con blanco/negro) y
+                 pinta background + boxShadow en línea; FUERA la
+                 paleta promo-c0…c5 (PALETA_LARGO y la clase
+                 promo-c{n} murieron). El badge sube a la FILA
+                 DEL TÍTULO (.promo-fila-titulo: título flex:1 +
+                 badge a la derecha). La base CSS queda como
+                 respaldo si la BD no trae color válido.
                  R58: contenido nuevo de la tarjeta — fuera la
                  campana, el tagline y el pie "Ver detalles";
                  entra badge blanco + promo-titulo +
@@ -82,11 +79,58 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     var pausadoPorInteraccion = false;
     var reducedMotion = false;
 
-    /* PALETA R60 · colores de tarjeta (el degradado lo pinta
-       Promo_CSS con la clase promo-c{n}): naranja oficial, verde,
-       violeta, turquesa, fucsia y ámbar. El índice de la promo
-       decide (i % 6) y el clon hereda el de su original. */
-    var PALETA_LARGO = 6;
+    /* ============================================================
+       DEGRADADO DEL COLOROFICIAL (R62) · versión 2026
+       Deriva claro/oscuro desde el hex de la BD (mezcla con
+       blanco/negro) y devuelve el estilo inline de la tarjeta:
+       diagonal 135° (claro → base → oscuro) + sombra del
+       propio color. Sin hex válido → null (el respaldo CSS
+       naranja queda debajo).
+       ============================================================ */
+    function hexARgb(hex) {
+      var h = String(hex || '').trim().replace('#', '');
+      if (/^[0-9a-fA-F]{3}$/.test(h)) {
+        h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) +
+            h.charAt(2) + h.charAt(2);
+      }
+      if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+
+      return {
+        r: parseInt(h.charAt(0) + h.charAt(1), 16),
+        g: parseInt(h.charAt(2) + h.charAt(3), 16),
+        b: parseInt(h.charAt(4) + h.charAt(5), 16)
+      };
+    }
+
+    /* mezcla hacia blanco (t < 0) o negro (t > 0) — t en [-1,1] */
+    function mezclar(c, t) {
+      var destino = t < 0 ? 255 : 0;
+      var k = Math.min(Math.abs(t), 1);
+      return {
+        r: Math.round(c.r + (destino - c.r) * k),
+        g: Math.round(c.g + (destino - c.g) * k),
+        b: Math.round(c.b + (destino - c.b) * k)
+      };
+    }
+
+    function rgbStr(c) {
+      return c.r + ', ' + c.g + ', ' + c.b;
+    }
+
+    function estiloDegradado(colorHex) {
+      var base = hexARgb(colorHex);
+      if (!base) return null;
+
+      var claro = mezclar(base, -0.16);
+      var oscuro = mezclar(base, 0.18);
+
+      return {
+        background: 'linear-gradient(135deg, rgb(' + rgbStr(claro) + ') 0%, ' +
+                    'rgb(' + rgbStr(base) + ') 52%, ' +
+                    'rgb(' + rgbStr(oscuro) + ') 100%)',
+        boxShadow: '0 6px 16px rgba(' + rgbStr(base) + ', 0.28)'
+      };
+    }
 
     /* Marquesina · R32 */
     var VELOCIDAD_FALLBACK = 22;   /* px/s si no se puede derivar */
@@ -223,27 +267,31 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       var textoPromo = textoDePromo(item, post);
       var tituloPost = String(post.titulo || post.boton || '').trim();
 
-      /* R61 · Anatomía pedida por el dueño:
-         1) TÍTULO = TEXTO de la promo (PROMOJSON), grande y sin
-            bold (el estilo lo pinta Promo_CSS).
+      /* R62 · Anatomía pedida por el dueño:
+         1) FILA DEL TÍTULO = TEXTO de la promo (PROMOJSON),
+            grande y sin bold (el estilo lo pinta Promo_CSS),
+            con el badge a la derecha de la MISMA fila.
          2) SUBTÍTULO = título del post.
          3) TERCERA FILA = nombre del partner + check de
             certificado a la derecha, en BLANCO (badgeCheck).
          Si la promo no trae texto, el título del post sube y NO
-         se duplica en el subtítulo. La flecha circular cierra. */
-      var html = '';
-      if (badge && badge.titulo) {
-        html += '<span class="badge">' + escapeHtml(badge.titulo) + '</span>';
-      }
+         se duplica en el subtítulo. La flecha circular cierra
+         abajo a la derecha. */
+      var badgeHtml = (badge && badge.titulo)
+        ? '<span class="badge">' + escapeHtml(badge.titulo) + '</span>'
+        : '';
 
-      if (textoPromo) {
-        html += '<span class="promo-titulo">' + escapeHtml(textoPromo) + '</span>';
-        if (tituloPost) {
-          html += '<span class="promo-sub">' + escapeHtml(tituloPost) + '</span>';
-        }
-      } else {
-        html += '<span class="promo-titulo">' +
-                escapeHtml(tituloPost || post.id) + '</span>';
+      var tituloHtml = textoPromo
+        ? '<span class="promo-titulo">' + escapeHtml(textoPromo) + '</span>'
+        : '<span class="promo-titulo">' +
+          escapeHtml(tituloPost || post.id) + '</span>';
+
+      var html = '<span class="promo-fila-titulo">' +
+                   tituloHtml + badgeHtml +
+                 '</span>';
+
+      if (textoPromo && tituloPost) {
+        html += '<span class="promo-sub">' + escapeHtml(tituloPost) + '</span>';
       }
 
       if (marca) {
@@ -423,12 +471,19 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       var unaSola = (vigentes.length === 1);
       var hayBucle = !unaSola && !reducedMotion;
 
-      function montarBoton(par, esClon, indice) {
+      function montarBoton(par, esClon) {
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'lista-item promo-item' +
-                        ' promo-c' + (indice % PALETA_LARGO);
+        btn.className = 'lista-item promo-item';
         btn.setAttribute('data-post', par.post.id);
+
+        /* R62 · degradado del colorOficial del post (inline);
+           sin color válido queda el respaldo naranja del CSS. */
+        var degradado = estiloDegradado(par.post.colorOficial);
+        if (degradado) {
+          btn.style.background = degradado.background;
+          btn.style.boxShadow = degradado.boxShadow;
+        }
 
         if (unaSola) {
           btn.style.flexBasis = '100%';
@@ -463,15 +518,15 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       }
 
       vigentes.forEach(function (par, indice) {
-        trackEl.appendChild(montarBoton(par, false, indice));
+        trackEl.appendChild(montarBoton(par, false));
       });
 
       /* Segunda vuelta exacta: es lo que hace que el envolvimiento
          en anchoVuelta no tenga costura visible. El clon lleva el
-         MISMO índice que su original (mismo color de paleta). */
+         MISMO degradado que su original (mismo par, mismo color). */
       if (hayBucle) {
         vigentes.forEach(function (par, indice) {
-          trackEl.appendChild(montarBoton(par, true, indice));
+          trackEl.appendChild(montarBoton(par, true));
         });
       }
 
@@ -543,4 +598,3 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     return { construir: construir };
 
   })();
-

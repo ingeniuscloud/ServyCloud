@@ -3,14 +3,23 @@
 ARCHIVO:         GitHub_Cromo.js
 ESPEJO GITHUB:   js/GitHub_Cromo.js (SOLO-GitHub: no existe en GAS)
 PROYECTO:        ServyCloud | App en GitHub Pages
-RESPONSABILIDAD: Cromo de la página estática: preloader orbital,
+RESPONSABILIDAD: Cromo de la página estática: preloader orbital
+                 (R62: en ESCRITORIO vive DENTRO del marco del
+                 teléfono — .lienzo —, no en toda la pantalla; en
+                 móvil el lienzo es la pantalla completa, así que
+                 el efecto es el mismo de siempre),
                  puente local (mismas claves de storage del
                  envoltorio), sesión→ciudad (wrap de asegurarSesion),
                  píldora "Instalar app" (Android) y registro del
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
-VERSIÓN:         1.1
-CAMBIOS:         R33: el boleto de instalación se comparte en
+VERSIÓN:         1.2
+CAMBIOS:         R62: el preloader se ancla DENTRO de #lienzo
+                 (position absolute: cubre SOLO el área del
+                 teléfono en PC; en móvil el lienzo es full
+                 screen y no cambia nada). Fallback: sin lienzo
+                 en el DOM, se ancla al body como antes.
+                 R33: el boleto de instalación se comparte en
                  window.__servyBoleto para que el ítem "Instalar la
                  app" del menú (Global_Menu_Script) pueda abrir el
                  diálogo nativo sin capturarlo de nuevo; la píldora
@@ -67,7 +76,11 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
           }
 
           const preloader = crearPreloader('Servy', 'Cargando catálogo');
-          document.body.appendChild(preloader);
+          // R62 · DENTRO del marco en PC: el lienzo del teléfono
+          // es el ancla (position absolute del overlay); en móvil
+          // el lienzo es la pantalla completa (mismo efecto de
+          // siempre). Sin lienzo (imprevisto), body como antes.
+          (document.getElementById('lienzo') || document.body).appendChild(preloader);
 
           function retirarPreloader() {
               if (preloaderRetirado) return;

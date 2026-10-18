@@ -1,74 +1,64 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_CSS.html
-ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
                  fade. Item de la vidriera (R58 · CAJA como la
                  imagen del dueño): TARJETA BLANCA con radio y
-                 sombra suave, franja del colorOficial a sangre
-                 en el borde izquierdo (variable --post-color que
-                 pinta Lista_Script), título y subtítulo en su
-                 color normal (tinta/gris, SIN colorOficial) con
-                 recorte a 2 líneas, línea divisora debajo del
-                 subtítulo y fila del partner abajo: avatar
-                 circular SIN BORDES con la INICIAL (fondo
-                 colorClaro del post, letra colorOficial) + nombre
-                 + glifo verificado (Iconos.html); a la derecha
-                 "Ver publicación →" en NARANJA oficial y peso
-                 normal. La estrella métrica pasiva se queda
-                 anclada a la esquina superior derecha (fila
-                 horizontal: glifo amarillo + contador a su
+                 sombra suave (R62: SIN la franja del colorOficial
+                 a la izquierda — el dueño la quitó por
+                 fricción), título y subtítulo en su color normal
+                 (tinta/gris, SIN colorOficial) con recorte a 2
+                 líneas, línea divisora debajo del subtítulo y
+                 fila del partner abajo: avatar circular SIN
+                 BORDES con la INICIAL (fondo colorClaro del
+                 post, letra colorOficial) + nombre (R62: peso
+                 normal) + glifo verificado (Iconos.html); a la
+                 derecha "Ver publicación →" en NARANJA oficial y
+                 peso normal. El TÍTULO del item (R62) recibe el
+                 mismo tratamiento que el de las promos: sin bold
+                 y más grande. La estrella métrica pasiva se
+                 queda anclada a la esquina superior derecha
+                 (fila horizontal: glifo amarillo + contador a su
                  derecha, oculta en 0).
-                 R61: el rótulo "Explorar" es una FILA — texto con
-                 CONTADOR de items (píldora pequeña, lo pinta
-                 Lista_Script) y, a la derecha, la CÁPSULA de modo
-                 de VISTA (lista / miniatura, el mismo idioma del
-                 menú chips, seleccionable sin acción).
+                 R62: la fila "Explorar" con su contador y la
+                 cápsula de modo de vista se ELIMINARON (el
+                 dueño no va a aplicar los tipos de vista; el
+                 contador de filtrados vive ahora dentro del
+                 campo buscar, #buscarContador en Chips_CSS).
                  Sin badge (vive en la promo y el post). La lista
-                 es PLANA bajo el rótulo "Explorar" (el agrupado
-                 por grupo vuelve como opción del filtro cuando
-                 el dueño lo ordene). Skeleton del detalle
-                 (primera carga de un post). Skeleton de lista con
-                 la misma anatomía de caja (solo si el POST
-                 inicial aún está en vuelo cuando el usuario
-                 elige ciudad).
-VERSIÓN:         2.0
-CAMBIOS:         R61: .lista-encabezado pasa de rótulo a FILA
-                 (flex, espacio entre extremos): a la izquierda
-                 "Explorar" + .lista-contador (píldora con la
-                 cantidad de items, la pinta Lista_Script en cada
-                 repintado) y a la derecha .modo-vista — cápsula
-                 #f1f3f7 con dos botones (glifos vistaLista /
-                 vistaMiniatura de Iconos.html), el ACTIVO en
-                 blanco con el naranja oficial, tal como el
-                 control segmentado de los chips. Sin acción de
-                 render todavía (decisión del dueño).
+                 es PLANA. Skeleton del detalle (primera carga de
+                 un post). Skeleton de lista con la misma anatomía
+                 de caja (solo si el POST inicial aún está en
+                 vuelo cuando el usuario elige ciudad).
+VERSIÓN:         2.1
+CAMBIOS:         R62: FUERA la franja colorOficial (el ::before
+                 de .lista-item y su espejo del skeleton — el
+                 padding izquierdo vuelve a 16px); título del
+                 item sin bold y más grande (15px/600 →
+                 16px/400, mismo tratamiento que el de las
+                 promos); nombre del partner sin bold (600→400,
+                 la tercera fila); FUERA la fila "Explorar"
+                 (.lista-encabezado, .lista-contador, .modo-vista
+                 y .mv-btn con todo su responsive — el toggle
+                 lista/miniatura no se va a aplicar).
                  R60: el bloque modo-detalle oculta la FILA
-                 COMPLETA de chips + buscar (.filtros-fila —
-                 chips, lupa, cápsula y compartir son hijos de
+                 COMPLETA de filtros (.filtros-fila — chips,
+                 ciudad, lupa, cápsula y compartir son hijos de
                  esa fila); la excepción del post compartido
                  vive en Chips_CSS con mayor especificidad.
-                 R59: 3 ajustes del item — "Ver publicación" en
-                 NARANJA oficial #f97316 (la flecha hereda por
-                 currentColor); avatar del partner SIN BORDES
-                 (el borde 1.5px de la regla global .partner-avatar
-                 de Partner_Sheet_CSS se colaba en el item y le
-                 quitaba protagonismo al título) y el check
+                 R59: "Ver publicación" en NARANJA oficial
+                 #f97316 (la flecha hereda por currentColor);
+                 avatar del partner SIN BORDES y el check
                  verificado más grande (15→17px).
                  R58: item como CAJA — tarjeta blanca con radio
-                 16px, sombra suave y franja colorOficial a
-                 sangre en el borde izquierdo (::before con
-                 var(--post-color)); título y subtítulo vuelven a
-                 su color normal (#1f2937/#64748b, fuera
-                 var(--post-color) del título) con recorte a 2
-                 líneas; divisoria interna debajo del subtítulo;
-                 partner con avatar circular de la inicial
-                 (--post-claro/--post-color) + glifo verificado;
-                 "Ver detalles" pasa a "Ver publicación" (mismo
-                 gris medio, sin bold, glifo flechaVer); fuera la
-                 agrupación por grupos (lista plana bajo el
-                 rótulo "Explorar"); skeleton espeja la caja.
+                 16px, sombra suave; título y subtítulo en color
+                 normal (#1f2937/#64748b) con recorte a 2 líneas;
+                 divisoria interna; partner con avatar circular
+                 de la inicial + glifo verificado; "Ver
+                 publicación" (mismo gris medio, sin bold, glifo
+                 flechaVer); lista plana; skeleton espeja la caja.
                  R56: estrella en fila horizontal (glifo +
                  contador a su derecha) y amarilla #fbbf24,
                  anclada absolute a la esquina — deja de reservar
@@ -145,9 +135,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   body.modo-detalle .filtros-fila,
   body.modo-detalle .titulo-header,
-  body.modo-detalle .promo-encabezado,
-  body.modo-detalle .city-bar,
-  body.modo-detalle .lista-encabezado {
+  body.modo-detalle .promo-encabezado {
     display: none !important;
   }
 
@@ -189,20 +177,19 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .secciones-track[hidden] { display: none !important; }
 
   /* ============================================================
-     LISTA ITEM · CAJA (R58)
+     LISTA ITEM · CAJA (R58 · R62 sin franja)
      Tarjeta blanca con radio, borde y sombra suave, separada
      por aire (sin divisoria entre items: las cajas se
-     sostienen solas). La FRANJA del colorOficial vuelve a
-     sangre en el borde izquierdo (::before con la variable
-     --post-color que pinta Lista_Script); overflow hidden la
-     recorta con el radio de la tarjeta. La promo no lleva
-     franja (su tarjeta es propia de Promo_CSS).
+     sostienen solas). La FRANJA del colorOficial salió en R62
+     (fricción, orden del dueño): el padding izquierdo volvió a
+     16px. La promo no lleva esta caja (su tarjeta es propia de
+     Promo_CSS).
      ============================================================ */
   .lista-item {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 14px 16px 14px 21px;
+    padding: 14px 16px;
     background: #ffffff;
     width: 100%;
     border: 1px solid #f1f5f9;
@@ -218,134 +205,11 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   }
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
 
-  .lista-item:not(.promo-item)::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;
-    background: var(--post-color, #cbd5e1);
-  }
-
   /* ============================================================
-     RÓTULO "EXPLORAR" (R58 · R61 FILA con contador + vista)
-     Etiqueta de la vidriera, sobre la lista plana (la imagen
-     del dueño). R61: es una FILA — "Explorar" con el CONTADOR
-     de items (píldora pequeña; Lista_Script la pinta en cada
-     repintado con la cantidad que trae el filtro) y, alineada
-     a la derecha, la CÁPSULA de modo de vista (lista /
-     miniatura): el mismo idioma visual del menú chips
-     (contenedor #f1f3f7, activo blanco + naranja oficial).
-     Selección SIN acción de render por ahora (el dueño la pidió
-     seleccionable, no funcional). Esta fila NO se oculta al
-     abrir la búsqueda (R61: solo se tapan los chips).
+     (R62) La fila "Explorar" con su contador y su cápsula de
+     modo de vista se ELIMINARON — sus estilos murieron con la
+     fila (el dueño no aplica los tipos de vista).
      ============================================================ */
-  .lista-encabezado {
-    flex-shrink: 0;
-    padding: 12px 16px 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .lista-encabezado-texto {
-    display: inline-flex;
-    align-items: center;
-    min-width: 0;
-
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    color: #64748b;
-  }
-
-  /* CONTADOR de items (R61): píldora pequeña junto al rótulo.
-     Números tabulares para que no baile al cambiar. */
-  .lista-contador {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    margin-left: 8px;
-    padding: 1px 8px 2px;
-
-    background: rgba(15, 23, 42, 0.06);
-    border-radius: 999px;
-
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.5;
-    color: #64748b;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* MODO DE VISTA (R61) · cápsula lista / miniatura a la
-     derecha de la fila, idéntico idioma del menú chips:
-     contenedor claro con radio, botón ACTIVO blanco con el
-     naranja oficial y sombra suave. Los glifos vienen de
-     Iconos.html (vistaLista / vistaMiniatura, stroke
-     currentColor). */
-  .modo-vista {
-    flex: 0 0 auto;
-
-    display: flex;
-    align-items: stretch;
-    gap: 2px;
-    padding: 3px;
-
-    background: #f1f3f7;
-    border-radius: 999px;
-  }
-
-  .mv-btn {
-    flex: 0 0 auto;
-    width: 34px;
-    height: 26px;
-    padding: 0;
-
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-
-    color: #64748b;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-
-    transition: color 0.18s ease, background 0.18s ease,
-                box-shadow 0.18s ease;
-  }
-
-  .mv-btn:active { opacity: 0.7; }
-
-  .mv-btn svg {
-    width: 15px;
-    height: 15px;
-    display: block;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .mv-btn.activo {
-    background: #ffffff;
-    color: #f97316;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.10);
-  }
-
-  /* Portador del glifo: inline-flex para que el svg herede el
-     centro del botón sin descuadres verticales. */
-  .mv-btn span { display: inline-flex; }
 
   /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
      glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
@@ -403,14 +267,14 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding-right: 44px;
   }
 
-  /* Título y subtítulo en su COLOR NORMAL (R58): tinta para el
-     título, gris para el subtítulo — el colorOficial vuelve a
-     vivir SOLO en la franja y en el avatar del partner. Recorte
-     a 2 líneas en ambos, como la imagen del dueño. La promo no
-     usa estas vías: su tarjeta se pinta entera en Promo_CSS. */
+  /* Título (R62) · MISMO TRATAMIENTO que el título de las
+     promos: SIN bold y más grande. Subtítulo en su COLOR
+     NORMAL (tinta/gris). Recorte a 2 líneas en ambos, como la
+     imagen del dueño. La promo no usa estas vías: su tarjeta
+     se pinta entera en Promo_CSS. */
   .lista-item .titulo {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 400;
     color: #1f2937;
     letter-spacing: -0.01em;
     line-height: 1.3;
@@ -475,7 +339,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     align-items: center;
     gap: 5px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 400;
     color: #1f2937;
     min-width: 0;
   }
@@ -645,7 +509,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     position: relative;
     display: flex;
     align-items: center;
-    padding: 14px 16px 14px 21px;
+    padding: 14px 16px;
     background: #ffffff;
     border: 1px solid #f1f5f9;
     border-radius: 16px;
@@ -654,17 +518,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     overflow: hidden;
   }
 
-  /* Espejo de la franja colorOficial (R58): banda neutra a
-     sangre en el borde izquierdo. */
-  .lista-skeleton-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;
-    background: #eef2f7;
-  }
+  /* (R62) La franja del skeleton murió con la franja real. */
 
   .lista-skeleton-body {
     flex: 1;
@@ -754,16 +608,15 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
      RESPONSIVE
      ============================================================ */
   @media (max-width: 360px) {
-    .lista-item { padding: 12px 14px 12px 19px; }
+    .lista-item { padding: 12px 14px; }
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
     .lista-item .estrella-num { font-size: 11px; }
-    .lista-item .titulo { font-size: 14px; font-weight: 600; }
+    .lista-item .titulo { font-size: 15px; }
     .lista-item .tagline { font-size: 12px; font-weight: 400; }
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
     .lista-item .partner-avatar { width: 30px; height: 30px; font-size: 13px; }
-    .lista-encabezado { padding: 10px 14px 8px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -772,13 +625,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .skeleton-detalle .skeleton-identidad { padding: 0 22px; }
     .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
 
-    .lista-skeleton-item { padding: 12px 14px 12px 19px; }
+    .lista-skeleton-item { padding: 12px 14px; }
     .lista-skeleton-avatar { width: 30px; height: 30px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
-    .lista-encabezado { padding: 10px 14px 8px; }
-    .modo-vista { padding: 2px; }
-    .mv-btn { width: 30px; height: 24px; }
-    .mv-btn svg { width: 14px; height: 14px; }
-    .lista-contador { font-size: 10px; margin-left: 6px; }
   }
-

@@ -1,49 +1,58 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Promo_CSS.html
-ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE sobre el lienzo y cada
-                 promo es una TARJETA con degradado PROPIO (R60:
-                 paleta de 6 colores para distinguirlas — naranja,
-                 verde, violeta, turquesa, fucsia y ámbar; el
-                 índice lo asigna Promo_Script): radio, sombra
-                 propia del color y contenido en blanco — badge
-                 PROMOCIONADO arriba, TÍTULO = TEXTO DE LA PROMO
-                 (R61: PROMOJSON, grande y sin bold), subtítulo =
-                 título del post, partner con check de
-                 certificado blanco a la derecha y botón circular
-                 de flecha a la derecha. La tarjeta es un 18% MÁS
-                 ANCHA (R61) y el GRID de la marquesina queda
-                 TRANSPARENTE (R61: sin gris, se ve el lienzo).
-                 Encabezado propio ("Promos cerca de ti" + "Toca
-                 para conocer más") y FADE a los laterales de la
-                 marquesina hacia el color del lienzo. El avance
-                 continuo lo lleva Promo_Script (rAF sobre
-                 scrollLeft). El badge vive SOLO aquí y en el post:
-                 es la única diferencia visible de la promo dentro
-                 del sistema. Sin estrella (la métrica es solo del
+                 promo es una TARJETA con degradado PROPIO del
+                 colorOficial del post (R62: adiós a la paleta
+                 fija c0…c5 — Promo_Script pinta el degradado
+                 2026 en línea con el color de cada post: claro →
+                 base → oscuro, diagonal 135°, y su sombra
+                 acompaña; sin color en la BD, el respaldo
+                 naranja queda abajo): radio, sombra y contenido
+                 en blanco — fila del TÍTULO (R62): el TEXTO DE
+                 LA PROMO (PROMOJSON, grande y sin bold) con el
+                 badge PROMOCIONADO a su derecha en la MISMA
+                 fila, subtítulo = título del post, partner con
+                 check de certificado blanco y la flecha circular
+                 ANCLADA A LA ESQUINA INFERIOR DERECHA (R62). La
+                 tarjeta es MÁS COMPACTA (R62: menos alto, ancho
+                 recortado un 10%) y el GRID de la marquesina
+                 queda TRANSPARENTE (R61: sin gris, se ve el
+                 lienzo). Encabezado propio ("Promos cerca de
+                 ti" en peso normal R62, color de los títulos de
+                 sección) y FADE a los laterales de la marquesina
+                 hacia el color del lienzo. El avance continuo lo
+                 lleva Promo_Script (rAF sobre scrollLeft). El
+                 badge vive SOLO aquí y en el post: es la única
+                 diferencia visible de la promo dentro del
+                 sistema. Sin estrella (la métrica es solo del
                  item de la lista). Vive fuera del scroll en modo
                  lista. Se oculta en modo detalle.
-VERSIÓN:         2.3
-CAMBIOS:         R61: anatomía de la tarjeta al pie del dueño —
+VERSIÓN:         2.4
+CAMBIOS:         R62: tarjeta compacta al pie del dueño — MENOS
+                 ALTO (padding 11/12 y gap 3), FLECHA a la
+                 esquina inferior derecha (top 50% → bottom),
+                 BADGE a la fila del título alineado a la derecha
+                 (.promo-fila-titulo con .promo-titulo flex:1),
+                 ANCHO -10% (97→87% escritorio, 85→77% móvil),
+                 DEGRADADO del colorOficial del post (fuera la
+                 paleta .promo-c1…c5 y sus sombras — el estilo
+                 inline lo pinta Promo_Script; la base sin clase
+                 queda como respaldo naranja en versión 2026:
+                 135°, claro→base→oscuro) y "Promos cerca de
+                 ti" sin bold (700→400, color #1f2937 de los
+                 títulos de sección intacto).
+                 R61: anatomía de la tarjeta al pie del dueño —
                  .promo-titulo ES el texto de PROMOJSON (18px,
                  peso 400, sin bold) y el título del post baja a
-                 .promo-sub (subtítulo blanco suavizado); la
-                 tercera fila es .promo-partner con el check de
-                 certificado (.promo-check, badgeCheck de
-                 Iconos.html) en BLANCO a la derecha; la tarjeta
-                 crece un 18% de ancho (82→97% escritorio,
-                 72→85% móvil); .promo-track declara
+                 .promo-sub; la tercera fila es .promo-partner
+                 con el check de certificado (.promo-check,
+                 badgeCheck de Iconos.html) en BLANCO a la
+                 derecha; .promo-track declara
                  background:transparent (el grid no tapa el
                  lienzo).
-                 R60: entra el TEXTO DE LA PROMO (.promo-texto,
-                 blanco suavizado, 2 líneas) y la PALETA de
-                 degradados (.promo-c0…c5) para distinguir las
-                 tarjetas entre sí — el naranja oficial sigue
-                 siendo el color 0 (la primera promo, como la
-                 imagen del dueño); cada sombra acompaña a su
-                 color. Base sin clase: naranja (respaldo).
                  R58: la promo viste NARANJA (degradado de la
                  familia del oficial #f97316) con contenido
                  blanco como la imagen del dueño: badge blanco
@@ -120,7 +129,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
 
   .promo-encabezado-titulo {
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: #1f2937;
@@ -155,90 +164,75 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
   }
   .promo-track::-webkit-scrollbar { display: none; }
 
-  /* 97% (R61 · era 82%): la tarjeta crece un 18% y el asomo de
-     la siguiente queda como brillo al borde. Promo_Script lo
-     ajusta a 100% cuando hay una sola promo (lo hace con
-     estilo inline, así que gana a estas reglas). */
+  /* 87% (R62 · era 97%): el dueño recortó un 10% el ancho de
+     la tarjeta. Promo_Script lo ajusta a 100% cuando hay una
+     sola promo (lo hace con estilo inline, así que gana a
+     estas reglas). */
   .promo-track > .promo-item {
-    flex: 0 0 97%;
+    flex: 0 0 87%;
     margin-right: 10px;
   }
 
-  /* En el teléfono, 85% (R61 · era 72%): mismo crecimiento del
-     18%. Se usa body.is-mobile y no una media query porque el
+  /* En el teléfono, 77% (R62 · era 85%): mismo recorte del
+     10%. Se usa body.is-mobile y no una media query porque el
      marco de escritorio mide ≈414px, casi igual que un
      teléfono: por ancho de viewport no se distinguen. */
   body.is-mobile .promo-track > .promo-item {
-    flex: 0 0 85%;
+    flex: 0 0 77%;
   }
 
   /* ============================================================
-     ITEM PROMO · TARJETA CON DEGRADADO PROPIO (R60)
-     Especificidad doble para ganar a .lista-item. La PALETA
-     (promo-c0…c5) distingue las tarjetas entre sí; el color 0
-     es el NARANJA oficial de la app (la primera promo, como la
-     imagen del dueño). Contenido blanco en columna (R61):
-     badge arriba, TÍTULO = texto de la promo (grande, sin
-     bold), subtítulo = título del post, partner + check
-     blanco, y botón circular de flecha anclado a la derecha.
-     Sin franja, sin estrella, sin "Ver detalles" (la flecha
-     circular es la invitación).
+     ITEM PROMO · TARJETA COMPACTA (R62)
+     Especificidad doble para ganar a .lista-item. El
+     DEGRADADO lo pinta Promo_Script EN LÍNEA con el
+     colorOficial del post (versión 2026: diagonal 135°,
+     claro → base → oscuro); esta base sin clase es el
+     RESPALDO naranja (cuando la BD no trae color). Contenido
+     blanco en columna: fila del título (texto de la promo +
+     badge a la derecha), subtítulo = título del post, partner
+     + check blanco, y la flecha circular anclada a la ESQUINA
+     INFERIOR DERECHA. Sin franja, sin estrella, sin "Ver
+     detalles" (la flecha circular es la invitación).
      ============================================================ */
   .lista-item.promo-item {
-    background: linear-gradient(150deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 52%, #ea580c 100%);
     border: none;
     border-radius: 16px;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.30);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.28);
     position: relative;
     z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
-    padding: 14px 62px 15px 16px;
+    gap: 3px;
+    padding: 11px 14px 12px;
     margin-bottom: 0;
     overflow: hidden;
     text-align: left;
   }
 
-  /* PALETA R60 · cada tarjeta con su color principal:
-     c0 naranja (oficial) · c1 verde · c2 violeta ·
-     c3 turquesa · c4 fucsia · c5 ámbar. La sombra
-     acompaña a su color para el mismo resalte de siempre. */
-  .lista-item.promo-item.promo-c1 {
-    background: linear-gradient(150deg, #34d399 0%, #10b981 55%, #059669 100%);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.30);
-  }
-
-  .lista-item.promo-item.promo-c2 {
-    background: linear-gradient(150deg, #a78bfa 0%, #8b5cf6 55%, #7c3aed 100%);
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.30);
-  }
-
-  .lista-item.promo-item.promo-c3 {
-    background: linear-gradient(150deg, #2dd4bf 0%, #14b8a6 55%, #0d9488 100%);
-    box-shadow: 0 6px 16px rgba(20, 184, 166, 0.30);
-  }
-
-  .lista-item.promo-item.promo-c4 {
-    background: linear-gradient(150deg, #f472b6 0%, #ec4899 55%, #db2777 100%);
-    box-shadow: 0 6px 16px rgba(236, 72, 153, 0.30);
-  }
-
-  .lista-item.promo-item.promo-c5 {
-    background: linear-gradient(150deg, #fbbf24 0%, #f59e0b 55%, #d97706 100%);
-    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.30);
-  }
-
   .lista-item.promo-item:active { filter: brightness(0.96); }
 
   /* ============================================================
-     BADGE · etiqueta del post (vive SOLO en la promo y en el
-     post). Valores EXACTOS de la regla original; en la tarjeta
-     naranja se pinta BLANCO (borde dashed y texto), como la
-     imagen del dueño — el color de la BD queda reservado al
-     badge del post.
+     FILA DEL TÍTULO (R62) · TEXTO DE LA PROMO + badge a la
+     derecha, en la MISMA fila. El título manda (flex:1); el
+     badge no se encoge. Sustituye al badge suelto de R58
+     (arriba del título): la tarjeta gana la altura que el
+     dueño pidió recortar.
      ============================================================ */
+  .lista-item.promo-item .promo-fila-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* BADGE · etiqueta del post (vive SOLO en la promo y en el
+     post). Valores EXACTOS de la regla original; en la tarjeta
+     se pinta BLANCO (borde dashed y texto), como la imagen del
+     dueño — el color de la BD queda reservado al badge del
+     post. Vive en la fila del título (R62), a la derecha. */
   .lista-item.promo-item .badge {
     flex: 0 0 auto;
     font-size: 11px;
@@ -251,13 +245,16 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     background: transparent;
     white-space: nowrap;
     color: #ffffff;
-    margin-bottom: 3px;
   }
 
   /* TÍTULO DE LA PROMO (R61) · ES el TEXTO de PROMOJSON — la
      esencia del mensaje manda en la tarjeta. Grande y SIN
-     bold (font simple, sensación estética), blanco, 2 líneas. */
+     bold (font simple, sensación estética), blanco, 2 líneas.
+     R62: flex:1 dentro de su fila para que el badge quede a
+     la derecha. */
   .lista-item.promo-item .promo-titulo {
+    flex: 1 1 auto;
+    min-width: 0;
     font-size: 18px;
     font-weight: 400;
     line-height: 1.3;
@@ -317,15 +314,15 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     display: block;
   }
 
-  /* Flecha circular (R58): el botón-invitación de la tarjeta,
-     anclado a la derecha y centrado verticalmente. */
+  /* Flecha circular (R58 · R62 a la ESQUINA INFERIOR DERECHA):
+     el botón-invitación de la tarjeta. Salió del centro
+     derecho para ganar altura, como pidió el dueño. */
   .lista-item.promo-item .promo-flecha {
     position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
+    right: 12px;
+    bottom: 10px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
@@ -354,8 +351,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
     .lista-item.promo-item .promo-titulo { font-size: 17px; }
     .lista-item.promo-item .promo-sub { font-size: 12px; }
     .lista-item.promo-item .promo-check { width: 13px; height: 13px; }
-    .lista-item.promo-item .promo-flecha { width: 32px; height: 32px; right: 12px; }
+    .lista-item.promo-item .promo-flecha { width: 30px; height: 30px; right: 10px; bottom: 8px; }
     .lista-item.promo-item .promo-flecha svg { width: 16px; height: 16px; }
     #promoSlot::before, #promoSlot::after { width: 22px; }
   }
-

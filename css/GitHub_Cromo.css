@@ -4,11 +4,18 @@ ARCHIVO:         GitHub_Cromo.css
 ESPEJO GITHUB:   css/GitHub_Cromo.css (SOLO-GitHub: no existe en GAS)
 PROYECTO:        ServyCloud | App en GitHub Pages
 RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
-                 orbital y píldora "Instalar app". Nació con el
-                 envoltorio (R26) y desde R29 vive como archivo
-                 propio. El dueño no necesita tocarlo.
-VERSIÓN:         1.3
-CAMBIOS:         R59: interior del preloader corregido DE UNA VEZ
+                 orbital (R62: DENTRO del marco del teléfono en
+                 PC — overlay absoluto sobre el lienzo, no sobre
+                 toda la pantalla) y píldora "Instalar app". Nació
+                 con el envoltorio (R26) y desde R29 vive como
+                 archivo propio. El dueño no necesita tocarlo.
+VERSIÓN:         1.4
+CAMBIOS:         R62: .preloader-overlay pasa de position fixed
+                 (toda la pantalla) a ABSOLUTE dentro de #lienzo —
+                 en PC el preloader sale dentro del marco del
+                 teléfono (orden del dueño); en móvil el lienzo es
+                 full screen y el efecto no cambia.
+                 R59: interior del preloader corregido DE UNA VEZ
                  (orden del dueño): el anillo base de los
                  orbitales se funde con el fondo (transparente —
                  el mismo efecto del blanco-sobre-blanco de
@@ -38,7 +45,7 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
          base se funde con el fondo, arcos blancos, marca limpia
          y letras blancas para que todo resalte) ═══ */
     .preloader-overlay {
-      position: fixed;
+      position: absolute;   /* R62: dentro del lienzo (marco del teléfono en PC) */
       inset: 0;
       z-index: 9999;
       display: flex;

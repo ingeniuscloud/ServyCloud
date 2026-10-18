@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Compartir_Script.html
-ESPEJO GITHUB:   js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
@@ -20,14 +20,14 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  está inyectado; se aplica ciudad + contenido y la
                  app entra en MODO COMPARTIDO: ciudad VISTA pero
                  BLOQUEADA, campo de búsqueda fijado SIN foco y solo
-                 "Limpiar filtro" a la derecha (sin menú global ni
+                 "CANCELAR" a la derecha (sin menú global ni
                  compartir). El header del detalle lo decide el
                  TIPO de enlace (esta ronda marca el body): con UN
                  post la fila sustituye al par volver/título del
-                 modo detalle y la salida es "Limpiar filtro"; con
+                 modo detalle y la salida es CANCELAR; con
                  una LISTA cada post abre con volver/título normales
                  para recorrer los demás posts del filtro, y
-                 "Limpiar filtro" queda en la lista. Al limpiar
+                 CANCELAR queda en la lista. Al limpiar
                  vuelve todo el catálogo (la ciudad del enlace queda
                  como la del receptor). Aviso amable si el contenido
                  compartido ya no existe. La instalación de la PWA
@@ -44,8 +44,8 @@ CAMBIOS:         R61: el emisor de LISTA FILTRADA ya no es botón
                  R60: el modo compartido despliega la CÁPSULA
                  bloqueada (clase .compartida también en la fila
                  .filtros-fila: chips/lupa/filtro fuera, campo
-                 sin foco, solo "Limpiar filtro" activo).
-                 "Limpiar filtro" lo liga Buscar_Script (delega
+                 sin foco, solo CANCELAR activo).
+                 CANCELAR lo liga Buscar_Script (delega
                  en limpiar() cuando hay modo compartido) — aquí
                  solo queda el binding del compartir.
                  R43: lista compartida — activarModo marca el body
@@ -54,7 +54,7 @@ CAMBIOS:         R61: el emisor de LISTA FILTRADA ya no es botón
                  volver/título dentro de cada post de una lista
                  compartida (el receptor puede verlos todos y
                  regresar). El post compartido solitario queda
-                 exactamente igual: la fila con "Limpiar filtro"
+                 exactamente igual: la fila con CANCELAR
                  es su salida. Enlace corto ?s=, receptor legacy
                  ?d= y línea de confianza intactos.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
@@ -66,7 +66,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  Seccion_Script.html (irAPost público),
                  Core_Script.html (llama pintar/recibir),
                  Social_Script.html (urlDePost), Chips_CSS.html
-                 (.btn-compartir / .btn-limpiar / .compartida)
+                 (.btn-compartir / .btn-cancelar / .compartida)
 ════════════════════════════════════════════════════════════════════
 */
   window.Compartir = (function () {
@@ -347,7 +347,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       }
 
       btn.addEventListener('click', compartirLista);
-      /* R60: "Limpiar filtro" lo liga Buscar_Script — en modo
+      /* R60→R62: CANCELAR lo liga Buscar_Script — en modo
          compartido delega aquí (limpiar), en búsqueda normal
          limpia y cierra la cápsula. */
     }
@@ -483,7 +483,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
       /* R60: la CÁPSULA queda desplegada y bloqueada — la clase
          .compartida viste la fila (chips/lupa/compartir fuera,
-         solo "Limpiar filtro" activo) y la cabecera (menú global
+         solo CANCELAR activo) y la cabecera (menú global
          fuera). */
       if (wrap) wrap.classList.add('compartida');
       if (fila) fila.classList.add('compartida');
@@ -496,7 +496,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       /* El header del detalle lo decide el TIPO de enlace:
          compartido-lista → dentro del post vuelve el par
          volver/título (Chips_CSS) para recorrer la lista;
-         compartido-post  → la fila con "Limpiar filtro" sigue
+         compartido-post  → la fila con CANCELAR sigue
          sustituyendo a ese par, como siempre. */
       document.body.classList.remove('compartido-post');
       document.body.classList.remove('compartido-lista');
@@ -613,7 +613,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
-       Limpiar · botón "Limpiar filtro" + auto-limpieza
+       Limpiar · botón CANCELAR + auto-limpieza
        Devuelve la app a su estado normal: ciudades, chips y
        todas las listas. La ciudad aplicada por el enlace queda
        como la del receptor (ya es "su" ciudad).
@@ -678,4 +678,3 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     };
 
   })();
-

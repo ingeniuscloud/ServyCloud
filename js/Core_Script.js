@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_Script.html
-ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                  WhatsApp o el sheet de reserva.
@@ -20,18 +20,25 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.16
-CAMBIOS:         R61: el PLACEHOLDER del buscador se pinta desde
+VERSIÓN:         1.17
+CAMBIOS:         R62: app.tituloHeader es un VECTOR de frases —
+                 pintarTituloHeader() elige UNA AL AZAR en cada
+                 carga de la app (fraseAleatoria(); un texto único
+                 de la BD sigue funcionando, compatibilidad); el
+                 LIENZO recibe pintarGlifos al montarse (los
+                 glifos del template — ubicación, filtro — se
+                 pintan ahí: el pintado automático de Iconos corrió
+                 antes de que el lienzo existiera).
+                 R61: el PLACEHOLDER del buscador se pinta desde
                  la BD real (SISTEMA.root →
                  app.placeholderBuscar; si la BD no lo trae queda
                  el fijo de la app) — se deja de hardcodear el
                  texto en el markup.
                  R58: pantalla principal refactorizada — el
                  TÍTULO INICIAL grande se pinta desde la BD real
-                 (SISTEMA.root → app.tituloHeader; si la BD no lo
-                 trae queda oculto) y el skeleton de lista
-                 replica la anatomía de CAJA del item nuevo
-                 (franja, divisoria, avatar del partner, "Ver
+                 (SISTEMA.root → app.tituloHeader) y el skeleton
+                 de lista replica la anatomía de CAJA del item
+                 nuevo (divisoria, avatar del partner, "Ver
                  publicación", estrella; fuera la cabecera de
                  grupo). El fondo del lienzo #fdf3ec (R57)
                  queda EXACTO.
@@ -813,19 +820,40 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     }
 
     /* ============================================================
-       TÍTULO INICIAL (R58) · el texto grande del header vive en
-       la BD real: ROOTJSON → app.tituloHeader (SISTEMA.root).
-       Si la BD no lo trae, el elemento queda oculto y el
-       header respira sin él. Se pinta una vez al montar el
-       lienzo.
+       TÍTULO INICIAL (R62 · VECTOR ALEATORIO) · la frase grande
+       del header vive en la BD real: ROOTJSON → app.tituloHeader
+       (SISTEMA.root). Desde R62 es un VECTOR de frases: cada
+       carga/actualización de la app elige UNA AL AZAR — si el
+       usuario abre la app 10 veces, 10 frases distintas puede
+       ver (la app se siente viva). Si la BD lo trae como texto
+       único se usa tal cual (compatibilidad); si no trae nada,
+       el elemento queda oculto y el header respira sin él. Se
+       pinta una vez al montar el lienzo (cada carga de página
+       es un montaje nuevo: cada carga, frase nueva).
        ============================================================ */
+    function fraseAleatoria(vector) {
+      var limpias = [];
+      for (var i = 0; i < vector.length; i++) {
+        var v = String(vector[i] || '').trim();
+        if (v) limpias.push(v);
+      }
+      if (!limpias.length) return '';
+      return limpias[Math.floor(Math.random() * limpias.length)];
+    }
+
     function pintarTituloHeader() {
       var el = document.getElementById('tituloHeader');
       if (!el) return;
 
       var root = (window.SISTEMA && window.SISTEMA.root) || {};
       var app  = root.app || {};
-      var t = String(app.tituloHeader || '').trim();
+      var t    = app.tituloHeader;
+
+      if (Object.prototype.toString.call(t) === '[object Array]') {
+        t = fraseAleatoria(t);
+      } else {
+        t = String(t || '').trim();
+      }
 
       if (t) {
         el.textContent = t;
@@ -864,6 +892,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       var fragmento = plantilla.content.cloneNode(true);
       lienzo.appendChild(fragmento);
       lienzo.dataset.pintado = '1';
+
+      /* R62 · los glifos del template (ubicación del botón
+         ciudad, filtro del botón filtros…) se pintan aquí:
+         el pintado automático de Iconos corrió ANTES de que
+         el lienzo existiera. pintarUno es idempotente, así
+         que nadie se pinta doble. */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(lienzo);
+      }
 
       arrancarComponentes();
 
@@ -1129,4 +1166,3 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     document.addEventListener('visibilitychange', onVisibilityChange);
 
   })();
-
