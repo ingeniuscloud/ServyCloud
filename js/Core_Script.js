@@ -20,8 +20,27 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.25
-CAMBIOS:         R72: el degradado INICIAL del lienzo VUELVE A SER EL
+VERSIÓN:         1.26
+CAMBIOS:         R73: LA REVERSIÓN DE LA NOTA. Su orden: "hay una nota
+                 que era de reversión en caso de que saliera mal,
+                 busca esa nota, ahí está la clave — no incluyas
+                 el preloader, solo la parte del lienzo". La nota
+                 ES la del EXPERIMENTO R67 (LIENZO CASHEA/YUMMY,
+                 marcado reversible a petición del dueño):
+                 "REVERSIÓN (si el dueño lo pide): devolver el
+                 degradado de R65/R66". Restaurado BYTE A BYTE el
+                 degradado de esa nota (bloque comentado que
+                 traían las versiones R67–R71): blanco arriba
+                 (0–5%), subida al tinte #fdf3ec en 15% y el
+                 tinte SE DETIENE EN 24% — CASI EN LOS BOTONES
+                 de la fila de filtros (22–27%, calibración R67)
+                 — blanco limpio desde 36%. El degradado R57 queda
+                 COMENTADO abajo (reversión en una jugada). EL
+                 PRELOADER NO SE TOCA (GitHub_Cromo 1.4/1.5), ni
+                 la vela fija (Core_CSS 2.6), ni theme-color, ni
+                 manifest.json, ni el body. El resto del archivo
+                 intacto.
+                 R72: el degradado INICIAL del lienzo VUELVE A SER EL
                  ORIGINAL DEL DUEÑO (su orden: "como estaba antes,
                  que venía de blanco y a naranja y llegaba casi
                  hasta los botones — no lo inventes, búscalo"):
@@ -533,30 +552,40 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!area) return;
 
       if (!post) {
-        /* R72 · VUELTA AL DEGRADADO ORIGINAL DEL DUEÑO (su orden:
-           "como estaba antes, que venía de blanco y a naranja y
-           llegaba casi hasta los botones — no lo inventes,
-           búscalo"): restaurado el degradado R57 de su
-           producción real, byte a byte — blanco arriba (0–5%),
-           subida al tinte #fdf3ec en 15% y el tinte SE QUEDA
-           HASTA EL FINAL del lienzo (100%). El degradado R71
-           queda COMENTADO abajo para revertirlo en una jugada.
-           La franja de abajo no interviene: el body ya es blanco
-           (Core_CSS 2.6) y la vela fija sigue pintando la franja
-           de arriba (Core_CSS 2.6). */
+        /* R73 · LA REVERSIÓN DE LA NOTA (su orden: "busca esa
+           nota... ahí está la clave para la reversión del
+           pintado... no incluyas el preloader, solo la parte
+           del lienzo"): la nota ES la del EXPERIMENTO R67
+           (LIENZO CASHEA/YUMMY, reversible a petición del
+           dueño) — "REVERSIÓN (si el dueño lo pide): devolver
+           el degradado de R65/R66". Restaurado BYTE A BYTE el
+           degradado de esa nota (el bloque comentado que
+           traían las versiones R67–R71): blanco arriba (0–5%),
+           subida al tinte #fdf3ec en 15% y el tinte SE DETIENE
+           EN 24% — CASI EN LOS BOTONES de la fila de filtros
+           (22–27%, calibración R67) — y blanco limpio desde
+           36%. El preloader NO se toca (GitHub_Cromo 1.4/1.5),
+           ni la vela fija (Core_CSS 2.6), ni theme-color, ni
+           manifest, ni el body. La franja de abajo no
+           interviene: el body ya es blanco (Core_CSS 2.6).
+           REVERSIÓN (una línea): el degradado R57 de su
+           producción COMENTADO abajo. */
+        area.style.background =
+          'linear-gradient(180deg, ' +
+            '#ffffff 0%, ' +
+            '#ffffff 5%, ' +
+            '#fdf3ec 15%, ' +
+            '#fdf3ec 24%, ' +
+            '#ffffff 36%, ' +
+            '#ffffff 100%)';
+        /* REVERSIÓN R57 (el tinte de su producción se quedaba
+           hasta el final del lienzo):
         area.style.background =
           'linear-gradient(180deg, ' +
             '#ffffff 0%, ' +
             '#ffffff 5%, ' +
             '#fdf3ec 15%, ' +
             '#fdf3ec 100%)';
-        /* REVERSIÓN R71 (naranja arriba → blanco en la lista):
-        area.style.background =
-          'linear-gradient(180deg, ' +
-            '#fed7aa 0%, ' +
-            '#fdf3ec 12%, ' +
-            '#ffffff 30%, ' +
-            '#ffffff 100%)';
         */
         area.style.removeProperty('--post-color');
         return;
