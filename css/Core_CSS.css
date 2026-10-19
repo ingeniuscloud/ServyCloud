@@ -18,24 +18,26 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  izquierda, menú a la derecha) y un 15% MÁS
                  PEQUEÑO — la fila entera gana aire para la
                  lista.
-VERSIÓN:         2.3
-CAMBIOS:         R69: FIX DEFINITIVO de la franja superior — el dueño
-                 la vio BLANCA otra vez en Safari y PWA pese al fix
-                 R68 del theme-color. CAUSA PROBADA con sus capturas
-                 (píxel a píxel): iOS pinta la franja del sistema con
-                 el FONDO DEL DOCUMENTO (canvas), no con el
-                 theme-color — y body.is-mobile estaba forzado a
-                 BLANCO #fff, así que al retirarse el preloader (un
-                 fixed que sí la cubría de naranja) la franja quedaba
-                 255,255,255 con el clarito del lienzo pintando justo
-                 debajo. Ahora el body carga el MISMO degradado del
-                 lienzo R67 (clarito #fdf3ec arriba, blanco desde
-                 ~1/3): el fondo viaja al canvas del documento y la
-                 franja se funde con el lienzo en Safari, en la PWA
-                 vieja (sin viewport-fit=cover) y en la PWA nueva; el
-                 rebote de goma arriba también sale clarito. La
-                 franja de abajo sigue BLANCA (blanco desde 30%).
-                 REVERSIÓN: devolver background: #fff !important.
+VERSIÓN:         2.4
+CAMBIOS:         R70: FIX DEFINITIVO de la franja superior (3.er
+                 intento, causa raíz COMPLETA): el degradado del
+                 body de R69 quedaba TAPADO por tres capas blancas
+                 (.phone #fff !important de R63, .glass #fff y
+                 .safari #fff del style inline del index) y el body
+                 solo llevaba background-IMAGE sin background-COLOR:
+                 iOS no puede derivar un color sólido del canvas de
+                 una imagen → franja blanca. Ahora el body lleva
+                 background-COLOR #fdf3ec (lo que iOS pinta en la
+                 franja de Safari) + el degradado encima, y .phone,
+                 .glass y .safari quedan TRANSPARENTES en móvil:
+                 nada tapa el degradado. La PWA instalada hay que
+                 BORRARLA y REINSTALARLA (iOS cachea el modo). El
+                 resto del archivo intacto (safe-areas del área,
+                 título, CTA, partner).
+                 R69: el fondo del documento móvil cargaba el
+                 degradado del lienzo (clarito #fdf3ec arriba,
+                 blanco desde 30%) — iba bien ENCIMA pero las capas
+                 blancas de la carcasa lo tapaban.
                  R68: .area-contenido respira con las SAFE-AREAS:
                  padding-top env(safe-area-inset-top) y
                  padding-bottom env(safe-area-inset-bottom). Con
@@ -111,17 +113,28 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   body.is-mobile {
     display: block !important;
     padding: 0 !important;
-    /* R69 · FONDO DEL DOCUMENTO = LIENZO: la franja del sistema
-       (barra de estado / zona superior de Safari) la pinta iOS
-       con el fondo del documento — estaba BLANCO puro (#fff) y
-       por eso la franja "se despintaba" al retirarse el
-       preloader. El body ahora carga el MISMO degradado del
-       lienzo R67: clarito #fdf3ec arriba (se funde con la
-       cabecera) y blanco desde 30% (llega blanco a la franja de
-       abajo). El fondo del body viaja al canvas, así que la
-       franja pinta clarito en Safari, en la PWA vieja y en la
-       nueva. REVERSIÓN: background: #fff !important; */
-    background: linear-gradient(180deg, #fdf3ec 0%, #fdf3ec 12%, #ffffff 30%, #ffffff 100%) !important;
+    /* R70 · FIX DEFINITIVO de la franja superior (3.º intento,
+       CAUSA RAÍZ COMPLETA probada leyendo el deploy vivo):
+       quedaban TRES capas BLANCAS tapando el degradado del body
+       (.phone #fff !important de R63 + .glass #fff y .safari
+       #fff del style inline del index) y el body solo llevaba
+       background-IMAGE sin background-COLOR: iOS no puede sacar
+       un COLOR sólido de una imagen para el canvas, así que la
+       franja del sistema seguía blanca. Ahora: (1) el body lleva
+       COLOR sólido #fdf3ec (lo que iOS pinta en la franja de
+       Safari y el respaldo bajo la imagen) + el degradado de
+       R69 encima (clarito arriba, blanco desde 30%); (2) el
+       .phone, el .glass y el .safari quedan TRANSPARENTES en
+       móvil para que NADA tape el degradado del documento — la
+       franja pinta clarito en Safari, en la PWA vieja (color
+       sólido) y en la PWA nueva (black-translucent + canvas
+       clarito). NOTA PWA: iOS cachea el modo al instalar — la
+       app instalada hay que BORRARLA y VOLVERLA A INSTALAR para
+       que la barra acepte el pintado. REVERSIÓN: background:
+       #fff !important en body.is-mobile y en .phone. */
+    background-color: #fdf3ec !important;
+    background-image: linear-gradient(180deg, #fdf3ec 0%, #fdf3ec 12%, #ffffff 30%, #ffffff 100%) !important;
+    background-repeat: no-repeat !important;
     color: #000;
   }
   body.is-mobile .phone {
@@ -130,11 +143,25 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
     min-height: 100vh !important;
     border-radius: 0 !important;
     padding: 0 !important;
-    background: #fff !important;
+    /* R70: era #fff !important — la capa que TAPABA el
+       degradado del documento (causa principal de la franja
+       blanca). Transparente: el fondo del body manda. */
+    background: transparent !important;
     box-shadow: none !important;
   }
-  body.is-mobile .glass  { border-radius: 0 !important; }
-  body.is-mobile .safari { top: 0 !important; }
+  /* R70: el style inline del index pinta .glass y .safari de
+     blanco — en móvil quedan transparentes (tapaban el
+     degradado del body igual que el .phone). En PC siguen
+     intactos (el style inline no lleva !important: gana esta
+     regla solo dentro de body.is-mobile). */
+  body.is-mobile .glass {
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+  body.is-mobile .safari {
+    top: 0 !important;
+    background: transparent !important;
+  }
   body.is-mobile .btn,
   body.is-mobile .notch,
   body.is-mobile .status,

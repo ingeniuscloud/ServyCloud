@@ -27,8 +27,18 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.5
-CAMBIOS:         R67: comentario — el sheet se renombra a
+VERSIÓN:         2.6
+CAMBIOS:         R70: "Compartir lista" ALINEADO A LA DERECHA
+                 (orden del dueño): competía con el PRIMER TÍTULO
+                 de la lista — los dos arrancaban en el mismo
+                 canto izquierdo. Ahora el botón es block-level
+                 con margin-left auto (inline-flex no obedece al
+                 auto): se pega al borde derecho con el mismo aire
+                 de la lista (padding derecho 18px) y el canto
+                 izquierdo queda LIBRE para el título. El aviso
+                 "No se encontraron resultados" sigue a la
+                 izquierda (es un aviso, no una acción).
+                 R67: comentario — el sheet se renombra a
                  Orden_Sheet_* (orden del dueño). Sin estilos.
                  R66: entra la CABECERA DE GRUPO (.lista-grupo-
                  header): con el orden "Por categoría"
@@ -202,17 +212,29 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
        junto al verbo: Compartir lista (8). Lista_Script lo
        enciende con items y le escribe la cantidad en cada
        repintado; Compartir_Script lleva el envío.
+       R70 · ALINEADO A LA DERECHA (orden del dueño): arriba
+       competía con el PRIMER TÍTULO de la lista — ambos
+       empezaban en el mismo canto izquierdo y el título
+       quedaba ahogado. El aire derecho respeta el margen de
+       la lista (18px) y el izquierdo queda libre para el
+       título.
      · AVISO SIN RESULTADOS — el mensaje de la búsqueda vacía
        aparece JUSTO donde va Compartir lista (mismo slot:
-       nunca los dos a la vez).
+       nunca los dos a la vez). Ese mensaje sigue a la
+       izquierda (es un aviso, no una acción).
      ============================================================ */
   .btn-compartir {
-    display: inline-flex;
+    /* R70: block-level + margin-left auto lo empuja a la
+       derecha dentro de .secciones-wrap (que es block) — con
+       inline-flex el auto no actúa. width fit-content guarda
+       el tamaño natural del texto. */
+    display: flex;
+    width: fit-content;
     align-items: baseline;
     gap: 6px;
 
-    padding: 4px 4px 6px 18px;
-    margin: 2px 0 6px;
+    padding: 4px 18px 6px 4px;
+    margin: 2px 0 6px auto;
 
     border: none;
     background: transparent;
@@ -239,7 +261,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .btn-compartir:active { opacity: 0.5; }
 
-  /* [hidden] DEBE ganar sobre display:inline-flex (lección del
+  /* [hidden] DEBE ganar sobre display:flex (lección del
      estándar: sin esto el botón se vería siempre). */
   .btn-compartir[hidden] { display: none; }
 
@@ -266,7 +288,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .buscar-vacio[hidden] { display: none; }
 
   @media (max-width: 360px) {
-    .btn-compartir { font-size: 13px; padding: 3px 4px 5px 16px; }
+    .btn-compartir { font-size: 13px; padding: 3px 16px 5px 4px; }
     .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
   }
 

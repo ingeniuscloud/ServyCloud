@@ -15,8 +15,14 @@ RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  en modo compartido delega en Compartir.limpiar()
                  (el trabajo que hacía CANCELAR — libera la
                  vista). Límite: 40 chars.
-VERSIÓN:         2.0
-CAMBIOS:         R64: el campo NO se abre ni se cierra (siempre
+VERSIÓN:         2.1
+CAMBIOS:         R70: la X QUITA EL FOCO del campo (input.blur())
+                 al limpiar — orden del dueño: el teclado virtual
+                 del teléfono se CIERRA al tocar la X (antes el
+                 blur lo re-enfocaba con input.focus() y el
+                 teclado seguía abierto). El blur corre SIEMPRE,
+                 también en modo compartido. Resto intacto.
+                 R64: el campo NO se abre ni se cierra (siempre
                  visible) — fuera abrir()/cerrar()/abrir capsula,
                  la lupa-botón (#btnBuscar) y el texto CANCELAR
                  (#btnCancelarBusqueda) con el evento
@@ -26,11 +32,6 @@ CAMBIOS:         R64: el campo NO se abre ni se cierra (siempre
                  vista (mismo trabajo de siempre).
                  R61: el placeholder lo pinta Core_Script desde
                  app.placeholderBuscar.
-                 R60: la lupa volvía como botón y abría la
-                 cápsula.
-                 R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  Chips_Script.html (window.Chips), Lista_Script.html
                  (window.Lista.getPostActivo),
@@ -71,9 +72,17 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
        chip (con cross-sell activo restaura el chip del post,
        como hacía CANCELAR). Modo compartido: libera la vista
        vía Compartir.limpiar (mismo trabajo de siempre).
+       R70 · SIEMPRE suelta el foco del campo al entrar: al
+       tocar la X el teclado virtual del teléfono se cierra
+       (orden del dueño) — ya no se re-enfoca el input al
+       final.
        ============================================================ */
     function limpiarCampo() {
       haptic(8);
+
+      /* R70 · FUERA EL FOCO (teclado cerrado) en cuanto se
+         toca la X — en el camino compartido y en el normal. */
+      if (input) { try { input.blur(); } catch (_) {} }
 
       if (window.Compartir &&
           typeof window.Compartir.estaCompartido === 'function' &&
@@ -107,7 +116,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
 
       emitir('', false);
 
-      try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+      /* R70: el input.focus() que seguía aquí RE-ENFOCABA el
+         campo tras limpiar y el teclado no se cerraba nunca —
+         el blur del encabezado de la función manda ahora. */
     }
 
     function onInput() {
