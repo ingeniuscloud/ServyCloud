@@ -20,8 +20,20 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.24
-CAMBIOS:         R71: el degradado INICIAL del lienzo ahora SE VE — arranca
+VERSIÓN:         1.25
+CAMBIOS:         R72: el degradado INICIAL del lienzo VUELVE A SER EL
+                 ORIGINAL DEL DUEÑO (su orden: "como estaba antes,
+                 que venía de blanco y a naranja y llegaba casi
+                 hasta los botones — no lo inventes, búscalo"):
+                 restaurado el degradado R57 de su producción real,
+                 byte a byte — blanco arriba (0–5%), subida al tinte
+                 #fdf3ec en 15% y el tinte SE QUEDA HASTA EL FINAL
+                 (100%). El degradado R71 queda COMENTADO dentro de
+                 pintarAreaConPost para revertirlo en una jugada.
+                 Preloader, vela fija superior (Core_CSS 2.6), línea
+                 de inicio (Lista_CSS 2.8), theme-color y manifest:
+                 INTACTOS.
+                 R71: el degradado INICIAL del lienzo ahora SE VE — arranca
                  en naranja suave #fed7aa (mismo tono que la vela fija
                  superior de Core_CSS 2.6: cero costura con la franja
                  del sistema), pasa por el clarito #fdf3ec y llega al
@@ -521,33 +533,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!area) return;
 
       if (!post) {
-        /* R71 · DEGRADADO INICIAL VISIBLE (pide el dueño: "no me
-           da color en el lienzo"): el clarito #fdf3ec era tan
-           claro que se leía blanco. Ahora el lienzo ARRANCA en
-           naranja suave #fed7aa (mismo tono de la vela fija
-           superior de Core_CSS 2.6 — cero costura), pasa por el
-           clarito #fdf3ec y llega al BLANCO antes de la lista,
-           MISMA geometría calibrada de R67 (promos 5–21%,
-           filtros 22–27%, items 34%). En la franja de abajo no
-           interviene: el body ya es blanco (Core_CSS 2.6) y el
-           efecto de borde de iOS pinta neutral. REVERSIÓN (si
-           el dueño lo pide): volver a '#fdf3ec 0%, #fdf3ec
-           10%, #ffffff 28%, #ffffff 100%' (R67/R70) o el
-           degradado de R65/R66 COMENTADO abajo — una línea. */
-        area.style.background =
-          'linear-gradient(180deg, ' +
-            '#fed7aa 0%, ' +
-            '#fdf3ec 12%, ' +
-            '#ffffff 30%, ' +
-            '#ffffff 100%)';
-        /* REVERSIÓN R65/R66 (blanco arriba → tinte en filtros):
+        /* R72 · VUELTA AL DEGRADADO ORIGINAL DEL DUEÑO (su orden:
+           "como estaba antes, que venía de blanco y a naranja y
+           llegaba casi hasta los botones — no lo inventes,
+           búscalo"): restaurado el degradado R57 de su
+           producción real, byte a byte — blanco arriba (0–5%),
+           subida al tinte #fdf3ec en 15% y el tinte SE QUEDA
+           HASTA EL FINAL del lienzo (100%). El degradado R71
+           queda COMENTADO abajo para revertirlo en una jugada.
+           La franja de abajo no interviene: el body ya es blanco
+           (Core_CSS 2.6) y la vela fija sigue pintando la franja
+           de arriba (Core_CSS 2.6). */
         area.style.background =
           'linear-gradient(180deg, ' +
             '#ffffff 0%, ' +
             '#ffffff 5%, ' +
             '#fdf3ec 15%, ' +
-            '#fdf3ec 24%, ' +
-            '#ffffff 36%, ' +
+            '#fdf3ec 100%)';
+        /* REVERSIÓN R71 (naranja arriba → blanco en la lista):
+        area.style.background =
+          'linear-gradient(180deg, ' +
+            '#fed7aa 0%, ' +
+            '#fdf3ec 12%, ' +
+            '#ffffff 30%, ' +
             '#ffffff 100%)';
         */
         area.style.removeProperty('--post-color');
