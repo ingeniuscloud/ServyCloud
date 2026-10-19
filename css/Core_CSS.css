@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_CSS.html
-ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  dinámico) + fila CTA del post: píldora naranja
@@ -18,8 +18,17 @@ RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
                  izquierda, menú a la derecha) y un 15% MÁS
                  PEQUEÑO — la fila entera gana aire para la
                  lista.
-VERSIÓN:         2.4
-CAMBIOS:         R70: FIX DEFINITIVO de la franja superior (3.er
+VERSIÓN:         2.5
+CAMBIOS:         R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
+                 R70 pegaba este CSS sin las etiquetas <style> propias
+                 que TODO fragmento GAS trae desde siempre: el
+                 include() lo vertía como TEXTO en la página y el GAS
+                 quedaba en blanco (el dueño lo vivió como "los
+                 archivos llegaron malos / no me dejan cargar nada").
+                 El cuerpo NO cambia una línea: sigue el fix R70
+                 completo. En GAS: pega el archivo COMPLETO en el
+                 archivo Core_CSS (lleva sus <style>...</style>).
+                 R70: FIX DEFINITIVO de la franja superior (3.er
                  intento, causa raíz COMPLETA): el degradado del
                  body de R69 quedaba TAPADO por tres capas blancas
                  (.phone #fff !important de R63, .glass #fff y
@@ -86,7 +95,6 @@ CAMBIOS:         R70: FIX DEFINITIVO de la franja superior (3.er
 DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
                  usadas por el modo móvil body.is-mobile)
 ════════════════════════════════════════════════════════════════════*/
-
   *{ box-sizing: border-box; }
 
   html, body {

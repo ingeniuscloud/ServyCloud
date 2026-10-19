@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Buscar_Script.html
-ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  vez en la FILA 1 de la sección de filtros (sin
@@ -15,8 +15,16 @@ RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  en modo compartido delega en Compartir.limpiar()
                  (el trabajo que hacía CANCELAR — libera la
                  vista). Límite: 40 chars.
-VERSIÓN:         2.1
-CAMBIOS:         R70: la X QUITA EL FOCO del campo (input.blur())
+VERSIÓN:         2.2
+CAMBIOS:         R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
+                 R70 pegaba este JS sin las etiquetas <script> propias
+                 que TODO fragmento GAS trae desde siempre: el
+                 include() lo vertía como TEXTO en la página. El cuerpo
+                 NO cambia una línea: sigue el fix R70 completo (la X
+                 limpia y suelta el foco para cerrar el teclado). En
+                 GAS: pega el archivo COMPLETO en el archivo
+                 Buscar_Script (lleva sus <script>...</script>).
+                 R70: la X QUITA EL FOCO del campo (input.blur())
                  al limpiar — orden del dueño: el teclado virtual
                  del teléfono se CIERRA al tocar la X (antes el
                  blur lo re-enfocaba con input.focus() y el
@@ -37,7 +45,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  (window.Lista.getPostActivo),
                  Compartir_Script.html (estaCompartido/limpiar)
 ════════════════════════════════════════════════════════════════════*/
-
   window.Buscar = (function () {
 
     var capsula  = null;

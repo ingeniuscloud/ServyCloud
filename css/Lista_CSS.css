@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_CSS.html
-ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  categoría, alternancia lista ↔ detalle con
@@ -27,8 +27,16 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.6
-CAMBIOS:         R70: "Compartir lista" ALINEADO A LA DERECHA
+VERSIÓN:         2.7
+CAMBIOS:         R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
+                 R70 pegaba este CSS sin las etiquetas <style> propias
+                 que TODO fragmento GAS trae desde siempre: el
+                 include() lo vertía como TEXTO en la página. El cuerpo
+                 NO cambia una línea: sigue el fix R70 completo
+                 ("Compartir lista" alineada a la derecha). En GAS:
+                 pega el archivo COMPLETO en el archivo Lista_CSS
+                 (lleva sus <style>...</style>).
+                 R70: "Compartir lista" ALINEADO A LA DERECHA
                  (orden del dueño): competía con el PRIMER TÍTULO
                  de la lista — los dos arrancaban en el mismo
                  canto izquierdo. Ahora el botón es block-level
@@ -91,7 +99,6 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
                  Index.html; base .lista-item re-estilizada por
                  Promo_CSS.html, que aporta la regla .badge)
 ════════════════════════════════════════════════════════════════════*/
-
   /* ============================================================
      BOTÓN VOLVER
      ============================================================ */
