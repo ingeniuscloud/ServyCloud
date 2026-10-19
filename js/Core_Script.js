@@ -20,8 +20,15 @@ RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
                      mostrar skeleton de lista y esperar.
                  Cambio de ciudad posterior:
                    · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.23
-CAMBIOS:         R68: solo encabezado — la mención del menú global
+VERSIÓN:         1.24
+CAMBIOS:         R71: el degradado INICIAL del lienzo ahora SE VE — arranca
+                 en naranja suave #fed7aa (mismo tono que la vela fija
+                 superior de Core_CSS 2.6: cero costura con la franja
+                 del sistema), pasa por el clarito #fdf3ec y llega al
+                 blanco ANTES de la lista (misma geometría R67). Cura
+                 el "no me da color en el lienzo" del dueño. El resto
+                 del archivo INTACTO.
+                 R68: solo encabezado — la mención del menú global
                  pasa a Global_Sheet_Script (renombrado R68). Ni
                  una línea de código tocada; el lienzo y el
                  preloader-evento quedan intactos.
@@ -514,28 +521,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!area) return;
 
       if (!post) {
-        /* R67 · EXPERIMENTO LIENZO CASHEA/YUMMY (reversible):
-           el clarito #fdf3ec COMIENZA en la parte superior
-           (0–12% plano, como el clarito de Cashea/Yummy detrás
-           de su cabecera) y DEGRADA a BLANCO terminando debajo
-           de las promos (34%); de ahí en adelante blanco puro
-           hasta la franja de abajo del navegador (el body
-           is-mobile ya es blanco y viewport-fit=cover lo
-           estira bajo la home bar). En PWA la misma condición:
-           manifest theme_color #fdf3ec + splash blanco.
-           REVERSIÓN (si el dueño lo pide): devolver el
-           degradado de R65/R66 que está COMENTADO abajo —
-           una línea, sin tocar nada más. Stops calibrados
-           en el laboratorio (390×844): promos 5–21%,
-           filtros 22–27%, items 34% → el clarito acompaña
-           cabecera + promos + filtros y alcanza el BLANCO
-           justo antes de la lista. El detalle sigue con su
-           colorClaro (intacto). */
+        /* R71 · DEGRADADO INICIAL VISIBLE (pide el dueño: "no me
+           da color en el lienzo"): el clarito #fdf3ec era tan
+           claro que se leía blanco. Ahora el lienzo ARRANCA en
+           naranja suave #fed7aa (mismo tono de la vela fija
+           superior de Core_CSS 2.6 — cero costura), pasa por el
+           clarito #fdf3ec y llega al BLANCO antes de la lista,
+           MISMA geometría calibrada de R67 (promos 5–21%,
+           filtros 22–27%, items 34%). En la franja de abajo no
+           interviene: el body ya es blanco (Core_CSS 2.6) y el
+           efecto de borde de iOS pinta neutral. REVERSIÓN (si
+           el dueño lo pide): volver a '#fdf3ec 0%, #fdf3ec
+           10%, #ffffff 28%, #ffffff 100%' (R67/R70) o el
+           degradado de R65/R66 COMENTADO abajo — una línea. */
         area.style.background =
           'linear-gradient(180deg, ' +
-            '#fdf3ec 0%, ' +
-            '#fdf3ec 10%, ' +
-            '#ffffff 28%, ' +
+            '#fed7aa 0%, ' +
+            '#fdf3ec 12%, ' +
+            '#ffffff 30%, ' +
             '#ffffff 100%)';
         /* REVERSIÓN R65/R66 (blanco arriba → tinte en filtros):
         area.style.background =

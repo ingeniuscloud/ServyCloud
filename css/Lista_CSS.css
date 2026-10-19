@@ -27,8 +27,18 @@ RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
                  un post). Skeleton de lista con la misma
                  anatomía de fila (solo si el POST inicial aún
                  está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.7
-CAMBIOS:         R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
+VERSIÓN:         2.8
+CAMBIOS:         R71: LÍNEA DE INICIO en el primer item (orden del dueño:
+                 "le falta la línea de inicio en el primer item de la
+                 lista... que se diferencie cada bloque o items"): cada
+                 .lista-item PRIMERO de su bloque abre con la misma
+                 línea tenue #eef2f7 que separa a los demás — así el
+                 primer item no se funde con la fila "Compartir lista".
+                 Entre items sigue mandando el border-bottom (cero
+                 líneas dobles); el último sigue terminando en aire.
+                 Una regla nueva, nada más tocado. REVERSIÓN: borrar
+                 la regla .lista-item:first-child.
+                 R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
                  R70 pegaba este CSS sin las etiquetas <style> propias
                  que TODO fragmento GAS trae desde siempre: el
                  include() lo vertía como TEXTO en la página. El cuerpo
@@ -348,6 +358,12 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     -webkit-tap-highlight-color: transparent;
     transition: background 0.12s ease;
   }
+  /* R71 · LÍNEA DE INICIO: el primer item de cada bloque abre
+     con la MISMA línea tenue que separa a los demás (el dueño:
+     "que se diferencie cada bloque o items"). Entre items no
+     cambia nada: manda el border-bottom (sin dobles líneas). */
+  .lista-item:first-child { border-top: 1px solid #eef2f7; }
+
   /* El último item no pinta línea: la lista termina en aire. */
   .lista-item:last-child { border-bottom: none; }
 
