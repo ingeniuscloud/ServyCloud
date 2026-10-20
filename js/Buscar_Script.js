@@ -1,4 +1,5 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Buscar_Script.html
 ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -45,6 +46,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  (window.Lista.getPostActivo),
                  Compartir_Script.html (estaCompartido/limpiar)
 ════════════════════════════════════════════════════════════════════*/
+
   window.Buscar = (function () {
 
     var capsula  = null;

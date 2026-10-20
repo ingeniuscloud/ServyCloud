@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Partner_Sheet_Script.html
-ESPEJO GITHUB:   js/Partner_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Partner_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Bottom sheet dedicado al partner del post activo.
                  Header sticky, fila de stats, dirección (si

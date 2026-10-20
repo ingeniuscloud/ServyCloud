@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Ciudad_Sheet_CSS.html
-ESPEJO GITHUB:   css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
                  en la FILA 2 de la sección de filtros como un
@@ -22,41 +23,19 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
                  guardada. Aviso de cookies de esa primera
                  carga: icono a la izquierda del texto y botón
                  Aceptar debajo.
-VERSIÓN:         1.8
-CAMBIOS:         R65: el sheet de ciudad cambia de MODELO —
-                 fuera la rejilla de 2 columnas con punto de
-                 selección (el dueño: se veía plano); entra el
-                 stack vertical de tarjetas nativas que trajo
-                 de referencia: cards de esquinas 18px con
-                 borde fino #eef0f2, nombre 17px en negrita,
-                 badge "Activo" (solo la activa lo muestra),
-                 pills horizontales con la cifra en negrita y
-                 la de Promos destacada; activa = degradado
-                 tinte naranja→blanco + borde #f97316 + pills
-                 naranjas; al tocar, la tarjeta se encoge 3%
-                 (rebote nativo); handle 36×5 #dee2e6 y título
-                 20px centrado (mismos valores del modelo).
-                 R64: el botón ciudad entra a la FILA 2 de la
-                 sección de filtros (con los chips): borde suave
-                 y delgado (1px #e2e8f0, estilo 2026 — fuera el
-                 1.2px #475569) y reparte la fila en partes
-                 iguales (flex 1, texto centrado), sin números
-                 de items.
-                 R62: el botón ciudad entra a la sección de
-                 filtros como botón compacto (cápsula redonda,
-                 fondo transparente, pin 15px + nombre — sin
-                 bold, sin chevron, sin "Estás viendo en"); el
-                 sheet convierte la lista de radios en TARJETAS
-                 (fuera .ciudad-radio y su AZUL #1d4ed8 — el
-                 color oficial es el naranja): rejilla 2
-                 columnas, punto de selección, métricas
-                 Servicios/Cursos/Promos con cifras tabulares,
-                 activa con borde y tinte naranja.
-                 R38: estilos del aviso de cookies dentro del
-                 sheet (.ciudad-cookies): icono, texto y botón
-                 Aceptar centrados como puerta de entrada.
-DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
-                 Index.html y pintados por Ciudad_Sheet_Script.html)
+VERSIÓN:         1.10
+CAMBIOS:         R77B: El nombre de la ciudad en el botón de la
+                 fila de filtros pasa a la voz del textoPrimario
+                 (variables del Core). Las tarjetas del sheet
+                 conservan su modelo.
+                 R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -129,6 +108,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+    /* Voz del textoPrimario (maestras del Core) */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
+    color: var(--color-textoPrimario);
   }
 
   /* ============================================================
@@ -319,7 +302,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
   .cookies-texto {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--size-textoPrimario);
     line-height: 1.55;
     color: #475569;
     text-align: left;
@@ -462,7 +445,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding: 6px 12px;
     border-radius: 10px;
 
-    font-size: 13px;
+    font-size: var(--size-enlaces);
     font-weight: 500;
     line-height: 1.2;
     color: #495057;

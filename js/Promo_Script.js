@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Promo_Script.html
-ESPEJO GITHUB:   github/js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  del scroll en modo lista. Se oculta en modo

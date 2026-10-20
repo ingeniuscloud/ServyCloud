@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_OTP_Script.html
-ESPEJO GITHUB:   js/Reserva_OTP_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Reserva_OTP_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Lógica de solicitud, reenvío y verificación del
                  código OTP enviado por el backend (OTP.gs).

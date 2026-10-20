@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Orden_Sheet_Script.html
-ESPEJO GITHUB:   github/js/Orden_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Orden_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo Ordenar (R66): el bottom sheet que abre el
                  botón ordenar (#btnOrdenar, fila 1 de la sección

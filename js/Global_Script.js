@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Global_Script.html
-ESPEJO GITHUB:   github/js/Global_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Global_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Timeout de 12s por intento (GAS tiene arranques en

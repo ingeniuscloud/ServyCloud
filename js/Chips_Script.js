@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Chips_Script.html
-ESPEJO GITHUB:   js/Chips_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Chips_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
                  window.SISTEMA.chips ({ idChip, titulo, estado })

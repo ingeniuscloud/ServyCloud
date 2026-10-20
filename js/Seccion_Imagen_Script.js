@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Seccion_Imagen_Script.html
-ESPEJO GITHUB:   js/Seccion_Imagen_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Seccion_Imagen_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Todo lo relacionado con imágenes:
                  · Helpers de URL (Drive → lh3, normalización).
@@ -13,10 +14,10 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                    cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.2.0
+CAMBIOS:         R77.1: El método enganchar() ahora también
+                 detecta la clase .post-hero-img para que el
+                 Lightbox funcione en el nuevo lienzo del post.
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
                  Seccion_Imagen_CSS.html (clases lightbox-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -141,7 +142,6 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
         dlg.addEventListener('pointerup',     onPointerUp);
         dlg.addEventListener('pointercancel', onPointerCancel);
 
-        /* ESC nativo del dialog → cerrar limpiando clases */
         dlg.addEventListener('cancel', function (e) {
           e.preventDefault();
           cerrar();
@@ -233,7 +233,6 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
             var C = centro();
             var ratio = nueva / pinchEscalaIni;
 
-            /* Ancla el midpoint: la imagen se pellizca en el punto real */
             tx = midX - C.x - (pinchMidIniX - C.x - pinchTxIni) * ratio;
             ty = midY - C.y - (pinchMidIniY - C.y - pinchTyIni) * ratio;
 
@@ -358,7 +357,6 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
           return;
         }
 
-        /* Tap en el fondo (no en la imagen) cierra */
         if (e.target === backdrop && escala === 1) {
           cerrar();
         }
@@ -436,7 +434,11 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
         }, { passive: true });
       });
 
-      root.querySelectorAll('.foto-sola img, .carrusel-slide img').forEach(function (img) {
+      // R77.1: Se incluye .post-hero-img para el nuevo hero 1:1
+      root.querySelectorAll('.foto-sola img, .carrusel-slide img, .post-hero-img').forEach(function (img) {
+        if (img.dataset.lightboxEnganchado === '1') return;
+        img.dataset.lightboxEnganchado = '1';
+
         img.addEventListener('click', function () {
           var full = this.getAttribute('data-full') || this.src;
           if (full) Lightbox.abrir(full);

@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Promo_CSS.html
-ESPEJO GITHUB:   css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Promo_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE sobre el lienzo y cada
@@ -30,50 +31,15 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  sistema. Sin estrella (la métrica es solo del
                  item de la lista). Vive fuera del scroll en modo
                  lista. Se oculta en modo detalle.
-VERSIÓN:         2.5
-CAMBIOS:         R65: "Promos cerca de ti" al COLOR DE TEXTO
-                 NORMAL (#64748B, el .t-body del sistema de
-                 texto) — ya no compite con el tituloHeader
-                 (#1f2937, el color de título del par).
-                 Reparado de paso: el selector
-                 .promo-encabezado[hidden] venía incompleto y
-                 el ocultamiento por atributo no aplicaba.
-                 R62: tarjeta compacta al pie del dueño — MENOS
-                 ALTO (padding 11/12 y gap 3), FLECHA a la
-                 esquina inferior derecha (top 50% → bottom),
-                 BADGE a la fila del título alineado a la derecha
-                 (.promo-fila-titulo con .promo-titulo flex:1),
-                 ANCHO -10% (97→87% escritorio, 85→77% móvil),
-                 DEGRADADO del colorOficial del post (fuera la
-                 paleta .promo-c1…c5 y sus sombras — el estilo
-                 inline lo pinta Promo_Script; la base sin clase
-                 queda como respaldo naranja en versión 2026:
-                 135°, claro→base→oscuro) y "Promos cerca de
-                 ti" sin bold (700→400, color #1f2937 de los
-                 títulos de sección intacto).
-                 R61: anatomía de la tarjeta al pie del dueño —
-                 .promo-titulo ES el texto de PROMOJSON (18px,
-                 peso 400, sin bold) y el título del post baja a
-                 .promo-sub; la tercera fila es .promo-partner
-                 con el check de certificado (.promo-check,
-                 badgeCheck de Iconos.html) en BLANCO a la
-                 derecha; .promo-track declara
-                 background:transparent (el grid no tapa el
-                 lienzo).
-                 R58: la promo viste NARANJA (degradado de la
-                 familia del oficial #f97316) con contenido
-                 blanco como la imagen del dueño: badge blanco
-                 (borde dashed intacto), título 2 líneas y
-                 partner debajo, botón circular translúcido con
-                 flecha a la derecha; fuera la campana y el pie
-                 "Ver detalles"; encabezado "Promos cerca de
-                 ti / Toca para conocer más" sobre la marquesina
-                 (lo muestra Promo_Script) y FADES laterales
-                 hacia el lienzo #fdf3ec en #promoSlot.
-DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
-                 botón), Promo_Script.html (duplica los items
-                 para el bucle continuo y lleva el scrollLeft),
-                 Index.html (#promoSlot, #promoEncabezado)
+VERSIÓN:         2.6
+CAMBIOS:         R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -266,7 +232,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
   .lista-item.promo-item .promo-titulo {
     flex: 1 1 auto;
     min-width: 0;
-    font-size: 18px;
+    font-size: var(--size-subtitulo);
     font-weight: 400;
     line-height: 1.3;
     letter-spacing: -0.01em;
@@ -282,7 +248,7 @@ DEPENDENCIAS:    Lista_CSS.html (reusa .lista-item como base del
      .promo-texto de R60 (ahora el texto ES el título). */
   .lista-item.promo-item .promo-sub {
     max-width: 100%;
-    font-size: 13px;
+    font-size: var(--size-enlaces);
     font-weight: 400;
     line-height: 1.35;
     letter-spacing: -0.01em;

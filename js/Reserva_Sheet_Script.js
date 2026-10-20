@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_Sheet_Script.html
-ESPEJO GITHUB:   js/Reserva_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Reserva_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Infraestructura del bottom sheet. Apertura,
                  cierre, drag con inercia, backdrop, scroll.

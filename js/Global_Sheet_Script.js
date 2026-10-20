@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Global_Sheet_Script.html
-ESPEJO GITHUB:   github/js/Global_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Global_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  jerarquía (marca de la app protagonista arriba,

@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -11,7 +12,7 @@ CAMBIOS:         R77: (1) Regla maestra de PLACEHOLDERS: todos los
                  única regla en ::placeholder.
                  (2) Encabezado saneado: solo queda lo vigente.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   *{ box-sizing: border-box; }
 

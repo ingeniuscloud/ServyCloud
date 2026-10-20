@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Social_Script.html
 ESPEJO GITHUB:   github/js/Social_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -26,7 +27,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  getPostActivo), Compartir_Script.html
                  (window.Compartir: urlDePost), Social_CSS.html,
                  Core_CSS.html
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Social = (function () {
 

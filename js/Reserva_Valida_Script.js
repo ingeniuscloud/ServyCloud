@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_Valida_Script.html
-ESPEJO GITHUB:   js/Reserva_Valida_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Reserva_Valida_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Validadores y limpiadores puros del módulo
                  Reserva. Sin DOM, sin state, sin dependencias.

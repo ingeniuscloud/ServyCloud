@@ -1,194 +1,67 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Social_CSS.html
-ESPEJO GITHUB:   css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de los botones flotantes laterales (like,
-                 comenta, comparte + contadores).
-                 Iconos sociales OUTLINE con stroke-width 1.05
-                 (equivalente visual a 1.2px reales).
-                 Like con fill rojo cuando está activo.
-                 Corazón volador: sube linealmente 200px.
-                 La fila del partner (.user-fila) vive en
-                 Core_CSS.html desde R49.
-VERSIÓN:         1.2
-CAMBIOS:         R49: se retira el botón Partner flotante (su
-                 fila .user-fila vive en Core_CSS.html desde
-                 R49). Quedan los botones flotantes like/
-                 comenta/comparte con sus contadores.
-                 R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
-DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
-                 Index.html y pintados por Social_Script.html)
+VERSIÓN:         1.4.0
+CAMBIOS:         R90: Se recibe el CSS de los botones sociales
+                 del hero (antes en Seccion_CSS). Se ajusta el
+                 tamaño de los iconos a 24px para una mejor
+                 proporción visual con el círculo de 42px.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CONTENEDOR FLOTANTE
+     BOTONES SOCIALES EN EL HERO
      ============================================================ */
-  .botones-flotantes {
-    position: absolute;
-    top: 60%;
-    right: 10px;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    z-index: 10;
-    transition: color 0.4s ease;
+  .app-hero-social {
+    position: absolute; bottom: 12px; right: 12px;
+    display: flex; gap: 8px; z-index: 2;
   }
-
-  /* ============================================================
-     BOTÓN BASE
-     ============================================================ */
-  .btn-flotante {
-    width: 38px;
-    height: 38px;
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition: transform 0.2s ease, color 0.2s ease;
-    position: relative;
+  
+  .app-hero-social-btn {
+    position: relative; /* Necesario para el corazón volador */
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08); 
+    background: #ffffff;
+    color: #334155;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+    transition: transform 0.15s ease, color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-flotante svg {
-    width: 28px;
-    height: 28px;
-    transition: fill 0.2s ease, stroke 0.2s ease;
+  .app-hero-social-btn:active { transform: scale(0.92); }
+  
+  /* R90: Iconos más grandes para llenar mejor el círculo */
+  .app-hero-social-btn svg { 
+    width: 24px; height: 24px; 
+    fill: none; stroke: currentColor; 
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; 
   }
-  .btn-flotante:active { transform: scale(0.92); }
+
+  /* Estado activo del like */
+  .app-hero-social-btn.activo { color: #ef4444; }
+  .app-hero-social-btn.activo svg { fill: #ef4444; }
 
   /* ============================================================
-     ICONO LIKE · outline en reposo
-     ============================================================ */
-  #btnLikeFlotante svg,
-  #btnLikeFlotante svg path {
-    fill: none !important;
-    stroke: currentColor !important;
-    stroke-width: 1.05 !important;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
-     LIKE ACTIVO · relleno rojo + contorno rojo
-     ============================================================ */
-  #btnLikeFlotante.activo { color: #ef4444; }
-
-  #btnLikeFlotante.activo svg,
-  #btnLikeFlotante.activo svg path {
-    fill: #ef4444 !important;
-    stroke: #ef4444 !important;
-    stroke-width: 1.05 !important;
-  }
-
-  /* ============================================================
-     ICONO COMENTARIO · outline
-     ============================================================ */
-  #btnCommentFlotante svg,
-  #btnCommentFlotante svg path {
-    fill: none !important;
-    stroke: currentColor !important;
-    stroke-width: 1.05 !important;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
-     ICONO COMPARTIR · outline
-     ============================================================ */
-  #btnShareFlotante svg {
-    fill: none !important;
-    stroke: currentColor !important;
-    stroke-width: 1.05 !important;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  #btnShareFlotante svg circle,
-  #btnShareFlotante svg line {
-    fill: none !important;
-    stroke: currentColor !important;
-    stroke-width: 1.05 !important;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
-     CONTADORES FLOTANTES
-     ============================================================ */
-  .likes-flotante {
-    width: 44px;
-    text-align: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.1px;
-    color: inherit;
-    opacity: 1;
-    pointer-events: none;
-    transition: transform 0.3s cubic-bezier(0.34, 1.36, 0.64, 1),
-                color 0.4s ease;
-    margin-top: -4px;
-    margin-bottom: 6px;
-  }
-  .likes-flotante.bump { transform: scale(1.25); }
-
-  /* ============================================================
-     CORAZÓN VOLADOR · relleno rojo
+     CORAZÓN VOLADOR
      ============================================================ */
   .heart-pop-wrap {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-
-    pointer-events: none;
-    z-index: 100;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+    position: absolute; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
     will-change: transform, opacity;
-    animation: heartFly 0.6s linear forwards;
+    animation: heartFly 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 10;
   }
-
-  .heart-pop-svg {
-    width: 28px;
-    height: 28px;
-    color: #ef4444;
-  }
-  .heart-pop-svg svg,
-  .heart-pop-svg svg path {
-    width: 100%;
-    height: 100%;
-    display: block;
-    fill: #ef4444;
-    stroke: #ef4444;
+  
+  .heart-pop-svg { width: 28px; height: 28px; color: #ef4444; }
+  .heart-pop-svg svg, .heart-pop-svg path { 
+    width: 100%; height: 100%; 
+    display: block; fill: #ef4444; stroke: #ef4444; 
   }
 
   @keyframes heartFly {
-    0% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-    80% {
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateY(-200px);
-      opacity: 0;
-    }
-  }
-
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
-  @media (max-width: 360px) {
-    .btn-flotante { width: 34px; height: 34px; }
-    .btn-flotante svg { width: 24px; height: 24px; }
-    .likes-flotante { font-size: 0.75rem; width: 38px; }
+    0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20%  { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
   }

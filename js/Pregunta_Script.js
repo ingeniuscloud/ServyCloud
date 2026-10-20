@@ -11,7 +11,11 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  el campo y sale el foco) y sheet al 90% para ver
                  todas las preguntas con fade final.
                  Sin borrado y sin nombre de quien pregunta.
-VERSIÓN:         1.0.1
+VERSIÓN:         1.0.2
+CAMBIOS:         R82: Se retira la divisora propia del inicio: la
+                 que cierra la sección del partner ahora vive debajo
+                 de la dirección (Seccion_Script), y duplicarla
+                 dejaba dos líneas seguidas antes del Q&A.
 CAMBIOS:         R77B: El contador pasa a formato N/250 (cuánto
                  lleva y cuánto queda) centrado bajo el botón
                  enviar; el aviso corto lleva el icono info de
@@ -62,8 +66,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        HTML DE LA SECCIÓN (la monta Seccion_Script en su orden)
        ============================================================ */
     function buildHTML() {
-      var html = '<div class="mk-hairline"></div>';
-      html += '<div class="mk-qa-section">';
+      /* R82: sin divisora propia — la ubicación ya cierra la
+         sección del partner con la suya. */
+      var html = '<div class="mk-qa-section">';
       html +=   '<h2 class="titulo mk-qa-titulo">Preguntas y respuestas</h2>';
       html +=   '<div class="preg-form">' +
                   '<div class="preg-input-wrap" id="pregWrap">' +

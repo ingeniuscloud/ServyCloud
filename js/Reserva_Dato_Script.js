@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_Dato_Script.html
-ESPEJO GITHUB:   js/Reserva_Dato_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Reserva_Dato_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
                  Bloque 2 = nombre, teléfono, correo, OTP y

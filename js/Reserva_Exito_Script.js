@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_Exito_Script.html
-ESPEJO GITHUB:   js/Reserva_Exito_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Reserva_Exito_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  Éxito: información de la reserva + aviso de que el

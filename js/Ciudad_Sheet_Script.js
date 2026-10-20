@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Ciudad_Sheet_Script.html
-ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  localStorage (app_ciudad). Si no existe, abre

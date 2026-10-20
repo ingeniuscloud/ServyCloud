@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Compartir_Script.html
-ESPEJO GITHUB:   js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y

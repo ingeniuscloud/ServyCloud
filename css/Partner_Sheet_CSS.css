@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Partner_Sheet_CSS.html
-ESPEJO GITHUB:   css/Partner_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Partner_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del bottom sheet del Partner. Header
                  sticky con avatar 56px a la izquierda + nombre
@@ -8,12 +9,15 @@ RESPONSABILIDAD: Estilos del bottom sheet del Partner. Header
                  (likes/comentarios/compartidos). Datos
                  institucionales con dirección clickable a Maps.
                  Colmena 3 columnas. Botón WhatsApp full-width.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
-DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
-                 local de .chip dentro de .partner-chips)
+VERSIÓN:         1.2
+CAMBIOS:         R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -201,7 +205,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
   }
 
   .partner-eslogan {
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 500;
     color: #64748b;
     line-height: 1.35;
@@ -330,7 +334,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
   }
 
   .partner-dato-valor {
-    font-size: 0.88rem;
+    font-size: var(--size-ui-4);
     font-weight: 500;
     color: #334155;
     line-height: 1.4;
@@ -406,7 +410,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
   }
 
   .partner-celda-nombre {
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     font-weight: 700;
     color: #334155;
     line-height: 1.2;
@@ -448,7 +452,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
     border-radius: 12px;
     color: #475569;
     font-family: inherit;
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 700;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -465,7 +469,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
   .partner-vacia {
     padding: 20px 22px 24px;
     text-align: center;
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     color: #94a3b8;
     font-weight: 500;
   }
@@ -487,7 +491,7 @@ DEPENDENCIAS:    Ninguna (clases partner-* propias y variante
     background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
     color: #ffffff;
     text-decoration: none;
-    font-size: 0.94rem;
+    font-size: var(--size-ui-5);
     font-weight: 800;
     letter-spacing: -0.2px;
 

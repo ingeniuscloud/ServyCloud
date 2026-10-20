@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Lista_CSS.html
 ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -18,7 +19,7 @@ CAMBIOS:         R77: El título del item pasa a la clase maestra
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      BOTÓN VOLVER

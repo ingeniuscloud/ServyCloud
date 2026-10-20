@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Lista_Script.html
 ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -27,7 +28,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Ciudad_Script (window.Ciudad), Compartir_Script.html
                  (window.Compartir), Orden_Sheet_Script.html,
                  Core_CSS.html, Lista_CSS.html, Promo_CSS.html
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Lista = (function () {
 

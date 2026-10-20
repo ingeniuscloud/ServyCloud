@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Orden_Sheet_CSS.html
-ESPEJO GITHUB:   github/css/Orden_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Orden_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  botón ordenar (#btnOrdenar, fila 1 de la sección
@@ -24,32 +25,15 @@ RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  si hiciera falta (.ordenar-content).
                  La estructura raíz/backdrop/handle/close replica
                  a Ciudad_Sheet_CSS (módulos hermanos).
-VERSIÓN:         1.2
-CAMBIOS:         R68: UNIFORMIDAD DE SHEETS (orden del dueño: los
-                 4 sheets abren a la misma altura): .ordenar-sheet
-                 pasa de max-height 90% (altura ajustada al
-                 contenido, ~72%) a height FIJA 90% — la altura de
-                 apertura queda idéntica a Reserva y Ciudad. Ni
-                 una regla más tocada.
-                 R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
-                 pasa a Orden_Sheet_* (el sheet es de ordenamiento,
-                 no de filtro — corrección de nombre del dueño).
-                 Ni una regla de estilo tocada.
-                 R66: NACE el módulo con el sheet de ordenamiento:
-                 6 opciones (Recomendado · Nombre A→Z · Nombre
-                 Z→A · Por categoría · Más compartidos · Mejor
-                 valorados) como tarjetas del lenguaje de la
-                 ciudad: icono en pastilla 38px (naranja suave en
-                 la activa), título 15.5px y descripción 12.5px,
-                 check naranja a la derecha de la activa,
-                 degradado + borde #f97316 en la activa, entrada
-                 escalonada con --i (índice, lo pinta
-                 Orden_Sheet_Script), feedback :active
-                 scale(0.97) y tap-highlight transparente.
-DEPENDENCIAS:    Iconos.html (glifos lista/grupos/alfabeto/share/
-                 estrella/verificado vía data-glifo),
-                 Orden_Sheet_Script.html (construye y pinta el
-                 DOM), Index.html (contenedor .area-contenido)
+VERSIÓN:         1.3
+CAMBIOS:         R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -357,5 +341,5 @@ DEPENDENCIAS:    Iconos.html (glifos lista/grupos/alfabeto/share/
     .ordenar-opt-titulo { font-size: 14.5px; }
     .ordenar-opt-desc { font-size: 12px; }
     .ordenar-check { width: 20px; height: 20px; }
-    .ordenar-titulo { font-size: 18px; }
+    .ordenar-titulo { font-size: var(--size-subtitulo); }
   }

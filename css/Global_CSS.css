@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Global_CSS.html
-ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "Acerca de" con jerarquía: marca de la app arriba
@@ -13,37 +14,15 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.6
-CAMBIOS:         R68: solo comentario — la mención del menú global
-                 pasa a Global_Sheet_Script (renombrado R68). Ni
-                 una regla tocada; la base .sheet (altura 90%)
-                 queda intacta.
-                 R66: los CÍRCULOS NUMERADOS del timeline de la
-                 ayuda de instalación quedan SIN FONDO (orden del
-                 dueño: el relleno naranja se veía saturado) —
-                 solo el círculo: aro fino #f97316, número en
-                 naranja y fondo blanco (necesario para tapar la
-                 línea del timeline que pasa por detrás); fuera
-                 el brillo naranja del box-shadow.
-                 R64: entra .pwa-instalada-aviso (banner verde
-                 suave con el check verificado de Iconos — el
-                 aviso de app ya instalada vive DENTRO de la
-                 ayuda, nunca la tapa) y .pwa-instalar pasa a
-                 botón manual SIEMPRE visible en Android con su
-                 glifo download dentro (flex + gap).
-                 R63: la guía de instalación viste el naranja
-                 oficial y TIMELINE — .pwa-tabs (píldoras Android/
-                 iPhone con glifo, activa en naranja), .pwa-timeline
-                 (línea vertical con degradado naranja + puntos
-                 numerados 30px) y .pwa-instalar (botón naranja
-                 pleno); cada paso entra con .pwaPasoIn escalonado
-                 (animation-delay por --i, "los puntos tienen
-                 vida"). .pwa-nota pasa a la familia naranja.
-                 R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
-DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
-                 Comenta_CSS.html y Reserva_CSS.html)
+VERSIÓN:         1.7
+CAMBIOS:         R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -238,7 +217,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     margin: 0;
     align-items: center;
     line-height: 1;
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 700;
     color: #64748b;
     letter-spacing: -0.1px;
@@ -322,7 +301,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
   .sheet-privacidad .fecha {
     text-align: center;
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     color: #94a3b8;
     font-weight: 500;
     letter-spacing: 0.2px;
@@ -338,7 +317,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
   .sheet-privacidad h3:first-of-type { margin-top: 0; }
   .sheet-privacidad p {
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     line-height: 1.55;
     color: #475569;
     margin: 0 0 8px;
@@ -349,7 +328,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     list-style: none;
   }
   .sheet-privacidad ul li {
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     line-height: 1.55;
     color: #475569;
     margin: 0 0 5px;
@@ -384,7 +363,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
     background: transparent;
     border-radius: 12px;
     font-family: inherit;
-    font-size: 0.94rem;
+    font-size: var(--size-ui-5);
     font-weight: 600;
     color: #5b6472;
     cursor: pointer;
@@ -425,7 +404,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
 
   .sheet-menu-titulo {
     display: block;
-    font-size: 0.94rem;
+    font-size: var(--size-ui-5);
     font-weight: 600;
     color: inherit;
     line-height: 1.2;
@@ -534,7 +513,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
 
   .sheet-acerca-app-version {
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     color: #94a3b8;
     font-weight: 700;
     letter-spacing: 0.4px;
@@ -558,7 +537,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
 
   .sheet-acerca-credito {
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     color: #94a3b8;
     font-weight: 500;
     letter-spacing: 0.4px;
@@ -600,7 +579,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
 
   .sheet-acerca-footer {
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     color: #94a3b8;
     line-height: 1.5;
     text-align: center;
@@ -762,7 +741,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
   .sheet-pwa .pwa-paso-titulo {
     display: block;
-    font-size: 0.88rem;
+    font-size: var(--size-ui-4);
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 3px;
@@ -770,7 +749,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
   .sheet-pwa .pwa-paso-detalle {
     display: block;
-    font-size: 0.78rem;
+    font-size: var(--size-ui-2);
     color: #64748b;
     line-height: 1.45;
   }
@@ -805,7 +784,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
   }
 
   .sheet-pwa .pwa-instalada-texto {
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 600;
     color: #065f46;
     line-height: 1.35;
@@ -859,7 +838,7 @@ DEPENDENCIAS:    Ninguna (base .sheet-* reutilizada por
 
   /* ---------- Nota por versión (familia naranja) ---------- */
   .sheet-pwa .pwa-nota {
-    font-size: 0.78rem;
+    font-size: var(--size-ui-2);
     color: #9A3412;
     line-height: 1.5;
     padding: 12px 14px;

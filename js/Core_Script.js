@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Core_Script.html
 ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -21,7 +22,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Pregunta_Script.html (window.Pregunta),
                  Reserva_Script.html y hojas de reserva,
                  Iconos.html, Core_CSS.html
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      CACHEL2 · capa del dispositivo

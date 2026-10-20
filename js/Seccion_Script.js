@@ -5,24 +5,38 @@ ESPEJO GITHUB:   github/js/Seccion_Script.js (subir a GitHub Pages; editar en GA
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  hero con carrusel y etiqueta de ciudad, bloque de
-                 bienvenida para posts sin foto, info y descripción
-                 con su sheet, fila del partner, CTA, ubicación,
-                 cross-sell, In Company y bloque asesor.
+                 bienvenida para posts sin foto, info (título, promo
+                 del post y descripción) con su sheet, CTA, fila del
+                 partner, ubicación, Q&A, publicaciones relacionadas
+                 (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.1.1
-CAMBIOS:         R77B: (1) Los posts sin foto ya no quedan sin
-                 hero: se pinta un bloque de bienvenida (glifo
-                 imagen de Iconos + mensaje de aliento) que conserva
-                 el badge de ciudad y los botones sociales, para que
-                 el post se sienta completo y con la misma estructura.
-                 (2) El nombre del partner pasa a .textoPrimario.
-                 R77: (1) El enlace de la descripción pasa a decir
-                 "Ver descripción completa".
-                 (2) El sheet de descripción gana el fade final que
-                 se retira al llegar al final del scroll.
-                 (3) El Q&A del lienzo lo construye y lo maneja
-                 window.Pregunta (campo, envío y sheet de lectura);
-                 aquí solo se monta en su orden.
+VERSIÓN:         2.2.0
+CAMBIOS:         R82: (1) El CTA sube arriba del partner: es el
+                 botón de la publicación, no del partner. Orden del
+                 lienzo: info → CTA → divisora → partner →
+                 ubicación → divisora → Q&A → relacionados.
+                 (2) Divisoras de sección: una debajo del CTA (cierra
+                 la info del producto o servicio) y una debajo de la
+                 dirección (cierra la sección del partner). Antes de
+                 "Publicaciones relacionadas" NO va divisora: esa
+                 sección abre con su propio fondo pintado.
+                 (3) Tarjeta de promo del post: si el post tiene
+                 promo activa (PROMOJSON vigente) se pinta debajo del
+                 título con banner del color del post y precios.
+                 (4) Publicaciones relacionadas con fondo propio
+                 (#FFF7ED) y tarjetas nuevas: banner superior con el
+                 color del post, avatar blanco con la inicial y nombre
+                 sobre fondo tintado. Sin caja: el fondo es de la
+                 sección completa.
+                 (5) Tipografías al sistema del Core: In Company y
+                 bloque asesor pasan a .textoSecundario/.textoPrimario.
+                 R77B: (1) Bloque de bienvenida para posts sin foto
+                 (glifo imagen + mensaje de aliento, badge de ciudad
+                 y sociales incluidos). (2) Nombre del partner en
+                 .textoPrimario.
+                 R77: (1) "Ver descripción completa". (2) Fade final
+                 del sheet de descripción. (3) El Q&A del lienzo lo
+                 construye window.Pregunta.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -121,6 +135,102 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       return '<p>' + escapeHtml(texto) + '</p>';
     }
 
+    /* ============================================================
+       PROMO DEL POST (R82) · tarjeta debajo del título
+       La promo activa sale del mismo PROMOJSON que alimenta la
+       marquesina de la lista (SISTEMA.promo.porCiudad): si el post
+       abierto es el de la promo vigente (fechas + ciudad), se pinta
+       aquí como incentivo de compra. El banner manda con el texto
+       de la promo y los precios aparecen si la hoja los trae.
+       ============================================================ */
+    function _hoyISO() {
+      var d = new Date();
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+
+    function _promoDelPost(post) {
+      var promo = (window.SISTEMA && window.SISTEMA.promo) || null;
+      if (!promo || promo.activo === false || !post) return null;
+      var ciudad = null;
+      try {
+        if (window.Ciudad && typeof window.Ciudad.getActual === 'function') {
+          var c = window.Ciudad.getActual();
+          ciudad = c ? c.idCiudad : null;
+        }
+      } catch (e) {}
+      if (!ciudad) return null;
+      var raw  = (promo.porCiudad && promo.porCiudad[ciudad]) || null;
+      var pool = [];
+      if (Array.isArray(raw)) { pool = raw; }
+      else if (raw && (raw.idPost || raw.idPostActual)) { pool = [raw]; }
+      var hoy = _hoyISO();
+      for (var i = 0; i < pool.length; i++) {
+        var item = pool[i]; if (!item) continue;
+        var idPost = item.idPost || item.idPostActual;
+        if (idPost !== post.id) continue;
+        if (item.inicia && item.inicia > hoy) continue;
+        if (item.termina && item.termina < hoy) continue;
+        return item;
+      }
+      return null;
+    }
+
+    function _primerTexto(fuente, campos) {
+      for (var i = 0; i < campos.length; i++) {
+        var v = fuente ? fuente[campos[i]] : null;
+        if (typeof v === 'string' && v.trim()) return v.trim();
+        if (typeof v === 'number' && !isNaN(v)) return String(v);
+      }
+      return '';
+    }
+
+    function buildPromoHTML() {
+      var post = postActivo;
+      if (!post) return '';
+      var item = _promoDelPost(post);
+      if (!item) return '';
+
+      var metaPost = (post.postJson && post.postJson.meta) || {};
+
+      var banner = _primerTexto(item, ['texto', 'promoTexto', 'descripcion', 'mensaje']) ||
+                   _primerTexto(post, ['promoTexto']) ||
+                   _primerTexto(metaPost, ['promoTexto']);
+
+      var viejo     = _primerTexto(item, ['precioAnterior', 'precioViejo', 'oldPrice', 'precioAntes']);
+      var actual    = _primerTexto(item, ['precioActual', 'precio', 'newPrice', 'precioNuevo']);
+      var descuento = _primerTexto(item, ['descuento', 'discount', 'off']);
+
+      /* Si no viene el descuento pero hay ambos precios numéricos,
+         se calcula (ej. 5% OFF). */
+      if (!descuento && viejo && actual) {
+        var vV = parseFloat(String(viejo).replace(/[^0-9.,-]/g, '').replace(',', '.'));
+        var vA = parseFloat(String(actual).replace(/[^0-9.,-]/g, '').replace(',', '.'));
+        if (!isNaN(vV) && !isNaN(vA) && vV > 0 && vA > 0 && vA < vV) {
+          descuento = Math.round((1 - (vA / vV)) * 100) + '% OFF';
+        }
+      }
+
+      if (!banner && !actual) return '';
+
+      var colorArr = metaPost.color || [];
+      var colorOficial = colorArr[0] || post.colorOficial || '#f97316';
+      var colorPastel  = colorArr[1] || post.colorClaro   || '#f1f5f9';
+
+      var html = '<div class="mk-promo-block" style="--post-color:' + escapeHtml(colorOficial) + '; --post-claro:' + escapeHtml(colorPastel) + '">';
+      if (banner) { html += '<div class="mk-promo-banner">' + escapeHtml(banner) + '</div>'; }
+      if (actual) {
+        html += '<div class="mk-promo-prices">';
+        if (viejo) { html += '<div class="mk-promo-old-price textoSecundario">' + escapeHtml(viejo) + '</div>'; }
+        html += '<div class="mk-promo-current-row">' +
+                  '<div class="mk-promo-current-price">' + escapeHtml(actual) + '</div>' +
+                  (descuento ? '<div class="mk-promo-discount">' + escapeHtml(descuento) + '</div>' : '') +
+                '</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
     function buildPresentacion() {
       var post = postActivo;
       if (!post) return '';
@@ -136,6 +246,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (hero) { html += '<div class="app-hero-wrap">' + hero + '</div>'; }
       html += '<div class="mk-info">';
       if (titulo) { html += '<h1 class="tituloPost" style="margin:0 0 8px 0;">' + escapeHtml(titulo) + '</h1>'; }
+      /* R82: la promo vive debajo del título (jerarquía: qué es →
+         incentivo → detalle). */
+      html += buildPromoHTML();
       if (markdown) {
         var renderExcerpt = _renderMarkdown(markdown);
         html += '<div class="mk-desc-wrap">' +
@@ -162,8 +275,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var colorOficial = colorArr[0] || '#475569';
       var colorPastel = colorArr[1] || '#f1f5f9';
 
-      var html = '<div class="mk-hairline"></div>';
-      html += '<div class="mk-partner-row" id="lienzoPartnerFila" style="--post-color:' + escapeHtml(colorOficial) + '; --post-pastel:' + escapeHtml(colorPastel) + ';">';
+      /* R82: sin hairline propia — la divisora que cierra la info
+         del producto queda debajo del CTA, justo antes del partner. */
+      var html = '<div class="mk-partner-row" id="lienzoPartnerFila" style="--post-color:' + escapeHtml(colorOficial) + '; --post-pastel:' + escapeHtml(colorPastel) + ';">';
       html +=   '<div class="mk-partner-avatar">';
       html +=     '<span class="mk-partner-initial">' + escapeHtml(inicial) + '</span>';
       html +=     '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>';
@@ -199,6 +313,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html += '</button>';
       
       html += '</div>';
+      /* R82: divisora debajo del CTA — aquí termina la info del
+         producto o servicio y empieza la sección del partner. */
+      html += '<div class="mk-hairline"></div>';
       return html;
     }
 
@@ -215,8 +332,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var dirCompleta = [direccion, ciudad, municipio, estado].filter(Boolean).join(', ');
       var urlMaps = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dirCompleta);
 
-      var html = '<div class="mk-hairline"></div>';
-      html += '<div class="mk-location-section">' +
+      var html = '<div class="mk-location-section">' +
                 '<div class="mk-location">' +
                   '<span class="mk-location-icon" data-glifo="ubicacion"></span>' +
                   '<div class="mk-location-content">' +
@@ -225,6 +341,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                   '</div>' +
                 '</div>' +
               '</div>';
+      /* R82: divisora debajo de la dirección — aquí termina la
+         sección del partner. */
+      html += '<div class="mk-hairline"></div>';
       return html;
     }
 
@@ -239,8 +358,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
     function buildCrossSellHTML(ids) {
       if (!ids || !ids.length) return '';
-      var html = '<div class="mk-hairline"></div>';
-      html += '<div class="mk-section"><h2 class="titulo" style="margin:0 0 12px 0;">Publicaciones relacionadas</h2></div>';
+      /* R82: sección pintada (fondo propio, no caja) y sin
+         divisora: el fondo marca el cambio de sección. Cada
+         tarjeta lleva un banner superior con el color del post
+         relacionado, el avatar blanco con la inicial y el nombre
+         sobre fondo tintado. */
+      var html = '<div class="mk-rel-section">';
+      html += '<div class="mk-section mk-rel-cabeza"><h2 class="titulo" style="margin:0;">Publicaciones relacionadas</h2></div>';
       html += '<div class="mk-cross-row">';
       ids.forEach(function (id) {
         var p = buscarPost(id);
@@ -250,10 +374,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         var color   = p.colorOficial || '#475569';
         var claro   = p.colorClaro   || '#f1f5f9';
         html += '<button type="button" class="mk-cross-card" data-post-solicitado="' + escapeHtml(p.id) + '" style="--post-color:' + escapeHtml(color) + '; --post-claro:' + escapeHtml(claro) + ';">' +
-                  '<div class="mk-cross-avatar">' + escapeHtml(inicial) + '</div>' +
+                  '<div class="mk-cross-top"><div class="mk-cross-avatar">' + escapeHtml(inicial) + '</div></div>' +
                   '<div class="mk-cross-name textoPrimario">' + escapeHtml(nombre) + '</div>' +
                 '</button>';
       });
+      html += '</div>';
       html += '</div>';
       return html;
     }
@@ -261,7 +386,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     function buildInCompanyButton() {
       return '<div class="mk-section" style="padding-top:10px;">' +
           '<button type="button" class="cross-incompany" data-post-incompany="' + ID_POST_INCOMPANY + '">' +
-            '<div class="ci-info"><span class="ci-titulo">¿Buscas capacitar a todo tu equipo?</span><span class="ci-cta">Conoce In Company</span></div>' +
+            '<div class="ci-info"><span class="ci-titulo textoSecundario">¿Buscas capacitar a todo tu equipo?</span><span class="ci-cta textoPrimario">Conoce In Company</span></div>' +
             '<span class="ci-boton"><span data-glifo="flechaVer" style="width:18px; height:18px; display:block;"></span></span>' +
           '</button></div>';
     }
@@ -270,7 +395,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       return '<div class="mk-section" style="padding-top:10px;">' +
           '<button type="button" class="bloque-asesor" id="bloqueAsesor">' +
             '<span class="bloque-asesor-icono" data-glifo="userPlus"></span>' +
-            '<span class="bloque-asesor-info"><span class="bloque-asesor-titulo">¿Ofreces algún servicio?</span><span class="bloque-asesor-sub">Publícalo con nosotros y llega a más personas</span></span>' +
+            '<span class="bloque-asesor-info"><span class="bloque-asesor-titulo textoPrimario">¿Ofreces algún servicio?</span><span class="bloque-asesor-sub textoSecundario">Publícalo con nosotros y llega a más personas</span></span>' +
             '<span class="bloque-asesor-flecha" data-glifo="flechaVer"></span>' +
           '</button></div>';
     }
@@ -348,9 +473,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       track.innerHTML = '';
       var fragment = document.createDocumentFragment();
 
+      /* R82: el CTA es de la publicación, no del partner — va
+         arriba del partner y cierra la info del producto con su
+         divisora. */
       var htmlPresentacion = buildPresentacion(); if (htmlPresentacion) { var sec = document.createElement('div'); sec.innerHTML = htmlPresentacion; fragment.appendChild(sec); }
-      var htmlPartner = buildPartner(); if (htmlPartner) { var sec = document.createElement('div'); sec.innerHTML = htmlPartner; fragment.appendChild(sec); }
       var htmlCTA = buildCTA(); if (htmlCTA) { var sec = document.createElement('div'); sec.innerHTML = htmlCTA; fragment.appendChild(sec); }
+      var htmlPartner = buildPartner(); if (htmlPartner) { var sec = document.createElement('div'); sec.innerHTML = htmlPartner; fragment.appendChild(sec); }
       var htmlUbi = buildUbicacion(); if (htmlUbi) { var sec = document.createElement('div'); sec.innerHTML = htmlUbi; fragment.appendChild(sec); }
       
       var htmlQandA = buildQandA(); if (htmlQandA) { var sec = document.createElement('div'); sec.innerHTML = htmlQandA; fragment.appendChild(sec); }

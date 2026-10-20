@@ -1,6 +1,7 @@
 /*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Reserva_CSS.html
-ESPEJO GITHUB:   css/Reserva_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Reserva_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
                  de Global, banner de mensajes, form contenedor,
@@ -10,12 +11,15 @@ RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
                  BLOQUE REVELABLE (zona-otp / post-validación).
                  La vista de éxito, su skeleton y su error viven en
                  Reserva_Exito_CSS.html.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
-DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
-                 (.sheet-content, .sheet-back, .sheet-close)
+VERSIÓN:         1.3
+CAMBIOS:         R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -46,7 +50,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
   .reserva-banner {
     padding: 10px 14px;
     border-radius: 10px;
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 600;
     line-height: 1.4;
     margin: 0 0 14px;
@@ -69,7 +73,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
     text-align: left;
   }
   .sheet-form .form-sub {
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     color: #64748b;
     font-weight: 500;
     margin: 0 0 20px;
@@ -96,7 +100,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
   .form-fieldset legend {
     padding: 0 6px;
     margin-left: 4px;
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     font-weight: 700;
     color: #475569;
     letter-spacing: 0.1px;
@@ -142,7 +146,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 0.88rem;
+    font-size: var(--size-ui-4);
     font-weight: 500;
     color: #94a3b8;
     pointer-events: none;
@@ -278,7 +282,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
     background: none;
     border: none;
     font-family: inherit;
-    font-size: 0.78rem;
+    font-size: var(--size-ui-2);
     font-weight: 700;
     color: var(--post-color, #1d4ed8);
     text-decoration: underline;
@@ -463,7 +467,7 @@ DEPENDENCIAS:    Global_CSS.html (base del sheet), Telefono.html
     border: none;
     border-radius: 999px;
     font-family: inherit;
-    font-size: 0.94rem;
+    font-size: var(--size-ui-5);
     font-weight: 800;
     letter-spacing: -0.2px;
     color: #ffffff;
