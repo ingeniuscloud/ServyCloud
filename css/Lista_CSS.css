@@ -1,114 +1,25 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_CSS.html
 ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS del menú lista. Botón volver, título de
-                 categoría, alternancia lista ↔ detalle con
-                 fade. Item de la vidriera (R64 · LIMPIO):
-                 SIN BORDES y fondo transparente — la división
-                 entre items es una LINEA TENUDE que no hace
-                 ruido. Primera fila: título + estrella métrica
-                 (como estaba). La segunda fila (subtítulo) y su
-                 divisoria interna DESAPARECIERON; la fila del
-                 partner sigue: avatar circular con la INICIAL
-                 de la marca (fondo colorClaro del post, letra
-                 colorOficial) + nombre — SIN el check verde —
-                 y a la derecha "Ver publicación →" en NARANJA
-                 oficial y peso normal. El título sin bold y
-                 más grande (R62). Espaciados sutiles: la
-                 división indica el corte pero todo se siente
-                 parte del mismo item. La estrella métrica
-                 pasiva se queda anclada a la esquina superior
-                 derecha (fila horizontal: glifo amarillo +
-                 contador a su derecha, oculta en 0).
-                 R62: la fila "Explorar" se ELIMINÓ. Sin badge
-                 (vive en la promo y el post). La lista es
-                 PLANA. Skeleton del detalle (primera carga de
-                 un post). Skeleton de lista con la misma
-                 anatomía de fila (solo si el POST inicial aún
-                 está en vuelo cuando el usuario elige ciudad).
-VERSIÓN:         2.8
-CAMBIOS:         R71: LÍNEA DE INICIO en el primer item (orden del dueño:
-                 "le falta la línea de inicio en el primer item de la
-                 lista... que se diferencie cada bloque o items"): cada
-                 .lista-item PRIMERO de su bloque abre con la misma
-                 línea tenue #eef2f7 que separa a los demás — así el
-                 primer item no se funde con la fila "Compartir lista".
-                 Entre items sigue mandando el border-bottom (cero
-                 líneas dobles); el último sigue terminando en aire.
-                 Una regla nueva, nada más tocado. REVERSIÓN: borrar
-                 la regla .lista-item:first-child.
-                 R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
-                 R70 pegaba este CSS sin las etiquetas <style> propias
-                 que TODO fragmento GAS trae desde siempre: el
-                 include() lo vertía como TEXTO en la página. El cuerpo
-                 NO cambia una línea: sigue el fix R70 completo
-                 ("Compartir lista" alineada a la derecha). En GAS:
-                 pega el archivo COMPLETO en el archivo Lista_CSS
-                 (lleva sus <style>...</style>).
-                 R70: "Compartir lista" ALINEADO A LA DERECHA
-                 (orden del dueño): competía con el PRIMER TÍTULO
-                 de la lista — los dos arrancaban en el mismo
-                 canto izquierdo. Ahora el botón es block-level
-                 con margin-left auto (inline-flex no obedece al
-                 auto): se pega al borde derecho con el mismo aire
-                 de la lista (padding derecho 18px) y el canto
-                 izquierdo queda LIBRE para el título. El aviso
-                 "No se encontraron resultados" sigue a la
-                 izquierda (es un aviso, no una acción).
-                 R67: comentario — el sheet se renombra a
-                 Orden_Sheet_* (orden del dueño). Sin estilos.
-                 R66: entra la CABECERA DE GRUPO (.lista-grupo-
-                 header): con el orden "Por categoría"
-                 (Orden_Sheet) Lista_Script intercala el
-                 rótulo del grupo al abrir cada bloque —
-                 mayúsculas pequeñas, gris tenue, sin ruido; el
-                 primero no necesita aire arriba.
-                 R65: el bloque de items RECIBE a dos piezas que
-                 ya no son sección filtro: "Compartir lista"
-                 (antes "Compartir lista filtrada", en Chips_CSS)
-                 con la CANTIDAD de items al lado — Compartir
-                 lista (8) — y el aviso "No se encontraron
-                 resultados". Ambos viven DENTRO de .secciones-
-                 wrap, encima de la lista (scroll con los items,
-                 como el bloque que son); en modo detalle se
-                 ocultan con el resto.
-                 R64: item LIMPIO — fuera la caja (background
-                 transparente, sin borde, sin sombra, sin radio
-                 y sin separación por aire): la división entre
-                 items es una línea tenue (border-bottom #eef2f7
-                 y el último item sin línea); FUERA la segunda
-                 fila (el subtítulo y su divisoria interna
-                 murieron con todo su CSS y el espejo del
-                 skeleton) y FUERA el check verificado verde del
-                 partner; padding simétrico sutil (13px) para
-                 que la división se note sin separar el item de
-                 sí mismo.
-                 R62: sin franja colorOficial (fuera el ::before
-                 y su espejo del skeleton); título del item sin
-                 bold y más grande (16px/400, mismo tratamiento
-                 que el de las promos); nombre del partner sin
-                 bold (600→400); FUERA la fila "Explorar"
-                 (.lista-encabezado, .lista-contador,
-                 .modo-vista y .mv-btn con todo su responsive).
-                 R60: el bloque modo-detalle oculta la FILA
-                 COMPLETA de filtros (.filtros-fila — chips,
-                 ciudad, campo y filtro son hijos de esas
-                 filas); la excepción del post compartido vive
-                 en Chips_CSS con mayor especificidad.
-                 R59: "Ver publicación" en NARANJA oficial
-                 #f97316 (la flecha hereda por currentColor);
-                 avatar del partner SIN BORDES.
-                 R56: estrella en fila horizontal (glifo +
-                 contador a su derecha) y amarilla #fbbf24,
-                 anclada absolute a la esquina — deja de reservar
-                 carril; "Ver detalles" en peso normal (sin
-                 bold); la fila del título reserva 44px para no
-                 chocar con la estrella (la promo no reserva).
-DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
-                 Index.html; base .lista-item re-estilizada por
-                 Promo_CSS.html, que aporta la regla .badge)
-════════════════════════════════════════════════════════════════════*/
+RESPONSABILIDAD: CSS del menú lista: botón volver, título de
+                 categoría, alternancia lista ↔ detalle con fade,
+                 items con línea tenue (título .subtitulo +
+                 estrella métrica + fila del partner con "Ver
+                 publicación" naranja), cabecera de grupo,
+                 botón "Compartir lista" alineado a la derecha,
+                 avisos y skeletons de lista y detalle.
+VERSIÓN:         2.10
+CAMBIOS:         R77: El título del item pasa a la clase maestra
+                 .subtitulo (Lista_Script): aquí solo queda el
+                 recorte a 2 líneas; el tamaño/peso/color lo pone
+                 el Core. Se retira el override muerto de .titulo.
+                 Encabezado saneado: solo queda lo vigente.
+DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
+                 Index.html (estructura), Promo_CSS.html (regla
+                 .badge re-estilizada)
+══════════════════════════════════════════════════════════════════*/
+
   /* ============================================================
      BOTÓN VOLVER
      ============================================================ */
@@ -292,7 +203,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
 
     padding: 8px 16px 10px;
 
-    font-size: 0.82rem;
+    font-size: var(--size-ui-3);
     font-weight: 500;
     line-height: 1.3;
     letter-spacing: -0.1px;
@@ -305,8 +216,8 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .buscar-vacio[hidden] { display: none; }
 
   @media (max-width: 360px) {
-    .btn-compartir { font-size: 13px; padding: 3px 16px 5px 4px; }
-    .buscar-vacio { font-size: 0.78rem; padding: 7px 14px 9px; }
+    .btn-compartir { font-size: var(--size-enlaces); padding: 3px 16px 5px 4px; }
+    .buscar-vacio { font-size: var(--size-ui-2); padding: 7px 14px 9px; }
   }
 
   /* ============================================================
@@ -320,7 +231,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   .lista-grupo-header {
     padding: 12px 18px 4px;
 
-    font-size: 0.72rem;
+    font-size: var(--size-ui-1);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -431,17 +342,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     padding-right: 44px;
   }
 
-  /* Título (R62) · MISMO TRATAMIENTO que el título de las
-     promos: SIN bold y más grande. Recorte a 2 líneas. La
-     segunda fila (el subtítulo) DESAPARECIÓ en R64: la fila
-     del título es la única del texto. La promo no usa esta
-     vía: su tarjeta se pinta entera en Promo_CSS. */
-  .lista-item .titulo {
-    font-size: 16px;
-    font-weight: 400;
-    color: #1f2937;
-    letter-spacing: -0.01em;
-    line-height: 1.3;
+  /* Título del item · R77: la voz la pone la maestra .subtitulo
+     (Core_CSS); aquí solo el recorte a 2 líneas y el carril. */
+  .lista-item .subtitulo {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -480,9 +383,9 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 13px;
-    font-weight: 400;
-    color: #1f2937;
+    font-size: var(--size-enlaces);
+    font-weight: var(--weight-enlaces);
+    color: var(--color-textoPrimario);
     min-width: 0;
   }
   .lista-item .marca .marca-texto {
@@ -510,10 +413,10 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 13px;
-    font-weight: 400;
+    font-size: var(--size-enlaces);
+    font-weight: var(--weight-enlaces);
     letter-spacing: 0.01em;
-    color: #f97316;
+    color: var(--color-enlaces);
     white-space: nowrap;
   }
   .lista-item .ver-glifo {
@@ -728,8 +631,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
   @media (max-width: 360px) {
     .lista-item { padding: 12px 14px; }
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
-    .lista-item .estrella-num { font-size: 11px; }
-    .lista-item .titulo { font-size: 15px; }
+    .lista-item .estrella-num { font-size: var(--size-cita); }
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }

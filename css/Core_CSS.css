@@ -1,141 +1,53 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS núcleo del lienzo. Área de contenido (fondo
-                 dinámico) + fila CTA del post: píldora naranja
-                 semi-transparente (estilo Instagram del dueño)
-                 y, cuando el post declara duda, la fila se
-                 vuelve UNA sola píldora dividida (.segmentada):
-                 duda secundaria a la izquierda (texto gris
-                 medio que no compite con el CTA) + CTA principal
-                 a la derecha, con borde hairline translúcido.
-                 Incluye la fila del partner estilo Instagram
-                 (divisoria a sangre, de borde a borde) y el
-                 estado deshabilitado en naranja tenue para
-                 cursos "pronto". R63: el TÍTULO INICIAL vive en
-                 la MISMA FILA que el menú global (título a la
-                 izquierda, menú a la derecha) y un 15% MÁS
-                 PEQUEÑO — la fila entera gana aire para la
-                 lista.
-VERSIÓN:         2.7
-CAMBIOS:         R74: LAS FRANJAS FUERA DEL PINTADO — EL DEGRADADO
-                 ES SOLO DEL LIENZO. Orden del dueño: "eso es el lienzo
-                 de la app, no incluye la franja de arriba ni la de
-                 abajo, corrigelos... comienza en blanco naranja y
-                 blanco justo como esta documentado". SALE LA VELA FIJA
-                 SUPERIOR (::before) y la imagen del body con tope
-                 naranja: el documento queda BLANCO LISO y viste las
-                 DOS franjas del sistema sin pintura (la de abajo ya
-                 venía blanca desde R71 y no se toca; las dos piezas
-                 retiradas quedan COMENTADAS dentro para revertir en
-                 una jugada). El pintado queda SOLO en el lienzo, donde
-                 Core_Script 1.26 ya trae el degradado documentado:
-                 blanco arriba (0–5%) → tinte #fdf3ec (15%) → SE
-                 DETIENE casi en los botones de la fila de filtros
-                 (24%) → blanco limpio para la lista (desde 36%).
-                 .phone/.glass/.safari transparentes, safe-areas R68,
-                 título, CTA, partner y el resto del archivo: INTACTOS.
-                 R71: EL DEGRADADO POR FIN DONDE DEBE — ARRIBA. Diagnóstico
-                 probado con la captura del dueño (muestreo píxel a
-                 píxel): iOS toma EL MISMO color de fondo del documento
-                 para las DOS franjas del sistema; con #fdf3ec (R70)
-                 arriba no se ve nada ("el lienzo sin color") y abajo el
-                 efecto de borde de iOS 26 lo tiñe cálido ("el degradado
-                 se ve en la franja de abajo en vez de arriba"). Ahora:
-                 fondo del documento BLANCO (franja de abajo neutral de
-                 una vez) + VELA FIJA SUPERIOR body.is-mobile::before
-                 (naranja suave #fed7aa degradado a nada, siempre
-                 pintada aunque la lista scrollee, por debajo de los
-                 sheets y sin robar toques) + degradado del body con
-                 tope naranja. El degradado del LIENZO lo refuerza
-                 Core_Script 1.24 (mismo tono, blanco antes de la
-                 lista). La franja de abajo y el resto del archivo:
-                 INTACTOS.
-                 R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
-                 R70 pegaba este CSS sin las etiquetas <style> propias
-                 que TODO fragmento GAS trae desde siempre: el
-                 include() lo vertía como TEXTO en la página y el GAS
-                 quedaba en blanco (el dueño lo vivió como "los
-                 archivos llegaron malos / no me dejan cargar nada").
-                 El cuerpo NO cambia una línea: sigue el fix R70
-                 completo. En GAS: pega el archivo COMPLETO en el
-                 archivo Core_CSS (lleva sus <style>...</style>).
-                 R70: FIX DEFINITIVO de la franja superior (3.er
-                 intento, causa raíz COMPLETA): el degradado del
-                 body de R69 quedaba TAPADO por tres capas blancas
-                 (.phone #fff !important de R63, .glass #fff y
-                 .safari #fff del style inline del index) y el body
-                 solo llevaba background-IMAGE sin background-COLOR:
-                 iOS no puede derivar un color sólido del canvas de
-                 una imagen → franja blanca. Ahora el body lleva
-                 background-COLOR #fdf3ec (lo que iOS pinta en la
-                 franja de Safari) + el degradado encima, y .phone,
-                 .glass y .safari quedan TRANSPARENTES en móvil:
-                 nada tapa el degradado. La PWA instalada hay que
-                 BORRARLA y REINSTALARLA (iOS cachea el modo). El
-                 resto del archivo intacto (safe-areas del área,
-                 título, CTA, partner).
-                 R69: el fondo del documento móvil cargaba el
-                 degradado del lienzo (clarito #fdf3ec arriba,
-                 blanco desde 30%) — iba bien ENCIMA pero las capas
-                 blancas de la carcasa lo tapaban.
-                 R68: .area-contenido respira con las SAFE-AREAS:
-                 padding-top env(safe-area-inset-top) y
-                 padding-bottom env(safe-area-inset-bottom). Con
-                 las metas apple (black-translucent) de la página
-                 de GitHub, el DEGRADADO del lienzo pinta DETRÁS
-                 de la barra de estado en la PWA (clarito arriba,
-                 orden del dueño) y el blanco llega hasta la
-                 franja de abajo (home bar). En Safari/Chrome del
-                 navegador ambas medidas son 0: ni se enteran.
-                 R63: .titulo-header baja de fila propia a la
-                 FILA DE CABECERA (h1 dentro de .filtros-wrap,
-                 flex 1): 36→30.6px (−15%, orden del dueño), peso
-                 300 intacto, clamp a 2 líneas intacto; en modo
-                 detalle sigue oculto (regla de Lista_CSS) y el
-                 par volver/título toma la fila. El hueco que
-                 dejaba su fila propia es LISTA GANADA.
-                 R62: .titulo-header pierde TODO el grosor que
-                 le quedaba (400→300): a su tamaño, el peso
-                 ligero es lo elegante (orden del dueño: "aun se
-                 nota muy rustico").
-                 R61: .titulo-header ganó el TAMAÑO DEFINITIVO
-                 del dueño — +20% (30→36px) y la mitad de bold
-                 (700→400); .area-contenido perdió el GRIS
-                 BÁSICO #e5e7eb del respaldo (la caja donde
-                 viven las promos se veía gris antes del pintado
-                 del lienzo) y ahora respalda con el tinte
-                 #fdf3ec del lienzo R57.
-                 R60: .titulo-header ganó aire y presencia —
-                 menos bold (800→700) y MÁS GRANDE (26→30px),
-                 con más padding arriba y abajo para que respire
-                 sin ruido.
-                 R52: el texto "Consultar" de la duda sale en
-                 GRIS MEDIO (#64748b) en los dos estados (píldora
-                 segmentada y duda suelta) — ya NO usa el
-                 colorOficial del post, que cuando es resaltante
-                 competía con el CTA naranja. El borde hairline
-                 del color del post (R51) se queda igual.
-                 R51: divisoria del partner de borde a borde (5%)
-                 y borde hairline de la píldora (color-mix 38%).
-                 R50: CTA translúcido rgba(0.87) + píldora
-                 dividida (.segmentada que pinta Core_Script).
-                 R49: fila .user-fila del partner (avatar +
-                 punto + eslogan, sin chevron). R46: la duda
-                 nunca se deshabilita; fila y partner ocultas
-                 en modo lista.
-DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
-                 usadas por el modo móvil body.is-mobile)
-════════════════════════════════════════════════════════════════════*/
+RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía
+                 maestra y de la voz única de los placeholders.
+VERSIÓN:         2.9.0
+CAMBIOS:         R77: (1) Regla maestra de PLACEHOLDERS: todos los
+                 placeholder de la app hablan con la voz de
+                 textoSecundario (14px / 300 / #64748B) desde esta
+                 única regla en ::placeholder.
+                 (2) Encabezado saneado: solo queda lo vigente.
+DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
+══════════════════════════════════════════════════════════════════*/
+
   *{ box-sizing: border-box; }
+
+  /* ============================================================
+     VARIABLES GLOBALES DE TIPOGRAFÍA
+     ============================================================ */
+  :root {
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    --size-tituloPost: 24px;      --weight-tituloPost: 300;      --color-tituloPost: #1f2937;
+    --size-titulo: 22px;          --weight-titulo: 300;          --color-titulo: #1f2937;
+    --size-subtitulo: 18px;       --weight-subtitulo: 300;       --color-subtitulo: #1f2937;
+    --size-textoPrimario: 14px;   --weight-textoPrimario: 300;   --color-textoPrimario: #1f2937;
+    --size-textoSecundario: 14px; --weight-textoSecundario: 300; --color-textoSecundario: #64748B;
+    --size-cita: 11px;            --weight-cita: 400;            --color-cita: #1f2937;
+    --size-enlaces: 13px;         --weight-enlaces: 400;         --color-enlaces: #f97316;
+    --size-botonPrimario: 16px;   --weight-botonPrimario: 400;   --color-botonPrimario: #FFFFFF;
+    --size-botonSecundario: 16px; --weight-botonSecundario: 400; --color-botonSecundario: #7A828A;
+    --size-badge: 9px;            --weight-badge: 700;
+
+    /* ============================================================
+       FAMILIA UI · tamaños recurrentes de sheets y controles
+       (referencia única: cambiar aquí cambia todo el sistema)
+       ============================================================ */
+    --size-ui-1: 0.72rem;
+    --size-ui-2: 0.78rem;
+    --size-ui-3: 0.82rem;
+    --size-ui-4: 0.88rem;
+    --size-ui-5: 0.94rem;
+  }
 
   html, body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                 "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-main) !important;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -149,482 +61,193 @@ DEPENDENCIAS:    Telefono.html (clases .phone/.glass/.safari/.lienzo
   }
 
   /* ============================================================
-     MODO MÓVIL
+     CLASES MAESTRAS DE TIPOGRAFÍA
+     ============================================================ */
+  .tituloPost {
+    font-size: var(--size-tituloPost) !important;
+    font-weight: var(--weight-tituloPost) !important;
+    color: var(--color-tituloPost) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px !important;
+    text-align: left !important;
+  }
+  .titulo {
+    font-size: var(--size-titulo) !important;
+    font-weight: var(--weight-titulo) !important;
+    color: var(--color-titulo) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px !important;
+    text-align: left !important;
+  }
+  .subtitulo {
+    font-size: var(--size-subtitulo) !important;
+    font-weight: var(--weight-subtitulo) !important; 
+    color: var(--color-subtitulo) !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0px !important;
+    text-align: left !important;
+  }
+  .textoPrimario, .textoPrimario p, .textoPrimario li, .textoPrimario div {
+    font-size: var(--size-textoPrimario) !important;
+    font-weight: var(--weight-textoPrimario) !important;
+    color: var(--color-textoPrimario) !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0px !important;
+  }
+  .textoPrimario strong, .textoPrimario b { font-weight: 600 !important; }
+  .textoPrimario em, .textoPrimario i { font-style: italic !important; }
+  .textoPrimario h2 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    margin: 16px 0 8px 0 !important;
+  }
+  .textoSecundario, .textoSecundario * {
+    font-size: var(--size-textoSecundario) !important;
+    font-weight: var(--weight-textoSecundario) !important;
+    color: var(--color-textoSecundario) !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0px !important;
+  }
+  .textoSecundario strong, .textoSecundario b { font-weight: 600 !important; }
+  .cita {
+    font-size: var(--size-cita) !important;
+    font-weight: var(--weight-cita) !important;
+    color: var(--color-cita) !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0px !important;
+  }
+  .enlacesOpciones {
+    font-size: var(--size-enlaces) !important;
+    font-weight: var(--weight-enlaces) !important;
+    color: var(--color-enlaces) !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    text-decoration: underline !important;
+    text-decoration-style: dotted !important;
+    text-decoration-thickness: 1.5px !important;
+    text-underline-offset: 4px !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    align-self: flex-start !important;
+  }
+  .botonPrimario {
+    font-size: var(--size-botonPrimario) !important;
+    font-weight: var(--weight-botonPrimario) !important;
+    color: var(--color-botonPrimario) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.1px !important;
+  }
+  .botonSecundario {
+    font-size: var(--size-botonSecundario) !important;
+    font-weight: var(--weight-botonSecundario) !important;
+    color: var(--color-botonSecundario) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.1px !important;
+  }
+  .badge {
+    font-size: var(--size-badge) !important;
+    font-weight: var(--weight-badge) !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* ============================================================
+     PLACEHOLDERS · voz única en toda la app (R77)
+     Todos los placeholder hablan como textoSecundario: una sola
+     regla aquí manda sobre Buscar, Reserva, Q&A y los que vengan.
+     ============================================================ */
+  ::placeholder {
+    color: var(--color-textoSecundario) !important;
+    font-weight: var(--weight-textoSecundario) !important;
+    font-size: var(--size-textoSecundario) !important;
+    opacity: 1 !important;
+  }
+  ::-webkit-input-placeholder {
+    color: var(--color-textoSecundario) !important;
+    font-weight: var(--weight-textoSecundario) !important;
+    font-size: var(--size-textoSecundario) !important;
+    opacity: 1 !important;
+  }
+
+  /* ============================================================
+     MODO MÓVIL Y LIENZO (Restaurado)
      ============================================================ */
   body.is-mobile {
     display: block !important;
     padding: 0 !important;
-    /* R74 · LAS FRANJAS FUERA DEL PINTADO (orden del dueño:
-       "eso es el lienzo de la app, no incluye la franja de
-       arriba ni la de abajo, corrigelos"). El documento queda
-       BLANCO LISO: ese color es el que iOS usa para vestir las
-       DOS franjas del sistema — la de abajo ya venía neutral
-       desde R71 y NO se toca; en la de arriba SALE la vela
-       fija y el tope naranja. El pintado vive SOLO en el
-       lienzo — Core_Script 1.26: blanco arriba (0–5%), tinte
-       #fdf3ec en 15%, SE DETIENE casi en los botones de la
-       fila de filtros (24%) y blanco limpio desde 36%. En la
-       PWA la barra de estado queda blanca: el lienzo empieza
-       en blanco detrás de ella (safe-areas R68 intactas).
-       NOTA PWA: iOS cachea el modo al instalar — si algo no
-       obedece, BORRAR la app y VOLVERLA A INSTALAR.
-       REVERSIÓN R71 (una jugada): descomentar la imagen de
-       abajo y el bloque ::before siguiente. */
-    background: #ffffff !important; /* shorthand: color + SIN imagen (el radial oscuro de PC no se asoma en móvil) */
-    /* background-image: linear-gradient(180deg, #fed7aa 0%, #fdf3ec 12%, #ffffff 30%, #ffffff 100%) !important;
-       background-repeat: no-repeat !important; */
+    background: #ffffff !important;
     color: #000;
   }
-  /* R74 · VELA FIJA SUPERIOR RETIRADA (R71 la puso para que
-     el tope se viera naranja siempre; R74 la sale porque el
-     dueño pidió las franjas SIN pintura — el degradado es
-     del lienzo, no de las franjas). Queda COMENTADA para
-     revertir en una jugada.
-  body.is-mobile::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: calc(env(safe-area-inset-top, 0px) + 52px);
-    background: linear-gradient(180deg, #fed7aa 0%, rgba(254, 215, 170, 0) 100%);
-    pointer-events: none;
-    z-index: 40;
-  }
-  */
   body.is-mobile .phone {
-    width: 100% !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    /* R70: era #fff !important — la capa que TAPABA el
-       degradado del documento (causa principal de la franja
-       blanca). Transparente: el fondo del body manda. */
-    background: transparent !important;
-    box-shadow: none !important;
+    width: 100% !important; height: 100vh !important; min-height: 100vh !important;
+    border-radius: 0 !important; padding: 0 !important;
+    background: transparent !important; box-shadow: none !important;
   }
-  /* R70: el style inline del index pinta .glass y .safari de
-     blanco — en móvil quedan transparentes (tapaban el
-     degradado del body igual que el .phone). En PC siguen
-     intactos (el style inline no lleva !important: gana esta
-     regla solo dentro de body.is-mobile). */
-  body.is-mobile .glass {
-    border-radius: 0 !important;
-    background: transparent !important;
-  }
-  body.is-mobile .safari {
-    top: 0 !important;
-    background: transparent !important;
-  }
-  body.is-mobile .btn,
-  body.is-mobile .notch,
-  body.is-mobile .status,
-  body.is-mobile .safari-bottom,
-  body.is-mobile .home-bar { display: none !important; }
-  body.is-mobile .lienzo {
-    width: 100% !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-  }
+  body.is-mobile .glass { border-radius: 0 !important; background: transparent !important; }
+  body.is-mobile .safari { top: 0 !important; background: transparent !important; }
+  body.is-mobile .btn, body.is-mobile .notch, body.is-mobile .status,
+  body.is-mobile .safari-bottom, body.is-mobile .home-bar { display: none !important; }
+  body.is-mobile .lienzo { width: 100% !important; height: 100vh !important; max-height: 100vh !important; }
 
-  /* ============================================================
-     LIENZO
-     ============================================================ */
-  .lienzo-wrap {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
+  .lienzo-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
 
-  /* ============================================================
-     TÍTULO INICIAL (R63 · EN LA FILA DE CABECERA) · la frase
-     que viene de la BD real (ROOTJSON → app.tituloHeader — un
-     VECTOR: una frase al azar por carga, lo pinta
-     Core_Script). VIVE DENTRO de .filtros-wrap: título a la
-     izquierda y MENÚ GLOBAL a la derecha en UNA sola fila —
-     el hueco de su fila propia es lista ganada. R63: 36→30.6px
-     (−15%, orden del dueño); peso 300 intacto. Dos líneas
-     máximo; si la BD no lo trae, Core_Script lo deja oculto
-     ([hidden]). En modo detalle queda oculto (Lista_CSS) y la
-     fila la toman volver + título de categoría.
-     ============================================================ */
   .titulo-header {
-    flex: 1 1 auto;
-    min-width: 0;
-    margin: 0;
-    padding: 2px 0 2px 8px;
-
-    font-family: inherit;
-    font-size: 30.6px;
-    font-weight: 300;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    color: #1f2937;
-    text-align: left;
-
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    flex: 1 1 auto; min-width: 0; margin: 0; padding: 2px 0 2px 8px;
+    font-size: 30.6px; font-weight: 300; line-height: 1.15; letter-spacing: -0.01em;
+    color: #1f2937; text-align: left;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .titulo-header[hidden] { display: none; }
 
-  @media (max-width: 360px) {
-    .titulo-header { font-size: 26.4px; padding-left: 6px; }
-  }
-
-  /* ============================================================
-     ÁREA DE CONTENIDO — degradado + color heredable
-     R61 · el respaldo ya NO es el gris básico #e5e7eb: era el
-     gris que se veía en la caja de las promos antes del
-     pintado del lienzo. Ahora respalda con el TINTE del
-     lienzo (#fdf3ec, R57) — Core_Script pinta encima su
-     degradado (blanco 0–5% + tinte) en el arranque.
-     R68 · SAFE-AREAS: en la PWA de iOS (black-translucent)
-     el lienzo sube hasta la barra de estado — el clarito
-     pinta detrás de ella y el contenido empuja hacia abajo
-     con env(safe-area-inset-top); abajo el blanco llega a la
-     franja del sistema con env(safe-area-inset-bottom). En
-     el navegador (Safari/Chrome móvil y PC) ambas env() son
-     0: ni se enteran.
-     ============================================================ */
   .area-contenido {
-    flex: 1 1 auto;
-    min-height: 0;
-
-    background: #fdf3ec;
-    color: #1f2937;
-
-    display: flex;
-    flex-direction: column;
-
-    padding-top:    env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-
+    flex: 1 1 auto; min-height: 0; background: #fdf3ec; color: #1f2937;
+    display: flex; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
     transition: background 0.35s ease;
   }
 
   /* ============================================================
-     CTA · Reservar cupo / Consultar fechas
-     Alineado a la izquierda, mismo margen que el contenido
-     (26px izquierda) y misma reserva derecha (60px para los
-     íconos flotantes). Ancho = 100% - 86px.
-     R50 · Transparencia estilo Instagram (referencia del
-     dueño): el naranja oficial va en rgba al ~87% para que
-     el botón destaque sin opacar el contenido del partner;
-     sombra más suave en la misma línea.
+     CTA Y PARTNER ORIGINALES (Restaurados)
      ============================================================ */
   .cta-reservar {
-    flex-shrink: 0;
-
-    width: calc(100% - 86px);
-    margin: 4px 60px 16px 26px;
-    padding: 14px 22px;
-
-    border: none;
-    border-radius: 999px;
-
-    background: rgba(249, 115, 22, 0.87);
-    color: #ffffff;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24),
-                0 3px 8px rgba(15, 23, 42, 0.10);
-
-    transition: transform 0.15s ease, background-color 0.2s ease,
-                box-shadow 0.2s ease;
+    flex-shrink: 0; width: calc(100% - 86px); margin: 4px 60px 16px 26px;
+    padding: 14px 22px; border: none; border-radius: 999px;
+    background: rgba(249, 115, 22, 0.87); color: #ffffff;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24), 0 3px 8px rgba(15, 23, 42, 0.10);
+    transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   }
+  .cta-reservar:active { transform: scale(0.97); background: rgba(234, 88, 12, 0.92); }
+  .cta-reservar-texto { flex: 1; text-align: left; }
+  .cta-reservar-icono { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+  .cta-reservar-icono svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
-  .cta-reservar:active {
-    transform: scale(0.97);
-    background: rgba(234, 88, 12, 0.92);
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.26),
-                0 2px 4px rgba(15, 23, 42, 0.10);
-  }
-
-  .cta-reservar-texto {
-    flex: 1;
-    text-align: left;
-  }
-
-  .cta-reservar-icono {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-  }
-
-  .cta-reservar-icono svg {
-    width: 100%;
-    height: 100%;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ============================================================
-     CTA · estado deshabilitado
-     ============================================================ */
-  .cta-reservar:disabled {
-    background: rgba(253, 186, 116, 0.9);
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.16),
-                0 2px 6px rgba(15, 23, 42, 0.06);
-    cursor: not-allowed;
-  }
-
-  .cta-reservar:disabled:active {
-    transform: none;
-    background: rgba(253, 186, 116, 0.9);
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.16),
-                0 2px 6px rgba(15, 23, 42, 0.06);
-  }
-
-  /* ============================================================
-     FILA CTA (R46) · duda a la izquierda + CTA a la derecha
-     La fila toma el ancho/márgenes que antes tenía el CTA solo.
-     La duda: outline FINO de 1px en el color del post, fondo
-     transparente, TEXTO EN GRIS MEDIO (R52: no compite con el
-     CTA aunque el color del post sea resaltante), no se
-     deshabilita nunca (si el post es modo WhatsApp,
-     Core_Script la oculta).
-     ============================================================ */
   .cta-fila {
-    flex-shrink: 0;
-    display: flex;
-    align-items: stretch;
-    gap: 10px;
-    width: calc(100% - 86px);
-    margin: 4px 60px 16px 26px;
+    flex-shrink: 0; display: flex; align-items: stretch; gap: 10px;
+    width: calc(100% - 86px); margin: 4px 60px 16px 26px;
   }
+  .cta-fila .cta-reservar { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
 
-  .cta-fila .cta-reservar {
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 0;
-    margin: 0;
-  }
-
-  /* ============================================================
-     FILA CTA · PÍLDORA SEGMENTADA (R50)
-     Cuando la duda está visible, Core_Script pone la clase
-     .segmentada y la fila se vuelve UN solo botón dividido
-     (split pill del dueño): contenedor píldora con borde
-     hairline del color del post; duda secundaria a la
-     IZQUIERDA (fondo transparente, texto GRIS MEDIO — R52:
-     sin el color del post para que no compita con el CTA)
-     y CTA principal a la DERECHA. Los rellenos van rectos
-     (radius 0) y el overflow del contenedor recorta las
-     esquinas; el brillo naranja sube al contenedor para que
-     la píldora brille completa.
-     R51 · borde hairline: 1px al ~38% de opacidad con
-     color-mix (línea fina que no compite con el contenido);
-     la declaración previa con el color pleno queda como
-     fallback para navegadores sin color-mix. Sombra más
-     suave en la misma línea minimalista.
-     ============================================================ */
-  .cta-fila.segmentada {
-    gap: 0;
-    padding: 0;
-
-    border: 1px solid var(--post-color, #64748b);
-    border-color: color-mix(in srgb, var(--post-color, #64748b) 38%, transparent);
-    border-radius: 999px;
-    overflow: hidden;
-
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.14),
-                0 3px 8px rgba(15, 23, 42, 0.06);
-  }
-
-  .cta-fila.segmentada .cta-duda {
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    color: #64748b;
-  }
-
-  .cta-fila.segmentada .cta-reservar {
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .cta-fila.segmentada .cta-reservar:active {
-    transform: none;
-    background: rgba(234, 88, 12, 0.92);
-  }
-
-  .cta-duda {
-    flex: 0 0 auto;
-    max-width: 46%;
-    padding: 14px 18px;
-
-    border: 1px solid var(--post-color, #64748b);
-    border-radius: 999px;
-    background: transparent;
-    color: #64748b;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.15s ease;
-  }
-
-  .cta-duda:active { opacity: 0.55; }
-
-  .cta-duda[hidden] { display: none; }
-
-  body.modo-lista .cta-fila,
-  body.modo-lista .user-fila { display: none !important; }
-
-  /* ============================================================
-     FILA PARTNER (R49) · estilo Instagram bajo la fila CTA.
-     Avatar circular 44px con borde del color del post + glifo
-     user + punto con anillo blanco (mismo patrón de la
-     campanita de la promo). Nombre del partner en negrita y
-     su eslogan como subtítulo gris, ambos a la izquierda y
-     con elipsis si no caben. Sin chevron (decisión del dueño:
-     fricción con la flecha del CTA). Social_Script llena
-     textos y decide visibilidad ([hidden]); en modo lista se
-     oculta con la fila CTA (regla de arriba).
-     R51 · divisoria a sangre (del dueño): la fila ocupa el
-     100% del ancho y el aire de siempre pasa a padding
-     interno (26px izq / 60px der), así la línea divisoria
-     corre de borde a borde de la pantalla. Línea más sutil
-     (5% en vez de 8%) para que se sienta hairline y no un
-     marco. El título del partner va en el color oficial del
-     post (var --post-color).
-     ============================================================ */
   .user-fila {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    margin: 0 0 12px;
-    padding: 12px 60px 0 26px;
-
-    background: transparent;
-    border: none;
-    border-top: 1px solid rgba(15, 23, 42, 0.05);
-    text-align: left;
-    font-family: inherit;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.15s ease;
+    display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 12px;
+    padding: 12px 60px 0 26px; background: transparent; border: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.05); text-align: left; font-family: inherit;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.15s ease;
   }
-  .user-fila[hidden] { display: none; }
   .user-fila:active { opacity: 0.6; }
-
   .user-avatar {
-    flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1.6px solid var(--post-color, #475569);
-    background: transparent;
-    color: var(--post-color, #475569);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%;
+    border: 1.6px solid var(--post-color, #475569); background: transparent;
+    color: var(--post-color, #475569); display: flex; align-items: center; justify-content: center;
     position: relative;
   }
-  .user-avatar svg {
-    width: 22px;
-    height: 22px;
-    display: block;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .user-punto {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--post-color, #475569);
-    box-shadow: 0 0 0 2px #ffffff;
-  }
-
-  .user-info {
-    flex: 1;
-    min-width: 0;
-    text-align: left;
-  }
-  .user-nombre {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.25;
-    color: var(--post-color, #1f2937);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .user-eslogan {
-    display: block;
-    font-size: 12px;
-    line-height: 1.3;
-    margin-top: 2px;
-    color: #64748b;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .user-eslogan[hidden] { display: none; }
-
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
-  @media (max-width: 360px) {
-    .cta-fila {
-      width: calc(100% - 74px);
-      margin: 4px 52px 16px 22px;
-    }
-    .cta-fila .cta-reservar {
-      padding: 13px 18px;
-      font-size: 14px;
-    }
-    .cta-duda {
-      padding: 13px 14px;
-      font-size: 14px;
-    }
-    .user-fila {
-      width: 100%;
-      margin: 0 0 10px;
-      padding: 12px 52px 0 22px;
-      gap: 10px;
-    }
-    .user-avatar { width: 40px; height: 40px; }
-    .user-avatar svg { width: 20px; height: 20px; }
-  }
+  .user-avatar svg { width: 22px; height: 22px; display: block; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .user-punto { position: absolute; bottom: 4px; right: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--post-color, #475569); box-shadow: 0 0 0 2px #ffffff; }
+  .user-info { flex: 1; min-width: 0; text-align: left; }
+  .user-nombre { display: block; font-size: 14px; font-weight: 700; line-height: 1.25; color: var(--post-color, #1f2937); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-eslogan { display: block; font-size: 12px; line-height: 1.3; margin-top: 2px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

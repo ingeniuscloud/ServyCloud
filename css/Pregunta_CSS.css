@@ -1,0 +1,145 @@
+/*══════════════════════════════════════════════════════════════════
+ARCHIVO:         Pregunta_CSS.html
+ESPEJO GITHUB:   github/css/Pregunta_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
+                 lienzo (con enviar, X de limpiar, contador y aviso),
+                 vista previa de las últimas preguntas con fade y el
+                 sheet al 90% para ver todas las preguntas.
+VERSIÓN:         1.0.0
+CAMBIOS:         R77: Nace el archivo. El Q&A se maneja completo en
+                 el lienzo (sin sheet para escribir) y el sheet queda
+                 solo para ver todas las preguntas, igual que "Ver
+                 descripción completa": solo lectura, sin botones
+                 internos. Placeholder con la voz de textoSecundario,
+                 enlace con .enlacesOpciones, contador y aviso con
+                 .cita. Sin borrado y sin nombre de quien pregunta.
+DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
+                 Seccion_CSS.html (infra .mk-sheet-* del sheet),
+                 Social_CSS.html (colores del post vía --post-color)
+══════════════════════════════════════════════════════════════════*/
+
+  /* ============================================================
+     SECCIÓN Q&A EN EL LIENZO
+     ============================================================ */
+  .mk-qa-section { padding: 20px 5%; }
+
+  .mk-qa-titulo { margin: 0 0 14px 0; }
+
+  /* ============================================================
+     CAMPO DE PREGUNTA · mismo lenguaje que el Buscar del lienzo
+     ============================================================ */
+  .preg-form {
+    display: flex; align-items: flex-end; gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .preg-input-wrap {
+    flex: 1; min-width: 0; position: relative; display: flex; align-items: center;
+    border: 1.5px solid #e2e8f0; border-radius: 999px;
+    background-color: #f8fafc; transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .preg-input-wrap.foco { background-color: #ffffff; border-color: #cbd5e1; }
+
+  .preg-input {
+    flex: 1; min-width: 0; height: 42px; padding: 0 14px;
+    border: none; background: transparent;
+    font-family: inherit; font-size: var(--size-textoPrimario); font-weight: 400;
+    color: #0f172a; outline: none;
+  }
+  .preg-input::-webkit-scrollbar { display: none; }
+
+  /* X de limpiar: solo con texto; limpia y quita el foco (como el Buscar) */
+  .preg-clear {
+    display: none; align-items: center; justify-content: center;
+    width: 28px; height: 28px; margin-right: 7px; flex-shrink: 0;
+    border: none; border-radius: 50%; background-color: #f97316; color: #ffffff;
+    cursor: pointer; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .preg-clear svg { width: 14px; height: 14px; display: block; }
+  .preg-input-wrap.con-texto .preg-clear { display: flex; }
+
+  .preg-send {
+    width: 42px; height: 42px; flex-shrink: 0; padding: 0;
+    border: none; border-radius: 50%; background-color: #f97316; color: #ffffff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(249, 115, 22, 0.30);
+    transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .preg-send:active { transform: scale(0.92); }
+  .preg-send:disabled { opacity: 0.35; background-color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+  .preg-send svg { width: 19px; height: 19px; display: block; margin-left: 1px; }
+
+  /* ============================================================
+     FILA INFERIOR · aviso corto bajo el campo + contador bajo enviar
+     ============================================================ */
+  .preg-meta {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 0 2px; margin-bottom: 4px;
+  }
+  .preg-aviso { flex: 1; min-width: 0; }
+
+  .preg-counter {
+    flex-shrink: 0; min-width: 26px; text-align: right;
+    font-size: var(--size-cita) !important; font-weight: 400 !important;
+    color: #64748b !important; transition: color 0.2s ease;
+  }
+  .preg-counter.warn   { color: #ea580c !important; }
+  .preg-counter.danger { color: #dc2626 !important; }
+
+  /* ============================================================
+     VISTA PREVIA · última pregunta y penúltima con fade
+     ============================================================ */
+  .mk-qa-preview {
+    display: flex; flex-direction: column;
+    text-align: left;
+  }
+  .mk-qa-preview:empty { display: none; }
+
+  .mk-qa-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+  }
+  .mk-qa-item:first-child { padding-top: 6px; }
+  .mk-qa-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .mk-qa-question { margin: 0; text-align: left; }
+
+  /* Fade del penúltimo: indica que hay más en el sheet */
+  .mk-qa-item.preg-fade .mk-qa-question {
+    display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+    -webkit-line-clamp: 3;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 92%);
+            mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 92%);
+  }
+
+  .mk-qa-vertodas-wrap { text-align: left; margin-top: 10px; }
+  .mk-qa-vertodas-wrap[hidden] { display: none; }
+
+  /* ============================================================
+     SHEET VER TODAS LAS PREGUNTAS · 90%, solo lectura
+     (infra .mk-sheet-* de Seccion_CSS; el root recorta para que
+     la sombra no se asome cuando está guardado)
+     ============================================================ */
+  .preg-root { overflow: hidden; }
+
+  .preg-sheet-content { padding: 0 5% calc(26px + env(safe-area-inset-bottom, 0px)); position: relative; }
+
+  .preg-sheet-lista { padding-top: 4px; }
+
+  .preg-sheet-item { padding: 14px 0; border-bottom: 1px solid #f1f5f9; text-align: left; }
+  .preg-sheet-item:first-child { padding-top: 2px; }
+  .preg-sheet-item:last-child { border-bottom: none; }
+
+  .preg-sheet-cargando { padding: 24px 0; }
+
+  /* Fade del final del sheet: desaparece al llegar al final del scroll */
+  .preg-sheet-fade {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+    background: linear-gradient(to top, #ffffff 22%, rgba(255, 255, 255, 0));
+    pointer-events: none; opacity: 1; transition: opacity 0.25s ease;
+  }
+  .preg-sheet-fade.fin { opacity: 0; }

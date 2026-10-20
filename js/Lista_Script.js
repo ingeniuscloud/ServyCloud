@@ -1,99 +1,33 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Lista_Script.html
-ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Menú lista. Pinta los posts filtrados por
-                 ciudad activa + chip activo, sobre TABLAS.posts
-                 cargada una sola vez. Emite 'post:change'.
-                 Escucha 'chips:change', 'buscar:change' y
-                 'ciudad:change'. Item de la vidriera (R64 ·
-                 LIMPIO): fila del título (título + estrella
-                 métrica) y fila del partner: avatar circular
-                 con la INICIAL de la marca (fondo colorClaro
-                 del post, letra colorOficial) + nombre, a la
-                 derecha "Ver publicación" (glifo flechaVer,
-                 naranja oficial, sin bold) — sin subtítulo y
-                 sin check verde (R64: la segunda fila y el
-                 check murieron). Estrella métrica PASIVA con
-                 el contador de likes (oculta en 0; glifo de
-                 Iconos); al volver del detalle se re-sincroniza
-                 con TABLAS para que el número sea siempre el
-                 mismo que dejó el corazón. DECIDE el botón
-                 "Compartir lista" (R65 · BLOQUE DE ITEMS): vive
-                 ENCIMA de la lista (dentro de .secciones-wrap,
-                 ya no es sección filtro), se muestra cuando la
-                 lista pinta items, se OCULTA cuando no y en cada
-                 repintado le escribe la CANTIDAD de items al
-                 lado (Compartir_Script lleva el envío).
-                 ORDENAMIENTO (R66): la lista ya no es siempre
-                 plana — escucha 'orden:change' (lo emite
-                 Ordenar, el sheet del botón ordenar) y aplica
-                 el orden elegido a lo que llegue del filtro:
-                 recomendado (el orden de la hoja, el de
-                 siempre), nombre A→Z / Z→A (título), categoría
-                 (agrupa por su GRUPO con cabecera visible entre
-                 bloques), más compartidos (post.comparte, ceros
-                 al final) y mejor valorados (post.like, ceros
-                 al final). El orden es de sesión.
-                 Modo lista ↔ detalle con fade y botón
-                 volver. Skeleton del detalle mientras carga la
-                 primera vez un post (PostFull). Precarga del
-                 primer post de la lista filtrada para que el
-                 primer tap sea instantáneo. Los posts que están
-                 activos como promo siguen apareciendo en la
-                 lista (no se excluyen).
-VERSIÓN:         2.6
-CAMBIOS:         R67: comentario — el sheet se renombra a
-                 Orden_Sheet_* (orden del dueño). Sin lógica.
-                 R66: entra el ORDENAMIENTO — escuchar 'orden:change'
-                 (Ordenar, Orden_Sheet_Script) y aplicar el
-                 orden en cada repintado: aplicarOrden() ordena
-                 lo que llegue del filtro (recomendado = el
-                 orden de la hoja; nombre A→Z/Z→A por título;
-                 categoría agrupa por SU GRUPO e intercala la
-                 cabecera .lista-grupo-header — estilos en
-                 Lista_CSS — entre bloques; más compartidos por
-                 post.comparte y mejor valorados por post.like,
-                 ambos con ceros al final); el orden es de
-                 SESIÓN (sin storage) y el API expone getOrden().
-                 R65: actualizarCompartir(cantidad) ahora también
-                 ESCRIBE la cantidad en el botón — "Compartir
-                 lista (N)" — y el botón/aviso viven en el BLOQUE
-                 de items (el markup se movió a .secciones-wrap
-                 en Index); renombrado el verbo: "Compartir
-                 lista".
-                 R64: montarItem LIMPIO — fuera la segunda fila
-                 (tagline), la divisoria interna y el check
-                 verificado del partner (murieron con su CSS);
-                 entra actualizarCompartir(): el botón vive con
-                 items en la lista y se esconde con la lista
-                 vacía; FUERA actualizarContador() y el envío de
-                 'buscar:resultados'.
-                 R63: respirarScroll() — cada repintado de la
-                 lista recoloca el contenedor arriba y re-evalúa
-                 su scroll (cura el "se queda pegado" del
-                 teléfono al regresar a Güiria tras cambiar de
-                 ciudad; la restauración del detalle no pasa por
-                 aquí).
-                 R60: el selector del estado abierto de la
-                 búsqueda usa .filtros-fila (la cápsula vive en
-                 la sección de filtros).
-                 R58: avatar del partner (--post-claro +
-                 inicial); título/subtítulo en color normal;
-                 "Ver detalles" pasa a "Ver publicación"; la
-                 lista se pinta PLANA.
-                 R55: fuera el cuadrado avatar, el badge y el
-                 chevron; estrella métrica pasiva (glifo estrella
-                 de Iconos, oculta en 0);
-                 sincronizarEstrellas() actualiza los contadores
-                 al cerrar el detalle.
-DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
-                 (getActual, hayPendiente), Chips_Script.html
-                 (getChipActivo, seleccionar), Core_Script.html
-                 (window.PostFull.obtener), Iconos.html
-                 (window.pintarGlifos), Lista_CSS.html,
-                 Compartir_Script.html (#btnCompartir)
-════════════════════════════════════════════════════════════════════*/
+RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
+                 filtrados por ciudad activa + chip activo sobre
+                 TABLAS.posts. Item: título (.subtitulo) + estrella
+                 métrica pasiva + fila del partner con "Ver
+                 publicación". Decide el botón "Compartir lista"
+                 con la cantidad de items. Ordenamiento por
+                 'orden:change': recomendado, nombre, categoría
+                 (con cabecera de grupo), más compartidos y mejor
+                 valorados. Modo lista ↔ detalle con fade, botón
+                 volver y skeleton. Emite 'post:change'; escucha
+                 'chips:change', 'buscar:change', 'ciudad:change'
+                 y 'orden:change'.
+VERSIÓN:         2.8
+CAMBIOS:         R77: El título del item usa la clase maestra
+                 .subtitulo (el .titulo era demasiado grande para
+                 la pantalla). Encabezado saneado: solo queda lo
+                 vigente.
+DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
+                 Index.html (SISTEMA, TABLAS), Iconos.html
+                 (pintarGlifos), Seccion_Script.html (detalle,
+                 window.Secciones), Seccion_Imagen_Script.html,
+                 Chips_Script.html, Buscar_Script.html,
+                 Ciudad_Script (window.Ciudad), Compartir_Script.html
+                 (window.Compartir), Orden_Sheet_Script.html,
+                 Core_CSS.html, Lista_CSS.html, Promo_CSS.html
+══════════════════════════════════════════════════════════════════*/
 
   window.Lista = (function () {
 
@@ -176,12 +110,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
        llegue del filtro (chip o búsqueda). El array original
        NUNCA se muta (se ordena una copia) y 'recomendado'
        devuelve el orden tal cual (el de la hoja).
-       · nombre-asc / nombre-desc: por título (es, sin acentos).
-       · categoria: por SU GRUPO (A→Z); los sin grupo van al
-         final, y dentro de cada bloque manda el título.
-       · compartido: post.comparte MAYOR→menor (ceros quedan
-         al final solos, orden del dueño).
-       · valoracion: post.like MAYOR→menor (ceros al final).
        ============================================================ */
     function aplicarOrden(arr) {
       if (!arr || arr.length < 2) return arr;
@@ -228,7 +156,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     }
 
     /* B6 · R10: escapado HTML para el contenido que viene de la
-       hoja. Mismo patrón que Comenta/Ciudad/Partner/Reserva. */
+       hoja. Mismo patrón que Ciudad/Partner/Reserva. */
     function escapeHtml(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
         return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
@@ -362,7 +290,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         var campos = normalizar(
           (p.boton    || '') + ' ' +
           (p.titulo   || '') + ' ' +
-          (p.tagline  || '') + ' ' +
           (p.id       || '') + ' ' +
           gruposTexto + ' ' +
           (partner.nombre || '') + ' ' +
@@ -458,11 +385,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     /* ============================================================
        RESPIRO DE SCROLL (R63) · tras un repintado (cambio de
        ciudad o de chip) el contenedor de la lista vuelve arriba
-       y re-evalúa su scroll: cura el "se queda pegado" que el
-       dueño vio en el teléfono al regresar a Güiria (scroll
-       interno muerto tras repintar la lista con contenido nuevo).
-       La restauración del detalle NO pasa por aquí
-       (cerrarDetalle recoloca su scroll aparte).
+       y re-evalúa su scroll.
        ============================================================ */
     function respirarScroll() {
       var wrap = document.querySelector('.secciones-wrap');
@@ -513,16 +436,13 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
         btn.className = 'lista-item';
         btn.setAttribute('data-post', post.id);
 
-        /* R58 · el colorOficial viste la letra del avatar; el
-           colorClaro su fondo. El CSS de Lista_CSS consume
-           ambas variables. */
         btn.style.setProperty('--post-color', color);
         btn.style.setProperty('--post-claro', claro);
 
         var html = '';
         html += '<span class="body">';
         html +=   '<span class="fila-titulo">';
-        html +=     '<span class="titulo">' + escapeHtml(titulo) + '</span>';
+        html +=     '<span class="subtitulo">' + escapeHtml(titulo) + '</span>';
         html +=   '</span>';
         html +=   '<span class="pie">';
         html +=     '<span class="partner-avatar" aria-hidden="true">' +
@@ -557,8 +477,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       /* R66 · se renderiza TODO lo que llega del filtro, con el
          ORDEN activo aplicado. Con "Por categoría" el agrupado
          ES el orden: se intercala una cabecera
-         .lista-grupo-header al abrir cada bloque de grupo (los
-         sin grupo van bajo "Otros", al final). */
+         .lista-grupo-header al abrir cada bloque de grupo. */
       var renderizados = [];
       var bloqueActual = null;
       var agrupando = (ordenActual === 'categoria');
@@ -652,8 +571,9 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
       window.PostFull.obtener(idPost)
         .then(function (det) {
-          post.seccionJson = det.seccionJson || {};
-          post.planJson    = det.planJson || null;
+          /* R76: postJson (antes seccionJson). planJson intacto. */
+          post.postJson = det.postJson || {};
+          post.planJson = det.planJson || null;
 
           postActivoId = idPost;
           emitirCambio(post);
@@ -694,9 +614,8 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
       setTimeout(function () {
         /* R19: si entre el cierre y este borrado (200 ms) se abrió
-           OTRO detalle (cross-sell cambia chip/ciudad y reabre a los
-           ~80 ms), el modo ya es 'detalle' de nuevo: abortar el
-           borrado para no vaciar el post nuevo. */
+           OTRO detalle, el modo ya es 'detalle' de nuevo: abortar
+           el borrado para no vaciar el post nuevo. */
         if (modo !== 'lista') return;
 
         detalle.hidden = true;
@@ -712,11 +631,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
       }, DURACION_FADE_MS);
 
       if (!desdePopstate) {
-        /* R19: marcar el popstate PROPIO de este cierre. El back()
-         es asíncrono: si el usuario (o un cross-sell) reabre un
-         detalle antes de que el popstate llegue, el listener de
-         popstate lo confundiría con un gesto de ATRÁS y cerraría
-         el post recién abierto. Con la marca se consume aquí. */
         _popstateEsperado = true;
         try { history.back(); } catch (e) {}
       }
@@ -746,8 +660,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
     function getModo() { return modo; }
 
-    /* R66 · orden activo de la vidriera ('recomendado' al
-       arrancar; lo fija el sheet de ordenamiento). */
     function getOrden() { return ordenActual; }
 
     /* ============================================================
@@ -772,9 +684,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     document.addEventListener('ciudad:change', function () {
       if (modo === 'detalle') cerrarDetalle(false);
 
-      /* R64: el estado .buscando murió (el campo vive expandido):
-         basta con que el campo tenga texto para repintar la
-         búsqueda en la ciudad nueva. */
       var input = document.getElementById('buscarInput');
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
@@ -785,10 +694,7 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
 
     /* ============================================================
        R66 · ORDEN:change · el sheet de ordenamiento fijó otro
-       orden: se recuerda y se repinta la vista VIVA (búsqueda
-       si el campo tiene texto, chip si no) — mismo patrón de
-       ciudad:change. Con detalle abierto, el detalle se cierra
-       (la lista es la que ordena).
+       orden: se recuerda y se repinta la vista VIVA.
        ============================================================ */
     document.addEventListener('orden:change', function (e) {
       ordenActual = (e.detail && e.detail.orden) || 'recomendado';
@@ -816,9 +722,6 @@ DEPENDENCIAS:    Index.html (TABLAS, SISTEMA), Ciudad_Sheet_Script.html
     });
 
     window.addEventListener('popstate', function () {
-      /* R19: si este popstate es el que nosotros mismos provocamos
-         con history.back() al cerrar, consumirlo SIN cerrar nada
-         (el detalle activo, si lo hay, es uno NUEVO legítimo). */
       if (_popstateEsperado) {
         _popstateEsperado = false;
         return;

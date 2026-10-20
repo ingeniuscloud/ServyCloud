@@ -1,42 +1,32 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Social_Script.html
-ESPEJO GITHUB:   js/Social_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Social_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Botones flotantes laterales. El contador de
-                 compartir solo incrementa cuando el share nativo
-                 resuelve (no en cancelación). Fallback WhatsApp
-                 también cuenta. El mensaje de WhatsApp lleva el
-                 formato del dueño: saludo con tipo y ciudad,
-                 partner con ✨, título en negrita, tagline, línea
-                 de confianza (curso: inscripciones abiertas con
-                 invitación a reservar en la app · servicio: te lo
-                 recomiendo) y enlace profundo en
-                 línea propia. La fila del partner (bajo la fila
-                 CTA, estilo Instagram) abre el bottom sheet
-                 dedicado.
-                 Key localStorage: post_likes.
-VERSIÓN:         1.8
-CAMBIOS:         R51: el título de la fila del partner ya no
-                 lleva color inline: su color lo pone el CSS
-                 (Core_CSS) con el colorOficial del post
-                 (var --post-color), igual que el avatar y el
-                 punto.
-                 R49: fila .user-fila del partner bajo la fila
-                 CTA (estilo Instagram del dueño): nombre y
-                 eslogan de subtítulo, misma acción (Partner
-                 Sheet); se oculta sin post/partner; el rail
-                 queda like/comenta/comparte.
-                 R40: la línea de confianza del curso pasa a
-                 "Inscripciones abiertas, reserva tu cupo desde
-                 ya en la app Servy" (servicio: "Te lo
-                 recomiendo" sin cambio).
+RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
+                 sobre la imagen del hero (like + compartir, sin
+                 contadores): corazón volador al dar like, share
+                 nativo con fallback WhatsApp y contador de
+                 compartidos en el backend. El mensaje de WhatsApp
+                 lleva el formato del dueño y el enlace profundo de
+                 Compartir. Key localStorage: post_likes.
+VERSIÓN:         2.0.0
+CAMBIOS:         R77: REPARACIÓN DEL ARCHIVO. El Social_Script de
+                 producción había quedado reemplazado por una copia
+                 vieja de Seccion_Script: eso borraba window.Social
+                 (nadie pintaba los botones del hero) y pisaba
+                 window.Secciones con una versión antigua. Vuelve el
+                 módulo real, solo declara window.Social, pinta
+                 like + compartir en #heroSocialButtons (diseño de
+                 Social_CSS: círculos de 42px, sin contadores) y el
+                 backend no cambia: mismas acciones like/comparte y
+                 su notificación Telegram al partner.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
-                 (pintarGlifos), Comenta_Script.html
-                 (window.Comentarios), Partner_Sheet_Script.html
-                 (window.PartnerSheet), Lista_Script.html
-                 (window.Lista), Social_CSS.html
-════════════════════════════════════════════════════════════════════*/
+                 (pintarGlifos), Lista_Script.html (window.Lista:
+                 getPostActivo), Compartir_Script.html
+                 (window.Compartir: urlDePost), Social_CSS.html,
+                 Core_CSS.html
+══════════════════════════════════════════════════════════════════*/
 
   window.Social = (function () {
 
@@ -112,246 +102,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Pintar
-       ============================================================ */
-    function pintar() {
-      var contenedor = document.querySelector('.botones-flotantes');
-      if (!contenedor) return;
-
-      contenedor.style.color = '#475569';
-      contenedor.innerHTML = '';
-
-      var btnLike = document.createElement('button');
-      btnLike.type = 'button';
-      btnLike.id = 'btnLikeFlotante';
-      btnLike.className = 'btn-flotante';
-      btnLike.setAttribute('aria-label', 'Me gusta');
-      btnLike.setAttribute('data-glifo', 'like');
-      contenedor.appendChild(btnLike);
-
-      var likes = document.createElement('span');
-      likes.className = 'likes-flotante';
-      likes.id = 'likesFlotante';
-      likes.textContent = '0';
-      contenedor.appendChild(likes);
-
-      var btnComment = document.createElement('button');
-      btnComment.type = 'button';
-      btnComment.id = 'btnCommentFlotante';
-      btnComment.className = 'btn-flotante';
-      btnComment.setAttribute('aria-label', 'Comentarios');
-      btnComment.setAttribute('data-glifo', 'comment');
-      contenedor.appendChild(btnComment);
-
-      var comments = document.createElement('span');
-      comments.className = 'likes-flotante';
-      comments.id = 'commentsFlotante';
-      comments.textContent = '0';
-      contenedor.appendChild(comments);
-
-      var btnShare = document.createElement('button');
-      btnShare.type = 'button';
-      btnShare.id = 'btnShareFlotante';
-      btnShare.className = 'btn-flotante';
-      btnShare.setAttribute('aria-label', 'Compartir');
-      btnShare.setAttribute('data-glifo', 'share');
-      contenedor.appendChild(btnShare);
-
-      var shares = document.createElement('span');
-      shares.className = 'likes-flotante';
-      shares.id = 'sharesFlotante';
-      shares.textContent = '0';
-      contenedor.appendChild(shares);
-
-      if (typeof window.pintarGlifos === 'function') {
-        window.pintarGlifos(contenedor);
-      }
-
-      btnLike.addEventListener('click', onLikeClick);
-      btnComment.addEventListener('click', onCommentClick);
-      btnShare.addEventListener('click', onShareClick);
-
-      engancharUserFila();
-      actualizarUserFila();
-
-      if (!postActivoObj && window.Lista && typeof window.Lista.getPostActivo === 'function') {
-        postActivoObj = window.Lista.getPostActivo();
-      }
-      actualizarContadores();
-    }
-
-    /* ============================================================
-       Estado visual del corazón
-       ============================================================ */
-    function aplicarEstadoCorazon(activo) {
-      var btn = document.getElementById('btnLikeFlotante');
-      if (!btn) return;
-
-      if (activo) {
-        btn.classList.add('activo');
-        btn.style.color = '#ef4444';
-      } else {
-        btn.classList.remove('activo');
-        btn.style.color = '';
-      }
-    }
-
-    /* ============================================================
-       Contadores
-       ============================================================ */
-    function actualizarContadores() {
-      var likesEl    = document.getElementById('likesFlotante');
-      var sharesEl   = document.getElementById('sharesFlotante');
-      var commentsEl = document.getElementById('commentsFlotante');
-
-      if (!postActivoObj) {
-        aplicarEstadoCorazon(false);
-        if (likesEl)    likesEl.textContent = '0';
-        if (sharesEl)   sharesEl.textContent = '0';
-        if (commentsEl) commentsEl.textContent = '0';
-        return;
-      }
-
-      var tieneLike = postTieneLike(postActivoObj.id);
-      aplicarEstadoCorazon(tieneLike);
-
-      if (likesEl)    likesEl.textContent    = String(postActivoObj.like || 0);
-      if (sharesEl)   sharesEl.textContent   = String(postActivoObj.comparte || 0);
-      if (commentsEl) commentsEl.textContent = String(postActivoObj.comenta || 0);
-    }
-
-    /* ============================================================
-       LIKE
-       ============================================================ */
-    function onLikeClick(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-
-      var post = postActivoObj;
-      if (!post || !post.id) return;
-
-      haptic([15, 10, 15]);
-
-      var likes = getLikes();
-      var yaDio = likes.indexOf(post.id) !== -1;
-      var delta = yaDio ? -1 : 1;
-
-      if (yaDio) {
-        setLikes(likes.filter(function (k) { return k !== post.id; }));
-        post.like = Math.max(0, (post.like || 0) - 1);
-      } else {
-        likes.push(post.id);
-        setLikes(likes);
-        post.like = (post.like || 0) + 1;
-
-        /* GA4 (R12): like nuevo del usuario (solo frontend;
-           quitar like no dispara evento) */
-        if (window.Analitica) {
-          window.Analitica.enviar('like', { post_id: post.id });
-        }
-      }
-
-      actualizarContadores();
-      bumpContador('likesFlotante');
-      if (!yaDio) lanzarCorazon();
-
-      postBackend('like', { idPost: post.id, delta: delta })
-        .then(function (data) {
-          if (data && typeof data.like === 'number') {
-            post.like = data.like;
-            var el = document.getElementById('likesFlotante');
-            if (el) el.textContent = String(data.like);
-          }
-        })
-        .catch(function (err) {
-          if (delta === 1) {
-            setLikes(getLikes().filter(function (k) { return k !== post.id; }));
-            post.like = Math.max(0, (post.like || 0) - 1);
-          } else {
-            var ls = getLikes();
-            if (ls.indexOf(post.id) === -1) { ls.push(post.id); setLikes(ls); }
-            post.like = (post.like || 0) + 1;
-          }
-          actualizarContadores();
-          console.error('[Social] Error al dar like:', err.message);
-        });
-    }
-
-    /* ============================================================
-       Comentario
-       ============================================================ */
-    function onCommentClick(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-      haptic([15, 10, 15]);
-
-      if (window.Comentarios && typeof window.Comentarios.abrir === 'function') {
-        window.Comentarios.abrir();
-      }
-    }
-
-    /* ============================================================
-       Compartir
-       ============================================================ */
-    function onShareClick(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-
-      var post = postActivoObj;
-      if (!post || !post.id) return;
-
-      compartirNativo(post)
-        .then(function (resultado) {
-          if (resultado === 'compartido') {
-            contarCompartido(post);
-            return;
-          }
-          if (resultado === 'cancelado') {
-            return;
-          }
-          compartirWhatsApp(post);
-          contarCompartido(post);
-        })
-        .catch(function (err) {
-          console.warn('[Social] Error en compartir:', err);
-        });
-    }
-
-    function contarCompartido(post) {
-      haptic(10);
-
-      post.comparte = (post.comparte || 0) + 1;
-      actualizarContadores();
-      bumpContador('sharesFlotante');
-
-      postBackend('comparte', { idPost: post.id })
-        .then(function (data) {
-          if (data && typeof data.comparte === 'number') {
-            post.comparte = data.comparte;
-            var el = document.getElementById('sharesFlotante');
-            if (el) el.textContent = String(data.comparte);
-          }
-        })
-        .catch(function (err) {
-          post.comparte = Math.max(0, (post.comparte || 0) - 1);
-          actualizarContadores();
-          console.error('[Social] Error al compartir:', err.message);
-        });
-    }
-
-    /* ============================================================
-       Texto a compartir
+       Texto a compartir (formato del dueño) · R77: el título viene
+       de postJson.descripcion.tituloPost.
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
-      var sj = post.seccionJson || {};
-      var sp = sj.seccionPresentacion || {};
+      var pj = post.postJson || {};
+      var desc = pj.descripcion || {};
 
-      var titulo  = sp.titulo  || 'Publicación';
-      var tagline = sp.tagline || '';
+      var titulo  = String(desc.tituloPost || post.titulo || '').trim() || 'Publicación';
+      var tagline = String(desc.tagline || '').trim();
 
       var partner = buscarPartner(post.idPartner);
       var nombre  = partner ? String(partner.nombre || '').trim() : '';
 
-      /* Formato WhatsApp del dueño: saludo con tipo y ciudad,
-         partner con ✨, título SIN emoji y en negrita, tagline,
-         línea de confianza y el enlace en línea propia. */
       var url = String(urlEnlace || '').trim() || urlApp();
 
       var tipo   = tipoSingularDePost(post);
@@ -379,9 +142,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return { titulo: titulo, texto: texto };
     }
 
-    /* Texto a compartir con enlace profundo · Promise.
-       Compartir.urlDePost resuelve el enlace cifrado (o la URL
-       principal si no pudo). */
     function textoCompartirDe(post) {
       if (window.Compartir && typeof window.Compartir.urlDePost === 'function') {
         return window.Compartir.urlDePost(post)
@@ -396,43 +156,70 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Share nativo
+       LIKE
        ============================================================ */
-    function compartirNativo(post) {
-      if (!navigator.share) return Promise.resolve('no-soportado');
+    function onLikeClick(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
 
-      return textoCompartirDe(post)
-        .then(function (info) {
-          return navigator.share({
-            title: info.titulo,
-            text:  info.texto
-          })
-          .then(function () {
-            return 'compartido';
-          })
-          .catch(function (err) {
-            if (err && err.name === 'AbortError') return 'cancelado';
-            return 'cancelado';
-          });
+      var post = postActivoObj;
+      if (!post || !post.id) return;
+
+      haptic([15, 10, 15]);
+
+      var likes = getLikes();
+      var yaDio = likes.indexOf(post.id) !== -1;
+      var delta = yaDio ? -1 : 1;
+      var btn = document.getElementById('btnSocialLike');
+
+      if (yaDio) {
+        setLikes(likes.filter(function (k) { return k !== post.id; }));
+        post.like = Math.max(0, (post.like || 0) - 1);
+      } else {
+        likes.push(post.id);
+        setLikes(likes);
+        post.like = (post.like || 0) + 1;
+
+        /* GA4 (R12): like nuevo del usuario (solo frontend;
+           quitar like no dispara evento) */
+        if (window.Analitica) {
+          window.Analitica.enviar('like', { post_id: post.id });
+        }
+      }
+
+      aplicarEstadoCorazon();
+      if (!yaDio) lanzarCorazon();
+
+      postBackend('like', { idPost: post.id, delta: delta })
+        .then(function (data) {
+          if (data && typeof data.like === 'number') post.like = data.like;
+        })
+        .catch(function (err) {
+          if (delta === 1) {
+            setLikes(getLikes().filter(function (k) { return k !== post.id; }));
+            post.like = Math.max(0, (post.like || 0) - 1);
+          } else {
+            var ls = getLikes();
+            if (ls.indexOf(post.id) === -1) { ls.push(post.id); setLikes(ls); }
+            post.like = (post.like || 0) + 1;
+          }
+          aplicarEstadoCorazon();
+          console.error('[Social] Error al dar like:', err.message);
         });
     }
 
-    /* ============================================================
-       Fallback WhatsApp
-       ============================================================ */
-    function compartirWhatsApp(post) {
-      textoCompartirDe(post).then(function (info) {
-        var url = 'https://wa.me/?text=' + encodeURIComponent(info.texto);
-        window.open(url, '_blank', 'noopener,noreferrer');
-      });
+    function aplicarEstadoCorazon() {
+      var btn = document.getElementById('btnSocialLike');
+      if (!btn) return;
+      var activo = !!(postActivoObj && postActivoObj.id && postTieneLike(postActivoObj.id));
+      btn.classList.toggle('activo', activo);
     }
 
     /* ============================================================
-       Corazón volador
+       Corazón volador (desde el botón del hero)
        ============================================================ */
     function lanzarCorazon() {
-      var contenedor = document.querySelector('.botones-flotantes');
-      var btn = document.getElementById('btnLikeFlotante');
+      var contenedor = document.getElementById('heroSocialButtons');
+      var btn = document.getElementById('btnSocialLike');
       if (!contenedor || !btn) return;
 
       var contRect = contenedor.getBoundingClientRect();
@@ -460,76 +247,103 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       }, 700);
     }
 
-    function bumpContador(id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.classList.add('bump');
-      setTimeout(function () { el.classList.remove('bump'); }, 250);
+    /* ============================================================
+       COMPARTIR · nativo con fallback WhatsApp
+       ============================================================ */
+    function onShareClick(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+
+      var post = postActivoObj;
+      if (!post || !post.id) return;
+
+      compartirNativo(post)
+        .then(function (resultado) {
+          if (resultado === 'compartido') { contarCompartido(post); return; }
+          if (resultado === 'cancelado') return;
+          compartirWhatsApp(post);
+          contarCompartido(post);
+        })
+        .catch(function (err) {
+          console.warn('[Social] Error en compartir:', err);
+        });
     }
 
-    /* ============================================================
-       Partner · abre el bottom sheet
-       ============================================================ */
-    function irAPartner() {
+    function contarCompartido(post) {
       haptic(10);
-      if (window.PartnerSheet && typeof window.PartnerSheet.abrir === 'function') {
-        window.PartnerSheet.abrir(postActivoObj);
-      }
+      post.comparte = (post.comparte || 0) + 1;
+
+      postBackend('comparte', { idPost: post.id })
+        .then(function (data) {
+          if (data && typeof data.comparte === 'number') post.comparte = data.comparte;
+        })
+        .catch(function (err) {
+          post.comparte = Math.max(0, (post.comparte || 0) - 1);
+          console.error('[Social] Error al compartir:', err.message);
+        });
+    }
+
+    function compartirNativo(post) {
+      if (!navigator.share) return Promise.resolve('no-soportado');
+
+      return textoCompartirDe(post)
+        .then(function (info) {
+          return navigator.share({
+            title: info.titulo,
+            text:  info.texto
+          })
+          .then(function () { return 'compartido'; })
+          .catch(function (err) {
+            if (err && err.name === 'AbortError') return 'cancelado';
+            return 'cancelado';
+          });
+        });
+    }
+
+    function compartirWhatsApp(post) {
+      textoCompartirDe(post).then(function (info) {
+        var url = 'https://wa.me/?text=' + encodeURIComponent(info.texto);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
     }
 
     /* ============================================================
-       FILA PARTNER (R49) · estilo Instagram bajo la fila CTA.
-       Muestra nombre + eslogan del partner del post activo y
-       mantiene la acción de siempre: abrir el Partner Sheet.
-       Sin post/partner: fila oculta. El texto vive en
-       Index.html (userFila); aquí solo se llena y se decide
-       visibilidad (post:change + arranque).
-       R51 · el título NO lleva color inline: lo pinta el CSS
-       con el colorOficial del post (var --post-color),
-       igual que el avatar y el punto del círculo.
+       PINTAR · like + compartir sobre el hero (sin contadores)
+       Secciones llama pintar() después de montar cada post.
        ============================================================ */
-    function partnerDePost(post) {
-      if (!post || !post.idPartner) return null;
-      var partners = (window.TABLAS && window.TABLAS.partners) || [];
-      for (var i = 0; i < partners.length; i++) {
-        if (partners[i].id === post.idPartner) return partners[i];
-      }
-      return null;
-    }
+    function pintar() {
+      var contenedor = document.getElementById('heroSocialButtons');
+      if (!contenedor) return;
 
-    function actualizarUserFila() {
-      var fila = document.getElementById('userFila');
-      if (!fila) return;
-
-      var partner = partnerDePost(postActivoObj);
-      var nombre = (partner && partner.nombre) ? String(partner.nombre).trim() : '';
-      if (!nombre) {
-        fila.hidden = true;
-        return;
+      /* El post vivo al momento del pintado lo tiene Lista */
+      if (window.Lista && typeof window.Lista.getPostActivo === 'function') {
+        postActivoObj = window.Lista.getPostActivo() || postActivoObj;
       }
 
-      var pj = (partner && partner.partnerJson) || {};
-      var eslogan = String(pj.esloganPartner || '').trim();
+      contenedor.innerHTML = '';
 
-      var nombreEl  = fila.querySelector('.user-nombre');
-      var esloganEl = fila.querySelector('.user-eslogan');
+      var btnLike = document.createElement('button');
+      btnLike.type = 'button';
+      btnLike.className = 'app-hero-social-btn';
+      btnLike.id = 'btnSocialLike';
+      btnLike.setAttribute('data-glifo', 'like');
+      btnLike.setAttribute('aria-label', 'Me gusta');
 
-      if (nombreEl) {
-        nombreEl.textContent = nombre;
-      }
-      if (esloganEl) {
-        esloganEl.textContent = eslogan;
-        esloganEl.hidden = !eslogan;
-      }
+      var btnShare = document.createElement('button');
+      btnShare.type = 'button';
+      btnShare.className = 'app-hero-social-btn';
+      btnShare.id = 'btnSocialShare';
+      btnShare.setAttribute('data-glifo', 'share');
+      btnShare.setAttribute('aria-label', 'Compartir');
 
-      fila.hidden = false;
-    }
+      contenedor.appendChild(btnLike);
+      contenedor.appendChild(btnShare);
 
-    function engancharUserFila() {
-      var fila = document.getElementById('userFila');
-      if (!fila || fila.getAttribute('data-enganchado') === '1') return;
-      fila.setAttribute('data-enganchado', '1');
-      fila.addEventListener('click', irAPartner);
+      if (typeof window.pintarGlifos === 'function') window.pintarGlifos(contenedor);
+
+      btnLike.addEventListener('click', onLikeClick);
+      btnShare.addEventListener('click', onShareClick);
+
+      aplicarEstadoCorazon();
     }
 
     /* ============================================================
@@ -537,27 +351,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        ============================================================ */
     document.addEventListener('post:change', function (e) {
       postActivoObj = (e.detail && e.detail.post) ? e.detail.post : null;
-      actualizarContadores();
-      actualizarUserFila();
-    });
-
-    document.addEventListener('chips:change', function () {
-      setTimeout(actualizarContadores, 0);
-    });
-
-    document.addEventListener('comentarios:change', function (e) {
-      var d = e.detail || {};
-      if (!postActivoObj || d.idPost !== postActivoObj.id) return;
-      if (typeof d.comenta === 'number') {
-        postActivoObj.comenta = d.comenta;
-        var contador = document.getElementById('commentsFlotante');
-        if (contador) contador.textContent = String(d.comenta);
-      }
+      aplicarEstadoCorazon();
     });
 
     return {
-      pintar: pintar,
-      refrescarContadores: actualizarContadores
+      pintar: pintar
     };
-
   })();

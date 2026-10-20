@@ -1,85 +1,22 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Chips_CSS.html
-ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS de la pantalla principal. FILA DE CABECERA
-                 (R63): volver + TÍTULO DEL HEADER + título de
-                 categoría + MENÚ GLOBAL. SECCIÓN FILTROS (R64,
-                 debajo de las promos) en DOS filas de bordes
-                 SUAVES y DELGADOS (estilo UI/UX 2026, sin el
-                 borde grueso):
-                 · FILA 1: campo BUSCAR EXPANDIDO de una vez
-                   (blanco, cápsula redonda con lupa dentro y la
-                   X circular NARANJA para limpiar, que solo se
-                   ve al escribir) + BOTÓN ORDENAR a la derecha
-                   (círculo con el glifo de Iconos; abre el
-                   sheet de ordenamiento — R66).
-                 · FILA 2: los CHIPS (botones independientes, el
-                   SELECCIONADO con fondo NARANJA oficial y los
-                   otros sin fondo) y el BOTÓN CIUDAD
-                   (pin + nombre, en Ciudad_Sheet_CSS)
-                   repartiéndose la fila en partes iguales, SIN
-                   números de items.
-                 El bloque de items (Compartir lista + aviso sin
-                 resultados) vive en .secciones-wrap desde R65:
-                 sus estilos están en Lista_CSS. Modo compartido
-                 (recepción de un enlace): chips/ciudad/ordenar
-                 fuera, campo fijado SIN foco y la X libera la vista (Compartir.limpiar). El header
-                 del detalle lo decide el TIPO de enlace
-                 (Compartir marca el body): un post compartido
-                 usa el campo en lugar de volver/título; una
-                 lista compartida vuelve al par volver/título
-                 dentro de cada post.
-VERSIÓN:         2.4
-CAMBIOS:         R67: el sheet del ordenamiento se renombra:
-                 Filtros_Sheet_* pasa a Orden_Sheet_* (orden del
-                 dueño). Aquí solo cambia el comentario.
-                 R66: el BOTÓN FILTRO se jubila con su término —
-                 ahora es el BOTÓN ORDENAR (.btn-ordenar,
-                 #btnOrdenar): mismo círculo, glifo nuevo (3
-                 líneas que se acortan) y acción real: abre el
-                 sheet de ordenamiento (Orden_Sheet_Script);
-                 cuando hay un orden distinto del original luce
-                 el PUNTO NARANJA (.con-orden) como lo hacen las
-                 apps populares. La X de limpiar SUBE SU GLIFO:
-                 el trazo dentro del círculo pasa de 16 a 18px
-                 (el dueño: "la X de adentro se ve muy pequeña").
-                 La sección filtro RESPIRA: la fila 1 baja su
-                 margen superior a 14px y la fila 2 estira su
-                 respiro inferior a 16px.
-                 R65: el borde del MENÚ GLOBAL vuelve al suyo
-                 (1.2px #475569 — era especial y R64 se lo llevó
-                 el barrido de bordes suaves); los bordes de los
-                 OTROS botones suben un tono (#cbd5e1) porque en
-                 #e2e8f0 no se veían nada sobre el tinte; los 3
-                 botones de la fila 2 (2 chips + ciudad) quedan
-                 del MISMO TAMAÑO repartidos equitativos
-                 (.filtros flex 2); el campo buscar y el botón
-                 filtro quedan de FONDO TRANSPARENTE (el campo
-                 se viste BLANCO al enfocarse, :focus-within);
-                 la X de limpiar crece (28px con glifo 16) — se
-                 veía como un punto; la fila 2 gana el respiro
-                 de abajo que dejó Compartir lista (que se muda
-                 al bloque de items con su cantidad, Lista_CSS).
-                 R64: la sección filtros se REORDENA — FILA 1
-                 con el campo buscar EXPANDIDO de una vez (FUERA
-                 la lupa-botón con su animación de expansión, el
-                 estado .buscando y el texto CANCELAR) + botón
-                 filtro a la derecha; la X circular NARANJA vive
-                 DENTRO del campo (visible al escribir; en modo
-                 compartido queda fija y libera la vista); FILA 2
-                 (.filtros-fila-dos) con chips + ciudad
-                 repartidos en partes iguales; FUERA los números
-                 de items (contador de chips y contador del
-                 campo); el chip SELECCIONADO viste fondo
-                 NARANJA oficial con letra blanca (los otros sin
-                 fondo).
-                 R63: .filtros-fila ganó espacio de respiro
-                 abajo (los botones ya no quedan pegados a los
-                 items).
-DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
-                 Index.html; .city-bar vive en Ciudad_Sheet_CSS)
-════════════════════════════════════════════════════════════════════*/
+RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
+                 (volver, título del header, categoría y menú
+                 global), buscador con X de limpiar, botón
+                 ordenar, chips de categorías, botón ciudad,
+                 fila de promos y envoltorios de filtros.
+VERSIÓN:         2.6
+CAMBIOS:         R77: El placeholder del Buscar usa las variables
+                 de textoSecundario (la voz la manda también la
+                 regla maestra ::placeholder del Core). Encabezado
+                 saneado: solo queda lo vigente.
+DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
+                 Index.html (estructura de filtros),
+                 Lista_CSS.html (lista y buscar-vacio),
+                 Ciudad_Sheet_CSS.html (botón ciudad)
+══════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      WRAP · FILA DE CABECERA (R63)
@@ -403,11 +340,12 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     line-height: 1.1;
   }
 
-  /* Placeholder discreto: acompaña, no compite. */
+  /* Placeholder con la voz única de la app (R77): textoSecundario
+     vía variables; la regla maestra ::placeholder del Core manda. */
   .buscar-input::placeholder {
-    color: #94a3b8;
-    font-weight: 400;
-    font-size: 12.5px;
+    color: var(--color-textoSecundario);
+    font-weight: var(--weight-textoSecundario);
+    font-size: var(--size-textoSecundario);
   }
 
   /* ============================================================
@@ -537,7 +475,7 @@ DEPENDENCIAS:    Ninguna (estilos consumidos por la estructura de
     .btn-ordenar svg { width: 15px; height: 15px; }
     .btn-ordenar::after { width: 8px; height: 8px; top: 3px; right: 3px; }
     .buscar-capsula { height: 38px; }
-    .buscar-input { font-size: 14px; }
+    .buscar-input { font-size: var(--size-textoPrimario); }
     .buscar-input-wrap { padding: 0 6px 0 12px; }
     .buscar-limpiar { width: 25px; height: 25px; }
     .buscar-limpiar svg { width: 16px; height: 16px; }

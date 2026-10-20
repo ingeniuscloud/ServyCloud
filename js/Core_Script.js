@@ -1,139 +1,42 @@
-/*════════════════════════════════════════════════════════════════════
+/*══════════════════════════════════════════════════════════════════
 ARCHIVO:         Core_Script.html
-ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pagar el contenido)
+ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Núcleo de la página. El CTA decide entre abrir
-                 WhatsApp o el sheet de reserva.
-                 CacheL2: persistencia del catálogo y de los
-                 detalles en localStorage del dispositivo. La
-                 reapertura de la app pinta AL INSTANTE desde disco
-                 y la red valida por detrás (stale-while-revalidate:
-                 las mismas peticiones que antes, 0 cuotas nuevas).
-                 Arranque en orden original:
-                   1. cargarTablas() (POST · todos los posts)
-                   2. Cuando llega → inyectarLienzo() →
-                      arrancarComponentes() con datos ya cargados
-                 Primer arranque sin ciudad:
-                   · POST arranca en paralelo con el sheet.
-                   · Cuando el usuario elige, repintar SINCRÓNICO
-                     si los datos ya llegaron. Si NO llegaron,
-                     mostrar skeleton de lista y esperar.
-                 Cambio de ciudad posterior:
-                   · Repintar sincrónico. Instantáneo.
-VERSIÓN:         1.26
-CAMBIOS:         R73: LA REVERSIÓN DE LA NOTA. Su orden: "hay una nota
-                 que era de reversión en caso de que saliera mal,
-                 busca esa nota, ahí está la clave — no incluyas
-                 el preloader, solo la parte del lienzo". La nota
-                 ES la del EXPERIMENTO R67 (LIENZO CASHEA/YUMMY,
-                 marcado reversible a petición del dueño):
-                 "REVERSIÓN (si el dueño lo pide): devolver el
-                 degradado de R65/R66". Restaurado BYTE A BYTE el
-                 degradado de esa nota (bloque comentado que
-                 traían las versiones R67–R71): blanco arriba
-                 (0–5%), subida al tinte #fdf3ec en 15% y el
-                 tinte SE DETIENE EN 24% — CASI EN LOS BOTONES
-                 de la fila de filtros (22–27%, calibración R67)
-                 — blanco limpio desde 36%. El degradado R57 queda
-                 COMENTADO abajo (reversión en una jugada). EL
-                 PRELOADER NO SE TOCA (GitHub_Cromo 1.4/1.5), ni
-                 la vela fija (Core_CSS 2.6), ni theme-color, ni
-                 manifest.json, ni el body. El resto del archivo
-                 intacto.
-                 R72: el degradado INICIAL del lienzo VUELVE A SER EL
-                 ORIGINAL DEL DUEÑO (su orden: "como estaba antes,
-                 que venía de blanco y a naranja y llegaba casi
-                 hasta los botones — no lo inventes, búscalo"):
-                 restaurado el degradado R57 de su producción real,
-                 byte a byte — blanco arriba (0–5%), subida al tinte
-                 #fdf3ec en 15% y el tinte SE QUEDA HASTA EL FINAL
-                 (100%). El degradado R71 queda COMENTADO dentro de
-                 pintarAreaConPost para revertirlo en una jugada.
-                 Preloader, vela fija superior (Core_CSS 2.6), línea
-                 de inicio (Lista_CSS 2.8), theme-color y manifest:
-                 INTACTOS.
-                 R71: el degradado INICIAL del lienzo ahora SE VE — arranca
-                 en naranja suave #fed7aa (mismo tono que la vela fija
-                 superior de Core_CSS 2.6: cero costura con la franja
-                 del sistema), pasa por el clarito #fdf3ec y llega al
-                 blanco ANTES de la lista (misma geometría R67). Cura
-                 el "no me da color en el lienzo" del dueño. El resto
-                 del archivo INTACTO.
-                 R68: solo encabezado — la mención del menú global
-                 pasa a Global_Sheet_Script (renombrado R68). Ni
-                 una línea de código tocada; el lienzo y el
-                 preloader-evento quedan intactos.
-                 R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
-                 a petición del dueño): el clarito #fdf3ec
-                 COMIENZA en la parte superior de la pantalla
-                 principal (0–12% plano) y degrada a BLANCO
-                 terminando debajo de las promos (~34%); blanco
-                 puro hasta la franja de abajo del navegador. En
-                 PWA la misma condición (manifest + theme-color
-                 a juego, en Index/manifest). El degradado
-                 anterior (R65/R66) queda COMENTADO dentro de
-                 pintarAreaConPost para revertirlo en una
-                 jugada. Stops calibrados en laboratorio (390px).
-                 R66: arrancarComponentes() liga #btnOrdenar —
-                 window.Ordenar.engancharBoton() (el sheet de
-                 ordenamiento del botón de la fila 1).
-                 R65: el DEGRADADO de la pantalla principal se
-                 corta donde termina la sección filtro — blanco
-                 arriba (0–5%), tinte #fdf3ec en su pico (15%)
-                 y desde la zona de filtros vuelve a degradar a
-                 BLANCO (~24–36%) que queda para el resto de la
-                 pantalla (la subida blanco→tinte queda exacta
-                 como estaba). El detalle de un post conserva su
-                 degradado propio del colorClaro.
-                 R64: el skeleton de lista replica la anatomía
-                 LIMPIA del item (título + partner + estrella —
-                 sin la fila del subtítulo ni la divisoria
-                 interna, muertas con el item viejo).
-                 R63: (1) 'ciudad:change' cae al chip de SERVICIOS
-                 por defecto (Chips.resetearVista — orden del
-                 dueño: Irapa sin cursos no puede dejar la lista
-                 vacía, y el retorno a Güiria ya no aterriza en
-                 cursos); (2) pintarTituloHeader() acepta el
-                 VECTOR aunque la hoja lo guarde como TEXTO con
-                 formato JSON (parse defensivo): la frase al azar
-                 de cada carga ya no depende de cómo lo guarde el
-                 Setup (el dueño lo veía repetido).
-                 R61: el PLACEHOLDER del buscador se pinta desde
-                 la BD real (SISTEMA.root →
-                 app.placeholderBuscar; si la BD no lo trae queda
-                 el fijo de la app) — se deja de hardcodear el
-                 texto en el markup.
-                 R58: pantalla principal refactorizada — el
-                 TÍTULO INICIAL grande se pinta desde la BD real
-                 (SISTEMA.root → app.tituloHeader). El fondo del
-                 lienzo #fdf3ec (R57) queda EXACTO.
-DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
-                 (#canvas-content, #tituloHeader, SISTEMA, TABLAS,
-                 TOKEN, URL_EXEC),
-                 Telefono.html (#lienzo), Ciudad_Sheet_Script.html,
-                 Chips_Script.html, Buscar_Script.html,
-                 Promo_Script.html, Social_Script.html,
-                 Global_Sheet_Script.html (window.Global), Lista_Script.html,
-                 Seccion_Script.html, Comenta_Script.html,
-                 Compartir_Script.html (recibir/pintar)
-════════════════════════════════════════════════════════════════════*/
+RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
+                 arranca los componentes con datos; inyecta el
+                 lienzo; decide el CTA (WhatsApp o sheet de
+                 reserva); CacheL2 persiste catálogo y detalles
+                 en localStorage (stale-while-revalidate al
+                 reabrir); refresca catálogo y preguntas abiertas
+                 al volver la app a primer plano; guardia del
+                 token y detección de entorno.
+VERSIÓN:         1.28
+CAMBIOS:         R77: El refresco en segundo plano apunta a
+                 window.Pregunta (estaAbierto/refrescar), el módulo
+                 del Q&A del post. Encabezado saneado: solo queda
+                 lo vigente.
+DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
+                 Index.html (SISTEMA, TOKEN, URL_EXEC),
+                 Lista_Script.html, Seccion_Script.html,
+                 Pregunta_Script.html (window.Pregunta),
+                 Reserva_Script.html y hojas de reserva,
+                 Iconos.html, Core_CSS.html
+══════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CACHEL2 · capa del dispositivo (R21 · Propuesta 1 del dueño)
-     La sesión ya tenía L1 en memoria (PostFull._cache). L2
-     persiste en localStorage del contexto de la app: al reabrir
-     la app el contenido sale del DISCO al instante y la red
-     valida por detrás. Costo en cuotas: CERO (las peticiones
-     son las mismas que hoy, ni una más). Si el storage del
-     iframe no persiste o está lleno, todo degrada en silencio
-     al comportamiento de v1.6.
+     CACHEL2 · capa del dispositivo
+     R76: ahora persiste/lee `postJson` (antes `seccionJson`).
+     La clave de localStorage se mantiene (sv_l2_post_<id>):
+     el dueño ejecuta invalidarTodo() antes de cargar la app,
+     y el cliente purga el shape viejo porque _valido() exige
+     `postJson` en el envuelto.
      ============================================================ */
   window.CacheL2 = (function () {
     var K_CAT       = 'sv_l2_catalogo';
     var K_IDX       = 'sv_l2_posts_idx';
     var K_POST      = 'sv_l2_post_';
-    var MAX_POSTS   = 30;                          /* tope LRU de posts persistidos */
-    var TTL_MS      = 7 * 24 * 60 * 60 * 1000;     /* vencimiento duro: 7 días */
+    var MAX_POSTS   = 30;
+    var TTL_MS      = 7 * 24 * 60 * 60 * 1000;
     var ENV_VERSION = 1;
 
     function _valido(env, requiereSecciones) {
@@ -141,7 +44,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (!env.data || typeof env.data !== 'object') return false;
       if (typeof env.ts !== 'number') return false;
       if (Date.now() - env.ts > TTL_MS) return false;
-      if (requiereSecciones && !env.data.seccionJson) return false;
+      if (requiereSecciones && !env.data.postJson) return false;
       return true;
     }
 
@@ -149,8 +52,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       return { v: ENV_VERSION, ts: Date.now(), data: data };
     }
 
-    /* Devuelve { data, raw } o null. raw = serialización canónica
-       del catálogo para comparar barato tras la revalidación. */
     function leerCatalogo() {
       try {
         var raw = localStorage.getItem(K_CAT);
@@ -163,8 +64,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       } catch (_) { return null; }
     }
 
-    /* Guarda el catálogo y devuelve su serialización canónica
-       (para la comparación de la revalidación). */
     function guardarCatalogo(data) {
       if (!data || !Array.isArray(data.posts) ||
           !Array.isArray(data.partners)) return null;
@@ -190,14 +89,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     }
 
     function guardarPost(idPost, det) {
-      if (!idPost || !det || !det.seccionJson) return;
+      if (!idPost || !det || !det.postJson) return;
       try {
         localStorage.setItem(K_POST + String(idPost),
                              JSON.stringify(_envuelto(det)));
       } catch (_) { return; }
 
-      /* LRU: el id recién usado va al final; se recortan los
-         más viejos respetando el tope MAX_POSTS. */
       try {
         var idx = JSON.parse(localStorage.getItem(K_IDX) || '[]');
         if (!Array.isArray(idx)) idx = [];
@@ -224,6 +121,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
   /* ============================================================
      POSTFULL · caché cliente de detalles bajo demanda
+     R76: `postJson` (antes `seccionJson`).
      ============================================================ */
   window.PostFull = (function () {
     var _cache = {};
@@ -233,24 +131,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       window.CacheL2.guardarPost(idPost, det);
     }
 
-    /* R21: refresco silencioso de un detalle que ya vive en L2.
-       Mismo número de peticiones que antes (1 por apertura fría
-       de sesión). Si falla, no pasa nada: el usuario ya está
-       leyendo la versión cacheada. */
     function _revalidar(idPost) {
       postBackend('postDetalle', { idPost: idPost }, { mudo: true })
         .then(function (det) {
-          if (det && det.seccionJson) _recordar(idPost, det);
+          if (det && det.postJson) _recordar(idPost, det);
         })
-        .catch(function () { /* silencioso: hay contenido en pantalla */ });
+        .catch(function () {});
     }
 
     function obtener(idPost) {
       if (_cache[idPost]) return Promise.resolve(_cache[idPost]);
 
-      /* R21 · L2: detalle persistido de una visita anterior →
-         resolver YA (la apertura ni ve el skeleton) y refrescar
-         por detrás. Propuesta 1 del dueño: 0 cuotas nuevas. */
       var l2 = window.CacheL2.leerPost(idPost);
       if (l2) {
         _cache[idPost] = l2;
@@ -269,9 +160,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         });
     }
 
-    /* Limpia SOLO la memoria de sesión (L1). La L2 se autorregula
-       por revalidación (cada apertura fría) y TTL de 7 días:
-       nunca sirve contenido viejo más de una apertura. */
     function limpiar() { _cache = {}; }
 
     return {
@@ -281,14 +169,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
   })();
 
   /* ============================================================
-     PUENTE · persistencia de preferencias vía envoltorio (R10)
-     El localStorage del iframe de GAS es efímero (sandbox de
-     googleusercontent + ITP de Safari). El envoltorio de
-     github.io guarda ciudad/vista en un origen estable y las
-     devuelve por postMessage. El origen del padre llega firmado
-     en el hash del iframe (#puente=<origen>) para no enviar
-     nada a terceros. Sin envoltorio (exec directo) el módulo
-     resuelve inmediato y no emite nada.
+     PUENTE · persistencia de preferencias vía envoltorio
      ============================================================ */
   window.Puente = (function () {
     var ORIGEN_PADRE  = null;
@@ -313,9 +194,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       try { window.parent.postMessage(msg, ORIGEN_PADRE || '*'); } catch (_) {}
     }
 
-    /* Pide el estado guardado. Resuelve {ciudad, vista} o null
-       (sin envoltorio, sin estado o respuesta tardía >1500ms;
-       R14: antes 600ms y en móviles lentos se perdía). */
     function pedirEstado() {
       return new Promise(function (resolve) {
         if (!hayPadre()) { SINCRONIZADO = true; resolve(null); return; }
@@ -334,8 +212,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
           if (e.source !== window.parent) return;
           if (!e.data || e.data.tipo !== 'estado-aplicar') return;
 
-          /* GA4 (R12): el contenedor presta su deviceid estable
-             (github.io no purga storage) para unificar identidad. */
           if (e.data.deviceid && typeof e.data.deviceid === 'string' &&
               e.data.deviceid.length <= 64) {
             DISPOSITIVO_PADRE = e.data.deviceid.replace(/[^A-Za-z0-9_.\-]/g, '');
@@ -351,15 +227,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
         window.addEventListener('message', onMensaje);
         enviar({ tipo: 'estado-pedir' });
-        setTimeout(function () { cerrar(null); }, 1500);   /* R14: antes 600 */
+        setTimeout(function () { cerrar(null); }, 1500);
       });
     }
 
-    /* Aplica el estado devuelto. La ciudad se valida contra
-       SISTEMA.ciudades (por si quedó desactivada en la hoja) y
-       se aplica con Ciudad.aplicarGuardada (emite ciudad:change).
-       La vista se valida contra SISTEMA.chips y se deja escrita
-       en app_vista ANTES del primer Chips.pintar(), que la lee. */
     function aplicarEstado(est) {
       if (!est) return;
 
@@ -368,10 +239,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         for (var i = 0; i < ciudades.length; i++) {
           var c = ciudades[i];
           if (c && c.idCiudad === est.ciudad && c.estado !== false) {
-            /* R13: camino normal + fallback. Si el módulo Ciudad
-               de producción todavía no trae aplicarGuardada
-               (archivo viejo), la ciudad se deja escrita en
-               app_ciudad para que la restaure cualquier versión. */
             if (window.Ciudad &&
                 typeof window.Ciudad.aplicarGuardada === 'function') {
               window.Ciudad.aplicarGuardada(c);
@@ -401,9 +268,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     }
 
-    /* Reporta el estado actual al envoltorio. Solo después de la
-       sincronización inicial, para no pisar lo guardado con
-       valores vacíos de arranque. */
     function guardar() {
       if (!SINCRONIZADO) return;
 
@@ -418,9 +282,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         vista = window.Chips.getChipActivo();
       }
 
-      /* R13: si los chips aún no se pintaron (cambio de ciudad
-         durante la restauración), se reporta la vista conocida
-         del storage en lugar de null. */
       if (!vista) {
         try {
           var v = JSON.parse(localStorage.getItem('app_vista') || 'null');
@@ -435,7 +296,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       pedirEstado:   pedirEstado,
       aplicarEstado: aplicarEstado,
       guardar:       guardar,
-      /* GA4 (R12): exponer el camino del puente a Analitica */
       hayPuente: function () { return !!(hayPadre() && ORIGEN_PADRE); },
       getDispositivo: function () { return DISPOSITIVO_PADRE || null; },
       retransmitir: enviar
@@ -443,11 +303,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
   })();
 
   /* ============================================================
-     ANALITICA · Capa 1 GA4 (R12)
-     Único punto de envío de eventos de comportamiento. Reenvía
-     por el puente al envoltorio, que los manda a GA4 (lista
-     blanca + saneo allí). Sin envoltorio (exec directo) o con
-     evento fuera de lista: no-op total, cero impacto.
+     ANALITICA · Capa 1 GA4
      ============================================================ */
   window.Analitica = (function () {
     var EVENTOS_OK = {
@@ -512,20 +368,22 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     var promesaCarga = null;
     var datosListos = false;
 
+    /* R76: el modo whatsapp ahora se decide por meta.mensajeCta
+       (antes meta.mensajeWhatsapp). */
     function esModoWhatsapp(post) {
       if (!post) return false;
-      var sj = post.seccionJson || {};
-      var meta = sj.meta || {};
-      return String(meta.mensajeWhatsapp || '').trim().length > 0;
+      var pj = post.postJson || {};
+      var meta = pj.meta || {};
+      return String(meta.mensajeCta || '').trim().length > 0;
     }
 
     function intentarWhatsapp() {
       if (!postActivoGlobal) return false;
       if (!esModoWhatsapp(postActivoGlobal)) return false;
 
-      var sj = postActivoGlobal.seccionJson || {};
-      var meta = sj.meta || {};
-      var mensaje = String(meta.mensajeWhatsapp || '').trim();
+      var pj = postActivoGlobal.postJson || {};
+      var meta = pj.meta || {};
+      var mensaje = String(meta.mensajeCta || '').trim();
 
       var partner = buscarPartner(postActivoGlobal.idPartner);
       var numero = partner && partner.partnerJson
@@ -546,30 +404,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
     /* ============================================================
        Fondo del área · colores del post
+       R76: meta.color[2] = claro · meta.color[0] = oficial.
        ============================================================ */
     function pintarAreaConPost(post) {
       var area = document.querySelector('.area-contenido');
       if (!area) return;
 
       if (!post) {
-        /* R73 · LA REVERSIÓN DE LA NOTA (su orden: "busca esa
-           nota... ahí está la clave para la reversión del
-           pintado... no incluyas el preloader, solo la parte
-           del lienzo"): la nota ES la del EXPERIMENTO R67
-           (LIENZO CASHEA/YUMMY, reversible a petición del
-           dueño) — "REVERSIÓN (si el dueño lo pide): devolver
-           el degradado de R65/R66". Restaurado BYTE A BYTE el
-           degradado de esa nota (el bloque comentado que
-           traían las versiones R67–R71): blanco arriba (0–5%),
-           subida al tinte #fdf3ec en 15% y el tinte SE DETIENE
-           EN 24% — CASI EN LOS BOTONES de la fila de filtros
-           (22–27%, calibración R67) — y blanco limpio desde
-           36%. El preloader NO se toca (GitHub_Cromo 1.4/1.5),
-           ni la vela fija (Core_CSS 2.6), ni theme-color, ni
-           manifest, ni el body. La franja de abajo no
-           interviene: el body ya es blanco (Core_CSS 2.6).
-           REVERSIÓN (una línea): el degradado R57 de su
-           producción COMENTADO abajo. */
         area.style.background =
           'linear-gradient(180deg, ' +
             '#ffffff 0%, ' +
@@ -578,22 +419,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
             '#fdf3ec 24%, ' +
             '#ffffff 36%, ' +
             '#ffffff 100%)';
-        /* REVERSIÓN R57 (el tinte de su producción se quedaba
-           hasta el final del lienzo):
-        area.style.background =
-          'linear-gradient(180deg, ' +
-            '#ffffff 0%, ' +
-            '#ffffff 5%, ' +
-            '#fdf3ec 15%, ' +
-            '#fdf3ec 100%)';
-        */
         area.style.removeProperty('--post-color');
         return;
       }
 
-      var meta = post.seccionJson ? (post.seccionJson.meta || {}) : {};
-      var colorClaro = meta.colorClaro || post.colorClaro || '#f4f6fc';
-      var colorOficial = meta.colorOficial || post.colorOficial || '';
+      var pj = post.postJson || {};
+      var meta = pj.meta || {};
+      var colores = Array.isArray(meta.color) ? meta.color : [];
+      var colorClaro   = colores[2] || '#f4f6fc';
+      var colorOficial = colores[0] || '';
 
       area.style.background =
         'linear-gradient(180deg, ' +
@@ -630,8 +464,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
           btn.disabled = true;
           span.textContent = 'Quiero reservar mi cupo';
         } else {
-          var sj = postActivoGlobal.seccionJson || {};
-          var meta = sj.meta || {};
+          /* R76: meta.cta (ya existía). Mensaje del whatsapp ya
+             no decide el texto, solo el modo (esModoWhatsapp). */
+          var pj = postActivoGlobal.postJson || {};
+          var meta = pj.meta || {};
           span.textContent = meta.cta || 'Quiero reservar mi cupo';
 
           var estado = postActivoGlobal.estado || 'activo';
@@ -647,22 +483,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         }
       }
 
-      /* R46: la duda del post se sincroniza con cada cambio
-         (mismos disparadores que el CTA). */
       actualizarDuda();
     }
 
     /* ============================================================
-       R46 · DUDA DEL POST (botón "Consultar")
-       Visibilidad: solo si el post declara meta.botonDuda con
-       texto Y el CTA NO es modo WhatsApp (dos botones que abren
-       WhatsApp no suman). Nunca se deshabilita: aunque el CTA
-       esté off (pronto o cupos agotados), preguntar sigue siendo
-       válido. El texto viaja en meta.mensajeDuda con el
-       placeholder {titulo}, que se sustituye por el título del
-       post al armar el mensaje.
-       R50 · con duda visible, la fila se marca .segmentada:
-       duda + CTA se pintan como UNA sola píldora dividida.
+       R46 · DUDA DEL POST
+       R76: meta.duda (antes meta.botonDuda). El resto igual.
        ============================================================ */
     function actualizarDuda() {
       var btn = document.querySelector('.cta-duda');
@@ -670,9 +496,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
       var texto = '';
       if (postActivoGlobal) {
-        var sj = postActivoGlobal.seccionJson || {};
-        var meta = sj.meta || {};
-        texto = String(meta.botonDuda || '').trim();
+        var pj = postActivoGlobal.postJson || {};
+        var meta = pj.meta || {};
+        texto = String(meta.duda || '').trim();
         if (esModoWhatsapp(postActivoGlobal)) texto = '';
       }
 
@@ -687,9 +513,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (fila) fila.classList.toggle('segmentada', !!texto);
     }
 
-    /* Click de la duda · delegado en document (capture, mismo
-       carril que el CTA). Arma el mensaje con {titulo} y abre
-       el WhatsApp del partner. */
+    /* Click de la duda · R76: meta.duda + meta.mensajeDuda. */
     document.addEventListener('click', function (e) {
       var objetivo = e.target;
       if (!objetivo || !objetivo.closest) return;
@@ -700,14 +524,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       var post = postActivoGlobal;
       if (!post) return;
 
-      var sj = post.seccionJson || {};
-      var meta = sj.meta || {};
-      var sp = sj.seccionPresentacion || {};
+      var pj = post.postJson || {};
+      var meta = pj.meta || {};
+      var desc = pj.descripcion || {};
 
       var mensaje = String(meta.mensajeDuda || '').trim();
       if (!mensaje) return;
 
-      var titulo = String(sp.titulo || post.titulo || '').trim();
+      var titulo = String(desc.tituloPost || post.titulo || '').trim();
       if (titulo) mensaje = mensaje.split('{titulo}').join(titulo);
 
       var partner = buscarPartner(post.idPartner);
@@ -719,8 +543,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (typeof window.abrirWhatsapp === 'function') {
         window.abrirWhatsapp(numero, mensaje);
 
-        /* GA4 (R12): mismo evento del CTA, con el tipo para
-           separar duda de reserva en los informes. */
         if (window.Analitica) {
           window.Analitica.enviar('whatsapp_click', {
             post_id:    post.id || '',
@@ -740,7 +562,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (btn.disabled) return;
 
       if (intentarWhatsapp()) {
-        /* GA4 (R12): CTA de WhatsApp del post activo */
         if (window.Analitica && postActivoGlobal) {
           window.Analitica.enviar('whatsapp_click', {
             post_id:    postActivoGlobal.id || '',
@@ -755,8 +576,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
     document.addEventListener('post:change', function (e) {
       var post = e.detail ? e.detail.post : null;
 
-      /* GA4 (R12): post_open al abrir detalle · post_close al
-         volver a la lista (post:change con null) */
       if (window.Analitica) {
         if (post && post.id) {
           window.Analitica.enviar('post_open', {
@@ -784,7 +603,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       actualizarTextoCTA();
       if (window.Puente) window.Puente.guardar();
 
-      /* GA4 (R12) */
       if (window.Analitica && e.detail && e.detail.idChip) {
         window.Analitica.enviar('chip_change', {
           chip_id: e.detail.idChip,
@@ -793,8 +611,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     });
 
-    /* GA4 (R12): búsqueda con debounce para no disparar por
-       tecla (el evento DOM buscar:change es por pulsación). */
     var _busquedaTimer = null;
     document.addEventListener('buscar:change', function (e) {
       if (!window.Analitica) return;
@@ -835,18 +651,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
           window.parent.postMessage({ tipo: 'app-lista' }, '*');
         }
       } catch (_) {}
-      /* R26: la página estática de GitHub Pages no tiene padre;
-         el preloader vive en ESTA página y escucha el evento DOM. */
       try { document.dispatchEvent(new Event('app-lista')); } catch (_) {}
     }
 
-    /* ============================================================
-       Carga de TABLAS · todos los posts en un solo POST
-       ============================================================ */
     function cargarTablas() {
-      /* R21 · L2: catálogo persistido → arranque instantáneo.
-         TABLAS se llena YA (la lista pinta al toque, incluso
-         con GAS en frío) y la red valida por detrás. */
       var l2 = window.CacheL2.leerCatalogo();
       if (l2) {
         window.TABLAS.posts    = l2.data.posts;
@@ -871,12 +679,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         });
     }
 
-    /* R21: el POST de catálogo en segundo plano cuando hay L2.
-       Si trajo algo distinto a lo cacheado y el usuario sigue
-       viendo la lista, se repinta lista + promo (SIN evento de
-       chip: no contamina GA4 ni el puente). Si está leyendo un
-       post, no se toca la pantalla. Si falla, la lista cacheada
-       sigue en pie. */
     function _revalidarCatalogo(rawAnterior) {
       postBackend('catalogo', null, { mudo: true })
         .then(function (data) {
@@ -902,20 +704,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
             }
           }
         })
-        .catch(function () { /* silencioso: la lista cacheada sigue en pantalla */ });
+        .catch(function () {});
     }
 
     /* ============================================================
-       TÍTULO INICIAL (R62 · VECTOR ALEATORIO) · la frase grande
-       del header vive en la BD real: ROOTJSON → app.tituloHeader
-       (SISTEMA.root). Desde R62 es un VECTOR de frases: cada
-       carga/actualización de la app elige UNA AL AZAR — si el
-       usuario abre la app 10 veces, 10 frases distintas puede
-       ver (la app se siente viva). Si la BD lo trae como texto
-       único se usa tal cual (compatibilidad); si no trae nada,
-       el elemento queda oculto y el header respira sin él. Se
-       pinta una vez al montar el lienzo (cada carga de página
-       es un montaje nuevo: cada carga, frase nueva).
+       TÍTULO INICIAL · vector aleatorio desde ROOTJSON
        ============================================================ */
     function fraseAleatoria(vector) {
       var limpias = [];
@@ -940,10 +733,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       } else {
         t = String(t || '').trim();
 
-        /* R63 · si el Setup guardó el vector como TEXTO (string
-           con formato JSON), se parsea aquí: la frase al azar
-           de cada carga ya no depende de cómo lo guarde la
-           hoja (el dueño veía siempre la misma). */
         if (t.charAt(0) === '[' && t.charAt(t.length - 1) === ']') {
           try {
             var v = JSON.parse(t);
@@ -962,13 +751,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     }
 
-    /* ============================================================
-       PLACEHOLDER DEL BUSCADOR (R61) · el texto guía vive en
-       la BD real: ROOTJSON → app.placeholderBuscar
-       (SISTEMA.root). Si la BD no lo trae queda el fijo de la
-       app. Así el dueño cambia el texto desde la hoja sin
-       tocar código.
-       ============================================================ */
     function pintarPlaceholderBuscar() {
       var input = document.getElementById('buscarInput');
       if (!input) return;
@@ -992,11 +774,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       lienzo.appendChild(fragmento);
       lienzo.dataset.pintado = '1';
 
-      /* R62 · los glifos del template (ubicación del botón
-         ciudad, filtro del botón filtros…) se pintan aquí:
-         el pintado automático de Iconos corrió ANTES de que
-         el lienzo existiera. pintarUno es idempotente, así
-         que nadie se pinta doble. */
       if (typeof window.pintarGlifos === 'function') {
         window.pintarGlifos(lienzo);
       }
@@ -1007,7 +784,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         requestAnimationFrame(function () {
           avisarAlPadre();
 
-          /* GA4 (R12): la app terminó de pintar */
           if (window.Analitica) {
             window.Analitica.enviar('app_ready', {
               ciudad: window.Analitica.idCiudadActual()
@@ -1017,11 +793,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       });
     }
 
-    /* ============================================================
-       Skeleton de lista
-       Solo se muestra si el usuario elige ciudad y el POST inicial
-       aún no llegó. Teléfonos lentos o elección muy rápida.
-       ============================================================ */
     function mostrarSkeletonLista() {
       var wrap = document.getElementById('listaWrap');
       if (!wrap) return;
@@ -1050,9 +821,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       wrap.innerHTML = html;
     }
 
-    /* ============================================================
-       Repintar chrome
-       ============================================================ */
     function repintar() {
       if (window.Chips && typeof window.Chips.pintar === 'function') {
         window.Chips.pintar();
@@ -1068,7 +836,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         return;
       }
 
-      /* Los datos aún no llegaron → mostrar skeleton y esperar */
       mostrarSkeletonLista();
 
       if (promesaCarga) {
@@ -1078,15 +845,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     }
 
-    /* ============================================================
-       Arrancar componentes · DOM ya montado
-       ============================================================ */
     function arrancarComponentes() {
       if (window.Ciudad && typeof window.Ciudad.engancharBoton === 'function') {
         window.Ciudad.engancharBoton();
       }
 
-      /* R66: liga #btnOrdenar (abre el sheet de ordenamiento) */
       if (window.Ordenar && typeof window.Ordenar.engancharBoton === 'function') {
         window.Ordenar.engancharBoton();
       }
@@ -1106,7 +869,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       if (window.Global && typeof window.Global.pintar === 'function') {
         window.Global.pintar();
       }
-      /* R64: liga #btnCompartir (la visibilidad la decide Lista) */
       if (window.Compartir && typeof window.Compartir.pintar === 'function') {
         window.Compartir.pintar();
       }
@@ -1117,22 +879,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       actualizarTextoCTA();
     }
 
-    /* ============================================================
-       Cambio de ciudad
-       ============================================================ */
     document.addEventListener('ciudad:change', function (e) {
       if (window.Lista && typeof window.Lista.getModo === 'function' &&
           window.Lista.getModo() === 'detalle') {
         window.Lista.cerrarDetalle(true);
       }
 
-      /* R63 · el dueño: cada cambio de ciudad cae al chip de
-         SERVICIOS por defecto (Irapa sin cursos no puede dejar
-         la lista vacía, y el retorno a Güiria ya no aterriza en
-         cursos). Chips.resetearVista escribe la vista guardada
-         para que la restauración no reviva el chip anterior;
-         sin el módulo nuevo (archivo viejo), borrar la vista
-         logra el mismo efecto con el chip 1. */
       if (window.Chips &&
           typeof window.Chips.resetearVista === 'function') {
         window.Chips.resetearVista();
@@ -1144,7 +896,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
 
       if (window.Puente) window.Puente.guardar();
 
-      /* GA4 (R12) */
       if (window.Analitica && e.detail && e.detail.idCiudad) {
         window.Analitica.enviar('city_change', {
           city_id:   e.detail.idCiudad,
@@ -1153,18 +904,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     });
 
-    /* ============================================================
-       Arranque · POST en paralelo con el sheet
-       El estado guardado (puente R10) se aplica ANTES de decidir
-       si se abre la selección obligatoria de ciudad: si el
-       envoltorio devuelve ciudad válida, el usuario entra directo
-       a su lista sin re-seleccionar nada.
-       ============================================================ */
     function arranque() {
-      /* R26: en la página estática la sesión llega POR DATOS
-         (abrirSesion → token + SISTEMA). En la página de GAS el
-         token ya viene inyectado y asegurarSesion resuelve al
-         instante: mismo orden de siempre (v1.7). */
       var pre = (typeof window.asegurarSesion === 'function')
         ? window.asegurarSesion()
         : Promise.resolve();
@@ -1177,12 +917,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         window.Puente.pedirEstado().then(function (estado) {
           window.Puente.aplicarEstado(estado);
 
-          /* R36 · ENLACE COMPARTIDO ENTRANTE: la recepción manda.
-             El enlace trae su contenido cifrado (post o lista con
-             ciudad): se omite la selección obligatoria de ciudad,
-             se espera la carga de TABLAS, se inyecta el lienzo y
-             Compartir.recibir() aplica todo y activa el modo
-             compartido (campo bloqueado + "Limpiar búsqueda"). */
           if (window.Compartir &&
               typeof window.Compartir.hayEntrante === 'function' &&
               window.Compartir.hayEntrante()) {
@@ -1215,8 +949,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         });
       });
 
-      /* R26: sin sesión no hay arranque posible (pantalla de
-         red con Reintentar). En la página de GAS nunca corre. */
       pre.catch(function (err) {
         console.warn('[Core] Sesión inicial falló:', err && err.message);
         if (typeof _mostrarErrorRed === 'function') _mostrarErrorRed();
@@ -1238,16 +970,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       }
     });
 
-    /* ============================================================
-       REFRESH AL VOLVER FOCO · 60s throttle
-       ============================================================ */
     var ULTIMO_REFRESH_MS   = 0;
     var THROTTLE_REFRESH_MS = 60 * 1000;
 
     function refrescarCatalogo() {
-      /* R21: mudo — este refresco corre con la app YA pintada;
-         si la red falla, el contenido vivo no se tapa con la
-         pantalla "Sin conexión". Éxito → se actualiza L2. */
       return postBackend('catalogo', null, { mudo: true })
         .then(function (data) {
           if (data && Array.isArray(data.posts))     window.TABLAS.posts    = data.posts;
@@ -1259,12 +985,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
         });
     }
 
-    function refrescarComentariosSiAplican() {
-      if (window.Comentarios &&
-          typeof window.Comentarios.estaAbierto === 'function' &&
-          window.Comentarios.estaAbierto() &&
-          typeof window.Comentarios.refrescar === 'function') {
-        window.Comentarios.refrescar();
+    function refrescarPreguntasSiAplican() {
+      if (window.Pregunta &&
+          typeof window.Pregunta.estaAbierto === 'function' &&
+          window.Pregunta.estaAbierto() &&
+          typeof window.Pregunta.refrescar === 'function') {
+        window.Pregunta.refrescar();
       }
     }
 
@@ -1276,7 +1002,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Index.html
       ULTIMO_REFRESH_MS = ahora;
 
       refrescarCatalogo();
-      refrescarComentariosSiAplican();
+      refrescarPreguntasSiAplican();
     }
 
     document.addEventListener('visibilitychange', onVisibilityChange);
