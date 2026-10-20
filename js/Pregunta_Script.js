@@ -1,15 +1,26 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Pregunta_Script.html
 ESPEJO GITHUB:   github/js/Pregunta_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
-                 lienzo: campo de pregunta (X de limpiar como el
-                 Buscar, contador restante con avisos, aviso corto),
-                 publicación sin recargar (recientes primero) y sheet
-                 al 90% para ver todas las preguntas con fade final.
+                 lienzo: campo de pregunta (X de limpiar neutra,
+                 aviso corto con icono de info, contador N/250
+                 centrado bajo el botón enviar), publicación sin
+                 recargar (recientes primero; al publicar se limpia
+                 el campo y sale el foco) y sheet al 90% para ver
+                 todas las preguntas con fade final.
                  Sin borrado y sin nombre de quien pregunta.
-VERSIÓN:         1.0.0
-CAMBIOS:         R77: Nace el archivo. Reemplaza al módulo de
+VERSIÓN:         1.0.1
+CAMBIOS:         R77B: El contador pasa a formato N/250 (cuánto
+                 lleva y cuánto queda) centrado bajo el botón
+                 enviar; el aviso corto lleva el icono info de
+                 Iconos; al publicar el campo se limpia y pierde
+                 el foco aunque venga del Enter; si el backend
+                 falla se avisa con un mensaje suave y el botón
+                 vuelve a su estado. Lee el total desde
+                 data.pregunta (o data.comenta de transición).
+                 R77: Nace el archivo. Reemplaza al módulo de
                  comentarios del post: mismo camino de backend
                  (acciones comentario/comentarios y notificación
                  Telegram al partner, intactas) contra la tabla
@@ -20,7 +31,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  (monta buildHTML/enganchar/cargar), Seccion_CSS.html
                  (infra .mk-sheet-*), Pregunta_CSS.html,
                  Core_CSS.html (clases maestras)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Pregunta = (function () {
 
@@ -62,12 +73,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                            'aria-label="Escribe tu pregunta">' +
                     '<button type="button" class="preg-clear" id="pregClear" aria-label="Limpiar pregunta"><span data-glifo="close"></span></button>' +
                   '</div>' +
-                  '<button type="button" class="preg-send" id="pregSend" disabled aria-label="Enviar pregunta"><span data-glifo="enviar"></span></button>' +
+                  '<div class="preg-send-col">' +
+                    '<button type="button" class="preg-send" id="pregSend" disabled aria-label="Enviar pregunta"><span data-glifo="enviar"></span></button>' +
+                    '<span class="preg-counter cita" id="pregCounter" hidden>0/' + MAX_CHARS + '</span>' +
+                  '</div>' +
                 '</div>';
       html +=   '<div class="preg-meta">' +
-                  '<span class="preg-aviso cita">' + AVISO + '</span>' +
-                  '<span class="preg-counter cita" id="pregCounter" hidden>' + MAX_CHARS + '</span>' +
+                  '<span class="preg-aviso cita">' +
+                    '<span class="preg-aviso-icono" data-glifo="info" aria-hidden="true"></span>' +
+                    AVISO +
+                  '</span>' +
                 '</div>';
+      html +=   '<p class="preg-error cita" id="pregError" hidden>No se pudo enviar. Intenta de nuevo.</p>';
       html +=   '<div class="mk-qa-preview" id="pregPreview"></div>';
       html += '</div>';
       return html;
@@ -83,6 +100,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         clear:    track.querySelector('#pregClear'),
         send:     track.querySelector('#pregSend'),
         counter:  track.querySelector('#pregCounter'),
+        error:    track.querySelector('#pregError'),
         preview:  track.querySelector('#pregPreview')
       };
       if (!el.input) return;
@@ -120,17 +138,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       el.send.disabled = !tieneTexto || enviando;
 
+      /* Contador N/250: cuánto lleva y cuánto queda. Solo con
+         texto; al llegar al tope avisa en naranja. */
       if (el.counter) {
         if (!tieneTexto) { el.counter.hidden = true; }
         else {
           el.counter.hidden = false;
-          var restantes = MAX_CHARS - len;
-          el.counter.textContent = String(restantes);
-          el.counter.classList.remove('warn', 'danger');
-          if (restantes <= 10) el.counter.classList.add('danger');
-          else if (restantes <= 20) el.counter.classList.add('warn');
+          el.counter.textContent = len + '/' + MAX_CHARS;
+          el.counter.classList.toggle('limite', len >= MAX_CHARS);
         }
       }
+    }
+
+    var errorTimer = null;
+    function mostrarError() {
+      if (!el.error) return;
+      el.error.hidden = false;
+      if (errorTimer) clearTimeout(errorTimer);
+      errorTimer = setTimeout(function () { if (el.error) el.error.hidden = true; }, 4000);
     }
 
     /* ============================================================
@@ -207,11 +232,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
             fecha:         new Date().toISOString(),
             dispositivoId: (typeof getDeviceId === 'function' ? getDeviceId() : '')
           });
-          if (data && typeof data.comenta === 'number') total = data.comenta;
+          if (data && typeof data.pregunta === 'number') total = data.pregunta;
+          else if (data && typeof data.comenta === 'number') total = data.comenta;
           else total = total + 1;
 
+          /* Publicada: campo limpio, sin foco y arriba de la lista */
           el.input.value = '';
           actualizarField();
+          try { el.input.blur(); } catch (err) {}
           renderPreview();
 
           document.dispatchEvent(new CustomEvent('preguntas:change', {
@@ -223,6 +251,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         .catch(function (err) {
           enviando = false;
           el.send.disabled = el.input.value.trim().length === 0;
+          mostrarError();
           console.error('[Pregunta] No se pudo publicar:', err && err.message);
         });
     }

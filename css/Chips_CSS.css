@@ -1,4 +1,5 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
@@ -7,8 +8,11 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  global), buscador con X de limpiar, botón
                  ordenar, chips de categorías, botón ciudad,
                  fila de promos y envoltorios de filtros.
-VERSIÓN:         2.6
-CAMBIOS:         R77: El placeholder del Buscar usa las variables
+VERSIÓN:         2.7
+CAMBIOS:         R77B: El texto de los chips pasa a la voz del
+                 textoPrimario (variables del Core) para acompañar
+                 la centralización tipográfica del dueño.
+                 R77: El placeholder del Buscar usa las variables
                  de textoSecundario (la voz la manda también la
                  regla maestra ::placeholder del Core). Encabezado
                  saneado: solo queda lo vigente.
@@ -16,7 +20,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura de filtros),
                  Lista_CSS.html (lista y buscar-vacio),
                  Ciudad_Sheet_CSS.html (botón ciudad)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      WRAP · FILA DE CABECERA (R63)
@@ -154,10 +158,10 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     background: transparent;
 
     font-family: inherit;
-    font-size: 13.5px;
-    font-weight: 500;
+    /* Voz del textoPrimario (maestras del Core) */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
     line-height: 1.1;
-    letter-spacing: -0.01em;
     white-space: nowrap;
 
     color: #475569;

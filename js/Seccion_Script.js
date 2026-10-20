@@ -1,14 +1,22 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Seccion_Script.html
 ESPEJO GITHUB:   github/js/Seccion_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
-                 hero con carrusel y etiqueta de ciudad, info y
-                 descripción con su sheet, fila del partner, CTA,
-                 ubicación, cross-sell, In Company y bloque asesor.
+                 hero con carrusel y etiqueta de ciudad, bloque de
+                 bienvenida para posts sin foto, info y descripción
+                 con su sheet, fila del partner, CTA, ubicación,
+                 cross-sell, In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.1.0
-CAMBIOS:         R77: (1) El enlace de la descripción pasa a decir
+VERSIÓN:         2.1.1
+CAMBIOS:         R77B: (1) Los posts sin foto ya no quedan sin
+                 hero: se pinta un bloque de bienvenida (glifo
+                 imagen de Iconos + mensaje de aliento) que conserva
+                 el badge de ciudad y los botones sociales, para que
+                 el post se sienta completo y con la misma estructura.
+                 (2) El nombre del partner pasa a .textoPrimario.
+                 R77: (1) El enlace de la descripción pasa a decir
                  "Ver descripción completa".
                  (2) El sheet de descripción gana el fade final que
                  se retira al llegar al final del scroll.
@@ -22,7 +30,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  Partner_Sheet_Script.html, Ciudad_Script (window.Ciudad),
                  Chips_Script (window.Chips), Seccion_CSS.html,
                  Pregunta_CSS.html, Core_CSS.html
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   window.Secciones = (function () {
 
@@ -56,9 +64,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     function _buildHero(imagenes) {
-      if (!imagenes || !imagenes.length) return '';
-      var limpias = imagenes.map(function (u) { return String(u || '').trim(); }).filter(Boolean);
-      if (!limpias.length) return '';
+      var limpias = (imagenes || []).map(function (u) { return String(u || '').trim(); }).filter(Boolean);
 
       var city = '';
       try {
@@ -75,6 +81,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         '</div>' : '';
 
       var socialContainer = '<div class="app-hero-social" id="heroSocialButtons"></div>';
+
+      /* Post sin foto: bloque de bienvenida con la misma estructura
+         del hero (badge de ciudad y sociales incluidos), para que
+         no se sienta roto ni incompleto y el usuario siga leyendo. */
+      if (!limpias.length) {
+        return '<div class="app-hero post-hero-vacio">' + cityBadge + socialContainer +
+                 '<div class="post-hero-vacio-centro">' +
+                   '<span class="post-hero-vacio-icono" data-glifo="imagen" aria-hidden="true"></span>' +
+                   '<p class="post-hero-vacio-titulo textoPrimario">Este post no trae foto</p>' +
+                   '<p class="textoSecundario post-hero-vacio-texto">Viene completo por escrito: sigue leyendo que aquí abajo hay bueno.</p>' +
+                 '</div>' +
+               '</div>';
+      }
 
       if (limpias.length === 1) {
         var src = escapeHtml(_urlImagen(limpias[0]));
@@ -150,7 +169,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html +=     '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>';
       html +=   '</div>';
       html +=   '<div class="mk-partner-info">';
-      html +=     '<div class="subtitulo" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
+      html +=     '<div class="textoPrimario" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
       if (eslogan) { html +=   '<div class="textoSecundario" style="font-size:12px !important;">' + escapeHtml(eslogan) + '</div>'; }
       html +=   '</div>';
       html +=   '<span class="mk-partner-chevron">›</span>';

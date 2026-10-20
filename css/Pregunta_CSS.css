@@ -1,13 +1,23 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Pregunta_CSS.html
 ESPEJO GITHUB:   github/css/Pregunta_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
-                 lienzo (con enviar, X de limpiar, contador y aviso),
-                 vista previa de las últimas preguntas con fade y el
-                 sheet al 90% para ver todas las preguntas.
-VERSIÓN:         1.0.0
-CAMBIOS:         R77: Nace el archivo. El Q&A se maneja completo en
+                 lienzo (enviar con su contador centrado debajo, X de
+                 limpiar neutra, aviso con icono de info), vista
+                 previa de las últimas preguntas con fade y el sheet
+                 al 90% para ver todas las preguntas.
+VERSIÓN:         1.0.1
+CAMBIOS:         R77B: El botón enviar queda de fondo blanco con el
+                 glifo naranja (sin competir con el CTA, igual que
+                 los botones sociales del hero); la X de limpiar
+                 deja el círculo naranja y pasa a glifo neutro; el
+                 contador N/250 se centra bajo el enviar y avisa en
+                 naranja solo al llegar al tope; el aviso corto se
+                 acompaña con el icono info; entra el mensaje suave
+                 de error de envío.
+                 R77: Nace el archivo. El Q&A se maneja completo en
                  el lienzo (sin sheet para escribir) y el sheet queda
                  solo para ver todas las preguntas, igual que "Ver
                  descripción completa": solo lectura, sin botones
@@ -17,7 +27,7 @@ CAMBIOS:         R77: Nace el archivo. El Q&A se maneja completo en
 DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
                  Seccion_CSS.html (infra .mk-sheet-* del sheet),
                  Social_CSS.html (colores del post vía --post-color)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
      SECCIÓN Q&A EN EL LIENZO
@@ -30,7 +40,7 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
      CAMPO DE PREGUNTA · mismo lenguaje que el Buscar del lienzo
      ============================================================ */
   .preg-form {
-    display: flex; align-items: flex-end; gap: 8px;
+    display: flex; align-items: flex-start; gap: 8px;
     margin-bottom: 6px;
   }
 
@@ -49,45 +59,66 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   }
   .preg-input::-webkit-scrollbar { display: none; }
 
-  /* X de limpiar: solo con texto; limpia y quita el foco (como el Buscar) */
+  /* X de limpiar: solo con texto; limpia y quita el foco (como el
+     Buscar). Glifo neutro sin círculo: no compite con el CTA. */
   .preg-clear {
     display: none; align-items: center; justify-content: center;
     width: 28px; height: 28px; margin-right: 7px; flex-shrink: 0;
-    border: none; border-radius: 50%; background-color: #f97316; color: #ffffff;
+    border: none; border-radius: 50%; background-color: transparent; color: #64748b;
     cursor: pointer; padding: 0;
+    transition: opacity 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .preg-clear svg { width: 14px; height: 14px; display: block; }
+  .preg-clear:active { opacity: 0.6; }
+  .preg-clear svg { width: 15px; height: 15px; display: block; }
   .preg-input-wrap.con-texto .preg-clear { display: flex; }
 
+  /* Columna enviar + contador centrado debajo del icono */
+  .preg-send-col {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 5px; flex-shrink: 0;
+  }
+
+  /* Enviar: círculo blanco con el glifo naranja (mismo tratamiento
+     de los botones sociales del hero); sin competir con el CTA.
+     Sin texto el glifo se apaga en gris. */
   .preg-send {
-    width: 42px; height: 42px; flex-shrink: 0; padding: 0;
-    border: none; border-radius: 50%; background-color: #f97316; color: #ffffff;
+    width: 42px; height: 42px; padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 50%;
+    background-color: #ffffff; color: #f97316;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
-    box-shadow: 0 3px 10px rgba(249, 115, 22, 0.30);
-    transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+    transition: transform 0.15s ease, color 0.2s ease, box-shadow 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
   .preg-send:active { transform: scale(0.92); }
-  .preg-send:disabled { opacity: 0.35; background-color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+  .preg-send:disabled { color: #cbd5e1; box-shadow: none; cursor: not-allowed; }
   .preg-send svg { width: 19px; height: 19px; display: block; margin-left: 1px; }
 
   /* ============================================================
-     FILA INFERIOR · aviso corto bajo el campo + contador bajo enviar
+     FILA INFERIOR · aviso corto con icono info + error de envío
      ============================================================ */
   .preg-meta {
-    display: flex; align-items: baseline; gap: 10px;
+    display: flex; align-items: baseline;
     padding: 0 2px; margin-bottom: 4px;
   }
-  .preg-aviso { flex: 1; min-width: 0; }
+  .preg-aviso { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+  .preg-aviso-icono {
+    flex-shrink: 0; width: 12px; height: 12px;
+    display: inline-flex; color: #64748b;
+  }
+  .preg-aviso-icono svg { width: 100%; height: 100%; display: block; }
 
+  .preg-error { margin: 0 0 4px 2px; color: #dc2626 !important; }
+  .preg-error[hidden] { display: none; }
+
+  /* Contador N/250 · centrado bajo el botón enviar */
   .preg-counter {
-    flex-shrink: 0; min-width: 26px; text-align: right;
+    text-align: center; line-height: 1;
     font-size: var(--size-cita) !important; font-weight: 400 !important;
     color: #64748b !important; transition: color 0.2s ease;
   }
-  .preg-counter.warn   { color: #ea580c !important; }
-  .preg-counter.danger { color: #dc2626 !important; }
+  .preg-counter.limite { color: #ea580c !important; }
 
   /* ============================================================
      VISTA PREVIA · última pregunta y penúltima con fade

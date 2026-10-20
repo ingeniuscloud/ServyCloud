@@ -1,14 +1,23 @@
-/*══════════════════════════════════════════════════════════════════
+/*════════════════════════════════════════════════════════════════════
+
 ARCHIVO:         Seccion_CSS.html
 ESPEJO GITHUB:   github/css/Seccion_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  info y descripción, fila del partner, CTA,
-                 ubicación, cross-sell, In Company, bloque asesor y
-                 la infraestructura de sheets .mk-sheet-* (leída
-                 por el sheet de descripción y por Pregunta).
-VERSIÓN:         2.0.8
-CAMBIOS:         R77: (1) La sombra del .mk-sheet solo se pinta con
+                 ubicación, cross-sell, In Company, bloque asesor,
+                 los puntos del carrusel, el bloque de bienvenida de
+                 los posts sin foto y la infraestructura de sheets
+                 .mk-sheet-* (leída por el sheet de descripción y por
+                 Pregunta).
+VERSIÓN:         2.0.9
+CAMBIOS:         R77B: (1) Los puntos del carrusel adoptan el
+                 tratamiento de los botones sociales del hero
+                 (fondo blanco, borde suave y sombra): ya no se
+                 pierden sobre imágenes claras. (2) Entran los
+                 estilos del bloque de bienvenida de los posts sin
+                 foto (.post-hero-vacio).
+                 R77: (1) La sombra del .mk-sheet solo se pinta con
                  el sheet abierto y el root recorta (.preg-root y
                  .mk-sheet-root con overflow:hidden): se acaba la
                  sombra viva en el borde inferior tras cerrar.
@@ -17,7 +26,7 @@ CAMBIOS:         R77: (1) La sombra del .mk-sheet solo se pinta con
                  retira al llegar al final del scroll.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
-══════════════════════════════════════════════════════════════════*/
+════════════════════════════════════════════════════════════════════*/
 
   /* [Todo el CSS de Seccion_CSS se mantiene igual] */
 
@@ -49,8 +58,30 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .post-hero-slide { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }
   
   .app-hero-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
-  .app-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.55); transition: background 0.2s, width 0.2s; }
-  .app-hero-dot.activo { background: #fff; width: 14px; border-radius: 3px; }
+  /* Mismo tratamiento de los botones sociales del hero:
+     fondo blanco + borde suave + sombra, visibles sobre
+     cualquier imagen, también sobre fondos claros. */
+  .app-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.14); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28); transition: width 0.2s, border-radius 0.2s; }
+  .app-hero-dot.activo { width: 14px; border-radius: 3px; }
+
+  /* ============================================================
+     POST SIN FOTO · bloque de bienvenida (misma estructura del
+     hero: badge de ciudad y sociales incluidos). Pastel cálido
+     de la app, glifo imagen y mensaje de aliento para que el
+     post no se sienta roto y se siga leyendo.
+     ============================================================ */
+  .post-hero-vacio { background: #FFF7ED; }
+
+  .post-hero-vacio-centro {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; text-align: center; padding: 0 14%;
+  }
+  .post-hero-vacio-icono { width: 44px; height: 44px; color: #fdba74; }
+  .post-hero-vacio-icono svg { width: 100%; height: 100%; display: block; }
+
+  .post-hero-vacio-titulo { margin: 2px 0 0; font-weight: 600 !important; }
+  .post-hero-vacio-texto { margin: 0; }
 
   .mk-hero-location {
     position: absolute; top: 12px; right: 12px; z-index: 2;
@@ -133,7 +164,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .cross-incompany .ci-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   .cross-incompany .ci-titulo { display: block; font-size: var(--size-ui-2); font-weight: 500; color: #64748B; line-height: 1.2; }
   .cross-incompany .ci-cta { display: block; font-size: 0.92rem; font-weight: 700; color: #1f2937; letter-spacing: -0.2px; line-height: 1.2; }
-  .cross-incompany .ci-boton { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #f97316; display: flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.32); }
+  .cross-incompany .ci-boton { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; color: #f97316; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10); }
 
   .bloque-asesor {
     display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 16px;
