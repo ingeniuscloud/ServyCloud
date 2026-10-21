@@ -10,8 +10,12 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  compartidos en el backend. El mensaje de WhatsApp
                  lleva el formato del dueño y el enlace profundo de
                  Compartir. Key localStorage: post_likes.
-VERSIÓN:         2.0.1
-CAMBIOS:         R90: EL CORAZÓN VOLADOR SALE DESDE EL LUGAR JUSTO —
+VERSIÓN:         2.0.2
+CAMBIOS:         R91: LIMPIEZA ALINEADA AL VUELO LARGO — la animación
+                 del corazón pasó de 0.8s a 1.05s (recorrido más
+                 largo, ver Social_CSS 1.4.2) y la limpieza del
+                 wrap pasa de 850ms a 1150ms para no cortarla.
+                 R90: EL CORAZÓN VOLADOR SALE DESDE EL LUGAR JUSTO —
                  antes se calculaba su posición con rects contra el
                  contenedor (#heroSocialButtons) y en el teléfono
                  arrancaba desplazado de donde está el corazón.
@@ -242,9 +246,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       btn.appendChild(wrap);
 
+      /* R91: limpieza alineada a la animación de 1.05s. */
       setTimeout(function () {
         if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-      }, 850);
+      }, 1150);
     }
 
     /* ============================================================

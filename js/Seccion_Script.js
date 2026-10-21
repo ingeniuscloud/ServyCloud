@@ -10,8 +10,18 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.2
-CAMBIOS:         R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — los
+VERSIÓN:         2.4.3
+CAMBIOS:         R91: SKELETON DE LAS IMÁGENES DEL POST — cada
+                 imagen del hero nace con .post-hero-img-cargando
+                 (shimmer en el marco, ver Seccion_CSS 2.3.3) y
+                 engacharSkeletonImagenes la destapa cuando su
+                 archivo termina: onload → .post-hero-img-cargada
+                 (fundido 0.35s), error → .post-hero-img-error
+                 (queda el vidrio). Si la imagen ya venía del
+                 cache (complete && naturalWidth>0) se destapa en
+                 el mismo frame, sin esqueleto visible. Vale para
+                 imagen única y carrusel.
+                 R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — los
                  posts sin foto propia llegan con la imagen del
                  Setup (ROOTJSON.app.imagenDefault); ahora el hero
                  la detecta (compara la URL con SISTEMA.root.app.
@@ -165,14 +175,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       if (limpias.length === 1) {
         var src = escapeHtml(_urlImagen(limpias[0]));
-        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img' + claseDefault(limpias[0]) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img post-hero-img-cargando' + claseDefault(limpias[0]) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       }
 
       var html = '<div class="app-hero post-hero-carrusel">' + cityBadge + socialContainer;
       html +=   '<div class="post-hero-track" id="postHeroTrack">';
       limpias.forEach(function (u) {
         var src = escapeHtml(_urlImagen(u));
-        html += '<div class="post-hero-slide"><img class="post-hero-img' + claseDefault(u) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        html += '<div class="post-hero-slide"><img class="post-hero-img post-hero-img-cargando' + claseDefault(u) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       });
       html +=   '</div>';
       html +=   '<div class="app-hero-dots" id="postHeroDots">';
@@ -180,6 +190,34 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html +=   '</div>';
       html += '</div>';
       return html;
+    }
+
+    /* ============================================================
+       R91 · SKELETON DE IMÁGENES — cada .post-hero-img nace
+       "cargando" (shimmer) y se destapa cuando su archivo
+       termina: load → .post-hero-img-cargada (fundido 0.35s,
+       la default del Setup queda en 0.32), error →
+       .post-hero-img-error (queda el vidrio del marco). Si ya
+       venía del cache se destapa en el mismo frame, sin
+       esqueleto visible ni parpadeo.
+       ============================================================ */
+    function engacharSkeletonImagenes(raiz) {
+      var imgs = (raiz || document).querySelectorAll('img.post-hero-img-cargando');
+      Array.prototype.forEach.call(imgs, function (img) {
+        function marcarCargada() {
+          img.classList.remove('post-hero-img-cargando');
+          img.classList.add('post-hero-img-cargada');
+        }
+        function marcarError() {
+          img.classList.remove('post-hero-img-cargando');
+          img.classList.add('post-hero-img-error');
+        }
+        try {
+          if (img.complete && img.naturalWidth > 0) { marcarCargada(); return; }
+          img.addEventListener('load', marcarCargada);
+          img.addEventListener('error', marcarError);
+        } catch (e) { marcarCargada(); }
+      });
     }
 
     function _renderMarkdown(md) {
@@ -584,6 +622,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var htmlCross = buildCrossSell(); if (htmlCross) { var sec = document.createElement('div'); sec.innerHTML = htmlCross; fragment.appendChild(sec); }
 
       track.appendChild(fragment);
+
+      /* R91: skeleton de las imágenes del hero (red y cache) */
+      engacharSkeletonImagenes(track);
 
       if (typeof window.pintarGlifos === 'function') window.pintarGlifos(track);
       if (window.SeccionImagen && typeof window.SeccionImagen.enganchar === 'function') window.SeccionImagen.enganchar(track);

@@ -9,8 +9,18 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.2
-CAMBIOS:         R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — la
+VERSIÓN:         2.3.3
+CAMBIOS:         R91: SKELETON DE LAS IMÁGENES DEL POST — cada
+                 .post-hero-img nace "cargando" (shimmer gris en
+                 el marco, igual lenguaje que el skeleton del
+                 detalle) y se destapa con fundido 0.35s cuando
+                 su archivo termina (onload). Con cache no se ve
+                 el esqueleto (se destapa en el mismo frame). En
+                 error queda el vidrio. La default del Setup
+                 carga igual y al terminar se queda en 0.32
+                 (R90 intacto: la regla 0.32 ahora exige
+                 "cargada" para no teñir el shimmer).
+                 R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — la
                  imagen que el backend entrega para posts SIN foto
                  propia (la del Setup) se pinta con opacity 0.32
                  (.post-hero-img-default) para que no compita con
@@ -114,13 +124,33 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   @supports not (aspect-ratio: 1/1) {
     .app-hero::before { content: ''; display: block; padding-top: 100%; }
   }
+  /* R91: SKELETON MIENTRAS CARGA — la img nace opacity 0 con
+     shimmer propio (mismo gris/ritmo del skeleton del detalle:
+     1.4s); onload la destapa con fundido de 0.35s. */
   .post-hero-img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: contain; display: block;
+    opacity: 0; transition: opacity 0.35s ease;
   }
-  /* R90: la imagen POR DEFECTO del Setup (post sin foto propia)
-     casi transparente: acompaña sin competir con el CTA. */
-  .post-hero-img.post-hero-img-default { opacity: 0.32; }
+  .post-hero-img.post-hero-img-cargando {
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.06) 0%, rgba(15, 23, 42, 0.10) 50%, rgba(15, 23, 42, 0.06) 100%);
+    background-size: 200% 100%;
+    animation: heroImgShimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes heroImgShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .post-hero-img.post-hero-img-cargada { opacity: 1; }
+  /* R90 intacto: la POR DEFECTO del Setup, ya cargada, se queda
+     en 0.32 para no competir con el CTA (antes de cargar es
+     esqueleto como cualquier otra). */
+  .post-hero-img.post-hero-img-cargada.post-hero-img-default { opacity: 0.32; }
+  /* En error no se destapa nada: queda el vidrio del marco. */
+  .post-hero-img.post-hero-img-error { opacity: 0; background: none; animation: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .post-hero-img.post-hero-img-cargando { animation: none; }
+  }
   .post-hero-track { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
   .post-hero-track::-webkit-scrollbar { display: none; }
   .post-hero-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }

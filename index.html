@@ -5,7 +5,17 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.30.0
+VERSIÓN:         1.31.0
+CAMBIOS:         R91: Vienen byte-idénticos al GAS: js/Social_Script.js
+                 + css/Social_CSS.css (el corazón del like vuela más
+                 lejos: el recorrido pasa de 28px a ≈210px y la
+                 animación de 0.8s a 1.05s, limpieza alineada) y
+                 js/Seccion_Script.js + css/Seccion_CSS.css
+                 (SKELETON de las imágenes del post: cada foto del
+                 hero nace con shimmer y se destapa con fundido al
+                 terminar de cargar; con cache no hay parpadeo; en
+                 error queda el vidrio; la default del Setup sigue
+                 en 0.32). Sin cambios de includes.
 CAMBIOS:         R90: Vienen byte-idénticos al GAS: js/Social_Script.js
                  + css/Social_CSS.css (el corazón del like arranca
                  EXACTO desde el corazón del botón: el wrap nace

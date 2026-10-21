@@ -3,8 +3,15 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-VERSIÓN:         1.4.1
-CAMBIOS:         R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
+VERSIÓN:         1.4.2
+CAMBIOS:         R91: VUELO MÁS LARGO — el recorrido terminaba en
+                 -150% de la caja (28px reales de vuelo, se veía
+                 un brinco corto); ahora termina en -800% de la
+                 caja (≈210px de recorrido real) con duración
+                 0.8s→1.05s para que el tramo largo se vea suelto
+                 y no apurado. El arranque sigue siendo el centro
+                 EXACTO del corazón (fix R90 intacto).
+                 R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
                  tamaño propio (28×28px) para que el centrado con
                  translate(-50%,-50%) sea exacto dentro del botón
                  (que lo aloja desde su 50%/50%); antes la caja
@@ -55,7 +62,7 @@ CAMBIOS:         R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
     width: 28px; height: 28px; margin: 0;
     display: flex; align-items: center; justify-content: center;
     will-change: transform, opacity;
-    animation: heartFly 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: heartFly 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     z-index: 10;
   }
   
@@ -65,8 +72,10 @@ CAMBIOS:         R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
     display: block; fill: #ef4444; stroke: #ef4444; 
   }
 
+  /* R91: caja 28px → -800% = -224px: el corazón sube ≈210px
+     reales desde el centro del botón (antes 28px). */
   @keyframes heartFly {
     0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    20%  { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
-    100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+    15%  { transform: translate(-50%, -85%) scale(1.25); opacity: 1; }
+    100% { transform: translate(-50%, -800%) scale(1); opacity: 0; }
   }
