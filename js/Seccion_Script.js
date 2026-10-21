@@ -10,8 +10,24 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.3
-CAMBIOS:         R91: SKELETON DE LAS IMÁGENES DEL POST — cada
+VERSIÓN:         2.4.4
+CAMBIOS:         R92: (1) TABLA MARKDOWN DEL POST — marked pinta
+                 las tablas "de fábrica"; _decorarTablasMarkdown
+                 las viste con el Core (th → .textoPrimario,
+                 td → .textoSecundario) y, si la tabla tiene 3
+                 columnas (plan de inversión del curso), la
+                 última (precios) lleva .subtitulo y la tabla
+                 .mk-plan-tabla para alinear los valores a la
+                 derecha; los colores del post (--post-color /
+                 --post-pastel) viajan ahora en el wrap de la
+                 descripción y en el sheet completo para que el
+                 encabezado use el pastel del post. (2) PLACEHOLDER
+                 [VALOR BCV] — el texto que el dueño escribe en el
+                 markdown se sustituye por la fila del plan viejo
+                 (Tasa BCV {fecha} · Bs. {dolar}, SISTEMA.root.
+                 tasas); sin tasa servida el placeholder no se
+                 pinta.
+                 R91: SKELETON DE LAS IMÁGENES DEL POST — cada
                  imagen del hero nace con .post-hero-img-cargando
                  (shimmer en el marco, ver Seccion_CSS 2.3.3) y
                  engacharSkeletonImagenes la destapa cuando su
@@ -223,8 +239,82 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     function _renderMarkdown(md) {
       var texto = String(md || '').trim();
       if (!texto) return '';
-      try { if (typeof window.marked !== 'undefined' && typeof window.marked.parse === 'function') { return window.marked.parse(texto); } } catch (e) {}
-      return '<p>' + escapeHtml(texto) + '</p>';
+      var html = '';
+      try { if (typeof window.marked !== 'undefined' && typeof window.marked.parse === 'function') { html = window.marked.parse(texto); } } catch (e) {}
+      if (!html) html = '<p>' + escapeHtml(texto) + '</p>';
+      /* R92: el placeholder [valor bcv] del markdown se sustituye
+         por la fila de la tasa (la misma que mostraba el plan
+         viejo). Si no hay tasa servida, desaparece — nunca se
+         pinta el texto crudo. */
+      try { if (/\[valor bcv\]/i.test(html)) html = html.replace(/\[valor bcv\]/gi, _htmlTasaBCV()); } catch (e) {}
+      return html;
+    }
+
+    /* ============================================================
+       R92 · TASA BCV EN EL MARKDOWN — helpers del texto antiguo
+       (formatearBs: 1234.5 → 1.234,50 · limpiarFechaTasa: quita
+       comas y el año suelto del final). La fila usa SISTEMA.root.
+       tasas (dolar + fechavalor), que el backend ya sirve en el
+       ROOTJSON (03 BCV.gs la actualiza a diario).
+       ============================================================ */
+    function formatearBs_(n) {
+      var v = Number(n);
+      if (!isFinite(v)) return '';
+      var s = v.toFixed(2).replace('.', ',');
+      var partes = s.split(',');
+      partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      return partes.join(',');
+    }
+
+    function limpiarFechaTasa_(s) {
+      return String(s || '')
+        .replace(/,/g, '')
+        .replace(/\s+\d{4}\s*$/, '')
+        .replace(/\s+d[ei]\s*$/i, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function _htmlTasaBCV() {
+      var tasas = {};
+      try { tasas = (window.SISTEMA && window.SISTEMA.root && window.SISTEMA.root.tasas) || {}; } catch (e) {}
+      var dolar = Number(tasas.dolar);
+      if (!isFinite(dolar) || dolar <= 0) return '';
+      var fecha = limpiarFechaTasa_(tasas.fechavalor);
+      return '<span class="mk-bcv" style="color:var(--post-color, #475569);">' +
+               '<span class="textoSecundario" style="color:inherit !important;">Tasa BCV' + (fecha ? ' ' + escapeHtml(fecha) : '') + '</span>' +
+               '<span class="subtitulo" style="color:inherit !important;">Bs. ' + formatearBs_(dolar) + '</span>' +
+             '</span>';
+    }
+
+    /* ============================================================
+       R92 · DECORADOR DE TABLAS MARKDOWN — marked produce
+       <table> sin clases y el navegador las pinta "de fábrica"
+       (encabezado centrado, sin bordes). Aquí se visten con las
+       tipografías del Core: th → .textoPrimario, td →
+       .textoSecundario. Si la tabla tiene 3 columnas (el plan de
+       inversión del curso), la última (precios) lleva .subtitulo
+       y la tabla .mk-plan-tabla para que el CSS alinee los
+       valores a la derecha.
+       ============================================================ */
+    function _decorarTablasMarkdown(raiz) {
+      if (!raiz || !raiz.querySelectorAll) return;
+      var tablas = raiz.querySelectorAll('table');
+      Array.prototype.forEach.call(tablas, function (tabla) {
+        var primera = tabla.rows && tabla.rows[0];
+        var esPlan = primera ? (primera.cells.length === 3) : false;
+        if (esPlan) tabla.classList.add('mk-plan-tabla');
+        Array.prototype.forEach.call(tabla.querySelectorAll('th'), function (th) {
+          th.classList.add('textoPrimario');
+        });
+        Array.prototype.forEach.call(tabla.querySelectorAll('td'), function (td) {
+          var esPrecio = esPlan && td.parentNode && td === td.parentNode.cells[td.parentNode.cells.length - 1];
+          /* R92: en el plan, la celda de precios SOLO lleva
+             .subtitulo — si llevara también .textoSecundario, la
+             de Core (más tarde en la hoja) pisaría el 18px. */
+          td.classList.add(esPrecio ? 'subtitulo' : 'textoSecundario');
+        });
+      });
     }
 
     /* ============================================================
@@ -376,7 +466,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html += buildPromoHTML();
       if (markdown) {
         var renderExcerpt = _renderMarkdown(markdown);
-        html += '<div class="mk-desc-wrap">' +
+        /* R92: los colores del post viajan en el wrap para que la
+           tabla markdown y la fila BCV usen el pastel/color. */
+        var colorArr = meta.color || [];
+        var oficial  = colorArr[0] || post.colorOficial || '#475569';
+        var pastel   = colorArr[1] || post.colorPastel || '#f1f5f9';
+        var claro    = colorArr[2] || post.colorClaro   || '#f1f5f9';
+        html += '<div class="mk-desc-wrap" style="--post-color:' + escapeHtml(oficial) + '; --post-pastel:' + escapeHtml(pastel) + '; --post-claro:' + escapeHtml(claro) + ';">' +
                   '<div class="mk-desc-clamp textoPrimario" id="postDescExcerpt">' + renderExcerpt + '</div>' +
                   '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:10px !important; margin-bottom:12px !important;">Ver descripción completa</button>' +
                 '</div>';
@@ -580,6 +676,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html += '<div class="mk-sheet-fade" id="postDescSheetFade"></div>';
       content.innerHTML = html;
 
+      /* R92: colores del post + tablas vestidas también en el
+         sheet de la descripción completa. */
+      try {
+        var colorArrC = (pj.meta && pj.meta.color) || [];
+        content.style.setProperty('--post-color',  String(colorArrC[0] || postActivo.colorOficial || '#475569'));
+        content.style.setProperty('--post-pastel', String(colorArrC[1] || postActivo.colorPastel || '#f1f5f9'));
+        content.style.setProperty('--post-claro',  String(colorArrC[2] || postActivo.colorClaro   || '#f1f5f9'));
+      } catch (e) {}
+      _decorarTablasMarkdown(content);
+
       /* R77: el fade avisa que hay más texto y se retira al llegar
          al final del scroll para leer completo. Si el texto no
          desborda, el fade se retira de una vez. */
@@ -625,6 +731,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       /* R91: skeleton de las imágenes del hero (red y cache) */
       engacharSkeletonImagenes(track);
+
+      /* R92: vestir las tablas del markdown con las tipografías
+         del Core (th textoPrimario, td textoSecundario, precios
+         del plan con subtitulo). */
+      _decorarTablasMarkdown(track);
 
       if (typeof window.pintarGlifos === 'function') window.pintarGlifos(track);
       if (window.SeccionImagen && typeof window.SeccionImagen.enganchar === 'function') window.SeccionImagen.enganchar(track);

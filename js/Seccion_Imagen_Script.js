@@ -14,8 +14,17 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                    cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.2.0
-CAMBIOS:         R77.1: El método enganchar() ahora también
+VERSIÓN:         1.2.1
+CAMBIOS:         R92: PESO DE LA IMAGEN — urlImagenDirecta pide
+                 ahora las fotos de Drive a lh3 con =w1600 (las
+                 /d/ crudas sirven el archivo a tamaño completo,
+                 fotos de varios MB: por eso la imagen tardaba en
+                 aparecer la primera vez). 1600px cubre el hero
+                 del teléfono con 2-4x de densidad y el lightbox;
+                 la descarga baja de megas a cientos de KB. Si la
+                 URL ya trae su propio =tamaño se respeta; las
+                 que no son de Drive pasan intactas.
+                 R77.1: El método enganchar() ahora también
                  detecta la clase .post-hero-img para que el
                  Lightbox funcione en el nuevo lienzo del post.
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
@@ -30,18 +39,29 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
        HELPERS · URLs de imágenes
        ============================================================ */
 
+    /* R92 · PESO DE LA IMAGEN: lh3 sirve las /d/ a tamaño
+       completo (fotos de varios MB — la causa de la carga lenta
+       la primera vez). Con =w1600 Google la reescala al vuelo:
+       el hero mide ≤430px y el lightbox cae bien a 1600. Si la
+       URL ya trae su propio =tamaño, se respeta. */
+    function _conTamanoLh3(url) {
+      if (url.indexOf('lh3.googleusercontent.com/d/') === -1) return url;
+      if (/=[wsh]\d+/.test(url)) return url;
+      return url + '=w1600';
+    }
+
     function urlImagenDirecta(url) {
       var u = String(url || '').trim();
       if (!u) return '';
 
       var m = u.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
-      if (m && m[1]) return 'https://lh3.googleusercontent.com/d/' + m[1];
+      if (m && m[1]) return _conTamanoLh3('https://lh3.googleusercontent.com/d/' + m[1]);
 
       m = u.match(/drive\.google\.com\/open\?id=([^&]+)/);
-      if (m && m[1]) return 'https://lh3.googleusercontent.com/d/' + m[1];
+      if (m && m[1]) return _conTamanoLh3('https://lh3.googleusercontent.com/d/' + m[1]);
 
       m = u.match(/drive\.google\.com\/uc\?.*id=([^&]+)/);
-      if (m && m[1]) return 'https://lh3.googleusercontent.com/d/' + m[1];
+      if (m && m[1]) return _conTamanoLh3('https://lh3.googleusercontent.com/d/' + m[1]);
 
       return u;
     }

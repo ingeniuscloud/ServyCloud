@@ -9,8 +9,23 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.3
-CAMBIOS:         R91: SKELETON DE LAS IMÁGENES DEL POST — cada
+VERSIÓN:         2.3.4
+CAMBIOS:         R92: TABLA MARKDOWN DEL POST + FILA [VALOR BCV]
+                 — las tablas que marked produce en la
+                 descripción (excerpt y sheet completo) se pintan
+                 con bordes sutiles (hairline 0.10/0.07),
+                 esquinas redondeadas y encabezado sobre el PASTEL
+                 del post (--post-pastel, que ahora viaja en el
+                 wrap/sheet desde Seccion_Script 2.4.4); las
+                 tipografías las ponen las clases del Core que el
+                 decorador añade (th textoPrimario, td
+                 textoSecundario). .mk-plan-tabla (tabla de 3
+                 columnas: plan de inversión) alinea la columna
+                 de precios a la derecha. La fila .mk-bcv repite
+                 el diseño del plan viejo: Tasa BCV {fecha} a la
+                 izquierda y Bs. {dolar} a la derecha, en el color
+                 del post.
+                 R91: SKELETON DE LAS IMÁGENES DEL POST — cada
                  .post-hero-img nace "cargando" (shimmer gris en
                  el marco, igual lenguaje que el skeleton del
                  detalle) y se destapa con fundido 0.35s cuando
@@ -184,6 +199,42 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-desc-clamp p { margin: 0 0 8px; } .mk-desc-clamp p:last-child { margin-bottom: 0; }
   .mk-desc-clamp ul, .mk-desc-clamp ol { margin: 0 0 8px; padding-left: 18px; }
   .mk-desc-clamp li { margin: 0 0 2px; }
+
+  /* ============================================================
+     R92 · TABLA MARKDOWN (plan de inversión) — líneas sutiles,
+     encabezado sobre el pastel del post y precios a la derecha.
+     El decorador de Seccion_Script marca .mk-plan-tabla cuando
+     la tabla tiene 3 columnas y viste th/td con las clases del
+     Core (textoPrimario / textoSecundario / subtitulo).
+     ============================================================ */
+  .mk-desc-clamp table, #postDescSheetContent table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    margin: 10px 0 12px; border: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 12px; overflow: hidden; font-variant-numeric: tabular-nums;
+  }
+  .mk-desc-clamp thead th, #postDescSheetContent thead th {
+    background: var(--post-pastel, #f1f5f9);
+    text-align: left; padding: 9px 12px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+  }
+  .mk-desc-clamp tbody td, #postDescSheetContent tbody td {
+    padding: 9px 12px; background: #ffffff;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  }
+  .mk-desc-clamp tbody tr:last-child td,
+  #postDescSheetContent tbody tr:last-child td { border-bottom: none; }
+  /* !important: .subtitulo del Core trae text-align:left
+     !important y pisaría la alineación de los precios. */
+  .mk-plan-tabla th:last-child, .mk-plan-tabla td:last-child { text-align: right !important; }
+
+  /* R92 · FILA [VALOR BCV] — la misma del plan viejo: fecha de
+     aplicación a la izquierda y Bs. a la derecha, en el color
+     del post. La pinta _renderMarkdown al sustituir el
+     placeholder del markdown. */
+  .mk-bcv {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; margin: 10px 0 12px;
+  }
 
   /* ============================================================
      PROMO DEL POST (R82/R83) · debajo del título
