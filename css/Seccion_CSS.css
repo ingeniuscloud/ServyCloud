@@ -6,12 +6,23 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  info y descripción, fila del partner, CTA,
                  ubicación, cross-sell, In Company, bloque asesor,
-                 los puntos del carrusel, el bloque de bienvenida de
-                 los posts sin foto y la infraestructura de sheets
-                 .mk-sheet-* (leída por el sheet de descripción y por
-                 Pregunta).
-VERSIÓN:         2.1.1
-CAMBIOS:         R83: (1) Divisoras visibles: la línea #f1f5f9 se
+                 los puntos del carrusel y la infraestructura de
+                 sheets .mk-sheet-* (leída por el sheet de
+                 descripción y por Pregunta).
+VERSIÓN:         2.2.0
+CAMBIOS:         R84: (1) El fondo del hero pasa a VIDRIO (blanco
+                 translúcido + blur): el color fuerte debajo de la
+                 imagen — y antes de cargar — rayía; el glass
+                 además rellena el marco 1:1 donde la imagen no
+                 cubre. (2) La imagen del hero entra CONTAIN:
+                 ajustada, proporcional, sin desbordarse ni
+                 deformarse (si es 1:1 llena el marco; si no, el
+                 glass completa). (3) Promo del post SIN cursiva.
+                 (4) Avatar del cross-sell blanco con la inicial
+                 en el color pastel del post. (5) Sale el bloque
+                 de "post sin foto" (.post-hero-vacio): código
+                 muerto, el backend entrega la imagen por defecto.
+                 R83: (1) Divisoras visibles: la línea #f1f5f9 se
                  perdía con el fondo — pasa a un gris que sí se ve.
                  (2) Promo del post en CLARITO: el banner fuerte
                  competía con el CTA; ahora banner tintado con el
@@ -50,14 +61,21 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   body.modo-detalle > .lienzo-wrap > .area-contenido > .cta-fila,
   body.modo-detalle > .lienzo-wrap > .area-contenido > #userFila { display: none !important; }
 
-  /* HERO */
+  /* HERO · R84: el fondo fuerte que se veía debajo de la imagen
+     (y antes de cargar) competía y rayía: ahora es VIDRIO —
+     blanco translúcido con blur — que además rellena el marco
+     1:1 donde la imagen no cubre. La imagen entra AJUSTADA,
+     proporcional y sin deformarse (object-fit: contain): si es
+     1:1 llena el marco; si no, el glass completa arriba/abajo. */
   .app-hero-wrap { padding: 10px 5% 14px; }
   .app-hero {
     position: relative; width: 100%; aspect-ratio: 1/1;
     border-radius: 16px; overflow: hidden;
-    background: linear-gradient(135deg, var(--post-color) 0%, #4c1d95 100%);
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
   }
-  .post-hero-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .post-hero-img { display: block; width: 100%; height: 100%; object-fit: contain; }
   .post-hero-track { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
   .post-hero-track::-webkit-scrollbar { display: none; }
   .post-hero-slide { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }
@@ -70,23 +88,10 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .app-hero-dot.activo { width: 14px; border-radius: 3px; }
 
   /* ============================================================
-     POST SIN FOTO · bloque de bienvenida (misma estructura del
-     hero: badge de ciudad y sociales incluidos). Pastel cálido
-     de la app, glifo imagen y mensaje de aliento para que el
-     post no se sienta roto y se siga leyendo.
+     (R84) El bloque de "post sin foto" (.post-hero-vacio) salió
+     del sistema: el backend entrega la imagen por defecto del
+     Setup para todo post sin foto.
      ============================================================ */
-  .post-hero-vacio { background: #FFF7ED; }
-
-  .post-hero-vacio-centro {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 6px; text-align: center; padding: 0 14%;
-  }
-  .post-hero-vacio-icono { width: 44px; height: 44px; color: #fdba74; }
-  .post-hero-vacio-icono svg { width: 100%; height: 100%; display: block; }
-
-  .post-hero-vacio-titulo { margin: 2px 0 0; font-weight: 600 !important; }
-  .post-hero-vacio-texto { margin: 0; }
 
   .mk-hero-location {
     position: absolute; top: 12px; right: 12px; z-index: 2;
@@ -107,10 +112,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* ============================================================
      PROMO DEL POST (R82/R83) · debajo del título
-     R83: TODO en CLARITO — el banner fuerte competía con el CTA.
-     Banner tintado al 12% con el texto de la promo y el BADGE a
-     la derecha (misma anatomía de la marquesina: texto manda,
-     badge identifica); precios sobre blanco. Nada satura: el
+     R84: SIN cursiva — el texto de la promo se lee derecho, con
+     el badge a la derecha (píldora blanca con borde punteado del
+     color del post) y los precios sobre blanco. Nada satura: el
      naranja del CTA sigue siendo el único acento fuerte.
      ============================================================ */
   .mk-promo-block {
@@ -123,7 +127,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     background: color-mix(in srgb, var(--post-color) 12%, #ffffff);
     color: var(--post-color, #f97316);
     display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; font-size: 15px; font-weight: 600; font-style: italic;
+    gap: 10px; font-size: 15px; font-weight: 600;
     padding: 10px 14px; text-align: left; letter-spacing: 0.3px;
   }
   .mk-promo-banner-texto { flex: 1 1 auto; min-width: 0; }
@@ -221,8 +225,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     height: 60px; display: flex; align-items: center; justify-content: center;
   }
   .mk-cross-avatar {
-    width: 36px; height: 36px; border-radius: 50%; background: var(--post-color, #475569);
-    color: #ffffff; display: flex; align-items: center; justify-content: center;
+    /* R84: fondo BLANCO e inicial en el color PASTEL del post
+       (--post-pastel la manda la tarjeta desde el índice);
+       responde al clarito del banner sin saturar. */
+    width: 36px; height: 36px; border-radius: 50%; background: #ffffff;
+    color: var(--post-pastel, var(--post-color, #475569));
+    display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
   }
   .mk-cross-name {

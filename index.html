@@ -5,7 +5,12 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.24.0
+VERSIÓN:         1.25.0
+CAMBIOS:         R84: (1) Icono PWA nuevo (logo Servy): icon-192/icon-512
+                 actualizados y entran apple-touch-icon, favicon-48 y las
+                 variantes maskable (manifest.json). (2) Los 7 módulos
+                 R84 (Pregunta, Seccion, Core, Lista, Promo) vienen en
+                 css/ y js/ byte-idénticos al GAS.
 CAMBIOS:         R83: (1) FIX DOBLE CTA Y DOBLE PARTNER: este index
                  seguía viejo — cargaba Comenta_CSS/Comenta_Script
                  (el módulo retirado que pintaba el partner y el CTA
@@ -59,7 +64,8 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ServyCloud">
   <link rel="manifest" href="./manifest.json">
-  <link id="pagina-icono" rel="icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link id="pagina-icono" rel="icon" href="./favicon-48.png">
 
 <script>
       (function () {

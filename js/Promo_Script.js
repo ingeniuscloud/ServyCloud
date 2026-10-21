@@ -47,7 +47,11 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  cambie de color). El encabezado "Promos cerca de
                  ti" + "Toca para conocer más" se muestra/oculta
                  junto con el slot.
-VERSIÓN:         2.4
+VERSIÓN:         2.5
+CAMBIOS:         R84: el badge se busca en el ITEM de PROMOJSON
+                 (item.idBadge, como quedó definido en R76) con
+                 respaldo en el post — la marquesina vuelve a
+                 identificar la promo con su badge de la BD.
 CAMBIOS:         R67: FIX del pool de promos — el PROMOJSON real
                  trae porCiudad como OBJETO (idPostActual, la
                  rotación la lleva el backend) y construir()
@@ -268,7 +272,10 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     }
 
     function buildItemHTML(item, post) {
-      var badge  = buscarBadge(post.idBadge);
+      /* R84: el badge vive en el ITEM de PROMOJSON (así quedó
+         definido en R76) con respaldo en el post — la marquesina
+         vuelve a identificar la promo con su badge. */
+      var badge  = buscarBadge((item && (item.idBadge || item.idBadgeActual)) || post.idBadge);
       var partner = buscarPartner(post.idPartner) || {};
       var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
       var textoPromo = textoDePromo(item, post);

@@ -7,12 +7,29 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  lienzo: campo de pregunta (X de limpiar con círculo
                  gris tenue, fila inferior fija con el aviso corto y
                  el contador N/250 SIEMPRE visible a la derecha),
-                 publicación sin recargar (recientes primero; al
-                 publicar se limpia el campo y sale el foco) y sheet
-                 al 90% para ver todas las preguntas con fade final.
-                 Sin borrado y sin nombre de quien pregunta.
-VERSIÓN:         1.0.3
-CAMBIOS:         R83: (1) El contador sale de debajo del botón enviar
+                 vista previa de las ÚLTIMAS 2 preguntas (con su
+                 respuesta, si ya la tienen) que llegan DENTRO del
+                 postDetalle (igual que la imagen: cero llamadas
+                 extra), publicación sin recargar y sheet al 90%
+                 con skeleton que carga TODAS las preguntas y
+                 respuestas del post en UNA llamada (acción
+                 `preguntas`). Sin borrado y sin nombre.
+VERSIÓN:         1.1.0
+CAMBIOS:         R84: (1) Las últimas 2 preguntas NO se piden
+                 aparte: llegan con el post (postDetalle.preguntas)
+                 y el lienzo las pinta con poner() — se acabó el
+                 “se me mostraron y al recargar desaparecieron”:
+                 lo que se publica viaja también a la caché del
+                 cliente (PostFull.anotarPregunta) y la
+                 revalidación muda repinta la vista previa
+                 (evento post:actualizado). (2) El sheet “Ver
+                 todas” pide TODAS las preguntas y respuestas en
+                 UNA llamada (acción `preguntas`) con SKELETON
+                 mientras llega (antes: hasta 10 pedidos paginados
+                 y texto de “Cargando...”). (3) La respuesta se
+                 pinta bajo su pregunta como burbuja suave, en el
+                 lienzo y en el sheet.
+                 R83: (1) El contador sale de debajo del botón enviar
                  y comparte LA MISMA FILA con el aviso: al escribir ya
                  no se mueve nada de sitio. (2) El contador queda
                  SIEMPRE visible en tenue (0/250 con el campo vacío).
@@ -175,7 +192,22 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
     /* ============================================================
        CARGA Y VISTA PREVIA (recientes primero)
+       R84: las últimas 2 llegan DENTRO del postDetalle
+       (igual que la imagen) y se pintan con poner() — sin pedido
+       extra. cargar() queda como respaldo (post viejo cacheado
+       sin la clave preguntas).
        ============================================================ */
+    function poner(idPost, data) {
+      if (!idPost) return;
+      idPostActual = idPost;
+      preguntas = (data && data.lista) || [];
+      total     = (data && typeof data.total === 'number') ? data.total : preguntas.length;
+      hayMas    = total > preguntas.length;
+      pagina    = 1;
+      cargando  = false;
+      renderPreview();
+    }
+
     function cargar(idPost) {
       if (!idPost) return;
       idPostActual = idPost;
@@ -193,6 +225,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         .catch(function () { cargando = false; });
     }
 
+    /* Burbuja de respuesta (R84): se pinta bajo su pregunta, en
+       el lienzo y en el sheet. Sin respuesta no se pinta nada. */
+    function htmlRespuesta(r) {
+      if (!r || !r.texto) return '';
+      return '<div class="preg-respuesta">' +
+               '<span class="preg-respuesta-eti cita">Respuesta</span>' +
+               '<p class="preg-respuesta-texto textoPrimario">' + escapeHtml(r.texto) + '</p>' +
+             '</div>';
+    }
+
     function renderPreview() {
       if (!el.preview) return;
 
@@ -205,6 +247,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var esPenultima = (i === 1);
         html += '<div class="mk-qa-item' + (esPenultima ? ' preg-fade' : '') + '">';
         html +=   '<p class="mk-qa-question textoPrimario">' + escapeHtml(c.texto) + '</p>';
+        if (!esPenultima) html += htmlRespuesta(c.respuesta);
         html += '</div>';
       });
 
@@ -242,14 +285,25 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         .then(function (data) {
           enviando = false;
 
-          preguntas.unshift({
+          var nueva = {
             texto:         texto,
             fecha:         new Date().toISOString(),
-            dispositivoId: (typeof getDeviceId === 'function' ? getDeviceId() : '')
-          });
+            dispositivoId: (typeof getDeviceId === 'function' ? getDeviceId() : ''),
+            respuesta:     null
+          };
+          preguntas.unshift(nueva);
           if (data && typeof data.pregunta === 'number') total = data.pregunta;
           else if (data && typeof data.comenta === 'number') total = data.comenta;
           else total = total + 1;
+
+          /* R84: la pregunta también vive en la caché del cliente:
+             si el usuario cierra y reabre el post, la vista previa
+             sigue mostrándola (PostFull + CacheL2). */
+          try {
+            if (window.PostFull && typeof window.PostFull.anotarPregunta === 'function') {
+              window.PostFull.anotarPregunta(idPostActual, nueva);
+            }
+          } catch (err) {}
 
           /* Publicada: campo limpio, sin foco y arriba de la lista */
           el.input.value = '';
@@ -312,45 +366,48 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     function cargarSheetLista() {
       var lista = sheetRoot.querySelector('#pregSheetLista');
       if (!lista || !idPostActual) return;
-      lista.innerHTML = '<p class="textoSecundario preg-sheet-cargando">Cargando preguntas...</p>';
 
-      var todas = [];
-      var paginaLocal = 1;
-
-      function pedir() {
-        return postBackend('comentarios', { idPost: idPostActual, pagina: paginaLocal })
-          .then(function (data) {
-            var lote = (data && (data.preguntas || data.comentarios)) || [];
-            todas = todas.concat(lote);
-            hayMas = !!(data && data.hayMas);
-            paginaLocal = paginaLocal + 1;
-            if (hayMas && paginaLocal <= 10) return pedir();
-          });
+      /* R84 · SKELETON mientras llega TODO (preguntas + respuestas)
+         en UNA llamada: suaviza la espera sin saltos de layout. */
+      var skel = '';
+      for (var i = 0; i < 5; i++) {
+        skel += '<div class="preg-skel"><div class="preg-skel-linea"></div></div>';
       }
+      lista.innerHTML = skel;
 
-      pedir()
-        .then(function () {
+      postBackend('preguntas', { idPost: idPostActual })
+        .then(function (data) {
           if (!sheetRoot || !sheetRoot.classList.contains('abierto')) return;
+          var todas = (data && data.lista) || [];
+          if (data && typeof data.total === 'number') total = data.total;
+
           var html = '';
           todas.forEach(function (c) {
             html += '<div class="preg-sheet-item">';
             html +=   '<p class="mk-qa-question textoPrimario">' + escapeHtml(c.texto) + '</p>';
+            html +=   htmlRespuesta(c.respuesta);
             html += '</div>';
           });
           lista.innerHTML = html || '<p class="textoSecundario preg-sheet-cargando">Aún no hay preguntas.</p>';
 
-          var content = sheetRoot.querySelector('#pregSheetContent');
-          content.scrollTop = 0;
-          /* Si la lista no desborda, el fade se retira de una vez */
-          var fade = sheetRoot.querySelector('#pregSheetFade');
-          if (fade) {
-            var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
-            fade.classList.toggle('fin', alFinal);
-          }
+          refrescarFadeSheet();
         })
         .catch(function () {
           if (lista) lista.innerHTML = '<p class="textoSecundario preg-sheet-cargando">No se pudieron cargar las preguntas.</p>';
         });
+    }
+
+    function refrescarFadeSheet() {
+      if (!sheetRoot) return;
+      var content = sheetRoot.querySelector('#pregSheetContent');
+      if (!content) return;
+      content.scrollTop = 0;
+      /* Si la lista no desborda, el fade se retira de una vez */
+      var fade = sheetRoot.querySelector('#pregSheetFade');
+      if (fade) {
+        var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
+        fade.classList.toggle('fin', alFinal);
+      }
     }
 
     function abrirSheet() {
@@ -373,9 +430,20 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        ============================================================ */
     document.addEventListener('post:change', function () {
       /* El post cambió: el sheet de lectura se cierra. La carga del
-         nuevo post la hace Seccion_Script vía cargar(idPost). */
+         nuevo post la hace Seccion_Script vía poner()/cargar(). */
       if (sheetAbierto) cerrarSheet();
       preguntas = []; total = 0; hayMas = false; pagina = 1;
+    });
+
+    /* R84: la revalidación muda del post activo trae preguntas
+       frescas — la vista previa se repinta sola (el post que se
+       abrió con caché L2 vieja se cura al llegar la respuesta). */
+    document.addEventListener('post:actualizado', function (e) {
+      var det = e.detail && e.detail.det;
+      if (!det || !det.preguntas) return;
+      if (det.idPost !== idPostActual || !el.preview) return;
+      if (sheetAbierto) { cargarSheetLista(); return; }
+      poner(det.idPost, det.preguntas);
     });
 
     /* ============================================================
@@ -391,6 +459,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     return {
       buildHTML:    buildHTML,
       enganchar:    enganchar,
+      poner:        poner,
       cargar:       cargar,
       estaAbierto:  estaAbierto,
       refrescar:    refrescar

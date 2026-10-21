@@ -15,8 +15,12 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.8
-CAMBIOS:         R77: El título del item usa la clase maestra
+VERSIÓN:         2.9
+CAMBIOS:         R84: el detalle sube con las ÚLTIMAS 2 preguntas
+                 del post (post.preguntas, ya vienen dentro de
+                 postDetalle): el Q&A del lienzo se pinta con la
+                 misma llamada, sin pedido extra.
+                 R77: El título del item usa la clase maestra
                  .subtitulo (el .titulo era demasiado grande para
                  la pantalla). Encabezado saneado: solo queda lo
                  vigente.
@@ -572,9 +576,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       window.PostFull.obtener(idPost)
         .then(function (det) {
-          /* R76: postJson (antes seccionJson). planJson intacto. */
+          /* R76: postJson (antes seccionJson). planJson intacto.
+             R84: las últimas 2 preguntas (con respuesta) viajan
+             dentro del detalle y suben con el post. */
           post.postJson = det.postJson || {};
           post.planJson = det.planJson || null;
+          post.preguntas = det.preguntas || null;
 
           postActivoId = idPost;
           emitirCambio(post);

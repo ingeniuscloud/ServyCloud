@@ -10,8 +10,21 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.2.1
-CAMBIOS:         R83: (1) El badge de la promo (el de la BD, el
+VERSIÓN:         2.3.0
+CAMBIOS:         R84: (1) Bloque "Este post no trae foto" RETIRADO
+                 (código muerto): el backend entrega la imagen por
+                 defecto (Setup ROOTJSON.app.imagenDefault) para
+                 todo post sin foto. (2) El badge de la promo se
+                 busca en el ITEM de PROMOJSON (idBadge) y como
+                 respaldo en el post; si hay banner y no llega
+                 badge de la BD, se pinta la píldora PROMO para que
+                 la etiqueta siempre identifique la promo. (3) El
+                 avatar del cross-sell queda blanco con la inicial
+                 en el color pastel del post. (4) El Q&A ya no pide
+                 las preguntas aparte: llegan con el post
+                 (postDetalle.preguntas) y se pintan con
+                 Pregunta.poner (cargar queda de respaldo).
+                 R83: (1) El badge de la promo (el de la BD, el
                  mismo de la marquesina) se pinta a la DERECHA del
                  banner del post. (2) La sección pintada de
                  relacionados ahora ABRIGA también a In Company y
@@ -104,17 +117,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       var socialContainer = '<div class="app-hero-social" id="heroSocialButtons"></div>';
 
-      /* Post sin foto: bloque de bienvenida con la misma estructura
-         del hero (badge de ciudad y sociales incluidos), para que
-         no se sienta roto ni incompleto y el usuario siga leyendo. */
+      /* R84: SIN bloque de "post sin foto" — código muerto. El
+         backend entrega la imagen por defecto del Setup
+         (ROOTJSON.app.imagenDefault) para todo post sin foto;
+         si aún así no llegara nada, el hero queda como vidrio
+         (glass) con su badge y sus sociales. */
       if (!limpias.length) {
-        return '<div class="app-hero post-hero-vacio">' + cityBadge + socialContainer +
-                 '<div class="post-hero-vacio-centro">' +
-                   '<span class="post-hero-vacio-icono" data-glifo="imagen" aria-hidden="true"></span>' +
-                   '<p class="post-hero-vacio-titulo textoPrimario">Este post no trae foto</p>' +
-                   '<p class="textoSecundario post-hero-vacio-texto">Viene completo por escrito: sigue leyendo que aquí abajo hay bueno.</p>' +
-                 '</div>' +
-               '</div>';
+        return '<div class="app-hero">' + cityBadge + socialContainer + '</div>';
       }
 
       if (limpias.length === 1) {
@@ -193,13 +202,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     /* R83: el badge que identifica a la promo es el MISMO de la
-       marquesina: post.idBadge buscado en SISTEMA.badges (mismo
-       criterio de Promo_Script: estado en false no se pinta). */
-    function _badgeDelPost(post) {
-      if (!post || !post.idBadge) return null;
+       marquesina. R84: se busca en el ITEM de PROMOJSON (ahí vive
+       desde R76) y como respaldo en el post; estado en false no
+       se pinta. */
+    function _badgeDelPost(obj) {
+      if (!obj || !obj.idBadge) return null;
       var badges = (window.SISTEMA && window.SISTEMA.badges) || [];
       for (var i = 0; i < badges.length; i++) {
-        if (badges[i] && badges[i].idBadge === post.idBadge) {
+        if (badges[i] && badges[i].idBadge === obj.idBadge) {
           if (badges[i].estado === false) return null;
           return badges[i];
         }
@@ -211,7 +221,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var post = postActivo;
       if (!post) return '';
       var item = _promoDelPost(post);
-      var badge = _badgeDelPost(post);
+      /* R84: el badge vive en el ITEM de PROMOJSON (con respaldo
+         en el post). Si hay banner y la BD no trae badge, la
+         píldora PROMO identifica la etiqueta igualmente. */
+      var badge = _badgeDelPost(item) || _badgeDelPost(post);
       if (!item && !badge) return '';
 
       var metaPost = (post.postJson && post.postJson.meta) || {};
@@ -242,9 +255,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       var html = '<div class="mk-promo-block" style="--post-color:' + escapeHtml(colorOficial) + '; --post-claro:' + escapeHtml(colorPastel) + '">';
       /* R83: fila del banner = TEXTO de la promo + BADGE a la
-         derecha (misma anatomía de la marquesina). */
-      var badgeHtml = (badge && badge.titulo)
-        ? '<span class="mk-promo-badge">' + escapeHtml(badge.titulo) + '</span>'
+         derecha (misma anatomía de la marquesina). R84: si el
+         item de PROMOJSON no trae idBadge, la píldora PROMO
+         identifica la etiqueta (nunca queda ciega). */
+      var badgeTitulo = (badge && badge.titulo) ? badge.titulo : ((banner) ? 'PROMO' : '');
+      var badgeHtml = badgeTitulo
+        ? '<span class="mk-promo-badge">' + escapeHtml(badgeTitulo) + '</span>'
         : '';
       if (banner || badgeHtml) {
         html += '<div class="mk-promo-banner">' +
@@ -287,7 +303,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         var renderExcerpt = _renderMarkdown(markdown);
         html += '<div class="mk-desc-wrap">' +
                   '<div class="mk-desc-clamp textoPrimario" id="postDescExcerpt">' + renderExcerpt + '</div>' +
-                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:6px;">Ver descripción completa</button>' +
+                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:14px;">Ver descripción completa</button>' +
                 '</div>';
       }
       html += '</div>';
@@ -395,7 +411,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       /* R83: devuelve solo la cabeza y las tarjetas — el wrapper
          de la sección pintada lo arma buildCrossSell para abrigar
          también a In Company y Servy publicidad. Banner clarito
-         (tinte 15%) y avatar del color con la inicial blanca. */
+         (tinte 15%) y avatar BLANCO con la inicial en el color
+         PASTEL del post (R84). */
       var html = '<div class="mk-section mk-rel-cabeza"><h2 class="titulo" style="margin:0;">Publicaciones relacionadas</h2></div>';
       html += '<div class="mk-cross-row">';
       ids.forEach(function (id) {
@@ -405,7 +422,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         var inicial = (nombre.charAt(0) || '?').toUpperCase();
         var color   = p.colorOficial || '#475569';
         var claro   = p.colorClaro   || '#f1f5f9';
-        html += '<button type="button" class="mk-cross-card" data-post-solicitado="' + escapeHtml(p.id) + '" style="--post-color:' + escapeHtml(color) + '; --post-claro:' + escapeHtml(claro) + ';">' +
+        var pastel  = p.colorPastel  || claro;
+        html += '<button type="button" class="mk-cross-card" data-post-solicitado="' + escapeHtml(p.id) + '" style="--post-color:' + escapeHtml(color) + '; --post-claro:' + escapeHtml(claro) + '; --post-pastel:' + escapeHtml(pastel) + ';">' +
                   '<div class="mk-cross-top"><div class="mk-cross-avatar">' + escapeHtml(inicial) + '</div></div>' +
                   '<div class="mk-cross-name textoPrimario">' + escapeHtml(nombre) + '</div>' +
                 '</button>';
@@ -543,10 +561,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       engacharBloqueAsesor(track);
 
       /* R77: el Q&A vive en window.Pregunta (campo + sheet de
-         lectura); aquí se engancha y se carga con el post vivo. */
+         lectura). R84: las últimas 2 preguntas llegan DENTRO del
+         post (igual que la imagen) y se pintan con poner() sin
+         pedir nada aparte; cargar() queda de respaldo. */
       if (window.Pregunta && typeof window.Pregunta.enganchar === 'function') {
         window.Pregunta.enganchar(track);
-        window.Pregunta.cargar(postActivo.id);
+        if (postActivo.preguntas && typeof window.Pregunta.poner === 'function') {
+          window.Pregunta.poner(postActivo.id, postActivo.preguntas);
+        } else {
+          window.Pregunta.cargar(postActivo.id);
+        }
       }
     }
 

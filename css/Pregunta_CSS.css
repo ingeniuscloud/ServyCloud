@@ -7,10 +7,19 @@ RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
                  lienzo (enviar blanco, X de limpiar con su círculo
                  gris tenue, fila inferior fija con el aviso de
                  siempre a la izquierda y el contador N/250 a la
-                 derecha), vista previa de las últimas preguntas con
-                 fade y el sheet al 90% para ver todas las preguntas.
-VERSIÓN:         1.0.2
-CAMBIOS:         R83: (1) La X de limpiar recupera su círculo ahora
+                 derecha), vista previa de las últimas preguntas
+                 (con su respuesta en burbuja suave) y el sheet al
+                 90% para ver todas con SKELETON de carga.
+VERSIÓN:         1.1.0
+CAMBIOS:         R84: (1) El contador queda en tipografía .cita
+                 PURA (sin Overrides de tamaño/color: manda la
+                 clase maestra; naranja solo al llegar al tope).
+                 (2) Burbuja de respuesta (.preg-respuesta) bajo su
+                 pregunta, en el lienzo y en el sheet: fondo gris
+                 tenue del sistema, etiqueta “Respuesta” en .cita.
+                 (3) Skeleton del sheet (.preg-skel) con brillo
+                 suave mientras llegan las preguntas.
+                 R83: (1) La X de limpiar recupera su círculo ahora
                  en gris tenue: se distinguía del texto escrito.
                  (2) El contador sale de debajo del enviar y comparte
                  LA MISMA FILA con el aviso (derecha): al escribir ya
@@ -123,12 +132,11 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .preg-error { margin: 0; color: #dc2626 !important; min-width: 0; }
   .preg-error[hidden] { display: none; }
 
-  /* Contador N/250 · SIEMPRE visible en tenue, a la derecha;
-     naranja solo al llegar al tope. */
+  /* Contador N/250 · SIEMPRE visible en tenue, a la derecha.
+     R84: tipografía .cita PURA — la clase maestra manda tamaño,
+     peso y color; aquí solo el layout. Naranja al llegar al tope. */
   .preg-counter {
     flex-shrink: 0; text-align: right; line-height: 1;
-    font-size: var(--size-cita) !important; font-weight: 400 !important;
-    color: #94a3b8 !important; transition: color 0.2s ease;
   }
   .preg-counter.limite { color: #ea580c !important; }
 
@@ -150,6 +158,22 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .mk-qa-item:last-child { border-bottom: none; padding-bottom: 0; }
 
   .mk-qa-question { margin: 0; text-align: left; }
+
+  /* ============================================================
+     RESPUESTA (R84) · burbuja suave bajo su pregunta
+     Estilo Mercado Libre: la respuesta vive en un fondo gris
+     tenue del sistema con esquina superior-izquierda quebrada,
+     apuntando a su pregunta. Etiqueta en .cita, texto maestro.
+     ============================================================ */
+  .preg-respuesta {
+    margin: 8px 0 0 12px; padding: 9px 12px 10px;
+    background: #f3f4f6; border-radius: 2px 12px 12px 12px;
+    text-align: left;
+  }
+  .preg-respuesta-eti {
+    display: block; margin: 0 0 2px; color: #94a3b8 !important;
+  }
+  .preg-respuesta-texto { margin: 0; }
 
   /* Fade del penúltimo: indica que hay más en el sheet */
   .mk-qa-item.preg-fade .mk-qa-question {
@@ -178,6 +202,25 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .preg-sheet-item:last-child { border-bottom: none; }
 
   .preg-sheet-cargando { padding: 24px 0; }
+
+  /* ============================================================
+     SKELETON DEL SHEET (R84) · filas fantasma con brillo suave
+     mientras llega la lista completa. Mismo ritmo que las items
+     reales para que el cambio no salte.
+     ============================================================ */
+  .preg-skel { padding: 15px 0; border-bottom: 1px solid #f1f5f9; }
+  .preg-skel:first-child { padding-top: 4px; }
+  .preg-skel-linea {
+    height: 13px; border-radius: 6px; width: 86%;
+    background: linear-gradient(90deg, #eceff3 25%, #f7f9fb 45%, #eceff3 65%);
+    background-size: 200% 100%;
+    animation: pregSkel 1.2s ease infinite;
+  }
+  .preg-skel:nth-child(even) .preg-skel-linea { width: 62%; }
+  @keyframes pregSkel {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
 
   /* Fade del final del sheet: desaparece al llegar al final del scroll */
   .preg-sheet-fade {
