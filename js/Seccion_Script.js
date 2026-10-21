@@ -10,8 +10,16 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.2.0
-CAMBIOS:         R82: (1) El CTA sube arriba del partner: es el
+VERSIÓN:         2.2.1
+CAMBIOS:         R83: (1) El badge de la promo (el de la BD, el
+                 mismo de la marquesina) se pinta a la DERECHA del
+                 banner del post. (2) La sección pintada de
+                 relacionados ahora ABRIGA también a In Company y
+                 Servy publicidad. (3) Servy publicidad lleva el
+                 MISMO botón blanco redondo del In Company. (4) El
+                 banner de las tarjetas del cross-sell pasa a
+                 clarito con el avatar del color.
+                 R82: (1) El CTA sube arriba del partner: es el
                  botón de la publicación, no del partner. Orden del
                  lienzo: info → CTA → divisora → partner →
                  ubicación → divisora → Q&A → relacionados.
@@ -184,11 +192,27 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       return '';
     }
 
+    /* R83: el badge que identifica a la promo es el MISMO de la
+       marquesina: post.idBadge buscado en SISTEMA.badges (mismo
+       criterio de Promo_Script: estado en false no se pinta). */
+    function _badgeDelPost(post) {
+      if (!post || !post.idBadge) return null;
+      var badges = (window.SISTEMA && window.SISTEMA.badges) || [];
+      for (var i = 0; i < badges.length; i++) {
+        if (badges[i] && badges[i].idBadge === post.idBadge) {
+          if (badges[i].estado === false) return null;
+          return badges[i];
+        }
+      }
+      return null;
+    }
+
     function buildPromoHTML() {
       var post = postActivo;
       if (!post) return '';
       var item = _promoDelPost(post);
-      if (!item) return '';
+      var badge = _badgeDelPost(post);
+      if (!item && !badge) return '';
 
       var metaPost = (post.postJson && post.postJson.meta) || {};
 
@@ -210,14 +234,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         }
       }
 
-      if (!banner && !actual) return '';
+      if (!banner && !actual && !badge) return '';
 
       var colorArr = metaPost.color || [];
       var colorOficial = colorArr[0] || post.colorOficial || '#f97316';
       var colorPastel  = colorArr[1] || post.colorClaro   || '#f1f5f9';
 
       var html = '<div class="mk-promo-block" style="--post-color:' + escapeHtml(colorOficial) + '; --post-claro:' + escapeHtml(colorPastel) + '">';
-      if (banner) { html += '<div class="mk-promo-banner">' + escapeHtml(banner) + '</div>'; }
+      /* R83: fila del banner = TEXTO de la promo + BADGE a la
+         derecha (misma anatomía de la marquesina). */
+      var badgeHtml = (badge && badge.titulo)
+        ? '<span class="mk-promo-badge">' + escapeHtml(badge.titulo) + '</span>'
+        : '';
+      if (banner || badgeHtml) {
+        html += '<div class="mk-promo-banner">' +
+                  '<span class="mk-promo-banner-texto">' + escapeHtml(banner) + '</span>' +
+                  badgeHtml +
+                '</div>';
+      }
       if (actual) {
         html += '<div class="mk-promo-prices">';
         if (viejo) { html += '<div class="mk-promo-old-price textoSecundario">' + escapeHtml(viejo) + '</div>'; }
@@ -358,13 +392,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
     function buildCrossSellHTML(ids) {
       if (!ids || !ids.length) return '';
-      /* R82: sección pintada (fondo propio, no caja) y sin
-         divisora: el fondo marca el cambio de sección. Cada
-         tarjeta lleva un banner superior con el color del post
-         relacionado, el avatar blanco con la inicial y el nombre
-         sobre fondo tintado. */
-      var html = '<div class="mk-rel-section">';
-      html += '<div class="mk-section mk-rel-cabeza"><h2 class="titulo" style="margin:0;">Publicaciones relacionadas</h2></div>';
+      /* R83: devuelve solo la cabeza y las tarjetas — el wrapper
+         de la sección pintada lo arma buildCrossSell para abrigar
+         también a In Company y Servy publicidad. Banner clarito
+         (tinte 15%) y avatar del color con la inicial blanca. */
+      var html = '<div class="mk-section mk-rel-cabeza"><h2 class="titulo" style="margin:0;">Publicaciones relacionadas</h2></div>';
       html += '<div class="mk-cross-row">';
       ids.forEach(function (id) {
         var p = buscarPost(id);
@@ -379,7 +411,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                 '</button>';
       });
       html += '</div>';
-      html += '</div>';
       return html;
     }
 
@@ -392,11 +423,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     function buildBloqueAsesor() {
+      /* R83: el Servy publicidad lleva el MISMO botón blanco
+         redondo del In Company (.ci-boton) en vez de la flecha
+         suelta. */
       return '<div class="mk-section" style="padding-top:10px;">' +
           '<button type="button" class="bloque-asesor" id="bloqueAsesor">' +
             '<span class="bloque-asesor-icono" data-glifo="userPlus"></span>' +
             '<span class="bloque-asesor-info"><span class="bloque-asesor-titulo textoPrimario">¿Ofreces algún servicio?</span><span class="bloque-asesor-sub textoSecundario">Publícalo con nosotros y llega a más personas</span></span>' +
-            '<span class="bloque-asesor-flecha" data-glifo="flechaVer"></span>' +
+            '<span class="ci-boton"><span data-glifo="flechaVer" style="width:18px; height:18px; display:block;"></span></span>' +
           '</button></div>';
     }
 
@@ -406,10 +440,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var pj = post.postJson || {};
       var ids       = Array.isArray(pj.crosssell) ? pj.crosssell : [];
       var inCompany = pj.inCompany === true;
-      var html = buildCrossSellHTML(ids);
-      if (inCompany) { html += buildInCompanyButton(); }
       var esServicio = (post.idChips || []).indexOf('se') !== -1;
-      if (esServicio) { html += buildBloqueAsesor(); }
+      var tarjetas  = buildCrossSellHTML(ids);
+      var inCo      = inCompany ? buildInCompanyButton() : '';
+      var asesor    = esServicio ? buildBloqueAsesor() : '';
+      if (!tarjetas && !inCo && !asesor) return '';
+      /* R83: la sección pintada abriga a las tarjetas relacionadas
+         Y también a In Company y Servy publicidad. */
+      var html = '<div class="mk-rel-section">';
+      if (tarjetas) { html += tarjetas; }
+      if (inCo)     { html += inCo; }
+      if (asesor)   { html += asesor; }
+      html += '</div>';
       return html;
     }
 

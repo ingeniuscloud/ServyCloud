@@ -1,136 +1,29 @@
 <!--
 ════════════════════════════════════════════════════════════════════
-ARCHIVO:         Index.html
+ARCHIVO:         index.html (GitHub Pages · espejo del Index.html de GAS)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estructura principal. SISTEMA y TOKEN llegan POR
-                 DATOS (abrirSesion vía POST al /exec). La
-                 detección de móvil corre ANTES de renderizar
-                 Telefono.html para evitar el flash del marco.
-                 El título se compone desde ROOTJSON (R63:
-                 app.tituloHeader es un VECTOR — una frase al azar
-                 por carga; lo pinta Core_Script y VIVE EN LA FILA
-                 DE CABECERA: título a la izquierda y MENÚ GLOBAL
-                 a la derecha).
-                 SECCIÓN FILTROS (R64, debajo de las promos) en
-                 DOS filas de bordes suaves y delgados:
-                 · FILA 1: campo BUSCAR EXPANDIDO de una vez
-                   (lupa + input + X circular naranja para
-                   limpiar el campo, visible al escribir) y el
-                   BOTÓN ORDENAR a su derecha (glifo de Iconos;
-                   abre el sheet de ordenamiento — R66).
-                 · FILA 2: los CHIPS (botones independientes con
-                   su icono, activo en NARANJA oficial) y el
-                   BOTÓN CIUDAD (pin + nombre) repartiéndose la
-                   fila en partes iguales.
-                 ORDENAMIENTO (R66): el botón abre el SHEET DE
-                 ORDENAMIENTO (Orden_Sheet_Script): nombre
-                 A-Z/Z-A, por categoría, más compartidos y mejor
-                 valorados.
-                 BLOQUE DE ITEMS (R65): dentro de .secciones-wrap
-                 viven, ENCIMA de la lista, "Compartir lista" (R65
-                 ya no es sección filtro: se muda al bloque de
-                 items con la CANTIDAD de items al lado —
-                 Lista_Script la escribe en cada repintado) y el
-                 aviso "No se encontraron resultados" (mismo slot
-                 del bloque de items). En modo compartido el
-                 campo queda desplegado y bloqueado: la X libera
-                 la vista (Compartir).
-                 El placeholder del campo llega de la BD real
-                 (ROOTJSON app.placeholderBuscar, lo pinta
-                 Core_Script).
-VERSIÓN:         1.17
-CAMBIOS:         R68: los 4 SHEETS IDENTIFICADOS Y A LA MISMA
-                 ALTURA: entran las metas apple (capable,
-                 status-bar-style black-translucent, title) para
-                 que en la PWA de iOS el lienzo pinte DETRÁS de
-                 la barra de estado — el clarito alcanza la
-                 franja de arriba también instalada; el script
-                 del menú global pasa a js/Global_Sheet_Script.js
-                 (renombrado). Mismo markup que Index.html 1.17
-                 de GAS.
-                 R67: EXPERIMENTO LIENZO CASHEA/YUMMY (reversible
-                 a petición del dueño): theme-color pasa a
-                 #fdf3ec para que la franja superior del
-                 navegador se funda con el clarito del degradado
-                 nuevo (lo pinta Core_Script 1.22). Los dos
-                 archivos del sheet se RENOMBRAN: Filtros_Sheet_*
-                 → Orden_Sheet_* (corrección de nombre del
-                 dueño). Mismo markup que Index.html 1.16 de GAS.
-                 R66: el BOTÓN FILTRO pasa a ser el BOTÓN ORDENAR
-                 (#btnOrdenar, .btn-ordenar, aria "Ordenar") con
-                 el glifo ordenar de Iconos (3 líneas, diseño del
-                 dueño); abre el SHEET DE ORDENAMIENTO
-                 (Orden_Sheet_Script). La X de limpiar del
-                 campo sube su glifo (líneas estiradas al doble,
-                 span 12/24). Entran los archivos Orden_Sheet_CSS
-                 y Orden_Sheet_Script del espejo. Mismo markup
-                 que Index.html 1.15 de GAS.
-                 R65: "Compartir lista" se MUDA al bloque de
-                 items — el botón y el aviso "No se encontraron
-                 resultados" viven DENTRO de .secciones-wrap,
-                 encima de la lista (fuera de la sección filtro,
-                 que se queda todo el respiro); el botón pasa a
-                 llamarse "Compartir lista" y Lista_Script le
-                 escribe la CANTIDAD de items al lado. Mismo
-                 markup que Index.html 1.14 de GAS.
-                 R63: el TÍTULO DEL HEADER entra a la FILA DE
-                 CABECERA (título a la izquierda + menú global
-                 a la derecha; en detalle lo toman volver +
-                 título de categoría). El preloader
-                 (GitHub_Cromo) sale DENTRO del marco del
-                 teléfono en PC y a pantalla completa en móvil.
-                 R60: cabecera con volver + título + menú global.
-                 Módulo Ciudad se encarga de la ciudad.
-DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
-                 Orden_Sheet_CSS.html, Seccion_CSS.html,
-                 Seccion_Imagen_CSS.html, Promo_CSS.html,
-                 Social_CSS.html, Comenta_CSS.html, Global_CSS.html,
-                 Reserva_CSS.html, Reserva_Exito_CSS.html, Lista_CSS.html,
-                 Partner_Sheet_CSS.html.
-                 Estructura: Iconos.html, Telefono.html.
-                 JS: Global_Script.html, Global_Sheet_Script.html,
-                 Chips_Script.html, Buscar_Script.html, Lista_Script.html,
-                 Seccion_Imagen_Script.html, Seccion_Script.html,
-                 Promo_Script.html, Social_Script.html,
-                 Comenta_Script.html, Reserva_Valida_Script.html,
-                 Reserva_Sheet_Script.html, Reserva_OTP_Script.html,
-                 Reserva_Dato_Script.html, Reserva_Exito_Script.html,
-                 Reserva_Script.html, Partner_Sheet_Script.html,
-                 Ciudad_Sheet_Script.html, Orden_Sheet_Script.html,
-                 Compartir_Script.html, Core_Script.html.
-                 Servido por 00 DoGet.gs (include + inyección).
+RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
+                 SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
+                 POST al /exec) y los fragments viven en css/ y js/.
+VERSIÓN:         1.24.0
+CAMBIOS:         R83: (1) FIX DOBLE CTA Y DOBLE PARTNER: este index
+                 seguía viejo — cargaba Comenta_CSS/Comenta_Script
+                 (el módulo retirado que pintaba el partner y el CTA
+                 a la manera antigua) y NO cargaba Pregunta_CSS/
+                 Pregunta_Script. Ahora carga EXACTAMENTE los mismos
+                 includes que el Index de GAS (entra Pregunta_*,
+                 sale Comenta_*). (2) Canvas sincronizado con el GAS
+                 Index vigente. (3) Entran las fuentes Inter y el
+                 CDN de marked (el index viejo no los cargaba).
+                 INSTALACIÓN: reemplazar este archivo completo y
+                 BORRAR del repo css/Comenta_CSS.css,
+                 css/Pregunta_Sheet_CSS.css, js/Comenta_Script.js y
+                 js/Pregunta_Sheet_Script.js si aún existen.
+DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
+                 sw.js, icon-192.png, icon-512.png, GitHub_Cromo.*,
+                 Backend: 00 DoGet.gs (doPost con abrirSesion).
 ════════════════════════════════════════════════════════════════════
 -->
-
-<!DOCTYPE html>
-<!--
-* ══════════════════════════════════════════════════════════════
-* ARCHIVO:         index.html (GitHub Pages · app MULTI-ARCHIVO)
-* PROYECTO:        ServyCloud | App en GitHub Pages
-* RESPONSABILIDAD: Estructura de la página (espejo del Index.html
-*                  de GAS) + cromo solo-GitHub (GA4, píldora
-*                  instalar, variables de despliegue). Desde R29 la
-*                  producción está PARTIDA: los estilos viven en
-*                  css/<Nombre>.css y los scripts en js/<Nombre>.js,
-*                  con EL MISMO NOMBRE que sus hermanos de Apps
-*                  Script (procedimiento del dueño: se prueba en
-*                  GAS y lo que queda bien se paga en GitHub).
-*                  Telefono.html queda inline (es HTML del body).
-*                  GAS (/exec) sigue siendo SOLO el motor de datos.
-* VERSIÓN:         1.0
-* CAMBIOS:         R29: nace la carpeta multi-archivo (GO del
-*                  dueño). Partido de Index_GitHub.html v4.1, que
-*                  queda como respaldo. Icono PWA nuevo: "Servy"
-*                  en cursiva (antes SERVY en mayúsculas).
-* DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
-*                  sw.js, icon-192.png, icon-512.png. Backend:
-*                  /exec doPost con abrirSesion (R26). Regla: el
-*                  contenido de cada css/js es el INTERIOR del
-*                  fragmento de GAS, SIN el envoltorio de estilo o
-*                  de script (el encabezado va como comentario).
-* ══════════════════════════════════════════════════════════════
--->
-
 <html lang="es">
 <head>
   <base target="_top">
@@ -138,8 +31,22 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ServyCloud</title>
 
-  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Orden_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Comenta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
-  <!-- ═══ R26 · CROMO DEL ENVOLTORIO (antes vivía en la página
+  <!-- FUENTE INTER -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- LIBRERÍA MARKED (GFM) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script>
+    if (typeof window.marked !== 'undefined' && window.marked.setOptions) {
+      window.marked.setOptions({ gfm: true, breaks: true, headerIds: false, mangle: false });
+    }
+  </script>
+
+  <link rel="stylesheet" href="./css/Core_CSS.css">  <link rel="stylesheet" href="./css/Chips_CSS.css">  <link rel="stylesheet" href="./css/Ciudad_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Orden_Sheet_CSS.css">  <link rel="stylesheet" href="./css/Seccion_CSS.css">  <link rel="stylesheet" href="./css/Seccion_Imagen_CSS.css">  <link rel="stylesheet" href="./css/Promo_CSS.css">  <link rel="stylesheet" href="./css/Social_CSS.css">  <link rel="stylesheet" href="./css/Pregunta_CSS.css">  <link rel="stylesheet" href="./css/Global_CSS.css">  <link rel="stylesheet" href="./css/Reserva_CSS.css">  <link rel="stylesheet" href="./css/Reserva_Exito_CSS.css">  <link rel="stylesheet" href="./css/Lista_CSS.css">  <link rel="stylesheet" href="./css/Partner_Sheet_CSS.css">
+
+<!-- ═══ R26 · CROMO DEL ENVOLTORIO (antes vivía en la página
        envoltorio con iframe; ahora acompaña a la app en ESTA
        página estática) ═══ -->
   <meta name="theme-color" content="#fdf3ec">
@@ -154,7 +61,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   <link rel="manifest" href="./manifest.json">
   <link id="pagina-icono" rel="icon" href="./icon-192.png">
 
-  <script>
+<script>
       (function () {
           try {
               var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -187,7 +94,7 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   <link rel="stylesheet" href="./css/GitHub_Cromo.css">
 </head>
 <body>
-  <!-- ═══ BOTÓN INSTALAR APP (solo Android; se muestra y se oculta solo) ═══ -->
+<!-- ═══ BOTÓN INSTALAR APP (solo Android; se muestra y se oculta solo) ═══ -->
   <div id="zona-instalar" hidden role="group" aria-label="Instalar aplicación">
       <button id="btn-instalar" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
@@ -198,282 +105,20 @@ DEPENDENCIAS:    CSS: Core_CSS.html, Chips_CSS.html, Ciudad_Sheet_CSS.html,
   </div>
 
 
-  <!-- Detección temprana de móvil · ANTES de Telefono.html
-       Evita el flash del marco iPhone en dispositivos móviles. -->
+
+
+  <!-- Detección temprana de móvil · ANTES de Telefono.html -->
   <script>
     (function () {
       var ua = navigator.userAgent || '';
       var esMovilUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
       var esPantallaPequena = window.matchMedia('(max-width: 768px)').matches;
-      if (esMovilUA || esPantallaPequena) {
-        document.body.classList.add('is-mobile');
-      }
+      if (esMovilUA || esPantallaPequena) { document.body.classList.add('is-mobile'); }
     })();
   </script>
 
   <script src="./js/Iconos.js"></script>
-<!--
-════════════════════════════════════════════════════════════════════
-ARCHIVO:         Telefono.html
-PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Shell visual del iPhone 11 con reloj dinámico en la
-                 barra de estado (formato 12h, se actualiza cada
-                 segundo). Barras superior e inferior en blanco
-                 #ffffff (igual que el menú tabs). NO define colores
-                 del área de trabajo.
-VERSIÓN:         1.2
-CAMBIOS:         R53: entra la shell del dueño TAL CUAL (Regla de
-                 Oro): cuerpo a 242.39 mm para más aire vertical del
-                 lienzo, carcasa sin sombra, barra de estado con la
-                 pila tipográfica del sistema, barra de Safari en
-                 blanco con bordes finos #e5e5ea (botones y cápsula),
-                 iconos grises #8e8e93 de trazo fino, icono de tres
-                 puntos a la derecha, URL real del proyecto en la
-                 cápsula y reloj dinámico 12h (#reloj-estado).
-                 Encabezado actualizado (solo info vigente).
-DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
-                 Core_Script.html y estilizado en modo móvil por
-                 Core_CSS.html). El reloj solo escribe en
-                 #reloj-estado.
-════════════════════════════════════════════════════════════════════
--->
-
-<style>
-  /* =========================================================
-     CUERPO DEL IPHONE 11 — carcasa gris oscura
-     Ancho: 116,58 mm · Alto: 242,39 mm
-     ========================================================= */
-  .phone {
-    position: relative;
-    width: 116.58mm;
-    height: 242.39mm;
-    border-radius: 16.1mm;
-    padding: 3.5mm;
-    background: linear-gradient(150deg,
-        #565659 0%,
-        #2b2b2d 20%,
-        #1a1a1c 52%,
-        #3f3f42 100%);
-    user-select: none;
-  }
-
-  .glass {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 12.6mm;
-    overflow: hidden;
-    background: #fff;
-  }
-
-  /* ---------- Botones laterales ---------- */
-  .btn {
-    position: absolute;
-    width: 1.26mm;
-    border-radius: 1.4mm;
-    background: linear-gradient(180deg, #565659, #1a1a1c);
-    box-shadow: 0 0 1.4mm rgba(0,0,0,.5);
-  }
-  .btn.mute   { left: -1.26mm; top: 46mm;   height: 10.8mm; }
-  .btn.vol-up { left: -1.26mm; top: 69mm;   height: 18.5mm; }
-  .btn.vol-dn { left: -1.26mm; top: 92mm;   height: 18.5mm; }
-  .btn.power  { right: -1.26mm; top: 72.4mm; height: 30.8mm; }
-
-  /* ---------- Notch ---------- */
-  .notch {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 33.6mm;
-    height: 7.56mm;
-    background: #000;
-    border-radius: 0 0 4.76mm 4.76mm;
-    z-index: 20;
-  }
-  .notch::before {
-    content: "";
-    position: absolute;
-    top: 2.52mm;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 11.9mm;
-    height: 1.26mm;
-    border-radius: 0.7mm;
-    background: #151517;
-    box-shadow: inset 0 0.28mm 0.42mm rgba(255,255,255,.08);
-  }
-  .notch::after {
-    content: "";
-    position: absolute;
-    top: 2.24mm;
-    left: 6.3mm;
-    width: 2.52mm;
-    height: 2.52mm;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #3a4a70, #06060a 70%);
-    box-shadow: inset 0 0 0.7mm #000;
-  }
-
-  /* ---------- Barra de estado — blanco ---------- */
-  .status {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 12.6mm;
-    padding: 4.2mm 7mm 0;
-    background: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 4.48mm;
-    font-weight: 600;
-    color: #000;
-    z-index: 15;
-    user-select: none;
-  }
-  .status .right {
-    display: flex;
-    align-items: center;
-    gap: 1.68mm;
-  }
-  .signal { display: flex; align-items: flex-end; gap: 0.56mm; height: 3.36mm; }
-  .signal i { width: 0.98mm; background: #000; border-radius: 0.28mm; }
-  .signal i:nth-child(1) { height: 1.26mm; }
-  .signal i:nth-child(2) { height: 1.96mm; }
-  .signal i:nth-child(3) { height: 2.66mm; }
-  .signal i:nth-child(4) { height: 3.36mm; opacity: .35; }
-
-  .battery {
-    position: relative;
-    width: 7.7mm;
-    height: 3.64mm;
-    border: 0.49mm solid #000;
-    border-radius: 1.12mm;
-    padding: 0.42mm;
-  }
-  .battery::after {
-    content: "";
-    position: absolute;
-    right: -1.12mm;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.7mm;
-    height: 1.4mm;
-    border-radius: 0 0.56mm 0.56mm 0;
-    background: #000;
-  }
-  .battery span {
-    display: block;
-    height: 100%;
-    width: 76%;
-    border-radius: 0.7mm;
-    background: #000;
-  }
-
-  /* ---------- Safari ---------- */
-  .safari {
-    position: absolute;
-    top: 12.6mm;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-  }
-
-  /* =========================================================
-     LIENZO — contenedor físico. NO define fondo propio.
-     ========================================================= */
-  .lienzo {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ---------- Barra inferior de Safari — blanco ---------- */
-  .safari-bottom {
-    flex-shrink: 0;
-    height: 22.4mm;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    gap: 3.5mm;
-    padding: 0 4.2mm 5.6mm;
-    user-select: none;
-  }
-
-  .circle-btn {
-    flex-shrink: 0;
-    width: 9.8mm;
-    height: 9.8mm;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 0.2mm solid #e5e5ea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #8e8e93;
-  }
-
-  .circle-btn svg {
-    width: 5.6mm;
-    height: 5.6mm;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .url-capsule {
-    flex: 1;
-    height: 9.8mm;
-    border-radius: 4.9mm;
-    background: #ffffff;
-    border: 0.2mm solid #e5e5ea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4.2mm;
-    font-size: 4.34mm;
-    color: #8e8e93;
-    letter-spacing: -0.07mm;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  .url-capsule svg {
-    width: 3.92mm;
-    height: 3.92mm;
-    margin-right: 1.68mm;
-    stroke: #8e8e93;
-    fill: none;
-    stroke-width: 3.08;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex-shrink: 0;
-  }
-
-  /* ---------- Home indicator ---------- */
-  .home-bar {
-    position: absolute;
-    bottom: 1.82mm;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44.8mm;
-    height: 1.54mm;
-    border-radius: 0.84mm;
-    background: rgba(0,0,0,.85);
-    z-index: 30;
-  }
-</style>
-
+  <link rel="stylesheet" href="./css/Telefono.css">
 <!-- =========================================================
      ESTRUCTURA DEL TELÉFONO
      ========================================================= -->
@@ -543,40 +188,11 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
 <!-- =========================================================
      SCRIPT PARA LA HORA DINÁMICA (Formato 12h)
      ========================================================= -->
-<script>
-  (function() {
-    function actualizarHora() {
-      var ahora = new Date();
-      var horas = ahora.getHours();
-      var minutos = ahora.getMinutes();
-
-      // Convertir a formato de 12 horas (1 a 12)
-      horas = horas % 12;
-      horas = horas ? horas : 12; // Si es 0 (medianoche), mostrar 12
-
-      // Formatear a 2 dígitos (ej. 9:05 -> 09:05)
-      horas = horas < 10 ? '0' + horas : horas;
-      minutos = minutos < 10 ? '0' + minutos : minutos;
-
-      var reloj = document.getElementById('reloj-estado');
-      if (reloj) {
-        reloj.textContent = horas + ':' + minutos;
-      }
-    }
-
-    // Ejecutar al cargar
-    actualizarHora();
-
-    // Actualizar cada segundo para mantener la precisión
-    setInterval(actualizarHora, 1000);
-  })();
-</script>
-
+  <script src="./js/Telefono.js"></script>
 
   <script>
     /* R26: la página es estática (GitHub Pages). La sesión llega
-       POR DATOS: abrirSesion entrega TOKEN_SESION y SISTEMA
-       (Global_Script 1.5 · Core_Script 1.8 espera al recibirla). */
+       POR DATOS: abrirSesion entrega TOKEN_SESION y SISTEMA. */
     window.TABLAS        = { posts: [], partners: [] };
     window.TOKEN_SESION  = '';
     window.URL_EXEC      = "https://script.google.com/macros/s/AKfycbw8k3rZGnWGNTNabSXh5PbjJg7OtLB8pWyX5eAukOjKqTyTwuW8MSqPUI9YW8LUyn8DtA/exec";
@@ -587,202 +203,64 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
       <div class="area-contenido">
 
         <!-- ============================================================
-             FILA DE CABECERA (R63) · volver + TÍTULO DEL HEADER
-             + título de categoría + MENÚ GLOBAL, TODO en una
-             fila: en modo lista el título vive a la IZQUIERDA y
-             el menú global a la DERECHA (lista ganada); en modo
-             detalle el título se oculta y entran volver +
-             título de categoría. La ciudad sigue en la fila de
-             filtros (debajo). El menú global se oculta en modo
-             compartido.
+             FILA DE CABECERA · Título (subtitulo) + Menú Global
              ============================================================ -->
         <div class="filtros-wrap">
-
           <button type="button" class="btn-volver" id="btnVolver" aria-label="Volver" hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <polyline points="15 18 9 12 15 6"/>
-            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-
-          <!-- R63 · TÍTULO DEL HEADER · frase de la BD real
-               (ROOTJSON → app.tituloHeader, un vector: UNA al
-               azar por carga). Mismo tamaño de fila que el
-               menú global; Core_Script lo pinta al arrancar. -->
+          
           <h1 class="titulo-header" id="tituloHeader" hidden></h1>
-
-          <div id="tituloCategoria" class="titulo-categoria" hidden></div>
-
+          
+          <!-- El título usa .subtitulo para heredar 18px/300 del Core -->
+          <div id="tituloCategoria" class="titulo-categoria subtitulo" hidden></div>
+          
           <button type="button" class="menu-global" aria-label="Menú">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="5"  cy="12" r="1.7"/>
-              <circle cx="12" cy="12" r="1.7"/>
-              <circle cx="19" cy="12" r="1.7"/>
-            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
           </button>
-
         </div>
 
-        <!-- ============================================================
-             ENCABEZADO DE PROMOS (R58) · par título/subtítulo sobre
-             la marquesina; Promo_Script lo muestra cuando hay
-             promos vigentes y lo oculta cuando no.
-             ============================================================ -->
+        <!-- ENCABEZADO DE PROMOS -->
         <div class="promo-encabezado" id="promoEncabezado" hidden>
           <span class="promo-encabezado-titulo">Promos cerca de ti</span>
           <span class="promo-encabezado-sub">Toca para conocer más</span>
         </div>
-
-        <!-- Promo · chrome, fuera del scroll · oculto por defecto -->
         <div id="promoSlot" hidden></div>
 
-        <!-- ============================================================
-             SECCIÓN FILTROS (R64) · vive DEBAJO de las promos,
-             en DOS filas de bordes suaves y delgados.
-             FILA 1: campo BUSCAR expandido de una vez (lupa +
-             input + X circular naranja para limpiar, visible al
-             escribir) + BOTÓN FILTRO a la derecha (glifo de
-             Iconos — sin acción todavía). Buscar_Script enlaza
-             el campo y la X (en modo compartido la X libera la
-             vista vía Compartir.limpiar).
-             ============================================================ -->
+        <!-- FILA 1: BUSCADOR Y BOTÓN ORDENAR -->
         <div class="filtros-fila" id="filtrosFila">
-
           <div class="buscar-capsula" id="buscarFila">
             <div class="buscar-input-wrap">
-              <span class="buscar-lupa" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="7"/>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-              </span>
-              <input type="text" class="buscar-input" id="buscarInput"
-                     placeholder="Buscar servicio, curso o palabra clave"
-                     maxlength="40"
-                     autocomplete="off" autocorrect="off"
-                     autocapitalize="off" spellcheck="false">
-              <!-- R64 · X circular naranja DENTRO del campo:
-                   aparece al escribir y limpia el campo. En modo
-                   compartido queda fija (libera la vista).
-                   R66 · el glifo se ESTIRA (span 12/24 del
-                   viewBox): a líneas de 6/24 la X se veía
-                   diminuta dentro del círculo. -->
-              <button type="button" class="buscar-limpiar" id="btnLimpiarCampo"
-                      aria-label="Limpiar el campo">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-              </button>
+              <span class="buscar-lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" class="buscar-input" id="buscarInput" placeholder="Buscar..." maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <button type="button" class="buscar-limpiar" id="btnLimpiarCampo" aria-label="Limpiar"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
           </div>
-
-          <!-- BOTÓN ORDENAR (R66) · a la derecha del campo:
-               círculo con el glifo ordenar de Iconos (3 líneas
-               que se acortan, diseño del dueño). ABRE EL SHEET
-               DE ORDENAMIENTO (Orden_Sheet_Script): nombre
-               A-Z/Z-A, categoría, más compartidos y mejor
-               valorados. Se retira en modo compartido. -->
-          <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar">
-            <span data-glifo="ordenar" aria-hidden="true"></span>
-          </button>
-
+          <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar"><span data-glifo="ordenar" aria-hidden="true"></span></button>
         </div>
 
-        <!-- ============================================================
-             FILA 2 (R64) · CHIPS + CIUDAD repartiéndose la fila
-             en partes iguales, sin números de items. Chips_Script
-             pinta los botones chip (con su icono) en #filtros;
-             el BOTÓN CIUDAD (#btnCiudad, pin + nombre) cierra la
-             fila. En modo compartido esta fila se retira.
-             ============================================================ -->
+        <!-- FILA 2: CHIPS Y CIUDAD -->
         <div class="filtros-fila-dos" id="filtrosFilaDos">
-
           <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
-
-          <!-- BOTÓN CIUDAD · pin + nombre de la ciudad, sin
-               fondo (solo el borde suave) y sin más texto que
-               la ciudad. El módulo Ciudad lo pinta y lo enlaza
-               (ids intactos). -->
-          <button type="button"
-                  class="city-bar"
-                  id="btnCiudad"
-                  disabled
-                  aria-label="Cambiar ciudad">
+          <button type="button" class="city-bar" id="btnCiudad" disabled aria-label="Cambiar ciudad">
             <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
             <span class="city-txt" id="ciudadTxt">—</span>
           </button>
-
         </div>
 
-        <!-- R65 · BLOQUE DE ITEMS · el botón "Compartir lista"
-             y el aviso sin resultados viven DENTRO del bloque de
-             los items (scrollean con la lista): ya no son sección
-             filtro. Lista_Script enciende el botón con items y le
-             escribe la cantidad; Compartir_Script lleva el envío.
-             En modo compartido no aplica. -->
+        <!-- CONTENEDOR DE LISTA Y DETALLE -->
         <div class="secciones-wrap">
-          <button type="button" class="btn-compartir" id="btnCompartir"
-                  aria-label="Compartir lista" hidden disabled>
-            Compartir lista
-          </button>
-
+          <button type="button" class="btn-compartir" id="btnCompartir" aria-label="Compartir lista" hidden disabled>Compartir lista</button>
           <div id="buscarVacio" class="buscar-vacio" hidden></div>
-
           <div class="lista-wrap" id="listaWrap"></div>
           <div class="secciones-track" id="seccionesTrack" hidden></div>
         </div>
 
-        <div class="cta-fila">
-
-          <!-- Duda del post · botón outline a la IZQUIERDA del CTA
-               (decisión del dueño). Se muestra solo si el post
-               declara meta.botonDuda con texto Y el CTA NO es modo
-               WhatsApp (dos botones que abren WhatsApp no suman).
-               Nunca se deshabilita. Core_Script decide
-               visibilidad/texto y arma el mensaje con
-               meta.mensajeDuda + {titulo}. -->
-          <button type="button" class="cta-duda" hidden>Consultar</button>
-
-          <button type="button" class="cta-reservar" aria-label="Reservar cupo">
-            <span class="cta-reservar-texto">Quiero reservar mi cupo</span>
-            <span class="cta-reservar-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M5 12h14"/>
-                <path d="m12 5 7 7-7 7"/>
-              </svg>
-            </span>
-          </button>
-
-        </div>
-
-        <!-- R49 · Fila del partner · estilo Instagram bajo la fila
-             CTA. Círculo con glifo user + punto (como la campanita
-             de la promo) + nombre del partner y su eslogan como
-             subtítulo. Social_Script llena textos/visibilidad con
-             post:change y mantiene la MISMA acción de antes:
-             abrir el Partner Sheet. Sin chevron (decisión del
-             dueño: fricción con la flecha del CTA). Oculta en
-             modo lista y si el post no tiene partner. -->
-        <button type="button" class="user-fila" id="userFila" hidden aria-label="Sobre el partner">
-          <span class="user-avatar" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span class="user-punto"></span>
-          </span>
-          <span class="user-info">
-            <span class="user-nombre">Partner</span>
-            <span class="user-eslogan" hidden>Eslogan</span>
-          </span>
-        </button>
-
-        <div class="botones-flotantes"></div>
       </div>
     </div>
   </template>
 
-  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Sheet_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Comenta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Orden_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
+  <script src="./js/Global_Script.js"></script>  <script src="./js/Global_Sheet_Script.js"></script>  <script src="./js/Chips_Script.js"></script>  <script src="./js/Buscar_Script.js"></script>  <script src="./js/Lista_Script.js"></script>  <script src="./js/Seccion_Imagen_Script.js"></script>  <script src="./js/Seccion_Script.js"></script>  <script src="./js/Promo_Script.js"></script>  <script src="./js/Social_Script.js"></script>  <script src="./js/Pregunta_Script.js"></script>  <script src="./js/Reserva_Valida_Script.js"></script>  <script src="./js/Reserva_Sheet_Script.js"></script>  <script src="./js/Reserva_OTP_Script.js"></script>  <script src="./js/Reserva_Dato_Script.js"></script>  <script src="./js/Reserva_Exito_Script.js"></script>  <script src="./js/Reserva_Script.js"></script>  <script src="./js/Partner_Sheet_Script.js"></script>  <script src="./js/Ciudad_Sheet_Script.js"></script>  <script src="./js/Orden_Sheet_Script.js"></script>  <script src="./js/Compartir_Script.js"></script>  <script src="./js/Core_Script.js"></script>
 
   <script src="./js/GitHub_Cromo.js"></script>
 </body>

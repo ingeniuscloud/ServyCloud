@@ -11,8 +11,12 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.28
-CAMBIOS:         R77: El refresco en segundo plano apunta a
+VERSIÓN:         1.29
+CAMBIOS:         R83: El gradiente del post adopta EL MISMO FORMATO
+                 del lienzo principal: blanco 0-5% → color claro del
+                 post 15% → 24% → blanco 36%. Antes el clarito se
+                 estiraba hasta el final del post.
+                 R77: El refresco en segundo plano apunta a
                  window.Pregunta (estaAbierto/refrescar), el módulo
                  del Q&A del post. Encabezado saneado: solo queda
                  lo vigente.
@@ -430,12 +434,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       var colorClaro   = colores[2] || '#f4f6fc';
       var colorOficial = colores[0] || '';
 
+      /* R83: mismo formato del lienzo principal — blanco al
+         inicio, color del post clarito en el mismo tramo
+         (15%-24%) y de vuelta al blanco. */
       area.style.background =
         'linear-gradient(180deg, ' +
           '#ffffff 0%, ' +
           '#ffffff 5%, ' +
           colorClaro + ' 15%, ' +
-          colorClaro + ' 100%)';
+          colorClaro + ' 24%, ' +
+          '#ffffff 36%, ' +
+          '#ffffff 100%)';
 
       if (colorOficial) {
         area.style.setProperty('--post-color', colorOficial);

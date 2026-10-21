@@ -4,18 +4,20 @@ ARCHIVO:         Pregunta_Script.html
 ESPEJO GITHUB:   github/js/Pregunta_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
-                 lienzo: campo de pregunta (X de limpiar neutra,
-                 aviso corto con icono de info, contador N/250
-                 centrado bajo el botón enviar), publicación sin
-                 recargar (recientes primero; al publicar se limpia
-                 el campo y sale el foco) y sheet al 90% para ver
-                 todas las preguntas con fade final.
+                 lienzo: campo de pregunta (X de limpiar con círculo
+                 gris tenue, fila inferior fija con el aviso corto y
+                 el contador N/250 SIEMPRE visible a la derecha),
+                 publicación sin recargar (recientes primero; al
+                 publicar se limpia el campo y sale el foco) y sheet
+                 al 90% para ver todas las preguntas con fade final.
                  Sin borrado y sin nombre de quien pregunta.
-VERSIÓN:         1.0.2
-CAMBIOS:         R82: Se retira la divisora propia del inicio: la
-                 que cierra la sección del partner ahora vive debajo
-                 de la dirección (Seccion_Script), y duplicarla
-                 dejaba dos líneas seguidas antes del Q&A.
+VERSIÓN:         1.0.3
+CAMBIOS:         R83: (1) El contador sale de debajo del botón enviar
+                 y comparte LA MISMA FILA con el aviso: al escribir ya
+                 no se mueve nada de sitio. (2) El contador queda
+                 SIEMPRE visible en tenue (0/250 con el campo vacío).
+                 (3) El error de envío toma el lugar del aviso dentro
+                 de esa misma fila y al curarse vuelve el aviso.
 CAMBIOS:         R77B: El contador pasa a formato N/250 (cuánto
                  lleva y cuánto queda) centrado bajo el botón
                  enviar; el aviso corto lleva el icono info de
@@ -78,18 +80,20 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                            'aria-label="Escribe tu pregunta">' +
                     '<button type="button" class="preg-clear" id="pregClear" aria-label="Limpiar pregunta"><span data-glifo="close"></span></button>' +
                   '</div>' +
-                  '<div class="preg-send-col">' +
-                    '<button type="button" class="preg-send" id="pregSend" disabled aria-label="Enviar pregunta"><span data-glifo="enviar"></span></button>' +
-                    '<span class="preg-counter cita" id="pregCounter" hidden>0/' + MAX_CHARS + '</span>' +
-                  '</div>' +
+                  '<button type="button" class="preg-send" id="pregSend" disabled aria-label="Enviar pregunta"><span data-glifo="enviar"></span></button>' +
                 '</div>';
+      /* R83: fila inferior fija — aviso a la izquierda (alineado
+         con el placeholder) y contador SIEMPRE visible a la
+         derecha en tenue. El error toma el lugar del aviso en
+         ESA misma fila: escribir o fallar no mueve el layout. */
       html +=   '<div class="preg-meta">' +
-                  '<span class="preg-aviso cita">' +
+                  '<span class="preg-aviso cita" id="pregAviso">' +
                     '<span class="preg-aviso-icono" data-glifo="info" aria-hidden="true"></span>' +
                     AVISO +
                   '</span>' +
+                  '<span class="preg-error cita" id="pregError" hidden>No se pudo enviar. Intenta de nuevo.</span>' +
+                  '<span class="preg-counter cita" id="pregCounter">0/' + MAX_CHARS + '</span>' +
                 '</div>';
-      html +=   '<p class="preg-error cita" id="pregError" hidden>No se pudo enviar. Intenta de nuevo.</p>';
       html +=   '<div class="mk-qa-preview" id="pregPreview"></div>';
       html += '</div>';
       return html;
@@ -105,6 +109,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         clear:    track.querySelector('#pregClear'),
         send:     track.querySelector('#pregSend'),
         counter:  track.querySelector('#pregCounter'),
+        aviso:    track.querySelector('#pregAviso'),
         error:    track.querySelector('#pregError'),
         preview:  track.querySelector('#pregPreview')
       };
@@ -143,24 +148,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       el.send.disabled = !tieneTexto || enviando;
 
-      /* Contador N/250: cuánto lleva y cuánto queda. Solo con
-         texto; al llegar al tope avisa en naranja. */
+      /* Contador N/250 (R83): SIEMPRE visible en tenue, viva en la
+         fila del aviso; al llegar al tope avisa en naranja. */
       if (el.counter) {
-        if (!tieneTexto) { el.counter.hidden = true; }
-        else {
-          el.counter.hidden = false;
-          el.counter.textContent = len + '/' + MAX_CHARS;
-          el.counter.classList.toggle('limite', len >= MAX_CHARS);
-        }
+        el.counter.textContent = len + '/' + MAX_CHARS;
+        el.counter.classList.toggle('limite', len >= MAX_CHARS);
       }
+
+      /* Si el usuario vuelve a escribir, el aviso curado regresa. */
+      if (tieneTexto && el.error && !el.error.hidden) ocultarError();
     }
 
     var errorTimer = null;
     function mostrarError() {
-      if (!el.error) return;
+      if (!el.error || !el.aviso) return;
+      el.aviso.hidden = true;
       el.error.hidden = false;
       if (errorTimer) clearTimeout(errorTimer);
-      errorTimer = setTimeout(function () { if (el.error) el.error.hidden = true; }, 4000);
+      errorTimer = setTimeout(ocultarError, 4000);
+    }
+    function ocultarError() {
+      if (errorTimer) { clearTimeout(errorTimer); errorTimer = null; }
+      if (el.error) el.error.hidden = true;
+      if (el.aviso) el.aviso.hidden = false;
     }
 
     /* ============================================================

@@ -4,17 +4,25 @@ ARCHIVO:         Pregunta_CSS.html
 ESPEJO GITHUB:   github/css/Pregunta_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
-                 lienzo (enviar con su contador centrado debajo, X de
-                 limpiar neutra, aviso con icono de info), vista
-                 previa de las últimas preguntas con fade y el sheet
-                 al 90% para ver todas las preguntas.
-VERSIÓN:         1.0.1
-CAMBIOS:         R77B: El botón enviar queda de fondo blanco con el
+                 lienzo (enviar blanco, X de limpiar con su círculo
+                 gris tenue, fila inferior fija con el aviso de
+                 siempre a la izquierda y el contador N/250 a la
+                 derecha), vista previa de las últimas preguntas con
+                 fade y el sheet al 90% para ver todas las preguntas.
+VERSIÓN:         1.0.2
+CAMBIOS:         R83: (1) La X de limpiar recupera su círculo ahora
+                 en gris tenue: se distinguía del texto escrito.
+                 (2) El contador sale de debajo del enviar y comparte
+                 LA MISMA FILA con el aviso (derecha): al escribir ya
+                 no se mueve nada de sitio. (3) El contador queda
+                 SIEMPRE visible en tenue (aunque el campo esté
+                 vacío) para no desequilibrar la fila con el aviso.
+                 (4) El icono info se alinea con el inicio del
+                 placeholder del campo. (5) El error de envío toma el
+                 lugar del aviso EN ESA MISMA FILA (sin saltos).
+                 R77B: El botón enviar queda de fondo blanco con el
                  glifo naranja (sin competir con el CTA, igual que
-                 los botones sociales del hero); la X de limpiar
-                 deja el círculo naranja y pasa a glifo neutro; el
-                 contador N/250 se centra bajo el enviar y avisa en
-                 naranja solo al llegar al tope; el aviso corto se
+                 los botones sociales del hero); el aviso corto se
                  acompaña con el icono info; entra el mensaje suave
                  de error de envío.
                  R77: Nace el archivo. El Q&A se maneja completo en
@@ -60,24 +68,19 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .preg-input::-webkit-scrollbar { display: none; }
 
   /* X de limpiar: solo con texto; limpia y quita el foco (como el
-     Buscar). Glifo neutro sin círculo: no compite con el CTA. */
+     Buscar). R83: recupera su círculo ahora en GRIS TENUE — sin
+     él la X se confundía con el texto escrito. */
   .preg-clear {
     display: none; align-items: center; justify-content: center;
     width: 28px; height: 28px; margin-right: 7px; flex-shrink: 0;
-    border: none; border-radius: 50%; background-color: transparent; color: #64748b;
+    border: none; border-radius: 50%; background-color: #edf1f5; color: #475569;
     cursor: pointer; padding: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .preg-clear:active { opacity: 0.6; }
+  .preg-clear:active { opacity: 0.6; background-color: #e2e8f0; }
   .preg-clear svg { width: 15px; height: 15px; display: block; }
   .preg-input-wrap.con-texto .preg-clear { display: flex; }
-
-  /* Columna enviar + contador centrado debajo del icono */
-  .preg-send-col {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 5px; flex-shrink: 0;
-  }
 
   /* Enviar: círculo blanco con el glifo naranja (mismo tratamiento
      de los botones sociales del hero); sin competir con el CTA.
@@ -94,29 +97,38 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .preg-send:active { transform: scale(0.92); }
   .preg-send:disabled { color: #cbd5e1; box-shadow: none; cursor: not-allowed; }
   .preg-send svg { width: 19px; height: 19px; display: block; margin-left: 1px; }
+  .preg-form > .preg-send { flex-shrink: 0; }
 
   /* ============================================================
-     FILA INFERIOR · aviso corto con icono info + error de envío
+     FILA INFERIOR (R83) · UNA SOLA FILA FIJA:
+     [icono info + aviso]  ·  [contador N/250]
+     El padding izquierdo (16px) alinea el icono con el inicio
+     del placeholder del campo (borde 1.5px + padding 14px).
+     El contador vive SIEMPRE aquí en tenue: al escribir no se
+     mueve nada de sitio. El error de envío toma el lugar del
+     aviso dentro de la misma fila (sin saltos de layout).
      ============================================================ */
   .preg-meta {
-    display: flex; align-items: baseline;
-    padding: 0 2px; margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 0 8px 0 16px; margin-bottom: 4px;
   }
   .preg-aviso { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+  .preg-aviso[hidden] { display: none; }
   .preg-aviso-icono {
     flex-shrink: 0; width: 12px; height: 12px;
     display: inline-flex; color: #64748b;
   }
   .preg-aviso-icono svg { width: 100%; height: 100%; display: block; }
 
-  .preg-error { margin: 0 0 4px 2px; color: #dc2626 !important; }
+  .preg-error { margin: 0; color: #dc2626 !important; min-width: 0; }
   .preg-error[hidden] { display: none; }
 
-  /* Contador N/250 · centrado bajo el botón enviar */
+  /* Contador N/250 · SIEMPRE visible en tenue, a la derecha;
+     naranja solo al llegar al tope. */
   .preg-counter {
-    text-align: center; line-height: 1;
+    flex-shrink: 0; text-align: right; line-height: 1;
     font-size: var(--size-cita) !important; font-weight: 400 !important;
-    color: #64748b !important; transition: color 0.2s ease;
+    color: #94a3b8 !important; transition: color 0.2s ease;
   }
   .preg-counter.limite { color: #ea580c !important; }
 

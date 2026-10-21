@@ -10,18 +10,17 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los posts sin foto y la infraestructura de sheets
                  .mk-sheet-* (leída por el sheet de descripción y por
                  Pregunta).
-VERSIÓN:         2.1.0
-CAMBIOS:         R82: (1) Tarjeta de promo del post (.mk-promo-*):
-                 banner con el color del post y precios sobre un
-                 tinte al 8% — no compite con el CTA.
-                 (2) Publicaciones relacionadas: sección pintada
-                 (.mk-rel-section, fondo #FFF7ED del sistema, sin
-                 caja ni divisora) y tarjetas nuevas con banner
-                 superior del color del post, avatar blanco con la
-                 inicial y nombre sobre fondo tintado.
-                 (3) Tipografías al sistema del Core: In Company y
-                 bloque asesor solo dejan layout; la tipografía la
-                 llevan .textoSecundario / .textoPrimario.
+VERSIÓN:         2.1.1
+CAMBIOS:         R83: (1) Divisoras visibles: la línea #f1f5f9 se
+                 perdía con el fondo — pasa a un gris que sí se ve.
+                 (2) Promo del post en CLARITO: el banner fuerte
+                 competía con el CTA; ahora banner tintado con el
+                 badge de la promo a la DERECHA y precios sobre
+                 blanco. (3) Tarjetas del cross-sell en clarito
+                 (banner tintado + avatar del color). (4) Fondo de
+                 la sección de relacionados en grisesito tenue
+                 (#f3f4f6) y tarjetas In Company y Servy publicidad
+                 DENTRO de esa sección sobre blanco.
                  R77B: (1) Los puntos del carrusel adoptan el
                  tratamiento de los botones sociales del hero
                  (fondo blanco, borde suave y sombra). (2) Entran los
@@ -107,25 +106,38 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-desc-clamp li { margin: 0 0 2px; }
 
   /* ============================================================
-     PROMO DEL POST (R82) · debajo del título
-     Banner con el color del post y precios sobre un tinte al 8%
-     del propio color: acompaña al post sin competir con el CTA
-     naranja. La pinta Seccion_Script solo si el PROMOJSON trae
-     una promo vigente para el post abierto.
+     PROMO DEL POST (R82/R83) · debajo del título
+     R83: TODO en CLARITO — el banner fuerte competía con el CTA.
+     Banner tintado al 12% con el texto de la promo y el BADGE a
+     la derecha (misma anatomía de la marquesina: texto manda,
+     badge identifica); precios sobre blanco. Nada satura: el
+     naranja del CTA sigue siendo el único acento fuerte.
      ============================================================ */
   .mk-promo-block {
-    margin: 2px 0 14px; border-radius: 8px; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.05); width: 100%;
+    margin: 2px 0 14px; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06); width: 100%;
   }
   .mk-promo-banner {
-    background: var(--post-color, #f97316); color: #ffffff;
-    font-size: 16px; font-weight: 600; font-style: italic;
-    padding: 10px 14px; text-align: left; letter-spacing: 0.5px;
+    background: var(--post-claro, #f1f5f9);
+    background: color-mix(in srgb, var(--post-color) 12%, #ffffff);
+    color: var(--post-color, #f97316);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; font-size: 15px; font-weight: 600; font-style: italic;
+    padding: 10px 14px; text-align: left; letter-spacing: 0.3px;
+  }
+  .mk-promo-banner-texto { flex: 1 1 auto; min-width: 0; }
+  /* Badge de la promo (el de la BD, el mismo de la marquesina):
+     píldora blanca con borde punteado del color del post. */
+  .mk-promo-badge {
+    flex: 0 0 auto; font-size: 11px; font-weight: 700; font-style: normal;
+    padding: 4px 9px; border-radius: 999px; line-height: 1;
+    letter-spacing: 0.01em; white-space: nowrap;
+    background: #ffffff; border: 1.3px dashed var(--post-color, #f97316);
+    color: var(--post-color, #f97316);
   }
   .mk-promo-prices {
-    background: var(--post-claro, #f1f5f9);
-    background: color-mix(in srgb, var(--post-color) 8%, #ffffff);
+    background: #ffffff;
     padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;
   }
   .mk-promo-old-price { text-decoration: line-through; }
@@ -133,11 +145,13 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-promo-current-price { font-size: 22px; font-weight: 700; color: #1f2937; letter-spacing: -0.5px; }
   .mk-promo-discount {
     font-size: 12px; font-weight: 700; color: var(--post-color, #f97316);
-    background: color-mix(in srgb, var(--post-color) 15%, transparent);
+    background: color-mix(in srgb, var(--post-color) 12%, transparent);
     padding: 2px 6px; border-radius: 4px;
   }
 
-  .mk-hairline { height: 1px; background: #f1f5f9; border: none; margin: 0; }
+  /* Divisoras de sección (R83): tenían que VERSE — el gris
+     anterior se perdía contra el fondo. */
+  .mk-hairline { height: 1px; background: rgba(15, 23, 42, 0.12); border: none; margin: 0; }
 
   /* PARTNER */
   .mk-partner-row { display: flex; align-items: center; gap: 12px; padding: 16px 5%; text-align: left; cursor: pointer; transition: background 0.15s; }
@@ -178,71 +192,79 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-location-content { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; align-items:flex-start; }
 
   /* ============================================================
-     PUBLICACIONES RELACIONADAS (R82) · sección pintada
-     Fondo propio (#FFF7ED, pastel cálido del sistema) para marcar
-     que es una sección distinta, sin caja. Antes de ella NO va
-     divisora: el fondo hace el corte. Cada tarjeta: banner
-     superior con el color del post relacionado + avatar blanco
-     con la inicial + nombre sobre fondo tintado al 8%. La
-     tipografía del nombre la lleva .textoPrimario del Core.
+     PUBLICACIONES RELACIONADAS (R82/R83) · sección pintada
+     R83: fondo GRIS TENUE (#f3f4f6) — el pastel cálido no
+     convenció — y dentro de la sección viven también In Company
+     y Servy publicidad (sobre blanco, para que respiren en el
+     gris). Sin caja ni divisora: el fondo hace el corte. Cada
+     tarjeta: banner CLARITO (tinte 15%) + avatar del color con
+     inicial blanca + nombre sobre blanco.
      ============================================================ */
-  .mk-rel-section { background: #FFF7ED; padding: 18px 0 20px; }
+  .mk-rel-section { background: #f3f4f6; padding: 18px 0 20px; }
   .mk-rel-section .mk-rel-cabeza { padding: 0 5% 12px; }
+  .mk-rel-section .mk-section { padding-top: 14px; }
   .mk-section { padding: 20px 5% 8px 5%; }
   .mk-cross-row { display: flex; gap: 8px; padding: 0 5% 4px; overflow-x: auto; scrollbar-width: none; }
   .mk-cross-row::-webkit-scrollbar { display: none; }
   .mk-cross-card {
     flex: 0 0 calc((100% - 16px) / 3); min-width: 0; padding: 0;
-    background: transparent; border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 8px; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
     font-family: inherit; text-align: left; cursor: pointer;
     transition: transform 0.15s ease; display: flex; flex-direction: column;
   }
   .mk-cross-card:active { transform: scale(0.97); }
-  .mk-cross-top { background: var(--post-color, #475569); height: 60px; display: flex; align-items: center; justify-content: center; }
+  .mk-cross-top {
+    background: var(--post-claro, #f1f5f9);
+    background: color-mix(in srgb, var(--post-color) 15%, #ffffff);
+    height: 60px; display: flex; align-items: center; justify-content: center;
+  }
   .mk-cross-avatar {
-    width: 36px; height: 36px; border-radius: 50%; background: #ffffff;
-    color: var(--post-color, #475569); display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    width: 36px; height: 36px; border-radius: 50%; background: var(--post-color, #475569);
+    color: #ffffff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
   }
   .mk-cross-name {
-    background: var(--post-claro, #f1f5f9);
-    background: color-mix(in srgb, var(--post-color) 8%, #ffffff);
+    background: #ffffff;
     padding: 8px 10px; display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden; margin: 0;
     line-height: 1.3; min-height: 50px;
   }
 
-  /* IN COMPANY Y BLOQUE ASESOR */
+  /* IN COMPANY Y SERVY PUBLICIDAD (R83): viven DENTRO de la
+     sección pintada, sobre blanco para respirar en el gris.
+     .ci-boton ya no depende de su tarjeta: la reutiliza el
+     bloque asesor (mismo botón blanco redondo). */
   .cross-incompany {
     display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; padding: 14px 16px;
-    border: 1.5px dashed rgba(15,23,42,0.18); border-radius: 14px; background: rgba(255,255,255,0.35);
+    border: 1.5px dashed rgba(15,23,42,0.18); border-radius: 14px; background: #ffffff;
     font-family: inherit; cursor: pointer; text-align: left; transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
   }
-  .cross-incompany:active { background: rgba(255,255,255,0.6); border-color: #94A3B8; transform: scale(0.985); }
+  .cross-incompany:active { background: #f8fafc; border-color: #94A3B8; transform: scale(0.985); }
   .cross-incompany .ci-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   /* R82: la tipografía la llevan .textoSecundario y .textoPrimario
      del Core; aquí queda solo el layout de las dos líneas. */
   .cross-incompany .ci-titulo { display: block; line-height: 1.2; }
   .cross-incompany .ci-cta { display: block; line-height: 1.2; }
-  .cross-incompany .ci-boton { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; color: #f97316; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10); }
+  .ci-boton { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; color: #f97316; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10); }
 
   .bloque-asesor {
-    display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 16px;
-    border: 1.5px dashed #F97316; border-radius: 14px; background: rgba(255, 255, 255, 0.4);
+    display: flex; align-items: center; gap: 14px; margin-top: 0; padding: 16px;
+    border: 1.5px dashed #F97316; border-radius: 14px; background: #ffffff;
     font-family: inherit; cursor: pointer; text-align: left; width: 100%;
     transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
   }
-  .bloque-asesor:active { background: rgba(255, 255, 255, 0.7); border-color: #EA580C; transform: scale(0.985); }
+  .bloque-asesor:active { background: #FFF7ED; border-color: #EA580C; transform: scale(0.985); }
   .bloque-asesor-icono { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background-color: #FFF7ED; color: #F97316; display: flex; align-items: center; justify-content: center; }
   .bloque-asesor-icono svg { width: 20px; height: 20px; display: block; }
   .bloque-asesor-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   /* R82: tipografía al sistema (.textoPrimario / .textoSecundario) */
   .bloque-asesor-titulo { display: block; }
   .bloque-asesor-sub { display: block; }
-  .bloque-asesor-flecha { flex-shrink: 0; width: 24px; height: 24px; color: #F97316; display: flex; align-items: center; justify-content: center; }
-  .bloque-asesor-flecha svg { width: 100%; height: 100%; display: block; }
+  /* R83: el bloque asesor usa el MISMO botón blanco redondo del
+     In Company (.ci-boton); ya no lleva la flecha suelta. */
+  .bloque-asesor .ci-boton svg { width: 18px; height: 18px; display: block; }
 
   /* SHEET (descripción y ver-todas-las-preguntas) */
   .mk-sheet-root { position: absolute; inset: 0; pointer-events: none; z-index: 700; overflow: hidden; }
