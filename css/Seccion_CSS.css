@@ -9,8 +9,17 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.0
-CAMBIOS:         R86: FIX IPHONE — la imagen del hero salía CORTADA
+VERSIÓN:         2.3.1
+CAMBIOS:         R89: AVATAR DEL PARTNER 56PX — el avatar de la
+                 fila del partner (lienzo del post) y de la
+                 identidad (lienzo del partner) pasa de 40px a
+                 56px, el tamaño exacto que traía el Partner_Sheet
+                 viejo (el dueño lo aprobó ahí). La inicial escala
+                 16→22px y el badge de verificación 20→24px para
+                 guardar la proporción. Una sola clase (.mk-partner-
+                 avatar, compartida por ambos lienzos), cero
+                 overrides en otras hojas.
+                 R86: FIX IPHONE — la imagen del hero salía CORTADA
                  en iOS (Safari y PWA; en PC y Android bien): el
                  height:100% de la img dentro del marco 1:1 con
                  aspect-ratio (y el track flex de por medio)
@@ -187,13 +196,13 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-partner-row { display: flex; align-items: center; gap: 12px; padding: 16px 5%; text-align: left; cursor: pointer; transition: background 0.15s; }
   .mk-partner-row:active { background: #fafbfc; }
   .mk-partner-avatar {
-    position: relative; width: 40px; height: 40px; border-radius: 50%;
+    position: relative; width: 56px; height: 56px; border-radius: 50%;
     background: var(--post-pastel, #f1f5f9); color: var(--post-color, #475569);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 22px;
   }
   .mk-partner-initial { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-  .mk-partner-verified-badge { position: absolute; bottom: -3px; right: -3px; width: 20px; height: 20px; background: #ffffff; border-radius: 50%; box-shadow: 0 1px 3px rgba(15,23,42,0.15); z-index: 2; display: flex; align-items: center; justify-content: center; color: #f97316; }
-  .mk-partner-verified-badge svg { width: 16px; height: 16px; display: block; }
+  .mk-partner-verified-badge { position: absolute; bottom: -4px; right: -4px; width: 24px; height: 24px; background: #ffffff; border-radius: 50%; box-shadow: 0 1px 3px rgba(15,23,42,0.15); z-index: 2; display: flex; align-items: center; justify-content: center; color: #f97316; }
+  .mk-partner-verified-badge svg { width: 19px; height: 19px; display: block; }
   .mk-partner-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .mk-partner-chevron { font-size: 24px; font-weight: 400; color: #94a3b8; line-height: 1; flex-shrink: 0; }
 
