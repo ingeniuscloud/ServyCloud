@@ -8,10 +8,21 @@ RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
                  gris tenue, fila inferior fija con el aviso de
                  siempre a la izquierda y el contador N/250 a la
                  derecha), vista previa de las últimas preguntas
-                 (con su respuesta en burbuja suave) y el sheet al
-                 90% para ver todas con SKELETON de carga.
-VERSIÓN:         1.1.0
-CAMBIOS:         R84: (1) El contador queda en tipografía .cita
+                 (con su respuesta como cita: línea izquierda,
+                 fecha y firma del partner) y el sheet al 90%
+                 para ver todas con SKELETON de carga.
+VERSIÓN:         1.2.0
+CAMBIOS:         R86: (1) La respuesta pasa de burbuja a CITA:
+                 línea vertical gris a la izquierda (la línea de
+                 cita del test), texto .textoPrimario, su fecha
+                 en .cita y debajo la firma "Respuesta de "
+                 (.textoSecundario) + nombre del partner
+                 (.textoPrimario). (2) La pregunta lleva su fecha
+                 en .cita (formato "20-10-2026 9:23 pm") bajo el
+                 texto — el usuario ve la rapidez de respuesta.
+                 (3) Fuera la etiqueta "Respuesta" de la burbuja:
+                 la firma ya dice quién responde.
+                 R84: (1) El contador queda en tipografía .cita
                  PURA (sin Overrides de tamaño/color: manda la
                  clase maestra; naranja solo al llegar al tope).
                  (2) Burbuja de respuesta (.preg-respuesta) bajo su
@@ -160,20 +171,22 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
   .mk-qa-question { margin: 0; text-align: left; }
 
   /* ============================================================
-     RESPUESTA (R84) · burbuja suave bajo su pregunta
-     Estilo Mercado Libre: la respuesta vive en un fondo gris
-     tenue del sistema con esquina superior-izquierda quebrada,
-     apuntando a su pregunta. Etiqueta en .cita, texto maestro.
+     RESPUESTA (R86) · CITA bajo su pregunta
+     Línea vertical gris a la izquierda (la línea de cita del
+     test), texto maestro, fecha de la respuesta (TIMESTAMPFIN)
+     en .cita y la firma "Respuesta de <partner>" al final.
      ============================================================ */
   .preg-respuesta {
-    margin: 8px 0 0 12px; padding: 9px 12px 10px;
-    background: #f3f4f6; border-radius: 2px 12px 12px 12px;
+    margin: 10px 0 0; padding: 4px 0 4px 12px;
+    border-left: 3px solid #e2e8f0;
     text-align: left;
   }
-  .preg-respuesta-eti {
-    display: block; margin: 0 0 2px; color: #94a3b8 !important;
-  }
   .preg-respuesta-texto { margin: 0; }
+  .preg-respuesta-fecha { display: block; margin-top: 4px; }
+  .preg-respuesta-firma { margin: 6px 0 0; line-height: 1.35; }
+
+  /* Fecha de la pregunta (R86) · .cita pura, solo layout */
+  .preg-fecha { display: block; margin-top: 3px; line-height: 1.4; }
 
   /* Fade del penúltimo: indica que hay más en el sheet */
   .mk-qa-item.preg-fade .mk-qa-question {

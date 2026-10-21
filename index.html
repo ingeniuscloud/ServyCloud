@@ -5,7 +5,19 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.25.0
+VERSIÓN:         1.26.0
+CAMBIOS:         R86: (1) VUELVEN css/GitHub_Cromo.css y
+                 js/GitHub_Cromo.js: el index siempre los cargó
+                 pero quedaron FUERA de las entregas R83/R84 — si
+                 reemplazaste css/ y js/ carpetas completas, estos
+                 2 archivos se perdieron del repo (sin ellos no hay
+                 preloader, ni píldora de instalación ni service
+                 worker). (2) El cromo trae MODO MANUAL para
+                 Androids donde Chrome no ofrece "Instalar
+                 aplicación" (Redmi A3x / Android Go): la píldora
+                 enseña ⋮ → Añadir a pantalla de inicio. (3) Los 6
+                 módulos tocados (Pregunta, Seccion, Lista ×2)
+                 vienen en css/ y js/ byte-idénticos al GAS.
 CAMBIOS:         R84: (1) Icono PWA nuevo (logo Servy): icon-192/icon-512
                  actualizados y entran apple-touch-icon, favicon-48 y las
                  variantes maskable (manifest.json). (2) Los 7 módulos

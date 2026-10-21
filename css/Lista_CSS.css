@@ -10,8 +10,12 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  publicación" naranja), cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.10
-CAMBIOS:         R77: El título del item pasa a la clase maestra
+VERSIÓN:         2.11
+CAMBIOS:         R86: el SKELETON del detalle imita la anatomía real
+                 del post (marco 1:1 con vidrio, título, promo,
+                 descripción, CTA píldora y fila del partner) —
+                 fuera la identidad centrada del post viejo.
+                 R77: El título del item pasa a la clase maestra
                  .subtitulo (Lista_Script): aquí solo queda el
                  recorte a 2 líneas; el tamaño/peso/color lo pone
                  el Core. Se retira el override muerto de .titulo.
@@ -432,10 +436,14 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     SKELETON DEL DETALLE
+     SKELETON DEL DETALLE (R86)
+     Imita la ANATOMÍA real del post de hoy: marco 1:1 con
+     vidrio (hero), título, promo, descripción, CTA píldora y
+     fila del partner — mismo orden y proporciones, en gris
+     brillante. Mientras carga ya se ve la forma del post.
      ============================================================ */
   .skeleton-detalle {
-    padding: 24px 26px 40px;
+    padding: 16px 0 40px;
     animation: skeletonFadeIn 0.15s ease;
   }
 
@@ -462,11 +470,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     100% { background-position: -200% 0; }
   }
 
-  .skeleton-detalle .skeleton-foto {
-    width: 65%;
-    margin: 0 auto 28px;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
+  /* Fondo brillante compartido por los bloques que no son línea */
+  .skeleton-foto, .skeleton-cta, .skeleton-avatar {
     background: linear-gradient(
       90deg,
       rgba(15, 23, 42, 0.06) 0%,
@@ -477,50 +482,53 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     animation: skeletonShimmer 1.4s ease-in-out infinite;
   }
 
-  .skeleton-detalle .skeleton-identidad {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 0 26px;
+  /* Hero: marco 1:1 con vidrio (mismo margen que .app-hero-wrap:
+     10px arriba, 5% de lado, 14px abajo) */
+  .skeleton-detalle .skeleton-foto {
+    width: 90%; margin: 0 auto 16px;
+    aspect-ratio: 1/1;
+    border-radius: 16px;
   }
 
-  .skeleton-detalle .skeleton-marca {
-    width: 42%;
-    height: 14px;
-    border-radius: 4px;
+  /* Info: título + promo + descripción, alineados a la izquierda
+     (mismo 5% que .mk-info) */
+  .skeleton-detalle .skeleton-cuerpo {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 0 5%;
   }
+  .skeleton-detalle .skeleton-titulo { width: 72%; height: 20px; border-radius: 6px; }
+  .skeleton-detalle .skeleton-promo  { width: 58%; height: 30px; border-radius: 10px; }
 
-  .skeleton-detalle .skeleton-titulo {
-    width: 78%;
-    height: 26px;
-    border-radius: 6px;
+  .skeleton-detalle .skeleton-desc {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 4px;
   }
+  .skeleton-detalle .skeleton-desc .skeleton-linea { height: 12px; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(1) { width: 100%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(2) { width: 94%; }
+  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(3) { width: 68%; }
 
-  .skeleton-detalle .skeleton-tagline {
-    width: 55%;
-    height: 22px;
+  /* CTA píldora ancho completo */
+  .skeleton-detalle .skeleton-cta {
+    width: 90%; height: 48px; margin: 18px auto 0;
     border-radius: 999px;
   }
 
-  .skeleton-detalle .skeleton-desc {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px 60px 0 26px;
+  /* Fila del partner: avatar + dos líneas */
+  .skeleton-detalle .skeleton-partner {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 5% 0;
   }
-
-  .skeleton-detalle .skeleton-desc .skeleton-linea {
-    height: 12px;
+  .skeleton-detalle .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+  .skeleton-detalle .skeleton-partner-info {
+    display: flex; flex-direction: column; gap: 7px;
   }
-
-  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(1) { width: 100%; }
-  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(2) { width: 95%; }
-  .skeleton-detalle .skeleton-desc .skeleton-linea:nth-child(3) { width: 70%; }
+  .skeleton-detalle .skeleton-partner-nombre { width: 120px; height: 13px; }
+  .skeleton-detalle .skeleton-partner-sub    { width: 84px;  height: 11px; }
 
   @media (prefers-reduced-motion: reduce) {
     .skeleton-linea,
-    .skeleton-detalle .skeleton-foto {
+    .skeleton-foto, .skeleton-cta, .skeleton-avatar {
       animation: none;
       background: rgba(15, 23, 42, 0.08);
     }
@@ -641,9 +649,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
 
-    .skeleton-detalle { padding: 20px 22px 40px; }
-    .skeleton-detalle .skeleton-identidad { padding: 0 22px; }
-    .skeleton-detalle .skeleton-desc { padding: 20px 50px 0 22px; }
+    .skeleton-detalle { padding: 12px 0 40px; }
 
     .lista-skeleton-item { padding: 12px 14px; }
     .lista-skeleton-avatar { width: 30px; height: 30px; }

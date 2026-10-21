@@ -14,7 +14,22 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  con skeleton que carga TODAS las preguntas y
                  respuestas del post en UNA llamada (acción
                  `preguntas`). Sin borrado y sin nombre.
-VERSIÓN:         1.1.0
+VERSIÓN:         1.2.0
+CAMBIOS:         R86: (1) FECHAS VISIBLES: la pregunta lleva su
+                 fecha (TIMESTAMPINI) y la respuesta la suya
+                 (TIMESTAMPFIN) en .cita con el formato
+                 "20-10-2026 9:23 pm" (formatoFecha) — el usuario
+                 ve la rapidez de respuesta. (2) La respuesta se
+                 pinta como CITA: línea vertical a la izquierda,
+                 texto .textoPrimario, su fecha y debajo la firma
+                 "Respuesta de " (.textoSecundario) + nombre del
+                 partner (.textoPrimario) — el nombre llega desde
+                 Seccion_Script con poner(idPost, data, nombre);
+                 si no hay, cae "nuestro partner". (3) El nuevo
+                 backend (02 Tablas 1.7) trae cada respuesta
+                 embebida en su misma fila (RESPUESTA +
+                 TIMESTAMPFIN): el shape cliente sigue siendo
+                 {texto, fecha, respuesta:{texto, fecha}}.
 CAMBIOS:         R84: (1) Las últimas 2 preguntas NO se piden
                  aparte: llegan con el post (postDetalle.preguntas)
                  y el lienzo las pinta con poner() — se acabó el
@@ -68,6 +83,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     var pagina       = 1;
     var cargando     = false;
     var enviando     = false;
+    var nombrePartner = '';   /* R86: firma "Respuesta de <partner>" */
 
     var el = {};          /* nodos del lienzo */
     var sheetRoot = null; /* root del sheet ver todas (lazy) */
@@ -79,6 +95,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
         return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
       });
+    }
+
+    /* R86 · "20-10-2026 9:23 pm" (hora local del dispositivo;
+       los ISO del backend vienen en UTC y new Date() los
+       convierte solos). Devuelve '' si la fecha no es válida. */
+    function formatoFecha(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      var dd  = String(d.getDate());
+      var mm  = String(d.getMonth() + 1);
+      var yy  = String(d.getFullYear());
+      var h24 = d.getHours();
+      var min = String(d.getMinutes()); if (min.length < 2) min = '0' + min;
+      var ampm = h24 >= 12 ? 'pm' : 'am';
+      var h12 = h24 % 12; if (h12 === 0) h12 = 12;
+      return dd + '-' + mm + '-' + yy + ' ' + h12 + ':' + min + ' ' + ampm;
+    }
+
+    /* Fecha de la pregunta en .cita (R86) */
+    function htmlFechaPregunta(c) {
+      var f = formatoFecha(c && c.fecha);
+      return f ? '<span class="preg-fecha cita">' + f + '</span>' : '';
     }
 
     /* ============================================================
@@ -197,9 +236,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        extra. cargar() queda como respaldo (post viejo cacheado
        sin la clave preguntas).
        ============================================================ */
-    function poner(idPost, data) {
+    function poner(idPost, data, nombrePartner_) {
       if (!idPost) return;
       idPostActual = idPost;
+      /* R86: nombre del partner del post para la firma de la
+         respuesta ("Respuesta de Creaciones Violeta"). */
+      if (nombrePartner_) nombrePartner = String(nombrePartner_).trim();
       preguntas = (data && data.lista) || [];
       total     = (data && typeof data.total === 'number') ? data.total : preguntas.length;
       hayMas    = total > preguntas.length;
@@ -225,14 +267,22 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         .catch(function () { cargando = false; });
     }
 
-    /* Burbuja de respuesta (R84): se pinta bajo su pregunta, en
-       el lienzo y en el sheet. Sin respuesta no se pinta nada. */
+    /* Respuesta como CITA (R86): línea vertical a la izquierda,
+       texto maestro, su fecha (TIMESTAMPFIN) y la firma
+       "Respuesta de <partner>" debajo. Sin respuesta no se pinta
+       nada. */
     function htmlRespuesta(r) {
       if (!r || !r.texto) return '';
-      return '<div class="preg-respuesta">' +
-               '<span class="preg-respuesta-eti cita">Respuesta</span>' +
-               '<p class="preg-respuesta-texto textoPrimario">' + escapeHtml(r.texto) + '</p>' +
-             '</div>';
+      var html = '<div class="preg-respuesta">';
+      html +=   '<p class="preg-respuesta-texto textoPrimario">' + escapeHtml(r.texto) + '</p>';
+      var fResp = formatoFecha(r.fecha);
+      if (fResp) html += '<span class="preg-respuesta-fecha cita">' + fResp + '</span>';
+      html +=   '<p class="preg-respuesta-firma">' +
+                  '<span class="textoSecundario">Respuesta de </span>' +
+                  '<span class="textoPrimario">' + escapeHtml(nombrePartner || 'nuestro partner') + '</span>' +
+                '</p>';
+      html += '</div>';
+      return html;
     }
 
     function renderPreview() {
@@ -247,6 +297,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var esPenultima = (i === 1);
         html += '<div class="mk-qa-item' + (esPenultima ? ' preg-fade' : '') + '">';
         html +=   '<p class="mk-qa-question textoPrimario">' + escapeHtml(c.texto) + '</p>';
+        html +=   htmlFechaPregunta(c);
         if (!esPenultima) html += htmlRespuesta(c.respuesta);
         html += '</div>';
       });
@@ -385,6 +436,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
           todas.forEach(function (c) {
             html += '<div class="preg-sheet-item">';
             html +=   '<p class="mk-qa-question textoPrimario">' + escapeHtml(c.texto) + '</p>';
+            html +=   htmlFechaPregunta(c);
             html +=   htmlRespuesta(c.respuesta);
             html += '</div>';
           });

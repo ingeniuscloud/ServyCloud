@@ -3,38 +3,27 @@
 ARCHIVO:         GitHub_Cromo.js
 ESPEJO GITHUB:   js/GitHub_Cromo.js (SOLO-GitHub: no existe en GAS)
 PROYECTO:        ServyCloud | App en GitHub Pages
-RESPONSABILIDAD: Cromo de la página estática: preloader orbital
-                 (R63: en ESCRITORIO vive DENTRO del marco del
-                 teléfono — .lienzo —; en MÓVIL cubre TODA la
-                 pantalla y mientras carga viste las franjas del
-                 sistema de NARANJA con el theme-color dinámico,
-                 al retirarse vuelven a su color de siempre),
+RESPONSABILIDAD: Cromo de la página estática: preloader orbital,
                  puente local (mismas claves de storage del
                  envoltorio), sesión→ciudad (wrap de asegurarSesion),
                  píldora "Instalar app" (Android) y registro del
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
-VERSIÓN:         1.4
-CAMBIOS:         R68: la franja superior VUELVE AL CLARITO al
-                 retirarse el preloader: theme-color pasa a
-                 #fdf3ec (el clarito del lienzo R67) y NO al
-                 #f8fafc casi blanco que traía de R63 — ese
-                 remanente pintaba la franja de BLANCO apenas
-                 cargaba la app, en Safari y en la PWA (el dueño
-                 lo capturó). Durante la carga sigue el naranja
-                 claro del preloader (#fb923c). Misma línea
-                 reversible del experimento R67.
-                 R63: THEME-COLOR DINÁMICO mientras carga: meta
-                 theme-color pasa a naranja claro (#fb923c, el del
-                 preloader) y al retirarse vuelve a su color de
-                 reposo — las franjas superior e inferior del
-                 teléfono acompañan cada fase. El preloader se
-                 ancla DENTRO de #lienzo en PC; en móvil el
-                 overlay es FIXED (css) y cubre todo (index.html
-                 porta viewport-fit=cover).
+VERSIÓN:         1.2
+CAMBIOS:         R86: MODO MANUAL de instalación: en Androids Go/
+                 básicos (Redmi A3x y compañía) Chrome NO dispara
+                 beforeinstallprompt (no crea WebAPK) y el menú
+                 ni siquiera muestra "Instalar aplicación": la
+                 píldora aparece TAMBIÉN sin el boleto, en modo
+                 "¿Cómo instalar?", y enseña el camino a mano
+                 (⋮ → Añadir a pantalla de inicio) en un panel de
+                 3 pasos. Si el boleto llega tarde, la píldora
+                 vuelve sola al modo nativo. El index no cambia:
+                 el panel lo crea este archivo y lo viste
+                 GitHub_Cromo.css.
                  R33: el boleto de instalación se comparte en
                  window.__servyBoleto para que el ítem "Instalar la
-                 app" del menú (Global_Sheet_Script) pueda abrir el
+                 app" del menú (Global_Menu_Script) pueda abrir el
                  diálogo nativo sin capturarlo de nuevo; la píldora
                  consume con try/catch porque el menú puede canjear
                  el boleto primero.
@@ -88,32 +77,8 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
               return wrap;
           }
 
-          // R63 · THEME-COLOR dinámico: durante la carga las
-          // franjas del sistema (superior/inferior) visten el
-          // naranja claro del preloader. R68 · al retirarse ya NO
-          // vuelve al #f8fafc casi blanco (remanente de R63 que
-          // pintaba la franja de blanco con la app ya cargada):
-          // queda el CLARITO #fdf3ec del lienzo (R67) — la franja
-          // superior se funde con el degradado en Safari, Chrome
-          // y la PWA. Sin meta (imprevisto), no-op.
-          (function () {
-              try {
-                  var meta = document.querySelector('meta[name="theme-color"]');
-                  if (!meta) return;
-                  meta.setAttribute('content', '#fb923c');
-                  document.addEventListener('preloader-retirado', function () {
-                      meta.setAttribute('content', '#fdf3ec');
-                  });
-              } catch (err) {}
-          })();
-
           const preloader = crearPreloader('Servy', 'Cargando catálogo');
-          // R62 · DENTRO del marco en PC: el lienzo del teléfono
-          // es el ancla (position absolute del overlay); en móvil
-          // el overlay es FIXED (css/GitHub_Cromo.css) y cubre la
-          // pantalla completa del teléfono. Sin lienzo
-          // (imprevisto), body como antes.
-          (document.getElementById('lienzo') || document.body).appendChild(preloader);
+          document.body.appendChild(preloader);
 
           function retirarPreloader() {
               if (preloaderRetirado) return;
@@ -261,14 +226,22 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
           })();
 
           // ═══ 4 · PÍLDORA "INSTALAR APP" (PWA · SOLO ANDROID) ═══
-          // Idéntica a la del envoltorio: solo Android + página
-          // instalable + no instalada + preloader retirado + 2ª visita.
+          // Solo Android + no instalada + preloader retirado + 2ª
+          // visita. R86: si Chrome NUNCA manda el boleto
+          // (beforeinstallprompt — Androids Go/básicos sin WebAPK),
+          // la píldora entra en MODO MANUAL: "¿Cómo instalar?" abre
+          // un panel con los 3 pasos del menú de Chrome.
           (function () {
               const zonaInstalar = document.getElementById('zona-instalar');
               if (!zonaInstalar) return;
 
+              const btnPrincipal = document.getElementById('btn-instalar');
+              const btnTexto = btnPrincipal ? btnPrincipal.querySelector('span') : null;
+
               let eventoInstalacion = null;
               let preloaderCerro = false;
+              let modoManual = false;
+              let graciaManual = null;
               const esAndroid = /android/i.test(navigator.userAgent);
               let yaInstalada = window.matchMedia('(display-mode: standalone)').matches;
 
@@ -278,10 +251,64 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
               const descarte = parseInt(localStorage.getItem('ingc_descarte') || '0', 10);
               const descartadoReciente = descarte && (Date.now() - descarte) < 3 * 24 * 60 * 60 * 1000;
 
-              function decidirSiMostrar() {
-                  if (yaInstalada || !esAndroid || !eventoInstalacion || !preloaderCerro) return;
-                  if (descartadoReciente || visitas < 2) return;
+              const TXT_NATIVO = 'Instalar app';
+              const TXT_MANUAL = '¿Cómo instalar?';
+
+              /* R86: panel de pasos del modo manual (nace aquí; el
+                 index queda intacto) */
+              let panel = null;
+              function panelPasos() {
+                  if (panel) return panel;
+                  panel = document.createElement('div');
+                  panel.id = 'zona-instalar-pasos';
+                  panel.hidden = true;
+                  panel.setAttribute('role', 'dialog');
+                  panel.setAttribute('aria-label', 'Cómo instalar la aplicación');
+                  panel.innerHTML =
+                      '<p class="zona-pasos-titulo">Instala la app en 3 pasos</p>' +
+                      '<ol class="zona-pasos-lista">' +
+                          '<li>Abre el menú de Chrome (⋮ arriba a la derecha).</li>' +
+                          '<li>Toca <b>Añadir a pantalla de inicio</b>.</li>' +
+                          '<li>Confirma con <b>Añadir</b> o <b>Instalar</b>.</li>' +
+                      '</ol>';
+                  document.body.appendChild(panel);
+                  return panel;
+              }
+              function mostrarPanel(mostrar) {
+                  panelPasos().hidden = !mostrar;
+                  if (btnPrincipal) btnPrincipal.setAttribute('aria-expanded', String(mostrar));
+              }
+
+              function activarModoManual() {
+                  if (modoManual || yaInstalada || eventoInstalacion) return;
+                  modoManual = true;
+                  if (btnTexto) btnTexto.textContent = TXT_MANUAL;
                   zonaInstalar.hidden = false;
+              }
+              function desactivarModoManual() {
+                  if (!modoManual) return;
+                  modoManual = false;
+                  mostrarPanel(false);
+                  if (btnTexto) btnTexto.textContent = TXT_NATIVO;
+              }
+
+              function decidirSiMostrar() {
+                  if (yaInstalada || !esAndroid || !preloaderCerro) return;
+                  if (descartadoReciente || visitas < 2) return;
+                  if (eventoInstalacion) {
+                      desactivarModoManual();
+                      zonaInstalar.hidden = false;
+                      return;
+                  }
+                  /* R86: sin boleto no hay diálogo nativo; tras una
+                     espera de gracia (por si el service worker tarda
+                     en habilitar la instalación) entra el manual. */
+                  if (modoManual) { zonaInstalar.hidden = false; return; }
+                  if (graciaManual) return;
+                  graciaManual = setTimeout(function () {
+                      graciaManual = null;
+                      if (!eventoInstalacion && !yaInstalada) activarModoManual();
+                  }, 4000);
               }
 
               window.addEventListener('beforeinstallprompt', function (e) {
@@ -296,7 +323,9 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
                   setTimeout(decidirSiMostrar, 2500);
               });
 
-              document.getElementById('btn-instalar').addEventListener('click', function () {
+              btnPrincipal.addEventListener('click', function () {
+                  /* R86: modo manual — el panel de pasos manda */
+                  if (modoManual) { mostrarPanel(panel === null || panel.hidden); return; }
                   if (!eventoInstalacion) return;
                   zonaInstalar.hidden = true;
                   window.__servyBoleto = null;   // R33: consumido
@@ -310,12 +339,14 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
 
               document.getElementById('btn-instalar-cerrar').addEventListener('click', function () {
                   zonaInstalar.hidden = true;
+                  mostrarPanel(false);
                   try { localStorage.setItem('ingc_descarte', String(Date.now())); } catch (_) {}
               });
 
               window.addEventListener('appinstalled', function () {
                   zonaInstalar.hidden = true;
                   yaInstalada = true;
+                  desactivarModoManual();
                   window.__servyBoleto = null;   // R33: ya no hay nada que canjear
               });
 

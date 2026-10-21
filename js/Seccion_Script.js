@@ -10,8 +10,13 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.3.0
-CAMBIOS:         R84: (1) Bloque "Este post no trae foto" RETIRADO
+VERSIÓN:         2.3.1
+CAMBIOS:         R86: el nombre del partner del post viaja con las
+                 preguntas (Pregunta.poner(id, data, nombre)) para
+                 la firma "Respuesta de <partner>" del nuevo
+                 esquema de fila única (RESPUESTA + TIMESTAMPFIN
+                 en la misma fila de la pregunta).
+                 R84: (1) Bloque "Este post no trae foto" RETIRADO
                  (código muerto): el backend entrega la imagen por
                  defecto (Setup ROOTJSON.app.imagenDefault) para
                  todo post sin foto. (2) El badge de la promo se
@@ -563,11 +568,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       /* R77: el Q&A vive en window.Pregunta (campo + sheet de
          lectura). R84: las últimas 2 preguntas llegan DENTRO del
          post (igual que la imagen) y se pintan con poner() sin
-         pedir nada aparte; cargar() queda de respaldo. */
+         pedir nada aparte; cargar() queda de respaldo.
+         R86: el nombre del partner viaja con ellas para la firma
+         "Respuesta de <partner>" de cada respuesta. */
       if (window.Pregunta && typeof window.Pregunta.enganchar === 'function') {
         window.Pregunta.enganchar(track);
         if (postActivo.preguntas && typeof window.Pregunta.poner === 'function') {
-          window.Pregunta.poner(postActivo.id, postActivo.preguntas);
+          var partnerQ = buscarPartner(postActivo.idPartner);
+          var nombreQ  = partnerQ ? String(partnerQ.nombre || partnerQ.marca || '').trim() : '';
+          window.Pregunta.poner(postActivo.id, postActivo.preguntas, nombreQ);
         } else {
           window.Pregunta.cargar(postActivo.id);
         }

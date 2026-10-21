@@ -15,8 +15,13 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.9
-CAMBIOS:         R84: el detalle sube con las ÚLTIMAS 2 preguntas
+VERSIÓN:         2.10
+CAMBIOS:         R86: el SKELETON del detalle se actualiza a la
+                 anatomía real del post de hoy: marco 1:1 con
+                 vidrio, título, promo, descripción, CTA píldora
+                 y fila del partner. Fuera la "identidad"
+                 centrada (marca/tagline) del post viejo.
+                 R84: el detalle sube con las ÚLTIMAS 2 preguntas
                  del post (post.preguntas, ya vienen dentro de
                  postDetalle): el Q&A del lienzo se pinta con la
                  misma llamada, sin pedido extra.
@@ -187,20 +192,31 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
     /* ============================================================
        Skeleton del detalle
+       R86: actualizado a la ANATOMÍA REAL del post de hoy — marco
+       1:1 con vidrio (hero), título, promo, descripción, CTA
+       píldora y fila del partner. Ya no muestra la "identidad"
+       centrada del post viejo (marca/tagline), que ya no existe.
        ============================================================ */
     function htmlSkeletonDetalle() {
       return '' +
         '<div class="skeleton-detalle" aria-hidden="true">' +
           '<div class="skeleton-foto"></div>' +
-          '<div class="skeleton-identidad">' +
-            '<span class="skeleton-linea skeleton-marca"></span>' +
+          '<div class="skeleton-cuerpo">' +
             '<span class="skeleton-linea skeleton-titulo"></span>' +
-            '<span class="skeleton-linea skeleton-tagline"></span>' +
+            '<span class="skeleton-linea skeleton-promo"></span>' +
+            '<div class="skeleton-desc">' +
+              '<span class="skeleton-linea"></span>' +
+              '<span class="skeleton-linea"></span>' +
+              '<span class="skeleton-linea"></span>' +
+            '</div>' +
           '</div>' +
-          '<div class="skeleton-desc">' +
-            '<span class="skeleton-linea"></span>' +
-            '<span class="skeleton-linea"></span>' +
-            '<span class="skeleton-linea"></span>' +
+          '<div class="skeleton-cta"></div>' +
+          '<div class="skeleton-partner">' +
+            '<div class="skeleton-avatar"></div>' +
+            '<div class="skeleton-partner-info">' +
+              '<span class="skeleton-linea skeleton-partner-nombre"></span>' +
+              '<span class="skeleton-linea skeleton-partner-sub"></span>' +
+            '</div>' +
           '</div>' +
         '</div>';
     }

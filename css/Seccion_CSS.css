@@ -9,8 +9,18 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.2.0
-CAMBIOS:         R84: (1) El fondo del hero pasa a VIDRIO (blanco
+VERSIÓN:         2.3.0
+CAMBIOS:         R86: FIX IPHONE — la imagen del hero salía CORTADA
+                 en iOS (Safari y PWA; en PC y Android bien): el
+                 height:100% de la img dentro del marco 1:1 con
+                 aspect-ratio (y el track flex de por medio)
+                 Safari lo resuelve como auto y overflow:hidden
+                 recorta. La imagen y el carrusel viven AHORA
+                 absolutos con inset:0 (tamaño exacto del marco,
+                 contain proporcional) + respaldo @supports para
+                 iOS sin aspect-ratio. Nada cambia a la vista en
+                 PC/Android.
+                 R84: (1) El fondo del hero pasa a VIDRIO (blanco
                  translúcido + blur): el color fuerte debajo de la
                  imagen — y antes de cargar — rayía; el glass
                  además rellena el marco 1:1 donde la imagen no
@@ -66,7 +76,15 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      blanco translúcido con blur — que además rellena el marco
      1:1 donde la imagen no cubre. La imagen entra AJUSTADA,
      proporcional y sin deformarse (object-fit: contain): si es
-     1:1 llena el marco; si no, el glass completa arriba/abajo. */
+     1:1 llena el marco; si no, el glass completa arriba/abajo.
+     R86 · FIX IPHONE: en iOS (Safari y PWA) la imagen salía
+     CORTADA — Safari resuelve distinto el height:100% de un
+     hijo dentro de un marco con aspect-ratio (y con el track
+     flex de por medio lo trata como auto): la img crecía a su
+     altura natural y overflow:hidden la recortaba. Ahora la
+     imagen y el carrusel viven ABSOLUTOS con inset:0: el marco
+     1:1 les da el tamaño exacto y contain ajusta proporcional.
+     Igual en PC, Android e iPhone (GAS y GitHub). */
   .app-hero-wrap { padding: 10px 5% 14px; }
   .app-hero {
     position: relative; width: 100%; aspect-ratio: 1/1;
@@ -75,10 +93,18 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
   }
-  .post-hero-img { display: block; width: 100%; height: 100%; object-fit: contain; }
-  .post-hero-track { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
+  /* Seguro para iOS que no conozca aspect-ratio: el ::before
+     le da al marco su alto 1:1 (la imagen vive absoluta). */
+  @supports not (aspect-ratio: 1/1) {
+    .app-hero::before { content: ''; display: block; padding-top: 100%; }
+  }
+  .post-hero-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; display: block;
+  }
+  .post-hero-track { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
   .post-hero-track::-webkit-scrollbar { display: none; }
-  .post-hero-slide { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }
+  .post-hero-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }
   
   .app-hero-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
   /* Mismo tratamiento de los botones sociales del hero:
