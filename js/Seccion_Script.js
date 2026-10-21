@@ -10,8 +10,15 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.3.1
-CAMBIOS:         R86: el nombre del partner del post viaja con las
+VERSIÓN:         2.4.0
+CAMBIOS:         R87: (1) La fila del partner ABRE EL LIENZO del
+                 partner (window.Partner, #partnerTrack) — el
+                 bottom sheet quedó retirado. (2) "Ver descripción
+                 completa" más despegada del fade: el margin-top
+                 inline NUNCA aplicó (margin:0 !important de
+                 .enlacesOpciones lo ganaba) — ahora 20px con
+                 !important inline.
+                 R86: el nombre del partner del post viaja con las
                  preguntas (Pregunta.poner(id, data, nombre)) para
                  la firma "Respuesta de <partner>" del nuevo
                  esquema de fila única (RESPUESTA + TIMESTAMPFIN
@@ -67,7 +74,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
                  (window.Pregunta), Social_Script.html (window.Social),
-                 Partner_Sheet_Script.html, Ciudad_Script (window.Ciudad),
+                 Partner_Script.html, Ciudad_Script (window.Ciudad),
                  Chips_Script (window.Chips), Seccion_CSS.html,
                  Pregunta_CSS.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
@@ -308,7 +315,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         var renderExcerpt = _renderMarkdown(markdown);
         html += '<div class="mk-desc-wrap">' +
                   '<div class="mk-desc-clamp textoPrimario" id="postDescExcerpt">' + renderExcerpt + '</div>' +
-                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:14px;">Ver descripción completa</button>' +
+                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:20px !important;">Ver descripción completa</button>' +
                 '</div>';
       }
       html += '</div>';
@@ -602,12 +609,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (btnVerMas) { btnVerMas.addEventListener('click', function (e) { e.preventDefault(); haptic(10); abrirSheetDesc(); }); }
     }
 
+    /* R87: el partner abre su LIENZO propio (#partnerTrack);
+       el bottom sheet quedó retirado. */
     function engacharPartner(track) {
       var fila = track.querySelector('#lienzoPartnerFila');
       if (!fila) return;
       fila.addEventListener('click', function() {
         haptic(10);
-        if (window.PartnerSheet && typeof window.PartnerSheet.abrir === 'function') { window.PartnerSheet.abrir(postActivo); }
+        if (window.Partner && typeof window.Partner.abrir === 'function') { window.Partner.abrir(postActivo); }
       });
     }
 

@@ -10,8 +10,12 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  publicación" naranja), cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.11
-CAMBIOS:         R86: el SKELETON del detalle imita la anatomía real
+VERSIÓN:         2.12
+CAMBIOS:         R87: (1) "Compartir lista" con la tipografía
+                 .enlacesOpciones (13px/400/#f97316 vía variables
+                 del Core; sigue a la derecha). (2) Cinturón de
+                 seguridad: body.modo-partner apaga el compartir.
+                 R86: el SKELETON del detalle imita la anatomía real
                  del post (marco 1:1 con vidrio, título, promo,
                  descripción, CTA píldora y fila del partner) —
                  fuera la identidad centrada del post viejo.
@@ -172,19 +176,23 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     border: none;
     background: transparent;
 
-    color: #FA6A08;
+    /* R87 · tipografía .enlacesOpciones leída de las variables
+       del Core (13px / 400 / #f97316, subrayado punteado 1.5px
+       a 4px). La ÚNICA diferencia con la clase maestra es la
+       alineación: esta vive a la derecha (orden R70). */
+    color: var(--color-enlaces);
     font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-size: var(--size-enlaces);
+    font-weight: var(--weight-enlaces);
+    letter-spacing: 0px;
     line-height: 1.2;
-    text-align: left;
+    text-align: right;
     white-space: nowrap;
 
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-thickness: 1.5px;
-    text-underline-offset: 3px;
+    text-underline-offset: 4px;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -202,6 +210,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
+
+  /* R87 · en el LIENZO del partner el compartir no existe:
+     es una acción de la lista. body.modo-partner lleva también
+     .modo-detalle (la regla de arriba ya lo apaga); esto es
+     cinturón y suspenders por si el orden cambia. */
+  body.modo-partner .btn-compartir { display: none !important; }
 
   .buscar-vacio {
     flex-shrink: 0;

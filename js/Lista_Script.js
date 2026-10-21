@@ -15,8 +15,15 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.10
-CAMBIOS:         R86: el SKELETON del detalle se actualiza a la
+VERSIÓN:         2.12
+CAMBIOS:         R87: NACE EL MODO 'partner' — el perfil del
+                 vendedor es un LIENZO propio (#partnerTrack, lo
+                 pinta window.Partner), hijo del detalle: el
+                 título del header pasa a "Perfil del vendedor",
+                 el botón volver REGRESA AL POST (no a la lista)
+                 y el historial apila su estado propio. Cambios de
+                 chip/ciudad/orden cierran partner + detalle.
+                 R86: el SKELETON del detalle se actualiza a la
                  anatomía real del post de hoy: marco 1:1 con
                  vidrio, título, promo, descripción, CTA píldora
                  y fila del partner. Fuera la "identidad"
@@ -394,12 +401,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       if (modo === nuevoModo) return;
       modo = nuevoModo;
       var body = document.body;
-      if (modo === 'detalle') {
+      if (modo === 'lista') {
+        body.classList.remove('modo-detalle');
+        body.classList.remove('modo-partner');
+        body.classList.add('modo-lista');
+      } else {
+        /* R87: el modo partner conserva las reglas del detalle
+           (filtros ocultos, volver visible) y añade la suya. */
         body.classList.remove('modo-lista');
         body.classList.add('modo-detalle');
-      } else {
-        body.classList.remove('modo-detalle');
-        body.classList.add('modo-lista');
+        body.classList.toggle('modo-partner', modo === 'partner');
       }
     }
 
@@ -660,6 +671,52 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       }
     }
 
+    /* ============================================================
+       R87 · MODO PARTNER · el perfil del vendedor como lienzo
+       propio, hijo del detalle. El contenido lo pinta
+       window.Partner en #partnerTrack; aquí solo modo, título
+       del header e historial. El volver REGRESA AL POST.
+       ============================================================ */
+    function abrirPartner() {
+      if (!postActivoId) return;
+
+      var tituloCat = document.getElementById('tituloCategoria');
+      if (tituloCat) {
+        tituloCat.textContent = 'Perfil del vendedor';
+        tituloCat.hidden = false;
+      }
+
+      var btnVolver = document.getElementById('btnVolver');
+      if (btnVolver) btnVolver.hidden = false;
+
+      setModo('partner');
+
+      try { history.pushState({ sv: 'partner' }, ''); } catch (e) {}
+    }
+
+    function cerrarPartner(desdePopstate) {
+      if (modo !== 'partner') return;
+
+      var post = postActivoId ? buscarPost(postActivoId) : null;
+
+      var tituloCat = document.getElementById('tituloCategoria');
+      if (tituloCat) {
+        var t = tituloHeaderDetalle(post);
+        tituloCat.textContent = t;
+        tituloCat.hidden = !t;
+      }
+
+      setModo('detalle');
+
+      /* El fade de vuelta al post lo hace window.Partner. */
+      document.dispatchEvent(new CustomEvent('partner:ocultar'));
+
+      if (!desdePopstate) {
+        _popstateEsperado = true;
+        try { history.back(); } catch (e) {}
+      }
+    }
+
     function seleccionar(idPost) {
       var post = buscarPost(idPost);
       if (!post) return false;
@@ -691,6 +748,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
+      if (modo === 'partner') cerrarPartner(false);
       if (modo === 'detalle') cerrarDetalle(false);
       pintar(idChip, null);
     });
@@ -706,6 +764,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     });
 
     document.addEventListener('ciudad:change', function () {
+      if (modo === 'partner') cerrarPartner(false);
       if (modo === 'detalle') cerrarDetalle(false);
 
       var input = document.getElementById('buscarInput');
@@ -723,6 +782,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     document.addEventListener('orden:change', function (e) {
       ordenActual = (e.detail && e.detail.orden) || 'recomendado';
 
+      if (modo === 'partner') cerrarPartner(false);
       if (modo === 'detalle') cerrarDetalle(false);
 
       var input = document.getElementById('buscarInput');
@@ -742,6 +802,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var btn = e.target && e.target.closest && e.target.closest('#btnVolver');
       if (!btn) return;
       e.preventDefault();
+      /* R87: en el lienzo del partner el volver regresa al POST. */
+      if (modo === 'partner') { cerrarPartner(false); return; }
       cerrarDetalle(false);
     });
 
@@ -750,6 +812,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         _popstateEsperado = false;
         return;
       }
+      if (modo === 'partner') { cerrarPartner(true); return; }
       if (modo === 'detalle') cerrarDetalle(true);
     });
 
@@ -763,7 +826,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       getModo:        getModo,
       getOrden:       getOrden,
       abrirDetalle:   abrirDetalle,
-      cerrarDetalle:  cerrarDetalle
+      cerrarDetalle:  cerrarDetalle,
+      abrirPartner:   abrirPartner,
+      cerrarPartner:  cerrarPartner
     };
 
   })();

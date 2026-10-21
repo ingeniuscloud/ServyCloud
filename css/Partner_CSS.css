@@ -1,0 +1,187 @@
+/*════════════════════════════════════════════════════════════════════
+
+ARCHIVO:         Partner_CSS.html
+ESPEJO GITHUB:   github/css/Partner_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos del LIENZO del partner (#partnerTrack),
+                 hermano del post dentro de .secciones-wrap (R87:
+                 el perfil del vendedor dejó de ser bottom sheet).
+                 Identidad (avatar con check + nombre + eslogan,
+                 mismas clases del post), stats del sheet,
+                 dirección, botón WhatsApp .botonSecundario sin
+                 fondo, tabs Servicios/Cursos estilo Yummy y
+                 tarjetas .mk-cross-* del post.
+VERSIÓN:         1.0
+CAMBIOS:         R87: NACE — reemplaza al bottom sheet del
+                 partner (Partner_Sheet_CSS retirado).
+DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
+                 .mk-rel-section, .mk-cross-*), Core_CSS.html
+                 (variables y .botonSecundario/.enlacesOpciones)
+════════════════════════════════════════════════════════════════════*/
+
+  /* ============================================================
+     TRACK DEL PARTNER · hermano del #seccionesTrack
+     ============================================================ */
+  .partner-track { padding-bottom: 56px; }
+  .partner-track[hidden] { display: none !important; }
+
+  .partner-track.fade-out { animation: partnerFadeOut 0.2s ease forwards; }
+  .partner-track.fade-in  { animation: partnerFadeIn 0.2s ease forwards; }
+  @keyframes partnerFadeOut { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes partnerFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .partner-track.fade-out,
+    .partner-track.fade-in { animation-duration: 0.01s; }
+  }
+
+  /* ============================================================
+     IDENTIDAD · mismo avatar del post (clases .mk-partner-*),
+     nombre y eslogan con la tipografía del post.
+     Divisora abajo estilo sheet (1px #f1f5f9).
+     ============================================================ */
+  .pf-identidad {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 5%;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .pf-identidad .mk-partner-info { gap: 2px; }
+
+  /* ============================================================
+     STATS · iconos sociales y contadores, misma anatomía que
+     traía el sheet (grid 3, iconos rojo/azul/verde, número
+     0.98rem/800, label uppercase 0.66rem).
+     Divisora abajo estilo sheet.
+     ============================================================ */
+  .pf-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px 5% 18px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .pf-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-stat-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-stat-icon {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pf-stat-icon svg {
+    width: 100%; height: 100%; display: block;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .pf-stat-icon.rojo svg,
+  .pf-stat-icon.rojo svg path {
+    fill: #ef4444; stroke: #ef4444; stroke-width: 1.8;
+  }
+  .pf-stat-icon.azul svg,
+  .pf-stat-icon.azul svg path {
+    fill: none; stroke: #3b82f6; stroke-width: 2;
+  }
+  .pf-stat-icon.verde svg,
+  .pf-stat-icon.verde svg path {
+    fill: #10b981; stroke: #10b981; stroke-width: 1.8;
+  }
+  .pf-stat-numero {
+    font-size: 0.98rem; font-weight: 800;
+    color: #0f172a; line-height: 1;
+  }
+  .pf-stat-label {
+    font-size: 0.66rem; font-weight: 600; color: #94a3b8;
+    letter-spacing: 0.3px; text-transform: uppercase;
+  }
+
+  /* ============================================================
+     DIRECCIÓN · reutiliza las clases del post tal cual
+     (.mk-location-section / .mk-location / .mk-location-icon /
+     .mk-location-content) — cero CSS propio.
+     ============================================================ */
+
+  /* ============================================================
+     BOTÓN WHATSAPP · .botonSecundario (16px/400 gris del Core),
+     SIN fondo, píldora con borde, texto centrado y glifo de
+     WhatsApp a la derecha (verde de la marca: el glifo trae
+     fill blanco del hero y sobre lienzo blanco no se vería).
+     ============================================================ */
+  .pf-wa-wrap { padding: 10px 5% 22px; }
+  .pf-wa {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; box-sizing: border-box;
+    padding: 14px 48px;
+    background: transparent;
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .pf-wa:active {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.3);
+    transform: scale(0.985);
+  }
+  .pf-wa-texto { text-align: center; }
+  .pf-wa-icono {
+    position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pf-wa-icono svg { width: 100%; height: 100%; display: block; }
+  .pf-wa-icono svg path { fill: #25d366; }
+
+  /* ============================================================
+     PUBLICACIONES · sección con el MISMO fondo del cross-sell
+     (.mk-rel-section, #f3f4f6) y tarjetas .mk-cross-* del post.
+     Tabs estilo Yummy (texto + subrayado del color del post).
+     ============================================================ */
+  .pf-tabs {
+    display: flex;
+    padding: 0 5%;
+    margin: 0 0 14px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  }
+  .pf-tab {
+    position: relative;
+    flex: 1 1 0; min-width: 0;
+    padding: 2px 4px 12px;
+    border: none; background: transparent;
+    font-family: inherit;
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.2px; line-height: 1.2;
+    white-space: nowrap;
+    color: #8e8e93;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.18s ease;
+  }
+  .pf-tab:active { opacity: 0.7; }
+  .pf-tab.activo { color: #1f2937; }
+  .pf-tab.activo::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2.5px; border-radius: 2px 2px 0 0;
+    background: var(--post-color, #f97316);
+  }
+  .pf-tab[data-solo="1"] { cursor: default; pointer-events: none; }
+
+  .pf-vacia {
+    padding: 6px 5% 8px;
+    text-align: center;
+    font-size: var(--size-ui-3);
+    color: #94a3b8; font-weight: 500;
+  }
+
+  .pf-ver-todas-wrap { padding: 14px 5% 0; }
