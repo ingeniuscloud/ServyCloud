@@ -9,8 +9,25 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.4
-CAMBIOS:         R92: TABLA MARKDOWN DEL POST + FILA [VALOR BCV]
+VERSIÓN:         2.3.5
+CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
+                 (1) CITAS (">"): el blockquote de la descripción
+                 lleva su LÍNEA a la izquierda (3px en el pastel del
+                 post) y la tipografía .cita del Core en el
+                 blockquote y en sus párrafos (selectores con
+                 especificidad alta para vencer al .textoPrimario p
+                 del Core, que pinta los <p> a 14px). (2) CITA CON
+                 LLAMADO ("^"): .mk-cita-llamado quita la línea y el
+                 padding — solo queda la tipografía .cita. (3) FILA
+                 [VALOR BCV]: ahora es una cita completa en UNA
+                 fila — .mk-bcv deja el flex space-between y pasa a
+                 bloque nowrap (separador fijo de 7 espacios duros),
+                 todo en .cita y con el color del post. (4) PLAN DE
+                 INVERSIÓN: .mk-plan-tabla pasa a table-layout fixed
+                 con anchos fijos (col2 28% acortada, col3 40% ancha)
+                 y la celda de precios con nowrap para que el valor
+                 se lea SIEMPRE en una sola fila.
+                 R92: TABLA MARKDOWN DEL POST + FILA [VALOR BCV]
                  — las tablas que marked produce en la
                  descripción (excerpt y sheet completo) se pintan
                  con bordes sutiles (hairline 0.10/0.07),
@@ -227,13 +244,54 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      !important y pisaría la alineación de los precios. */
   .mk-plan-tabla th:last-child, .mk-plan-tabla td:last-child { text-align: right !important; }
 
-  /* R92 · FILA [VALOR BCV] — la misma del plan viejo: fecha de
-     aplicación a la izquierda y Bs. a la derecha, en el color
-     del post. La pinta _renderMarkdown al sustituir el
-     placeholder del markdown. */
+  /* ============================================================
+     R93 · PLAN DE INVERSIÓN EN UNA SOLA FILA — el dueño pidió la
+     columna de inversión ANCHA para que su valor se lea completo
+     en una fila, acortando la segunda. table-layout fixed con
+     anchos fijos: col1 32% (reparto), col2 28% (acortada), col3
+     40% (ancha) y la celda de precios con nowrap — con el ancho
+     de .subtitulo (18px) “Bs. 1.480,00” cabe de sobra y ya no
+     se parte en dos filas.
+     ============================================================ */
+  .mk-plan-tabla { table-layout: fixed; }
+  .mk-plan-tabla th:nth-child(2), .mk-plan-tabla td:nth-child(2) { width: 28%; }
+  .mk-plan-tabla th:nth-child(3), .mk-plan-tabla td:nth-child(3) { width: 40%; white-space: nowrap; }
+
+  /* ============================================================
+     R93 · CITAS DEL MARKDOWN — configuración tipográfica del
+     dueño: las citas (“>”) llevan su línea a la IZQUIERDA (3px
+     sobre el pastel del post) y la tipografía .cita del Core.
+     Especificidad alta a propósito: el Core pinta los <p> de la
+     descripción con .textoPrimario p (14px !important) y aquí el
+     blockquote y sus párrafos deben quedar en .cita (11px).
+     La variante ^ (cita con llamado, marcada .mk-cita-llamado
+     por el decorador) NO lleva línea ni padding: solo tipografía.
+     ============================================================ */
+  .mk-desc-clamp blockquote.cita, #postDescSheetContent blockquote.cita {
+    margin: 10px 0 12px; padding: 2px 0 2px 12px;
+    border-left: 3px solid var(--post-pastel, #e2e8f0);
+  }
+  .mk-desc-clamp blockquote.cita p, #postDescSheetContent blockquote.cita p {
+    margin: 0;
+    font-size: var(--size-cita, 11px) !important;
+    font-weight: var(--weight-cita, 400) !important;
+    color: var(--color-cita, #1f2937) !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0 !important;
+  }
+  .mk-desc-clamp blockquote.cita.mk-cita-llamado,
+  #postDescSheetContent blockquote.cita.mk-cita-llamado {
+    border-left: none; padding-left: 0;
+  }
+
+  /* R92/R93 · FILA [VALOR BCV] — ahora es una cita completa: una
+     sola fila (nowrap + separador fijo de 7 espacios duros que
+     pinta Seccion_Script), tipografía .cita en todo el texto y
+     color del post (viaja inline con !important desde
+     _htmlTasaBCV — es la única diferencia con una cita). */
   .mk-bcv {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 12px; margin: 10px 0 12px;
+    display: block; white-space: nowrap;
+    margin: 10px 0 12px;
   }
 
   /* ============================================================

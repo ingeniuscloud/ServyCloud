@@ -10,8 +10,25 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.4
-CAMBIOS:         R92: (1) TABLA MARKDOWN DEL POST — marked pinta
+VERSIÓN:         2.4.5
+CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
+                 (1) CITAS: los blockquotes del markdown (filas ">")
+                 se visten con la tipografía .cita del Core y su
+                 línea a la izquierda (_decorarCitasMarkdown, enganchado
+                 junto al decorador de tablas en el excerpt y en el
+                 sheet completo). (2) CITA CON LLAMADO: las filas que
+                 el dueño escribe empezando con "^" (su configuración
+                 tipográfica propia, no es markdown) se convierten
+                 ANTES del parseo en blockquotes marcados con un
+                 separador invisible (ZWSP); el decorador los reconoce,
+                 limpia el separador y los deja en .cita SIN línea.
+                 (3) FILA [VALOR BCV] — ahora es una cita completa en
+                 UNA sola fila: tipografía .cita en todo el texto,
+                 color del post (única diferencia con una cita) y la
+                 fecha CON año: "Tasa BCV {lunes 21 de octubre 2026}
+                 · 7 espacios · Bs. {valor}". limpiarFechaTasa_ ya no
+                 recorta el año: quita comas y el "de" antes del año.
+                 R92: (1) TABLA MARKDOWN DEL POST — marked pinta
                  las tablas "de fábrica"; _decorarTablasMarkdown
                  las viste con el Core (th → .textoPrimario,
                  td → .textoSecundario) y, si la tabla tiene 3
@@ -239,6 +256,22 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     function _renderMarkdown(md) {
       var texto = String(md || '').trim();
       if (!texto) return '';
+      /* R93 · CITA CON LLAMADO (^) — configuración tipográfica del
+         dueño dentro del markdown (no es markdown estándar): las
+         filas que empiezan con "^" son citas de llamado, en .cita
+         pero SIN línea a la izquierda. Se convierten ANTES del
+         parseo en blockquotes marcados con un separador invisible
+         (ZWSP) para que el decorador las reconozca después y les
+         quite la línea. Las filas con ">" normales pasan intactas. */
+      try {
+        var filas = texto.split('\n');
+        for (var i = 0; i < filas.length; i++) {
+          if (/^\s*\^\s?/.test(filas[i])) {
+            filas[i] = '>' + '\u200B' + filas[i].replace(/^\s*\^\s?/, '');
+          }
+        }
+        texto = filas.join('\n');
+      } catch (e) {}
       var html = '';
       try { if (typeof window.marked !== 'undefined' && typeof window.marked.parse === 'function') { html = window.marked.parse(texto); } } catch (e) {}
       if (!html) html = '<p>' + escapeHtml(texto) + '</p>';
@@ -251,11 +284,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     /* ============================================================
-       R92 · TASA BCV EN EL MARKDOWN — helpers del texto antiguo
-       (formatearBs: 1234.5 → 1.234,50 · limpiarFechaTasa: quita
-       comas y el año suelto del final). La fila usa SISTEMA.root.
+       R92/R93 · TASA BCV EN EL MARKDOWN — helpers del texto antiguo
+       (formatearBs: 1234.5 → 1.234,50). La fila usa SISTEMA.root.
        tasas (dolar + fechavalor), que el backend ya sirve en el
        ROOTJSON (03 BCV.gs la actualiza a diario).
+       R93: limpiarFechaTasa deja la fecha COMPLETA con el año, como
+       la pide el dueño ("lunes 21 de octubre 2026"): quita las
+       comas, el "de" que queda colgando antes del año y baja el
+       inicial ("Viernes, 17 de octubre de 2025" → "viernes 17 de
+       octubre 2025").
        ============================================================ */
     function formatearBs_(n) {
       var v = Number(n);
@@ -267,12 +304,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     function limpiarFechaTasa_(s) {
-      return String(s || '')
+      var t = String(s || '')
         .replace(/,/g, '')
-        .replace(/\s+\d{4}\s*$/, '')
-        .replace(/\s+d[ei]\s*$/i, '')
+        .replace(/\s+d[ei]\s+(\d{4})\s*$/i, ' $1')
         .replace(/\s+/g, ' ')
         .trim();
+      if (t) t = t.charAt(0).toLowerCase() + t.slice(1);
+      return t;
     }
 
     function _htmlTasaBCV() {
@@ -281,9 +319,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var dolar = Number(tasas.dolar);
       if (!isFinite(dolar) || dolar <= 0) return '';
       var fecha = limpiarFechaTasa_(tasas.fechavalor);
-      return '<span class="mk-bcv" style="color:var(--post-color, #475569);">' +
-               '<span class="textoSecundario" style="color:inherit !important;">Tasa BCV' + (fecha ? ' ' + escapeHtml(fecha) : '') + '</span>' +
-               '<span class="subtitulo" style="color:inherit !important;">Bs. ' + formatearBs_(dolar) + '</span>' +
+      /* R93: la fila es una CITA completa — tipografía .cita en todo
+         el texto, en UNA sola fila (nowrap + separador fijo de 7
+         espacios duros) y en el color del post, que es la única
+         diferencia con una cita normal:
+         "Tasa BCV {fecha}       Bs. {valor}". El color viaja inline
+         con !important para vencer al !important de .cita del Core. */
+      return '<span class="mk-bcv cita" style="color:var(--post-color, #475569) !important;">' +
+               'Tasa BCV' + (fecha ? ' ' + escapeHtml(fecha) : '') +
+               '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' +
+               'Bs. ' + formatearBs_(dolar) +
              '</span>';
     }
 
@@ -314,6 +359,43 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
              de Core (más tarde en la hoja) pisaría el 18px. */
           td.classList.add(esPrecio ? 'subtitulo' : 'textoSecundario');
         });
+      });
+    }
+
+    /* ============================================================
+       R93 · DECORADOR DE CITAS MARKDOWN — el dueño pidió que las
+       citas (">") lleven su línea a la izquierda y la tipografía
+       .cita del Core. Los blockquotes marcados con el separador
+       invisible (ZWSP) son las citas de llamado "^": misma
+       tipografía, pero SIN línea. El separador se limpia del texto
+       para que nunca se pinte. La línea la dibuja Seccion_CSS
+       (blockquote con clase .cita); quitarla también es CSS
+       (.mk-cita-llamado).
+       ============================================================ */
+    function _limpiarInvisibles(el) {
+      var nodos = el.childNodes;
+      for (var i = nodos.length - 1; i >= 0; i--) {
+        var nodo = nodos[i];
+        if (nodo.nodeType === 3) {
+          if (nodo.nodeValue && nodo.nodeValue.indexOf('\u200B') !== -1) {
+            var limpio = nodo.nodeValue.split('\u200B').join('');
+            if (limpio) { nodo.nodeValue = limpio; } else { el.removeChild(nodo); }
+          }
+        } else if (nodo.nodeType === 1) { _limpiarInvisibles(nodo); }
+      }
+    }
+
+    function _decorarCitasMarkdown(raiz) {
+      if (!raiz || !raiz.querySelectorAll) return;
+      var citas = raiz.querySelectorAll('blockquote');
+      Array.prototype.forEach.call(citas, function (cita) {
+        cita.classList.add('cita');
+        var llamado = false;
+        try { llamado = (cita.textContent || '').indexOf('\u200B') !== -1; } catch (e) {}
+        if (llamado) {
+          _limpiarInvisibles(cita);
+          cita.classList.add('mk-cita-llamado');
+        }
       });
     }
 
@@ -677,7 +759,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       content.innerHTML = html;
 
       /* R92: colores del post + tablas vestidas también en el
-         sheet de la descripción completa. */
+         sheet de la descripción completa. R93: citas del markdown
+         (> con línea, ^ sin línea) vestidas con .cita. */
       try {
         var colorArrC = (pj.meta && pj.meta.color) || [];
         content.style.setProperty('--post-color',  String(colorArrC[0] || postActivo.colorOficial || '#475569'));
@@ -685,6 +768,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         content.style.setProperty('--post-claro',  String(colorArrC[2] || postActivo.colorClaro   || '#f1f5f9'));
       } catch (e) {}
       _decorarTablasMarkdown(content);
+      _decorarCitasMarkdown(content);
 
       /* R77: el fade avisa que hay más texto y se retira al llegar
          al final del scroll para leer completo. Si el texto no
@@ -734,8 +818,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       /* R92: vestir las tablas del markdown con las tipografías
          del Core (th textoPrimario, td textoSecundario, precios
-         del plan con subtitulo). */
+         del plan con subtitulo). R93: citas del markdown (> con
+         línea y .cita, ^ llamado sin línea). */
       _decorarTablasMarkdown(track);
+      _decorarCitasMarkdown(track);
 
       if (typeof window.pintarGlifos === 'function') window.pintarGlifos(track);
       if (window.SeccionImagen && typeof window.SeccionImagen.enganchar === 'function') window.SeccionImagen.enganchar(track);
