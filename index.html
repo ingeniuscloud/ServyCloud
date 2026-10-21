@@ -5,7 +5,16 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.29.0
+VERSIÓN:         1.30.0
+CAMBIOS:         R90: Vienen byte-idénticos al GAS: js/Social_Script.js
+                 + css/Social_CSS.css (el corazón del like arranca
+                 EXACTO desde el corazón del botón: el wrap nace
+                 dentro del botón anclado a 50%/50%, sin cálculos de
+                 rects) y js/Seccion_Script.js + css/Seccion_CSS.css
+                 (la imagen por defecto del Setup — post sin foto
+                 propia — se pinta casi transparente, opacity 0.32,
+                 para que no compita con el CTA; las fotos reales no
+                 cambian). Sin cambios de includes.
 CAMBIOS:         R89: Viene byte-idéntico al GAS css/Seccion_CSS.css:
                  el avatar del partner pasa de 40px a 56px (el tamaño
                  exacto del Partner_Sheet viejo) en la fila del post y

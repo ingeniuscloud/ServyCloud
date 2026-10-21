@@ -10,17 +10,17 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  compartidos en el backend. El mensaje de WhatsApp
                  lleva el formato del dueño y el enlace profundo de
                  Compartir. Key localStorage: post_likes.
-VERSIÓN:         2.0.0
-CAMBIOS:         R77: REPARACIÓN DEL ARCHIVO. El Social_Script de
-                 producción había quedado reemplazado por una copia
-                 vieja de Seccion_Script: eso borraba window.Social
-                 (nadie pintaba los botones del hero) y pisaba
-                 window.Secciones con una versión antigua. Vuelve el
-                 módulo real, solo declara window.Social, pinta
-                 like + compartir en #heroSocialButtons (diseño de
-                 Social_CSS: círculos de 42px, sin contadores) y el
-                 backend no cambia: mismas acciones like/comparte y
-                 su notificación Telegram al partner.
+VERSIÓN:         2.0.1
+CAMBIOS:         R90: EL CORAZÓN VOLADOR SALE DESDE EL LUGAR JUSTO —
+                 antes se calculaba su posición con rects contra el
+                 contenedor (#heroSocialButtons) y en el teléfono
+                 arrancaba desplazado de donde está el corazón.
+                 Ahora el wrap nace DENTRO del botón (que ya es
+                 position:relative para esto) anclado a left/top
+                 50%: el translate(-50%,-50%) del keyframe lo centra
+                 EXACTO en el centro del corazón, sin cálculos ni
+                 dependencia del offset parent. El tiempo de limpieza
+                 se alinea a la animación (700→850ms).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Lista_Script.html (window.Lista:
@@ -219,20 +219,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Corazón volador (desde el botón del hero)
        ============================================================ */
     function lanzarCorazon() {
-      var contenedor = document.getElementById('heroSocialButtons');
       var btn = document.getElementById('btnSocialLike');
-      if (!contenedor || !btn) return;
+      if (!btn) return;
 
-      var contRect = contenedor.getBoundingClientRect();
-      var btnRect  = btn.getBoundingClientRect();
-
-      var centerX = btnRect.left - contRect.left + btnRect.width / 2;
-      var centerY = btnRect.top  - contRect.top  + btnRect.height / 2;
-
+      /* R90: el corazón nace DENTRO del botón (position:relative),
+         anclado a 50%/50%: el translate(-50%,-50%) del keyframe lo
+         centra EXACTO en el centro del corazón del botón. Sin
+         rects ni offset parents: imposible que arranque en otra
+         posición aunque el hero esté scrolleado, transformado o
+         recién montado. */
       var wrap = document.createElement('div');
       wrap.className = 'heart-pop-wrap';
-      wrap.style.left = (centerX - 20) + 'px';
-      wrap.style.top  = (centerY - 20) + 'px';
+      wrap.style.left = '50%';
+      wrap.style.top = '50%';
 
       wrap.innerHTML =
         '<div class="heart-pop-svg">' +
@@ -241,11 +240,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
           '</svg>' +
         '</div>';
 
-      contenedor.appendChild(wrap);
+      btn.appendChild(wrap);
 
       setTimeout(function () {
         if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-      }, 700);
+      }, 850);
     }
 
     /* ============================================================

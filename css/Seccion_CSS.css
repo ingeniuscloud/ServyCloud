@@ -9,8 +9,15 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.1
-CAMBIOS:         R89: AVATAR DEL PARTNER 56PX — el avatar de la
+VERSIÓN:         2.3.2
+CAMBIOS:         R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — la
+                 imagen que el backend entrega para posts SIN foto
+                 propia (la del Setup) se pinta con opacity 0.32
+                 (.post-hero-img-default) para que no compita con
+                 el CTA del lienzo; SOLO esa imagen, las fotos
+                 reales siguen opacas y el lightbox la muestra
+                 completa.
+                 R89: AVATAR DEL PARTNER 56PX — el avatar de la
                  fila del partner (lienzo del post) y de la
                  identidad (lienzo del partner) pasa de 40px a
                  56px, el tamaño exacto que traía el Partner_Sheet
@@ -111,6 +118,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: contain; display: block;
   }
+  /* R90: la imagen POR DEFECTO del Setup (post sin foto propia)
+     casi transparente: acompaña sin competir con el CTA. */
+  .post-hero-img.post-hero-img-default { opacity: 0.32; }
   .post-hero-track { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
   .post-hero-track::-webkit-scrollbar { display: none; }
   .post-hero-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }

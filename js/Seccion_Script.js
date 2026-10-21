@@ -10,8 +10,17 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.1
-CAMBIOS:         R88: (1) "Ver descripción completa" PEGA más al
+VERSIÓN:         2.4.2
+CAMBIOS:         R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — los
+                 posts sin foto propia llegan con la imagen del
+                 Setup (ROOTJSON.app.imagenDefault); ahora el hero
+                 la detecta (compara la URL con SISTEMA.root.app.
+                 imagenDefault) y le pone .post-hero-img-default,
+                 que Seccion_CSS pinta con opacity 0.32 para que no
+                 compita con el CTA. SOLO esa imagen: las fotos
+                 reales no se tocan, y el lightbox la muestra
+                 completa.
+                 R88: (1) "Ver descripción completa" PEGA más al
                  fade del texto (margin-top 20→10px) y el aire que
                  suelta se muda ABAJO (margin-bottom 12px) para
                  despegarla de la opción de duda / CTA.
@@ -120,6 +129,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     function _buildHero(imagenes) {
       var limpias = (imagenes || []).map(function (u) { return String(u || '').trim(); }).filter(Boolean);
 
+      /* R90: URL de la imagen por defecto del Setup. Si una foto
+         del post ES esa (post sin foto propia), el CSS la pinta
+         casi transparente para que no compita con el CTA. */
+      var imgDef = '';
+      try {
+        imgDef = String((window.SISTEMA && window.SISTEMA.root && window.SISTEMA.root.app && window.SISTEMA.root.app.imagenDefault) || '').trim();
+      } catch (e) {}
+      function claseDefault(u) { return (imgDef && u === imgDef) ? ' post-hero-img-default' : ''; }
+
       var city = '';
       try {
         if (window.Ciudad && typeof window.Ciudad.getActual === 'function') {
@@ -147,14 +165,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       if (limpias.length === 1) {
         var src = escapeHtml(_urlImagen(limpias[0]));
-        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img' + claseDefault(limpias[0]) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       }
 
       var html = '<div class="app-hero post-hero-carrusel">' + cityBadge + socialContainer;
       html +=   '<div class="post-hero-track" id="postHeroTrack">';
       limpias.forEach(function (u) {
         var src = escapeHtml(_urlImagen(u));
-        html += '<div class="post-hero-slide"><img class="post-hero-img" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        html += '<div class="post-hero-slide"><img class="post-hero-img' + claseDefault(u) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       });
       html +=   '</div>';
       html +=   '<div class="app-hero-dots" id="postHeroDots">';

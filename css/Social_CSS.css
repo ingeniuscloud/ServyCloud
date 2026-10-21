@@ -3,11 +3,15 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-VERSIÓN:         1.4.0
-CAMBIOS:         R90: Se recibe el CSS de los botones sociales
-                 del hero (antes en Seccion_CSS). Se ajusta el
-                 tamaño de los iconos a 24px para una mejor
-                 proporción visual con el círculo de 42px.
+VERSIÓN:         1.4.1
+CAMBIOS:         R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
+                 tamaño propio (28×28px) para que el centrado con
+                 translate(-50%,-50%) sea exacto dentro del botón
+                 (que lo aloja desde su 50%/50%); antes la caja
+                 medía lo que su contenido y el anclaje flotaba.
+                 R90 (interna del dueño): Se recibe el CSS de los
+                 botones sociales del hero (antes en Seccion_CSS).
+                 Se ajusta el tamaño de los iconos a 24px.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -48,6 +52,7 @@ CAMBIOS:         R90: Se recibe el CSS de los botones sociales
      ============================================================ */
   .heart-pop-wrap {
     position: absolute; pointer-events: none;
+    width: 28px; height: 28px; margin: 0;
     display: flex; align-items: center; justify-content: center;
     will-change: transform, opacity;
     animation: heartFly 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
