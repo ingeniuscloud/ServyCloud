@@ -10,7 +10,7 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.5
+VERSIÓN:         2.4.6
 CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
                  (1) CITAS: los blockquotes del markdown (filas ">")
                  se visten con la tipografía .cita del Core y su
@@ -44,16 +44,16 @@ CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
                  (Tasa BCV {fecha} · Bs. {dolar}, SISTEMA.root.
                  tasas); sin tasa servida el placeholder no se
                  pinta.
-                 R91: SKELETON DE LAS IMÁGENES DEL POST — cada
-                 imagen del hero nace con .post-hero-img-cargando
-                 (shimmer en el marco, ver Seccion_CSS 2.3.3) y
-                 engacharSkeletonImagenes la destapa cuando su
-                 archivo termina: onload → .post-hero-img-cargada
-                 (fundido 0.35s), error → .post-hero-img-error
-                 (queda el vidrio). Si la imagen ya venía del
-                 cache (complete && naturalWidth>0) se destapa en
-                 el mismo frame, sin esqueleto visible. Vale para
-                 imagen única y carrusel.
+                 R94: L2 PROPIA + SIN SKELETON INDIVIDUAL — las
+                 imágenes del hero nacen SIN src y pintarImagenes
+                 Hero las alimenta vía SeccionImagen.poblarConL2
+                 (cache propio de la app: la repetida pinta desde
+                 disco sin red). El skeleton individual de imagen
+                 (R91) se retira: en la pantalla real nunca llegó
+                 a verse (código muerto); el esqueleto GENERAL
+                 del detalle sigue cubriendo la espera del post.
+                 La default del Setup vuelve a 0.32 incondicional
+                 (R90).
                  R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — los
                  posts sin foto propia llegan con la imagen del
                  Setup (ROOTJSON.app.imagenDefault); ahora el hero
@@ -208,14 +208,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       if (limpias.length === 1) {
         var src = escapeHtml(_urlImagen(limpias[0]));
-        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img post-hero-img-cargando' + claseDefault(limpias[0]) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        return '<div class="app-hero">' + cityBadge + socialContainer + '<img class="post-hero-img' + claseDefault(limpias[0]) + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       }
 
       var html = '<div class="app-hero post-hero-carrusel">' + cityBadge + socialContainer;
       html +=   '<div class="post-hero-track" id="postHeroTrack">';
       limpias.forEach(function (u) {
         var src = escapeHtml(_urlImagen(u));
-        html += '<div class="post-hero-slide"><img class="post-hero-img post-hero-img-cargando' + claseDefault(u) + '" src="' + src + '" alt="" loading="lazy" data-full="' + src + '"></div>';
+        html += '<div class="post-hero-slide"><img class="post-hero-img' + claseDefault(u) + '" alt="" loading="lazy" data-full="' + src + '"></div>';
       });
       html +=   '</div>';
       html +=   '<div class="app-hero-dots" id="postHeroDots">';
@@ -226,30 +226,25 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     }
 
     /* ============================================================
-       R91 · SKELETON DE IMÁGENES — cada .post-hero-img nace
-       "cargando" (shimmer) y se destapa cuando su archivo
-       termina: load → .post-hero-img-cargada (fundido 0.35s,
-       la default del Setup queda en 0.32), error →
-       .post-hero-img-error (queda el vidrio del marco). Si ya
-       venía del cache se destapa en el mismo frame, sin
-       esqueleto visible ni parpadeo.
+       R94 · PINTADO DE LAS IMÁGENES DEL HERO — cada
+       .post-hero-img nace SIN src: pintarImagenesHero la
+       alimenta vía window.SeccionImagen.poblarConL2 (L2 propia:
+       cache hit → pinta al instante sin red; miss → descarga y
+       guarda; sin Cache API → src directo). Respaldo: si algo
+       falla, src con la URL de siempre. El skeleton individual
+       de imagen (R91) se retira — código muerto en la pantalla
+       real; el esqueleto GENERAL del detalle sigue cubriendo la
+       espera del post.
        ============================================================ */
-    function engacharSkeletonImagenes(raiz) {
-      var imgs = (raiz || document).querySelectorAll('img.post-hero-img-cargando');
+    function pintarImagenesHero(raiz) {
+      var imgs = (raiz || document).querySelectorAll('img.post-hero-img');
       Array.prototype.forEach.call(imgs, function (img) {
-        function marcarCargada() {
-          img.classList.remove('post-hero-img-cargando');
-          img.classList.add('post-hero-img-cargada');
+        var u = img.getAttribute('data-full') || '';
+        if (!u) return;
+        if (window.SeccionImagen && typeof window.SeccionImagen.poblarConL2 === 'function') {
+          try { window.SeccionImagen.poblarConL2(img, u); return; } catch (e) {}
         }
-        function marcarError() {
-          img.classList.remove('post-hero-img-cargando');
-          img.classList.add('post-hero-img-error');
-        }
-        try {
-          if (img.complete && img.naturalWidth > 0) { marcarCargada(); return; }
-          img.addEventListener('load', marcarCargada);
-          img.addEventListener('error', marcarError);
-        } catch (e) { marcarCargada(); }
+        img.src = u; /* respaldo: comportamiento de siempre */
       });
     }
 
@@ -813,8 +808,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       track.appendChild(fragment);
 
-      /* R91: skeleton de las imágenes del hero (red y cache) */
-      engacharSkeletonImagenes(track);
+      /* R94: las imágenes del hero se pintan vía la L2 propia
+         (poblarConL2); sin esqueleto individual. */
+      pintarImagenesHero(track);
 
       /* R92: vestir las tablas del markdown con las tipografías
          del Core (th textoPrimario, td textoSecundario, precios

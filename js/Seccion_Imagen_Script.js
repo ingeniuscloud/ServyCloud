@@ -14,8 +14,22 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                    cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.2.1
-CAMBIOS:         R92: PESO DE LA IMAGEN — urlImagenDirecta pide
+VERSIÓN:         1.3.0
+CAMBIOS:         R94: L2 PROPIA DE LAS IMÁGENES — el cache HTTP del
+                 navegador no siempre conserva las fotos (en el
+                 teléfono cada visita al mismo post volvía a
+                 bajarlas: parecía que no se guardaba nada).
+                 poblarConL2 alimenta cada imagen del hero:
+                 la 1ª vez la descarga y la guarda en Cache API
+                 (servy-img-v1, tope 40, recorte de la más vieja);
+                 a partir de ahí pinta desde DISCO sin tocar la
+                 red (blob), aunque el navegador tire su cache
+                 HTTP. La clave usa el ID de la foto de Drive (no
+                 la URL completa) para sobrevivir a URLs que
+                 cambian. Sin Cache API o ante cualquier fallo
+                 (CORS, cuota): la imagen carga por su URL de
+                 siempre. El lightbox pasa por la misma L2.
+                 R92: PESO DE LA IMAGEN — urlImagenDirecta pide
                  ahora las fotos de Drive a lh3 con =w1600 (las
                  /d/ crudas sirven el archivo a tamaño completo,
                  fotos de varios MB: por eso la imagen tardaba en
@@ -64,6 +78,102 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
       if (m && m[1]) return _conTamanoLh3('https://lh3.googleusercontent.com/d/' + m[1]);
 
       return u;
+    }
+
+    /* ============================================================
+       R94 · L2 PROPIA DE IMÁGENES — el cache HTTP del navegador
+       no siempre conserva las fotos (el teléfono volvía a bajar
+       la misma imagen en cada visita al post). La app guarda SU
+       copia en Cache API: la 1ª vez baja la foto y la guarda;
+       después la pinta desde disco SIN red. Clave = ID de la
+       foto de Drive (no la URL completa); cualquier otra URL
+       se guarda ENTERA (sin el #), nunca recortada por query:
+       fotos distintas, entradas distintas. Tope 40 entradas
+       (se recorta la más vieja). Sin Cache API o ante cualquier
+       fallo: la imagen carga por su URL de siempre, como hasta
+       hoy.
+       ============================================================ */
+    var NOMBRE_L2 = 'servy-img-v1';
+    var MAX_L2    = 40;
+    var _blobURLs = (typeof WeakMap === 'function') ? new WeakMap() : null;
+
+    function _claveL2(url) {
+      var u = String(url || '').trim();
+      var m = u.match(/googleusercontent\.com\/d\/([^\/\?#=]+)/);
+      if (m && m[1]) return 'https://servy-img.local/' + m[1];
+      m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*?id=)([^&\/?]+)/);
+      if (m && m[1]) return 'https://servy-img.local/' + m[1];
+      /* Resto: la URL COMPLETA (sin el #). NO se corta el query:
+         dos URLs que solo difieren en query son fotos distintas
+         (p.ej. carrusel con urls por imagen) y jamás deben
+         compartir entrada. */
+      return 'https://servy-img.local/u/' + u.split('#')[0];
+    }
+
+    function _recortarL2(cache) {
+      cache.keys().then(function (claves) {
+        if (claves.length <= MAX_L2) return;
+        Promise.all(claves.map(function (c) {
+          return cache.match(c).then(function (r) {
+            return { clave: c, t: (r ? (Number(r.headers.get('x-guardado')) || 0) : 0) };
+          });
+        })).then(function (lista) {
+          lista.sort(function (a, b) { return a.t - b.t; });
+          var sobran = lista.length - MAX_L2;
+          for (var i = 0; i < sobran; i++) cache.delete(lista[i].clave);
+        }).catch(function () {});
+      }).catch(function () {});
+    }
+
+    function _asignarBlob(img, blob) {
+      var u = URL.createObjectURL(blob);
+      if (_blobURLs) {
+        var previo = _blobURLs.get(img);
+        if (previo) { try { URL.revokeObjectURL(previo); } catch (e) {} }
+        _blobURLs.set(img, u);
+      }
+      img.src = u;
+    }
+
+    function poblarConL2(img, url) {
+      url = String(url || '').trim();
+      if (!img || !url) return;
+
+      /* Sin Cache API (o contexto sin storage): la <img> carga
+         por su URL de siempre — el comportamiento de siempre. */
+      if (!(window.caches && typeof window.caches.open === 'function')) {
+        img.src = url;
+        return;
+      }
+
+      window.caches.open(NOMBRE_L2).then(function (cache) {
+        /* Que el sistema no despache fácil este storage. */
+        if (navigator.storage && navigator.storage.persist) {
+          try { navigator.storage.persist(); } catch (e) {}
+        }
+        var clave = _claveL2(url);
+        return cache.match(clave).then(function (hit) {
+          if (hit) return hit.blob().then(function (b) { _asignarBlob(img, b); });
+          return fetch(url, { credentials: 'omit' }).then(function (resp) {
+            if (!resp || !resp.ok || !resp.blob) { img.src = url; return null; }
+            return resp.blob().then(function (b) {
+              _asignarBlob(img, b);
+              try {
+                var copia = new Response(b, {
+                  headers: {
+                    'Content-Type': resp.headers.get('Content-Type') || 'image/jpeg',
+                    'x-guardado': String(Date.now())
+                  }
+                });
+                cache.put(new Request(clave), copia).then(function () { _recortarL2(cache); }).catch(function () {});
+              } catch (e) {}
+            });
+          });
+        });
+      }).catch(function () {
+        /* CORS, cuota o lo que sea: la URL de siempre. */
+        try { img.src = url; } catch (e2) {}
+      });
     }
 
     function capturasDePresentacion(sp) {
@@ -393,7 +503,8 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
         movimientoTotal = 0;
         ultimoTapTiempo = 0;
 
-        img.src = url;
+        /* R94: la L2 propia también alimenta el lightbox. */
+        poblarConL2(img, url);
 
         if (typeof dlg.showModal === 'function' && !dlg.open) {
           try { dlg.showModal(); } catch (err) { dlg.setAttribute('open', ''); }
@@ -472,6 +583,7 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
     return {
       urlImagenDirecta:       urlImagenDirecta,
       capturasDePresentacion: capturasDePresentacion,
+      poblarConL2:            poblarConL2,
       enganchar:              enganchar
     };
 

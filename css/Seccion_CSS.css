@@ -9,7 +9,7 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.5
+VERSIÓN:         2.3.6
 CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
                  (1) CITAS (">"): el blockquote de la descripción
                  lleva su LÍNEA a la izquierda (3px en el pastel del
@@ -42,16 +42,15 @@ CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
                  el diseño del plan viejo: Tasa BCV {fecha} a la
                  izquierda y Bs. {dolar} a la derecha, en el color
                  del post.
-                 R91: SKELETON DE LAS IMÁGENES DEL POST — cada
-                 .post-hero-img nace "cargando" (shimmer gris en
-                 el marco, igual lenguaje que el skeleton del
-                 detalle) y se destapa con fundido 0.35s cuando
-                 su archivo termina (onload). Con cache no se ve
-                 el esqueleto (se destapa en el mismo frame). En
-                 error queda el vidrio. La default del Setup
-                 carga igual y al terminar se queda en 0.32
-                 (R90 intacto: la regla 0.32 ahora exige
-                 "cargada" para no teñir el shimmer).
+                 R94: SIN SKELETON INDIVIDUAL DE IMAGEN — el
+                 esqueleto por-imagen del hero (R91: shimmer,
+                 cargando/cargada/error) se retira: código muerto
+                 en la pantalla real. La img del hero vuelve a
+                 pintarse directa y la default del Setup queda en
+                 0.32 incondicional (R90 intacto); la espera del
+                 post la cubre el esqueleto GENERAL del detalle.
+                 La alimentación va por la L2 propia
+                 (SeccionImagen.poblarConL2, R94).
                  R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — la
                  imagen que el backend entrega para posts SIN foto
                  propia (la del Setup) se pinta con opacity 0.32
@@ -156,33 +155,18 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   @supports not (aspect-ratio: 1/1) {
     .app-hero::before { content: ''; display: block; padding-top: 100%; }
   }
-  /* R91: SKELETON MIENTRAS CARGA — la img nace opacity 0 con
-     shimmer propio (mismo gris/ritmo del skeleton del detalle:
-     1.4s); onload la destapa con fundido de 0.35s. */
+  /* R94: la img del hero vuelve a pintarse DIRECTA (sin
+     esqueleto individual: en la pantalla real nunca llegaba a
+     verse). SeccionImagen.poblarConL2 la alimenta: la repetida
+     sale del cache propio de la app sin tocar la red. La espera
+     del post la cubre el esqueleto GENERAL del detalle. */
   .post-hero-img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: contain; display: block;
-    opacity: 0; transition: opacity 0.35s ease;
   }
-  .post-hero-img.post-hero-img-cargando {
-    background: linear-gradient(90deg, rgba(15, 23, 42, 0.06) 0%, rgba(15, 23, 42, 0.10) 50%, rgba(15, 23, 42, 0.06) 100%);
-    background-size: 200% 100%;
-    animation: heroImgShimmer 1.4s ease-in-out infinite;
-  }
-  @keyframes heroImgShimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-  .post-hero-img.post-hero-img-cargada { opacity: 1; }
-  /* R90 intacto: la POR DEFECTO del Setup, ya cargada, se queda
-     en 0.32 para no competir con el CTA (antes de cargar es
-     esqueleto como cualquier otra). */
-  .post-hero-img.post-hero-img-cargada.post-hero-img-default { opacity: 0.32; }
-  /* En error no se destapa nada: queda el vidrio del marco. */
-  .post-hero-img.post-hero-img-error { opacity: 0; background: none; animation: none; }
-  @media (prefers-reduced-motion: reduce) {
-    .post-hero-img.post-hero-img-cargando { animation: none; }
-  }
+  /* R90 intacto: la POR DEFECTO del Setup se queda en 0.32
+     para no competir con el CTA del lienzo. */
+  .post-hero-img.post-hero-img-default { opacity: 0.32; }
   .post-hero-track { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; touch-action: pan-x; scrollbar-width: none; }
   .post-hero-track::-webkit-scrollbar { display: none; }
   .post-hero-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; overflow: hidden; }
