@@ -13,9 +13,17 @@ RESPONSABILIDAD: Módulo window.Partner. LIENZO propio del partner
                  El modo (título "Perfil del vendedor", botón
                  volver e historial) lo lleva window.Lista vía
                  abrirPartner/cerrarPartner; este módulo solo pinta,
-                 hace los fades y navega a posts.
-VERSIÓN:         1.0
-CAMBIOS:         R87: NACE — reemplaza al bottom sheet del
+                 hace el intercambio inmediato y navega a posts.
+VERSIÓN:         1.1
+CAMBIOS:         R88: (1) El nombre del partner pasa a .subtitulo
+                 con el color del post (mismo tratamiento que la
+                 fila del post). (2) Las tarjetas de publicaciones
+                 van en CUADRÍCULA .pf-grid (3 columnas, como el
+                 sheet viejo) — fuera el carrusel .mk-cross-row.
+                 (3) INTERCAMBIO INMEDIATO post↔partner: sin fades
+                 ni temporizadores — el parpadeo con la imagen
+                 desaparece (abrir/ocultar/irAPost).
+                 R87: NACE — reemplaza al bottom sheet del
                  partner (Partner_Sheet_Script retirado).
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                  Lista_Script.html (abrirPartner/cerrarPartner/
@@ -190,7 +198,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                   '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>' +
                 '</div>';
       html +=   '<div class="mk-partner-info">';
-      html +=     '<div class="textoPrimario" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
+      /* R88: .subtitulo (18px/300) con el color del post. */
+      html +=     '<div class="subtitulo" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
       if (eslogan) {
         html +=   '<div class="textoSecundario" style="font-size:12px !important;">' + escapeHtml(eslogan) + '</div>';
       }
@@ -326,7 +335,9 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
       var hayMas = filtrados.length > LIMITE_VER;
       var visibles = verTodos ? filtrados : filtrados.slice(0, LIMITE_VER);
 
-      html += '<div class="mk-cross-row">';
+      /* R88: cuadrícula 3 columnas (.pf-grid) — el carrusel
+         horizontal se fue. */
+      html += '<div class="pf-grid">';
       visibles.forEach(function (p) { html += celdaCard(p); });
       html += '</div>';
 
@@ -449,7 +460,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
             detail: { idPost: idPost }
           }));
         }
-      }, 200);
+      }, 60);
     }
 
     /* ============================================================
@@ -479,7 +490,10 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
     }
 
     /* ============================================================
-       ABRIR / CERRAR (fades entre #seccionesTrack y #partnerTrack)
+       ABRIR / CERRAR (intercambio INMEDIATO post↔partner — R88:
+       sin fades: ocultar el post y mostrar el partner ocurre en
+       el mismo tick, el navegador pinta una sola vez y el
+       parpadeo con la imagen desaparece; y viceversa al volver)
        ============================================================ */
     function abrir(postDesdeElQueSeAbre) {
       postOrigen    = postDesdeElQueSeAbre || null;
@@ -497,10 +511,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
       abierto = true;
 
       var wrap = document.querySelector('.secciones-wrap');
-      if (wrap) {
-        scrollPostPrevio = wrap.scrollTop;
-        wrap.scrollTop = 0;
-      }
+      if (wrap) scrollPostPrevio = wrap.scrollTop;
 
       /* El modo, el título y el historial los lleva Lista. */
       if (window.Lista && typeof window.Lista.abrirPartner === 'function') {
@@ -508,18 +519,11 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
       }
 
       var detalle = document.getElementById('seccionesTrack');
-      if (!detalle) return;
 
-      detalle.classList.add('fade-out');
-
-      setTimeout(function () {
-        detalle.hidden = true;
-        detalle.classList.remove('fade-out');
-
-        track.hidden = false;
-        track.classList.add('fade-in');
-        setTimeout(function () { track.classList.remove('fade-in'); }, 220);
-      }, 200);
+      /* Intercambio en un solo tick: cero frames intermedios. */
+      if (wrap) wrap.scrollTop = 0;
+      if (detalle) detalle.hidden = true;
+      track.hidden = false;
     }
 
     function cerrar() {
@@ -539,30 +543,23 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
       abierto = false;
 
       if (!track) return;
-      track.classList.add('fade-out');
 
-      setTimeout(function () {
-        track.hidden = true;
-        track.classList.remove('fade-out');
+      /* Intercambio en un solo tick (R88: sin fades). */
+      track.hidden = true;
 
-        /* Volver al POST solo si seguimos en modo detalle (si el
-           cierre vino de un cambio de chip/ciudad ya se fue a la
-           lista y no hay que resucitar el detalle). */
-        var enDetalle = window.Lista && typeof window.Lista.getModo === 'function'
-          ? window.Lista.getModo() === 'detalle'
-          : false;
+      /* Volver al POST solo si seguimos en modo detalle (si el
+         cierre vino de un cambio de chip/ciudad ya se fue a la
+         lista y no hay que resucitar el detalle). */
+      var enDetalle = window.Lista && typeof window.Lista.getModo === 'function'
+        ? window.Lista.getModo() === 'detalle'
+        : false;
 
-        if (enDetalle) {
-          var detalle = document.getElementById('seccionesTrack');
-          if (detalle) {
-            detalle.hidden = false;
-            detalle.classList.add('fade-in');
-            setTimeout(function () { detalle.classList.remove('fade-in'); }, 220);
-          }
-          var wrap = document.querySelector('.secciones-wrap');
-          if (wrap) wrap.scrollTop = scrollPostPrevio;
-        }
-      }, 200);
+      if (enDetalle) {
+        var detalle = document.getElementById('seccionesTrack');
+        if (detalle) detalle.hidden = false;
+        var wrap = document.querySelector('.secciones-wrap');
+        if (wrap) wrap.scrollTop = scrollPostPrevio;
+      }
     }
 
     document.addEventListener('partner:ocultar', ocultar);

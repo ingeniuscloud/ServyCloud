@@ -11,8 +11,16 @@ RESPONSABILIDAD: Estilos del LIENZO del partner (#partnerTrack),
                  dirección, botón WhatsApp .botonSecundario sin
                  fondo, tabs Servicios/Cursos estilo Yummy y
                  tarjetas .mk-cross-* del post.
-VERSIÓN:         1.0
-CAMBIOS:         R87: NACE — reemplaza al bottom sheet del
+VERSIÓN:         1.1
+CAMBIOS:         R88: (1) Las tarjetas de publicaciones pasan a
+                 CUADRÍCULA 3 columnas (.pf-grid, como en el sheet
+                 viejo) — fuera el carrusel horizontal.
+                 (2) Las divisoras de identidad y stats adoptan el
+                 MISMO gris visible de las divisoras del post
+                 (rgba(15,23,42,.12), la .mk-hairline).
+                 (3) FUERA los fades post↔partner: el intercambio
+                 es inmediato (el parpadeo con la imagen se fue).
+                 R87: NACE — reemplaza al bottom sheet del
                  partner (Partner_Sheet_CSS retirado).
 DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
                  .mk-rel-section, .mk-cross-*), Core_CSS.html
@@ -21,28 +29,23 @@ DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
 
   /* ============================================================
      TRACK DEL PARTNER · hermano del #seccionesTrack
+     R88: SIN fades — el intercambio post↔partner es inmediato
+     (el cruzado de animaciones dejaba ver el post desvanecerse
+     y un flash antes de entrar el partner).
      ============================================================ */
   .partner-track { padding-bottom: 56px; }
   .partner-track[hidden] { display: none !important; }
 
-  .partner-track.fade-out { animation: partnerFadeOut 0.2s ease forwards; }
-  .partner-track.fade-in  { animation: partnerFadeIn 0.2s ease forwards; }
-  @keyframes partnerFadeOut { from { opacity: 1; } to { opacity: 0; } }
-  @keyframes partnerFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) {
-    .partner-track.fade-out,
-    .partner-track.fade-in { animation-duration: 0.01s; }
-  }
-
   /* ============================================================
      IDENTIDAD · mismo avatar del post (clases .mk-partner-*),
      nombre y eslogan con la tipografía del post.
-     Divisora abajo estilo sheet (1px #f1f5f9).
+     Divisora abajo = .mk-hairline del post (R88: el gris
+     #f1f5f9 del sheet no se veía contra el lienzo).
      ============================================================ */
   .pf-identidad {
     display: flex; align-items: center; gap: 12px;
     padding: 16px 5%;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
   }
   .pf-identidad .mk-partner-info { gap: 2px; }
 
@@ -50,7 +53,7 @@ DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
      STATS · iconos sociales y contadores, misma anatomía que
      traía el sheet (grid 3, iconos rojo/azul/verde, número
      0.98rem/800, label uppercase 0.66rem).
-     Divisora abajo estilo sheet.
+     Divisora abajo = .mk-hairline del post (R88).
      ============================================================ */
   .pf-stats {
     display: grid;
@@ -58,7 +61,7 @@ DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
     gap: 8px;
     padding: 16px 5% 18px;
     text-align: center;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
   }
   .pf-stat {
     display: flex;
@@ -182,6 +185,19 @@ DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
     text-align: center;
     font-size: var(--size-ui-3);
     color: #94a3b8; font-weight: 500;
+  }
+
+  /* ============================================================
+     R88 · CUADRÍCULA de publicaciones (3 columnas, como en el
+     sheet del partner antes del lienzo): las tarjetas
+     .mk-cross-card del post encajan como celdas del grid (el
+     flex:0 0 del carrusel queda inerte dentro del grid).
+     ============================================================ */
+  .pf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 5%;
   }
 
   .pf-ver-todas-wrap { padding: 14px 5% 0; }

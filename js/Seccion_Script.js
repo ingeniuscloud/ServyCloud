@@ -10,8 +10,15 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.0
-CAMBIOS:         R87: (1) La fila del partner ABRE EL LIENZO del
+VERSIÓN:         2.4.1
+CAMBIOS:         R88: (1) "Ver descripción completa" PEGA más al
+                 fade del texto (margin-top 20→10px) y el aire que
+                 suelta se muda ABAJO (margin-bottom 12px) para
+                 despegarla de la opción de duda / CTA.
+                 (2) El nombre del partner de la fila (y del lienzo
+                 del partner) pasa a .subtitulo (18px/300 del Core)
+                 conservando el color del post.
+                 R87: (1) La fila del partner ABRE EL LIENZO del
                  partner (window.Partner, #partnerTrack) — el
                  bottom sheet quedó retirado. (2) "Ver descripción
                  completa" más despegada del fade: el margin-top
@@ -315,7 +322,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         var renderExcerpt = _renderMarkdown(markdown);
         html += '<div class="mk-desc-wrap">' +
                   '<div class="mk-desc-clamp textoPrimario" id="postDescExcerpt">' + renderExcerpt + '</div>' +
-                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:20px !important;">Ver descripción completa</button>' +
+                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:10px !important; margin-bottom:12px !important;">Ver descripción completa</button>' +
                 '</div>';
       }
       html += '</div>';
@@ -345,7 +352,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       html +=     '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>';
       html +=   '</div>';
       html +=   '<div class="mk-partner-info">';
-      html +=     '<div class="textoPrimario" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
+      /* R88: .subtitulo (18px/300) con el color del post. */
+      html +=     '<div class="subtitulo" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
       if (eslogan) { html +=   '<div class="textoSecundario" style="font-size:12px !important;">' + escapeHtml(eslogan) + '</div>'; }
       html +=   '</div>';
       html +=   '<span class="mk-partner-chevron">›</span>';
