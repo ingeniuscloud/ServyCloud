@@ -15,9 +15,17 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  está instalada, el aviso vive DENTRO de la
                  pantalla como banner; Android no instalada lleva
                  botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.11.0
-CAMBIOS:         R95: VOLVER ARRIBA en el menú global — botón circular
-                 (.mk-sheet-top del Core) a la izquierda que
+VERSIÓN:         1.12.0
+CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
+                 los lienzos: círculo con chevron a la izquierda
+                 (el estilo lo pinta Global_CSS); (2) fuera el
+                 texto "Volver" de la cabecera (el botón se
+                 explica solo); (3) el volver-arriba vivió en su
+                 esquina y pasó abajo a la derecha (Core_CSS),
+                 así que el relevo sheet.profundo ya no existe:
+                 Volver siempre visible en subvista.
+                 R95: VOLVER ARRIBA en el menú global — botón circular
+                 (.mk-sheet-top del Core) que
                  aparece pasados ~120px de scroll y sube suave al
                  tocar. En subvista comparte esquina con Volver
                  (sheet.profundo lo alterna). 0 llamadas a la BD.
@@ -46,7 +54,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
     var btnClose   = null;
     var btnBack    = null;
     var btnTop     = null;
-    var titulo     = null;
 
     var dragActivo = false;
     var dragMoved = false;
@@ -638,7 +645,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
               '<polyline points="6 15 12 9 18 15"/>' +
             '</svg>' +
           '</button>' +
-          '<div class="sheet-back-titulo">Volver</div>' +
           '<div class="sheet-content"></div>' +
         '</div>';
 
@@ -651,16 +657,16 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       btnClose   = raiz.querySelector('.sheet-close');
       btnBack    = raiz.querySelector('.sheet-back');
       btnTop     = raiz.querySelector('#sheetTop');
-      titulo     = raiz.querySelector('.sheet-back-titulo');
 
       backdrop.addEventListener('click', cerrar);
       btnClose.addEventListener('click', cerrar);
       btnBack.addEventListener('click', volverAlMenu);
 
-      /* R95 · VOLVER ARRIBA: mismo botón circular de los sheets
-         (izquierda). Solo con scroll: 0 llamadas a la BD. En
-         subvista comparte la esquina con Volver: mientras estás
-         scrolleado, la flecha arriba lo reemplaza (sheet.profundo). */
+      /* R96 · VOLVER ARRIBA: mismo botón circular, ahora abajo a
+         la derecha (Core_CSS). Solo con scroll: 0 llamadas a la
+         BD. En subvista ya NO se alterna con Volver: la esquina
+         de Volver es la superior izquierda y la del volver-arriba
+         la inferior derecha — conviven sin pisarse. */
       btnTop.addEventListener('click', function () {
         haptic(8);
         content.scrollTo({ top: 0, behavior: 'smooth' });
@@ -676,7 +682,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       if (!sheet || !content) return;
       var abajo = content.scrollTop > 120;
       if (btnTop) btnTop.classList.toggle('visible', abajo);
-      sheet.classList.toggle('profundo', abajo);
     }
 
     function inyectarDirecto(k) {
@@ -731,7 +736,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
 
       inyectarDirecto('menu');
       sheet.classList.remove('subvista');
-      titulo.textContent = 'Volver';
 
       sheet.classList.add('sin-transicion');
       sheet.style.transform = 'translateY(100%)';
@@ -769,7 +773,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
 
     function navegar(subvista) {
       sheet.classList.add('subvista');
-      titulo.textContent = 'Volver';
 
       if (subvista === 'privacidad' ||
           subvista === 'terminos'   ||
@@ -787,7 +790,6 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
 
       sheet.classList.remove('subvista');
       sheet.classList.remove('con-privacidad', 'scroll-mas');
-      titulo.textContent = 'Volver';
 
       inyectarConFade('menu');
     }

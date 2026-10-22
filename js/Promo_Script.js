@@ -30,16 +30,16 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Tarjeta (R62): FILA DEL TÍTULO con el BADGE a la
-                 derecha (el texto de la promo manda, el badge lo
-                 acompaña), TÍTULO = TEXTO DE LA PROMO (la
-                 esencia del mensaje: item.texto de PROMOJSON,
-                 con respaldo en el promoTexto del post — grande
-                 y sin bold), SUBTÍTULO = título del post, y
-                 TERCERA FILA = partner con el CHECK DE
-                 CERTIFICADO en blanco a la derecha (glifo
-                 badgeCheck). Flecha circular a la esquina
-                 inferior derecha. Cada tarjeta lleva el
+                 Tarjeta (R96): TRES LÍNEAS de texto en blanco —
+                 1ª = item.titulo de PROMOJSON (tipografía
+                 .subtitulo), 2ª = item.descripcion
+                 (.textoPrimario) y 3ª = tituloPost del post
+                 (POSTJSON, .cita) — con el BADGE a la derecha
+                 de la primera fila y la flecha circular a la
+                 esquina inferior derecha. La pintura (degradado
+                 del colorOficial, sombra, badge, flecha) y el
+                 proceso (riel, bucle, pausa con el dedo) quedan
+                 igual; solo cambió el texto a mostrar. Cada tarjeta lleva el
                  DEGRADADO de su colorOficial (R62: estilo
                  inline 2026 — diagonal 135°, claro → base →
                  oscuro — y su sombra; los clones llevan el MISMO
@@ -47,8 +47,14 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  cambie de color). El encabezado "Promos cerca de
                  ti" + "Toca para conocer más" se muestra/oculta
                  junto con el slot.
-VERSIÓN:         1.9.0
-CAMBIOS:         R95: textoDePromo sin la lectura muerta de
+VERSIÓN:         2.0.0
+CAMBIOS:         R96: PROMOJSON nuevo (titulo + descripcion por
+                 item). La tarjeta muestra: titulo en .subtitulo,
+                 descripcion en .textoPrimario y el tituloPost
+                 del post en .cita — las tres en blanco. Fuera la
+                 fila del partner (el título del post ahora
+                 cierra la tarjeta en .cita).
+                 R95: textoDePromo sin la lectura muerta de
                  seccionJson (migración POSTJSON).
 
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
@@ -229,15 +235,18 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       });
     }
 
-    /* TEXTO DE LA PROMO (R60) · la esencia del mensaje. Se lee
-       del item de PROMOJSON (texto, con variantes por si la hoja
-       usa otro nombre) y como respaldo del promoTexto que el
-       índice del catálogo trae desde PostDetalle (02 Cache.gs).
-       R61: este texto ES el título de la tarjeta.
-       R95: fuera la lectura de seccionJson (camino muerto desde
-       la migración POSTJSON). */
-    function textoDePromo(item, post) {
-      var campos = ['texto', 'promoTexto', 'descripcion', 'mensaje'];
+    /* R96 · TEXTOS DE LA TARJETA — el PROMOJSON nuevo trae
+       titulo y descripcion por item:
+       · TITULO   (1ª línea, .subtitulo): item.titulo, con
+         respaldo en texto/mensaje de la estructura vieja para
+         que una promo sin migrar no se quede muda.
+       · DESCRIPCION (2ª línea, .textoPrimario): item.descripcion.
+       · TITULOpOST (3ª línea, .cita): el tituloPost del post —
+         el índice del catálogo ya lo trae en post.titulo
+         (02 Cache.gs: titulo = postJson.descripcion.tituloPost);
+         si el post trae el detalle montado, manda el postJson. */
+    function tituloDePromo(item, post) {
+      var campos = ['titulo', 'texto', 'promoTexto', 'mensaje'];
       for (var i = 0; i < campos.length; i++) {
         var v = item ? item[campos[i]] : null;
         if (typeof v === 'string' && v.trim()) return v.trim();
@@ -246,47 +255,46 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       return (typeof t === 'string' && t.trim()) ? t.trim() : '';
     }
 
-    function buildItemHTML(item, post) {
-      /* R84: el badge vive en el ITEM de PROMOJSON (así quedó
-         definido en R76) con respaldo en el post — la marquesina
-         vuelve a identificar la promo con su badge. */
-      var badge  = buscarBadge((item && (item.idBadge || item.idBadgeActual)) || post.idBadge);
-      var partner = buscarPartner(post.idPartner) || {};
-      var marca = escapeHtml(String(partner.marca || partner.nombre || '').trim());
-      var textoPromo = textoDePromo(item, post);
-      var tituloPost = String(post.titulo || post.boton || '').trim();
+    function descripcionDePromo(item) {
+      var v = item ? item.descripcion : null;
+      return (typeof v === 'string' && v.trim()) ? v.trim() : '';
+    }
 
-      /* R62 · Anatomía pedida por el dueño:
-         1) FILA DEL TÍTULO = TEXTO de la promo (PROMOJSON),
-            grande y sin bold (el estilo lo pinta Promo_CSS),
-            con el badge a la derecha de la MISMA fila.
-         2) SUBTÍTULO = título del post.
-         3) TERCERA FILA = nombre del partner + check de
-            certificado a la derecha, en BLANCO (badgeCheck).
-         Si la promo no trae texto, el título del post sube y NO
-         se duplica en el subtítulo. La flecha circular cierra
-         abajo a la derecha. */
+    function tituloPostDe(post) {
+      var pj = (post && post.postJson && post.postJson.descripcion) || {};
+      var t = String(pj.tituloPost || '').trim();
+      if (!t) t = String((post && post.titulo) || '').trim();
+      if (!t) t = String((post && post.boton) || '').trim();
+      return t;
+    }
+
+    function buildItemHTML(item, post) {
+      /* R96 · el badge vive en el ITEM de PROMOJSON (con
+         respaldo en el post) y sigue a la derecha de la 1ª
+         fila. Las 3 líneas las pinta Promo_CSS: titulo en
+         .subtitulo, descripcion en .textoPrimario y tituloPost
+         en .cita — todas en blanco sobre el degradado. */
+      var badge = buscarBadge((item && (item.idBadge || item.idBadgeActual)) || post.idBadge);
+      var tituloPromo = tituloDePromo(item, post);
+      var descripcion = descripcionDePromo(item);
+      var tituloPost  = tituloPostDe(post);
+
       var badgeHtml = (badge && badge.titulo)
         ? '<span class="badge">' + escapeHtml(badge.titulo) + '</span>'
         : '';
 
-      var tituloHtml = textoPromo
-        ? '<span class="promo-titulo">' + escapeHtml(textoPromo) + '</span>'
-        : '<span class="promo-titulo">' +
-          escapeHtml(tituloPost || post.id) + '</span>';
-
       var html = '<span class="promo-fila-titulo">' +
-                   tituloHtml + badgeHtml +
+                   '<span class="promo-titulo">' +
+                     escapeHtml(tituloPromo || tituloPost || post.id) +
+                   '</span>' + badgeHtml +
                  '</span>';
 
-      if (textoPromo && tituloPost) {
-        html += '<span class="promo-sub">' + escapeHtml(tituloPost) + '</span>';
+      if (descripcion) {
+        html += '<span class="promo-sub">' + escapeHtml(descripcion) + '</span>';
       }
 
-      if (marca) {
-        html += '<span class="promo-partner">' + marca +
-                '<span class="promo-check" data-glifo="badgeCheck" aria-hidden="true"></span>' +
-                '</span>';
+      if (tituloPost) {
+        html += '<span class="promo-cita">' + escapeHtml(tituloPost) + '</span>';
       }
 
       html += '<span class="promo-flecha" aria-hidden="true">' +

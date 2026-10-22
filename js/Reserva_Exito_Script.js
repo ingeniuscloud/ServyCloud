@@ -8,8 +8,15 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.2.0
-CAMBIOS:         R95: la pantalla de éxito lee el horario del item
+VERSIÓN:         1.3.0
+CAMBIOS:         R96: la pantalla de éxito muestra el PLAN DE
+                 ESTUDIOS — se extrae del markdown del post
+                 activo (sección "### Plan de Estudios" hasta el
+                 final, sin las líneas de horario: el horario
+                 elegido ya aparece en la lista). Sin sección:
+                 la pantalla queda como siempre. Mismo bloque
+                 que viaja al correo del alumno.
+                 R95: la pantalla de éxito lee el horario del item
                  nuevo del PLANJSON ({dias, horario, cupo}) y el
                  título directo del índice; fuera las lecturas
                  muertas (plan.turno, seccionJson).
@@ -35,6 +42,60 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     function tituloDelPost(post) {
       if (!post) return '';
       return String(post.titulo || '').trim();
+    }
+
+    /* ============================================================
+       R96 · PLAN DE ESTUDIOS — misma extracción que hace
+       03 Correo.gs para el correo: sección "### Plan de
+       Estudios" hasta el final, SIN las líneas de horario (el
+       horario elegido ya viaja en la lista de la pantalla) y
+       sin el marcador de cita ^.
+       ============================================================ */
+    function extraerPlanEstudios(markdown) {
+      var lineas = String(markdown == null ? '' : markdown).split(/\r?\n/);
+      var inicio = -1;
+      for (var i = 0; i < lineas.length; i++) {
+        if (/^#{1,6}\s*plan\s*de\s*estudios/i.test(lineas[i].trim())) { inicio = i; break; }
+      }
+      if (inicio === -1) return [];
+
+      var salida = [];
+      for (var j = inicio + 1; j < lineas.length; j++) {
+        var l = lineas[j].trim();
+        if (!l) { if (salida.length) salida.push(''); continue; }
+        if (/^#{1,6}\s/.test(l)) continue;
+        if (/^[-*]?\s*\*{0,2}\s*horario\b/i.test(l)) continue;
+        l = l.replace(/^\s*\^\s?/, '');
+        salida.push(l);
+      }
+      while (salida.length && !salida[salida.length - 1]) salida.pop();
+      return salida;
+    }
+
+    function htmlPlanEstudios(post) {
+      var pj = (post && post.postJson && post.postJson.descripcion) || {};
+      var lineas = extraerPlanEstudios(pj.markdown);
+      if (!lineas.length) return '';
+
+      var items = '';
+      for (var i = 0; i < lineas.length; i++) {
+        var l = String(lineas[i] || '').trim().replace(/^[-*]\s+/, '');
+        if (!l) continue;
+        /* **negrita** del markdown → <b> (texto ya escapado por
+           partes para no abrir la puerta al contenido de la hoja) */
+        var partes = l.split('**');
+        var pedazos = '';
+        for (var k = 0; k < partes.length; k++) {
+          pedazos += (k % 2 === 1) ? '<b>' + escapeHtml(partes[k]) + '</b>' : escapeHtml(partes[k]);
+        }
+        items += '<li>' + pedazos + '</li>';
+      }
+      if (!items) return '';
+
+      return '<div class="exito-plan">' +
+               '<div class="exito-plan-titulo">Plan de Estudios</div>' +
+               '<ul class="exito-plan-lista">' + items + '</ul>' +
+             '</div>';
     }
 
     /* ============================================================
@@ -147,6 +208,10 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       html += fila('Horario:', turnoFull);
       html += fila('¿Cómo nos conociste?:', origenTxt);
       html += '</ul>';
+
+      /* R96 · Plan de Estudios del markdown del post (si lo
+         trae): inicio, duración, inversión… sin el horario. */
+      html += htmlPlanEstudios(post);
 
       html += '<div class="exito-aviso warning">' +
                 '<span class="exito-aviso-icono">⚠️</span>' +

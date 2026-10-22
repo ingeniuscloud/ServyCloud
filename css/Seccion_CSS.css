@@ -86,8 +86,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* Mismo tratamiento de los botones sociales del hero:
      fondo blanco + borde suave + sombra, visibles sobre
      cualquier imagen, también sobre fondos claros. */
-  .app-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.14); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28); transition: width 0.2s, border-radius 0.2s; }
-  .app-hero-dot.activo { width: 14px; border-radius: 3px; }
+  /* Dots del carrusel (R96): núcleo oscuro translúcido con halo
+     blanco — se ven sobre foto clara Y oscura; el activo pasa a
+     blanco con aro oscuro para no perderse nunca. */
+  .app-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(15, 23, 42, 0.30); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85), 0 1px 2px rgba(0, 0, 0, 0.18); transition: width 0.2s, background 0.2s, border-radius 0.2s; }
+  .app-hero-dot.activo { width: 14px; border-radius: 3px; background: #ffffff; box-shadow: 0 0 0 1.5px rgba(15, 23, 42, 0.30), 0 1px 3px rgba(0, 0, 0, 0.25); }
 
   /* ============================================================
      (R84) El bloque de "post sin foto" (.post-hero-vacio) salió
@@ -182,8 +185,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* R92/R93 · FILA [VALOR BCV] — ahora es una cita completa: una
      sola fila (nowrap + separador fijo de 7 espacios duros que
      pinta Seccion_Script), tipografía .cita en todo el texto y
-     color del post (viaja inline con !important desde
-     _htmlTasaBCV — es la única diferencia con una cita). */
+     NARANJA de la app #f97316 (R96: el color del post daba
+     fricción de lectura en varios posts; el naranja es legible
+     siempre). Viaja inline con !important desde _htmlTasaBCV. */
   .mk-bcv {
     display: block; white-space: nowrap;
     margin: 10px 0 12px;
@@ -191,10 +195,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* ============================================================
      PROMO DEL POST (R82/R83) · debajo del título
-     R84: SIN cursiva — el texto de la promo se lee derecho, con
-     el badge a la derecha (píldora blanca con borde punteado del
-     color del post) y los precios sobre blanco. Nada satura: el
-     naranja del CTA sigue siendo el único acento fuerte.
+     R96 · el texto nuevo del PROMOJSON va en DOS filas con
+     entrada suave: titulo en .subtitulo (color del post) y
+     descripcion en .textoPrimario debajo; el badge a la derecha
+     (píldora blanca con borde punteado del color del post) y
+     los precios sobre blanco. Nada satura: el naranja del CTA
+     sigue siendo el único acento fuerte.
      ============================================================ */
   .mk-promo-block {
     margin: 2px 0 14px; border-radius: 10px; overflow: hidden;
@@ -206,10 +212,28 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     background: color-mix(in srgb, var(--post-color) 12%, #ffffff);
     color: var(--post-color, #f97316);
     display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; font-size: 15px; font-weight: 600;
-    padding: 10px 14px; text-align: left; letter-spacing: 0.3px;
+    gap: 10px;
+    padding: 10px 14px; text-align: left;
   }
-  .mk-promo-banner-texto { flex: 1 1 auto; min-width: 0; }
+  /* R96 · dos filas de texto con entrada suave: titulo en
+     tipografía .subtitulo y descripcion en tipografía
+     .textoPrimario — las clases del Core mandan tamaño, peso y
+     color (llevan !important). El banner solo aporta la
+     animación de entrada y el orden. */
+  .mk-promo-banner-textos {
+    flex: 1 1 auto; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .mk-promo-banner .mk-promo-titulo {
+    animation: mkPromoEntra 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .mk-promo-banner .mk-promo-descripcion {
+    animation: mkPromoEntra 0.45s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes mkPromoEntra {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
   /* Badge de la promo (el de la BD, el mismo de la marquesina):
      píldora blanca con borde punteado del color del post. */
   .mk-promo-badge {

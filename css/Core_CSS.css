@@ -5,12 +5,16 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía
                  maestra y de la voz única de los placeholders.
-VERSIÓN:         2.10.0
-CAMBIOS:         R95: (1) Clase compartida .mk-sheet-top — el botón
+VERSIÓN:         2.11.0
+CAMBIOS:         R96: .mk-sheet-top (VOLVER ARRIBA de los bottom
+                 sheets) pasa a la ESQUINA INFERIOR DERECHA — la
+                 ubicación estándar de apps y web que el dueño
+                 pidió restituir — con fondo blanco y sombra para
+                 leerse sobre el fade y sobre cualquier contenido.
+                 R95: Clase compartida .mk-sheet-top — el botón
                  VOLVER ARRIBA de los bottom sheets (el mismo
                  círculo del volver de la app: 34px, borde fino,
-                 flecha hacia arriba) en la esquina superior
-                 IZQUIERDA. Aparece solo cuando hay scroll abajo
+                 flecha hacia arriba). Aparece solo cuando hay scroll abajo
                  (.visible la pone cada sheet) y desaparece al
                  llegar arriba. 0 llamadas a la BD, 0 temporizadores.
 
@@ -257,20 +261,24 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .user-eslogan { display: block; font-size: 12px; line-height: 1.3; margin-top: 2px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* ============================================================
-     R95 · VOLVER ARRIBA DE LOS BOTTOM SHEETS (clase compartida)
-     El mismo botón circular del volver de la app (.btn-volver:
-     34px, borde fino #475569, flecha) pero apuntando ARRIBA,
-     en la esquina superior izquierda del sheet. Aparece solo
-     cuando hay scroll abajo (.visible la pone cada sheet al
-     escuchar su propio scroll) y desaparece al llegar arriba.
-     Botón 100% local: 0 llamadas a la BD, 0 temporizadores.
+     R96 · VOLVER ARRIBA DE LOS BOTTOM SHEETS (clase compartida)
+     Mismo botón circular del volver de la app (34px, borde fino
+     #475569) pero con la flecha hacia ARRIBA y — como manda el
+     uso normal de apps y web — en la ESQUINA INFERIOR DERECHA
+     del sheet (el dueño corrigió la ubicación de la R95: arriba
+     a la izquierda estaba mal). Aparece solo cuando hay scroll
+     (.visible la pone cada sheet al escuchar su propio scroll)
+     y desaparece al llegar arriba. Queda sobre la zona de la
+     raya nativa (safe-area) y sobre el fade. Botón 100% local:
+     0 llamadas a la BD, 0 temporizadores.
      ============================================================ */
   .mk-sheet-top {
-    position: absolute; top: 6px; left: 12px; width: 34px; height: 34px;
-    border: 1.2px solid #475569; background: transparent; color: #475569; cursor: pointer;
+    position: absolute; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 14px; width: 34px; height: 34px;
+    border: 1.2px solid #475569; background: #ffffff; color: #475569; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%; z-index: 8; padding: 0;
-    opacity: 0; pointer-events: none; transform: translateY(-4px);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
+    opacity: 0; pointer-events: none; transform: translateY(4px);
     transition: opacity 0.2s ease, transform 0.22s ease;
     -webkit-tap-highlight-color: transparent;
   }

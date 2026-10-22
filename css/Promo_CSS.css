@@ -6,40 +6,36 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE sobre el lienzo y cada
                  promo es una TARJETA con degradado PROPIO del
-                 colorOficial del post (R62: adiós a la paleta
-                 fija c0…c5 — Promo_Script pinta el degradado
-                 2026 en línea con el color de cada post: claro →
-                 base → oscuro, diagonal 135°, y su sombra
-                 acompaña; sin color en la BD, el respaldo
-                 naranja queda abajo): radio, sombra y contenido
-                 en blanco — fila del TÍTULO (R62): el TEXTO DE
-                 LA PROMO (PROMOJSON, grande y sin bold) con el
-                 badge PROMOCIONADO a su derecha en la MISMA
-                 fila, subtítulo = título del post, partner con
-                 check de certificado blanco y la flecha circular
-                 ANCLADA A LA ESQUINA INFERIOR DERECHA (R62). La
-                 tarjeta es MÁS COMPACTA (R62: menos alto, ancho
-                 recortado un 10%) y el GRID de la marquesina
-                 queda TRANSPARENTE (R61: sin gris, se ve el
-                 lienzo). Encabezado propio ("Promos cerca de
-                 ti" en peso normal R62, color de los títulos de
-                 sección) y FADE a los laterales de la marquesina
-                 hacia el color del lienzo. El avance continuo lo
-                 lleva Promo_Script (rAF sobre scrollLeft). El
-                 badge vive SOLO aquí y en el post: es la única
-                 diferencia visible de la promo dentro del
-                 sistema. Sin estrella (la métrica es solo del
-                 item de la lista). Vive fuera del scroll en modo
-                 lista. Se oculta en modo detalle.
-VERSIÓN:         2.6
-CAMBIOS:         R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+                 colorOficial del post (R62: claro → base →
+                 oscuro, diagonal 135°, y su sombra acompaña; sin
+                 color en la BD, el respaldo naranja queda abajo):
+                 radio, sombra y contenido en blanco — R96: las
+                 tres líneas del texto en blanco con las
+                 tipografías del Core — fila del TÍTULO (item.
+                 titulo de PROMOJSON en .subtitulo) con el badge
+                 PROMOCIONADO a su derecha en la MISMA fila,
+                 DESCRIPCIÓN (item.descripcion en .textoPrimario)
+                 y TÍTULO DEL POST (tituloPost del POSTJSON en
+                 .cita) — y la flecha circular ANCLADA A LA
+                 ESQUINA INFERIOR DERECHA (R62). La tarjeta es
+                 MÁS ANCHA (R96: +15% para las líneas largas del
+                 texto nuevo) y el GRID de la marquesina queda
+                 TRANSPARENTE (R61). Encabezado propio ("Promos
+                 cerca de ti" en peso normal R62, color de los
+                 títulos de sección) y FADE a los laterales de la
+                 marquesina hacia el color del lienzo. El avance
+                 continuo lo lleva Promo_Script (rAF sobre
+                 scrollLeft). El badge vive SOLO aquí y en el
+                 post. Vive fuera del scroll en modo lista. Se
+                 oculta en modo detalle.
+VERSIÓN:         2.7
+CAMBIOS:         R96: las 3 líneas con las tipografías del Core
+                 en blanco (titulo .subtitulo, descripcion
+                 .textoPrimario, tituloPost .cita nueva clase
+                 .promo-cita) y tarjeta +15% de ancho (87→100%
+                 escritorio, 77→89% móvil). Fuera la fila del
+                 partner y su check (el título del post cierra
+                 la tarjeta).
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -141,21 +137,21 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
   }
   .promo-track::-webkit-scrollbar { display: none; }
 
-  /* 87% (R62 · era 97%): el dueño recortó un 10% el ancho de
-     la tarjeta. Promo_Script lo ajusta a 100% cuando hay una
-     sola promo (lo hace con estilo inline, así que gana a
-     estas reglas). */
+  /* R96 · +15% de ancho con las líneas largas del texto nuevo:
+     87% → 100% en el lienzo principal. Promo_Script lo ajusta
+     a 100% cuando hay una sola promo (lo hace con estilo
+     inline, así que gana a estas reglas). */
   .promo-track > .promo-item {
-    flex: 0 0 87%;
+    flex: 0 0 100%;
     margin-right: 10px;
   }
 
-  /* En el teléfono, 77% (R62 · era 85%): mismo recorte del
-     10%. Se usa body.is-mobile y no una media query porque el
-     marco de escritorio mide ≈414px, casi igual que un
-     teléfono: por ancho de viewport no se distinguen. */
+  /* En el teléfono, 89% (R96 · era 77%): el mismo +15%. Se usa
+     body.is-mobile y no una media query porque el marco de
+     escritorio mide ≈414px, casi igual que un teléfono: por
+     ancho de viewport no se distinguen. */
   body.is-mobile .promo-track > .promo-item {
-    flex: 0 0 77%;
+    flex: 0 0 89%;
   }
 
   /* ============================================================
@@ -224,9 +220,8 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     color: #ffffff;
   }
 
-  /* TÍTULO DE LA PROMO (R61) · ES el TEXTO de PROMOJSON — la
-     esencia del mensaje manda en la tarjeta. Grande y SIN
-     bold (font simple, sensación estética), blanco, 2 líneas.
+  /* TÍTULO DE LA PROMO (R96) · item.titulo de PROMOJSON en
+     tipografía .subtitulo (--size-subtitulo), blanco, 2 líneas.
      R62: flex:1 dentro de su fila para que el badge quede a
      la derecha. */
   .lista-item.promo-item .promo-titulo {
@@ -243,12 +238,12 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     overflow: hidden;
   }
 
-  /* SUBTÍTULO (R61) · el título del post bajo el texto de la
-     promo. Blanco suavizado, hasta 2 líneas. Sustituye al
-     .promo-texto de R60 (ahora el texto ES el título). */
+  /* DESCRIPCIÓN (R96) · item.descripcion en tipografía
+     .textoPrimario (--size-textoPrimario), blanco, hasta 2
+     líneas. */
   .lista-item.promo-item .promo-sub {
     max-width: 100%;
-    font-size: var(--size-enlaces);
+    font-size: var(--size-textoPrimario);
     font-weight: 400;
     line-height: 1.35;
     letter-spacing: -0.01em;
@@ -259,36 +254,19 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     overflow: hidden;
   }
 
-  /* TERCERA FILA (R61) · nombre del partner + check de
-     certificado a la derecha, en BLANCO (el dueño lo pidió
-     blanco sobre el degradado). El glifo badgeCheck
-     (Iconos.html) es de trazo: currentColor = blanco. */
-  .lista-item.promo-item .promo-partner {
+  /* TERCERA LÍNEA (R96) · el tituloPost del post (POSTJSON) en
+     tipografía .cita (--size-cita), blanco. Cierra la tarjeta
+     (sustituye a la fila del partner de R61). */
+  .lista-item.promo-item .promo-cita {
     max-width: 100%;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.2;
-    color: rgba(255, 255, 255, 0.85);
-
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-
+    font-size: var(--size-cita, 11px);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.92);
     overflow: hidden;
     white-space: nowrap;
-  }
-
-  .lista-item.promo-item .promo-check {
-    flex-shrink: 0;
-    width: 14px;
-    height: 14px;
-    color: #ffffff;
-    display: inline-flex;
-  }
-  .lista-item.promo-item .promo-check svg {
-    width: 100%;
-    height: 100%;
-    display: block;
+    text-overflow: ellipsis;
   }
 
   /* Flecha circular (R58 · R62 a la ESQUINA INFERIOR DERECHA):
@@ -326,8 +304,7 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     .promo-encabezado { padding: 8px 14px 0; }
     .promo-encabezado-titulo { font-size: 16px; }
     .lista-item.promo-item .promo-titulo { font-size: 17px; }
-    .lista-item.promo-item .promo-sub { font-size: 12px; }
-    .lista-item.promo-item .promo-check { width: 13px; height: 13px; }
+    .lista-item.promo-item .promo-sub { font-size: 13px; }
     .lista-item.promo-item .promo-flecha { width: 30px; height: 30px; right: 10px; bottom: 8px; }
     .lista-item.promo-item .promo-flecha svg { width: 16px; height: 16px; }
     #promoSlot::before, #promoSlot::after { width: 22px; }

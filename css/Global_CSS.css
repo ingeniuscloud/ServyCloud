@@ -14,8 +14,17 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.12.0
-CAMBIOS:         R95: en las subvistas del menú global, mientras
+VERSIÓN:         1.13.0
+CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
+                 los lienzos: círculo de 34px con borde fino
+                 #475569 y chevron a la izquierda (mismas
+                 características de .btn-volver); (2) fuera el
+                 texto "Volver" de la cabecera y su CSS; (3) el
+                 volver-arriba vivió en su esquina y pasó abajo a
+                 la derecha (Core_CSS): el relevo sheet.profundo
+                 quedó sin uso y salió — Volver siempre visible
+                 en subvista.
+                 R95: en las subvistas del menú global, mientras
                  hay scroll abajo (sheet.profundo) el botón
                  circular VOLVER ARRIBA (.mk-sheet-top del Core)
                  reemplaza a Volver en la esquina izquierda; al
@@ -172,69 +181,47 @@ CAMBIOS:         R95: en las subvistas del menú global, mientras
   .sheet-close svg { width: 18px; height: 18px; display: block; }
 
   /* ============================================================
-     BOTÓN VOLVER
+     BOTÓN VOLVER · R96: el MISMO de los lienzos (.btn-volver):
+     círculo de 34px, borde fino #475569, chevron a la
+     izquierda. Sin texto al lado — el botón se explica solo.
      ============================================================ */
   .sheet-back {
     position: absolute;
-    top: 4px;
-    left: 10px;
-    width: 40px;
-    height: 36px;
-    border: none;
+    top: 6px;
+    left: 12px;
+    width: 34px;
+    height: 34px;
+    border: 1.2px solid #475569;
     background: transparent;
-    color: #64748b;
+    color: #475569;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     padding: 0;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition: opacity 0.15s ease;
     touch-action: manipulation;
     z-index: 7;
     -webkit-tap-highlight-color: transparent;
   }
-  .sheet-back:active {
-    color: #1e293b;
-    background-color: #f1f5f9;
+  .sheet-back:active { opacity: 0.5; }
+  .sheet-back svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
-  .sheet-back svg { width: 22px; height: 22px; display: block; }
   .sheet.subvista .sheet-back { display: flex; }
 
-  /* ============================================================
-     R95 · VOLVER ARRIBA · el botón circular (clase compartida
-     .mk-sheet-top del Core) vive en la MISMA esquina que Volver.
-     En subvista, mientras hay scroll abajo (sheet.profundo) la
-     flecha hacia arriba reemplaza a Volver; al llegar arriba,
-     Volver vuelve. Fuera de subvista la esquina es libre.
-     ============================================================ */
-  .sheet.profundo.subvista .sheet-back { opacity: 0; pointer-events: none; }
+  /* R96 · el volver-arriba vive abajo a la derecha (Core_CSS):
+     ya no comparte esquina con Volver, así que el relevo
+     sheet.profundo quedó sin uso y salió. */
 
-  /* ============================================================
-     TÍTULO DE SUBVISTA
-     ============================================================ */
-  .sheet-back-titulo {
-    display: none;
-    position: absolute;
-    top: 4px;
-    height: 36px;
-    left: 54px;
-    right: 54px;
-    margin: 0;
-    align-items: center;
-    line-height: 1;
-    font-size: var(--size-ui-3);
-    font-weight: 700;
-    color: #64748b;
-    letter-spacing: -0.1px;
-    text-align: left;
-    pointer-events: none;
-    z-index: 3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .sheet.subvista .sheet-back-titulo { display: flex; }
   .sheet.subvista .sheet-handle { opacity: 0.4; }
 
   /* ============================================================

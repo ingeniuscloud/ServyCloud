@@ -10,8 +10,15 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.5.0
-CAMBIOS:         R95: en el sheet de descripción, el fade pasa a overlay
+VERSIÓN:         2.6.0
+CAMBIOS:         R96: (1) la promo del lienzo lee el PROMOJSON
+                 nuevo y muestra titulo (.subtitulo) y
+                 descripcion (.textoPrimario) con entrada
+                 suave; (2) dots del carrusel al instante (rAF,
+                 sin retardo) y visibles sobre fondo claro;
+                 (3) la fila BCV pasa al naranja de la app
+                 (#f97316) para que siempre sea legible.
+                 R95: en el sheet de descripción, el fade pasa a overlay
                  del .mk-sheet (fuera del scroll) y entra el botón
                  VOLVER ARRIBA (izquierda): el MISMO scroll del
                  content maneja ambos — fade .fin al llegar al
@@ -209,7 +216,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
          diferencia con una cita normal:
          "Tasa BCV {fecha}       Bs. {valor}". El color viaja inline
          con !important para vencer al !important de .cita del Core. */
-      return '<span class="mk-bcv cita" style="color:var(--post-color, #475569) !important;">' +
+      return '<span class="mk-bcv cita" style="color:#f97316 !important;">' +
                'Tasa BCV' + (fecha ? ' ' + escapeHtml(fecha) : '') +
                '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' +
                'Bs. ' + formatearBs_(dolar) +
@@ -288,8 +295,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
        La promo activa sale del mismo PROMOJSON que alimenta la
        marquesina de la lista (SISTEMA.promo.porCiudad): si el post
        abierto es el de la promo vigente (fechas + ciudad), se pinta
-       aquí como incentivo de compra. El banner manda con el texto
-       de la promo y los precios aparecen si la hoja los trae.
+       aquí como incentivo de compra.
+       R96 · el PROMOJSON nuevo trae titulo + descripcion por item:
+       el bloque los muestra en DOS filas con entrada suave —
+       titulo en tipografía .subtitulo (color del post) y abajo
+       la descripcion en .textoPrimario. Los precios siguen
+       apareciendo si la hoja los trae.
        ============================================================ */
     function _hoyISO() {
       var d = new Date();
@@ -353,16 +364,21 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (!post) return '';
       var item = _promoDelPost(post);
       /* R84: el badge vive en el ITEM de PROMOJSON (con respaldo
-         en el post). Si hay banner y la BD no trae badge, la
+         en el post). Si hay texto y la BD no trae badge, la
          píldora PROMO identifica la etiqueta igualmente. */
       var badge = _badgeDelPost(item) || _badgeDelPost(post);
       if (!item && !badge) return '';
 
       var metaPost = (post.postJson && post.postJson.meta) || {};
 
-      var banner = _primerTexto(item, ['texto', 'promoTexto', 'descripcion', 'mensaje']) ||
-                   _primerTexto(post, ['promoTexto']) ||
-                   _primerTexto(metaPost, ['promoTexto']);
+      /* R96 · textos nuevos: titulo + descripcion del item.
+         Respaldo en la estructura vieja (texto/mensaje) y en el
+         promoTexto del post para que una promo sin migrar
+         también se pinte. */
+      var tituloPromo = _primerTexto(item, ['titulo', 'texto', 'promoTexto', 'mensaje']) ||
+                        _primerTexto(post, ['promoTexto']) ||
+                        _primerTexto(metaPost, ['promoTexto']);
+      var descripcionPromo = _primerTexto(item, ['descripcion']);
 
       var viejo     = _primerTexto(item, ['precioAnterior', 'precioViejo', 'oldPrice', 'precioAntes']);
       var actual    = _primerTexto(item, ['precioActual', 'precio', 'newPrice', 'precioNuevo']);
@@ -378,25 +394,32 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         }
       }
 
-      if (!banner && !actual && !badge) return '';
+      if (!tituloPromo && !descripcionPromo && !actual && !badge) return '';
 
       var colorArr = metaPost.color || [];
       var colorOficial = colorArr[0] || post.colorOficial || '#f97316';
       var colorPastel  = colorArr[1] || post.colorClaro   || '#f1f5f9';
 
       var html = '<div class="mk-promo-block" style="--post-color:' + escapeHtml(colorOficial) + '; --post-claro:' + escapeHtml(colorPastel) + '">';
-      /* R83: fila del banner = TEXTO de la promo + BADGE a la
-         derecha (misma anatomía de la marquesina). R84: si el
-         item de PROMOJSON no trae idBadge, la píldora PROMO
+      /* R96 · fila del texto = titulo en .subtitulo + descripcion
+         en .textoPrimario (el CSS les da la entrada suave), con
+         el BADGE a la derecha (misma anatomía de la marquesina).
+         R84: si el item no trae idBadge, la píldora PROMO
          identifica la etiqueta (nunca queda ciega). */
-      var badgeTitulo = (badge && badge.titulo) ? badge.titulo : ((banner) ? 'PROMO' : '');
+      var badgeTitulo = (badge && badge.titulo) ? badge.titulo : ((tituloPromo || descripcionPromo) ? 'PROMO' : '');
       var badgeHtml = badgeTitulo
         ? '<span class="mk-promo-badge">' + escapeHtml(badgeTitulo) + '</span>'
         : '';
-      if (banner || badgeHtml) {
+      if (tituloPromo || descripcionPromo || badgeHtml) {
         html += '<div class="mk-promo-banner">' +
-                  '<span class="mk-promo-banner-texto">' + escapeHtml(banner) + '</span>' +
-                  badgeHtml +
+                  '<div class="mk-promo-banner-textos">';
+        if (tituloPromo) {
+          html += '<span class="mk-promo-titulo subtitulo">' + escapeHtml(tituloPromo) + '</span>';
+        }
+        if (descripcionPromo) {
+          html += '<span class="mk-promo-descripcion textoPrimario">' + escapeHtml(descripcionPromo) + '</span>';
+        }
+        html +=   '</div>' + badgeHtml +
                 '</div>';
       }
       if (actual) {
@@ -621,8 +644,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       descSheetRoot.id = 'postDescSheetRoot';
       /* R95: fade y volver-arriba son OVERLAYS del .mk-sheet
          (hermanos del content que scrollea): el degradado vive
-         pegado al borde inferior visible y el botón circular a
-         la izquierda. El scroll del content maneja a ambos. */
+         pegado al borde inferior visible y el botón circular
+         (abajo a la derecha desde la R96). El scroll del content
+         maneja a ambos. */
       descSheetRoot.innerHTML = '<div class="mk-sheet-backdrop" id="postDescSheetBackdrop"></div>' +
         '<div class="mk-sheet" id="postDescSheet"><div class="mk-sheet-handle-area"><div class="mk-sheet-handle"></div></div>' +
           '<button type="button" class="mk-sheet-close" id="postDescSheetClose" data-glifo="close"></button>' +
@@ -755,15 +779,22 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var heroTrack = track.querySelector('#postHeroTrack');
       var dots      = track.querySelectorAll('#postHeroDots .app-hero-dot');
       if (heroTrack && dots.length) {
-        var scrollTimeout = null;
+        /* R96 · DOTS AL INSTANTE — el retardo de 100ms (setTimeout
+           tras el scroll) hacía que el punto cambiara tarde y se
+           "pegara" al cambio de imagen. rAF pinta el punto activo
+           en el MISMO frame del desplazamiento: sin retardo, sin
+           temporizadores. iOS: scrollLeft del track puede llegar
+           con un frame de retraso, pero nunca se acumula. */
+        var rafDots = null;
         heroTrack.addEventListener('scroll', function () {
-          if (scrollTimeout) clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(function () {
+          if (rafDots) return;
+          rafDots = requestAnimationFrame(function () {
+            rafDots = null;
             var w = heroTrack.clientWidth; if (!w) return;
             var idx = Math.round(heroTrack.scrollLeft / w);
             if (idx < 0) idx = 0; if (idx >= dots.length) idx = dots.length - 1;
             dots.forEach(function (d, i) { d.classList.toggle('activo', i === idx); });
-          }, 100);
+          });
         }, { passive: true });
       }
       var btnVerMas = track.querySelector('#postVerMas');

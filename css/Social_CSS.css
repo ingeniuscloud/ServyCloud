@@ -3,8 +3,18 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-VERSIÓN:         1.5.0
-CAMBIOS:         R95: LIKE LIMPIO — sin efectos de tamaño en ningún
+VERSIÓN:         1.6.0
+CAMBIOS:         R96: (1) el corazón SÍ se rellena al dar like —
+                 el glifo like trae fill="none" como atributo del
+                 <path>, y la regla vieja (.activo svg { fill })
+                 nunca lo vencía porque el path lleva su propio
+                 fill: ahora la regla apunta al path y el corazón
+                 queda PINTADO en rojo (y se despinta al segundo
+                 toque, leyendo el estado local al reentrar);
+                 (2) borde de like y compartir en GRIS MEDIO
+                 (#94a3b8, el mismo para los dos) para que no
+                 compitan con el CTA.
+                 R95: LIKE LIMPIO — sin efectos de tamaño en ningún
                  lado: el corazón solo se desplaza (vuelo -800%
                  ≈ 210px, 1.05s, con fade de entrada/salida) y el
                  botón ya no escala al tocar (:active scale fuera).
@@ -23,7 +33,7 @@ CAMBIOS:         R95: LIKE LIMPIO — sin efectos de tamaño en ningún
   .app-hero-social-btn {
     position: relative; /* Necesario para el corazón volador */
     width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.08); 
+    border: 1px solid #94a3b8;
     background: #ffffff;
     color: #334155;
     display: flex; align-items: center; justify-content: center;
@@ -43,9 +53,13 @@ CAMBIOS:         R95: LIKE LIMPIO — sin efectos de tamaño en ningún
     stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; 
   }
 
-  /* Estado activo del like */
+  /* Estado activo del like (R96): la regla apunta al PATH del
+     glifo — el <svg> solo heredaba fill, pero el path del glifo
+     like trae fill="none" propio y lo pisaba: por eso el corazón
+     quedaba sin relleno. Con la regla directa el corazón queda
+     pintado en rojo (y el estado local lo repinta al reentrar). */
   .app-hero-social-btn.activo { color: #ef4444; }
-  .app-hero-social-btn.activo svg { fill: #ef4444; }
+  .app-hero-social-btn.activo svg path { fill: #ef4444; }
 
   /* ============================================================
      CORAZÓN VOLADOR
