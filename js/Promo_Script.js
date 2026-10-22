@@ -47,34 +47,10 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  cambie de color). El encabezado "Promos cerca de
                  ti" + "Toca para conocer más" se muestra/oculta
                  junto con el slot.
-VERSIÓN:         2.5
-CAMBIOS:         R84: el badge se busca en el ITEM de PROMOJSON
-                 (item.idBadge, como quedó definido en R76) con
-                 respaldo en el post — la marquesina vuelve a
-                 identificar la promo con su badge de la BD.
-CAMBIOS:         R67: FIX del pool de promos — el PROMOJSON real
-                 trae porCiudad como OBJETO (idPostActual, la
-                 rotación la lleva el backend) y construir()
-                 esperaba un ARRAY: la marquesina se apagaba en
-                 silencio con la hoja actual. Ahora se normaliza
-                 el formato antes de filtrar.
-                 R62: el DEGRADADO sale del colorOficial del
-                 post — estiloDegradado() deriva claro/oscuro
-                 desde el hex de la BD (mix con blanco/negro) y
-                 pinta background + boxShadow en línea; FUERA la
-                 paleta promo-c0…c5 (PALETA_LARGO y la clase
-                 promo-c{n} murieron). El badge sube a la FILA
-                 DEL TÍTULO (.promo-fila-titulo: título flex:1 +
-                 badge a la derecha). La base CSS queda como
-                 respaldo si la BD no trae color válido.
-                 R58: contenido nuevo de la tarjeta — fuera la
-                 campana, el tagline y el pie "Ver detalles";
-                 entra badge blanco + promo-titulo +
-                 promo-partner + promo-flecha (glifo flechaVer);
-                 el color del badge lo manda Promo_CSS (blanco);
-                 #promoEncabezado se enciende/apaga con el slot.
-                 R56: "Ver detalles" del colorOficial del post y
-                 en peso normal (esa pieza desaparece en R58).
+VERSIÓN:         1.9.0
+CAMBIOS:         R95: textoDePromo sin la lectura muerta de
+                 seccionJson (migración POSTJSON).
+
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  #promoEncabezado),
                  Ciudad_Sheet_Script.html (getActual),
@@ -257,7 +233,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
        del item de PROMOJSON (texto, con variantes por si la hoja
        usa otro nombre) y como respaldo del promoTexto que el
        índice del catálogo trae desde PostDetalle (02 Cache.gs).
-       R61: este texto ES el título de la tarjeta. */
+       R61: este texto ES el título de la tarjeta.
+       R95: fuera la lectura de seccionJson (camino muerto desde
+       la migración POSTJSON). */
     function textoDePromo(item, post) {
       var campos = ['texto', 'promoTexto', 'descripcion', 'mensaje'];
       for (var i = 0; i < campos.length; i++) {
@@ -265,9 +243,6 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
         if (typeof v === 'string' && v.trim()) return v.trim();
       }
       var t = post ? post.promoTexto : null;
-      if (typeof t === 'string' && t.trim()) return t.trim();
-      var meta = (post && post.seccionJson && post.seccionJson.meta) || null;
-      t = meta ? meta.promoTexto : null;
       return (typeof t === 'string' && t.trim()) ? t.trim() : '';
     }
 

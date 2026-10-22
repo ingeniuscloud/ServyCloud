@@ -10,125 +10,14 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.4.6
-CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
-                 (1) CITAS: los blockquotes del markdown (filas ">")
-                 se visten con la tipografía .cita del Core y su
-                 línea a la izquierda (_decorarCitasMarkdown, enganchado
-                 junto al decorador de tablas en el excerpt y en el
-                 sheet completo). (2) CITA CON LLAMADO: las filas que
-                 el dueño escribe empezando con "^" (su configuración
-                 tipográfica propia, no es markdown) se convierten
-                 ANTES del parseo en blockquotes marcados con un
-                 separador invisible (ZWSP); el decorador los reconoce,
-                 limpia el separador y los deja en .cita SIN línea.
-                 (3) FILA [VALOR BCV] — ahora es una cita completa en
-                 UNA sola fila: tipografía .cita en todo el texto,
-                 color del post (única diferencia con una cita) y la
-                 fecha CON año: "Tasa BCV {lunes 21 de octubre 2026}
-                 · 7 espacios · Bs. {valor}". limpiarFechaTasa_ ya no
-                 recorta el año: quita comas y el "de" antes del año.
-                 R92: (1) TABLA MARKDOWN DEL POST — marked pinta
-                 las tablas "de fábrica"; _decorarTablasMarkdown
-                 las viste con el Core (th → .textoPrimario,
-                 td → .textoSecundario) y, si la tabla tiene 3
-                 columnas (plan de inversión del curso), la
-                 última (precios) lleva .subtitulo y la tabla
-                 .mk-plan-tabla para alinear los valores a la
-                 derecha; los colores del post (--post-color /
-                 --post-pastel) viajan ahora en el wrap de la
-                 descripción y en el sheet completo para que el
-                 encabezado use el pastel del post. (2) PLACEHOLDER
-                 [VALOR BCV] — el texto que el dueño escribe en el
-                 markdown se sustituye por la fila del plan viejo
-                 (Tasa BCV {fecha} · Bs. {dolar}, SISTEMA.root.
-                 tasas); sin tasa servida el placeholder no se
-                 pinta.
-                 R94: L2 PROPIA + SIN SKELETON INDIVIDUAL — las
-                 imágenes del hero nacen SIN src y pintarImagenes
-                 Hero las alimenta vía SeccionImagen.poblarConL2
-                 (cache propio de la app: la repetida pinta desde
-                 disco sin red). El skeleton individual de imagen
-                 (R91) se retira: en la pantalla real nunca llegó
-                 a verse (código muerto); el esqueleto GENERAL
-                 del detalle sigue cubriendo la espera del post.
-                 La default del Setup vuelve a 0.32 incondicional
-                 (R90).
-                 R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — los
-                 posts sin foto propia llegan con la imagen del
-                 Setup (ROOTJSON.app.imagenDefault); ahora el hero
-                 la detecta (compara la URL con SISTEMA.root.app.
-                 imagenDefault) y le pone .post-hero-img-default,
-                 que Seccion_CSS pinta con opacity 0.32 para que no
-                 compita con el CTA. SOLO esa imagen: las fotos
-                 reales no se tocan, y el lightbox la muestra
-                 completa.
-                 R88: (1) "Ver descripción completa" PEGA más al
-                 fade del texto (margin-top 20→10px) y el aire que
-                 suelta se muda ABAJO (margin-bottom 12px) para
-                 despegarla de la opción de duda / CTA.
-                 (2) El nombre del partner de la fila (y del lienzo
-                 del partner) pasa a .subtitulo (18px/300 del Core)
-                 conservando el color del post.
-                 R87: (1) La fila del partner ABRE EL LIENZO del
-                 partner (window.Partner, #partnerTrack) — el
-                 bottom sheet quedó retirado. (2) "Ver descripción
-                 completa" más despegada del fade: el margin-top
-                 inline NUNCA aplicó (margin:0 !important de
-                 .enlacesOpciones lo ganaba) — ahora 20px con
-                 !important inline.
-                 R86: el nombre del partner del post viaja con las
-                 preguntas (Pregunta.poner(id, data, nombre)) para
-                 la firma "Respuesta de <partner>" del nuevo
-                 esquema de fila única (RESPUESTA + TIMESTAMPFIN
-                 en la misma fila de la pregunta).
-                 R84: (1) Bloque "Este post no trae foto" RETIRADO
-                 (código muerto): el backend entrega la imagen por
-                 defecto (Setup ROOTJSON.app.imagenDefault) para
-                 todo post sin foto. (2) El badge de la promo se
-                 busca en el ITEM de PROMOJSON (idBadge) y como
-                 respaldo en el post; si hay banner y no llega
-                 badge de la BD, se pinta la píldora PROMO para que
-                 la etiqueta siempre identifique la promo. (3) El
-                 avatar del cross-sell queda blanco con la inicial
-                 en el color pastel del post. (4) El Q&A ya no pide
-                 las preguntas aparte: llegan con el post
-                 (postDetalle.preguntas) y se pintan con
-                 Pregunta.poner (cargar queda de respaldo).
-                 R83: (1) El badge de la promo (el de la BD, el
-                 mismo de la marquesina) se pinta a la DERECHA del
-                 banner del post. (2) La sección pintada de
-                 relacionados ahora ABRIGA también a In Company y
-                 Servy publicidad. (3) Servy publicidad lleva el
-                 MISMO botón blanco redondo del In Company. (4) El
-                 banner de las tarjetas del cross-sell pasa a
-                 clarito con el avatar del color.
-                 R82: (1) El CTA sube arriba del partner: es el
-                 botón de la publicación, no del partner. Orden del
-                 lienzo: info → CTA → divisora → partner →
-                 ubicación → divisora → Q&A → relacionados.
-                 (2) Divisoras de sección: una debajo del CTA (cierra
-                 la info del producto o servicio) y una debajo de la
-                 dirección (cierra la sección del partner). Antes de
-                 "Publicaciones relacionadas" NO va divisora: esa
-                 sección abre con su propio fondo pintado.
-                 (3) Tarjeta de promo del post: si el post tiene
-                 promo activa (PROMOJSON vigente) se pinta debajo del
-                 título con banner del color del post y precios.
-                 (4) Publicaciones relacionadas con fondo propio
-                 (#FFF7ED) y tarjetas nuevas: banner superior con el
-                 color del post, avatar blanco con la inicial y nombre
-                 sobre fondo tintado. Sin caja: el fondo es de la
-                 sección completa.
-                 (5) Tipografías al sistema del Core: In Company y
-                 bloque asesor pasan a .textoSecundario/.textoPrimario.
-                 R77B: (1) Bloque de bienvenida para posts sin foto
-                 (glifo imagen + mensaje de aliento, badge de ciudad
-                 y sociales incluidos). (2) Nombre del partner en
-                 .textoPrimario.
-                 R77: (1) "Ver descripción completa". (2) Fade final
-                 del sheet de descripción. (3) El Q&A del lienzo lo
-                 construye window.Pregunta.
+VERSIÓN:         2.5.0
+CAMBIOS:         R95: en el sheet de descripción, el fade pasa a overlay
+                 del .mk-sheet (fuera del scroll) y entra el botón
+                 VOLVER ARRIBA (izquierda): el MISMO scroll del
+                 content maneja ambos — fade .fin al llegar al
+                 final, flecha visible pasados ~120px. Ambos son
+                 locales: 0 llamadas a la BD, 0 temporizadores.
+
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -730,10 +619,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       descSheetRoot = document.createElement('div');
       descSheetRoot.className = 'mk-sheet-root';
       descSheetRoot.id = 'postDescSheetRoot';
+      /* R95: fade y volver-arriba son OVERLAYS del .mk-sheet
+         (hermanos del content que scrollea): el degradado vive
+         pegado al borde inferior visible y el botón circular a
+         la izquierda. El scroll del content maneja a ambos. */
       descSheetRoot.innerHTML = '<div class="mk-sheet-backdrop" id="postDescSheetBackdrop"></div>' +
         '<div class="mk-sheet" id="postDescSheet"><div class="mk-sheet-handle-area"><div class="mk-sheet-handle"></div></div>' +
           '<button type="button" class="mk-sheet-close" id="postDescSheetClose" data-glifo="close"></button>' +
-          '<div class="mk-sheet-content" id="postDescSheetContent"></div></div>';
+          '<button type="button" class="mk-sheet-top" id="postDescSheetTop" data-glifo="flechaArriba" aria-label="Volver arriba"></button>' +
+          '<div class="mk-sheet-content" id="postDescSheetContent"></div>' +
+          '<div class="mk-sheet-fade" id="postDescSheetFade"></div></div>';
       area.appendChild(descSheetRoot);
       if (typeof window.pintarGlifos === 'function') window.pintarGlifos(descSheetRoot);
       descSheetRoot.querySelector('#postDescSheetBackdrop').addEventListener('click', cerrarSheetDesc);
@@ -750,7 +645,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var content = root.querySelector('#postDescSheetContent');
       var html = ''; if (titulo) html += '<h2 class="tituloPost" style="margin-bottom:16px;">' + escapeHtml(titulo) + '</h2>';
       html += '<div class="textoPrimario">' + _renderMarkdown(markdown) + '</div>';
-      html += '<div class="mk-sheet-fade" id="postDescSheetFade"></div>';
       content.innerHTML = html;
 
       /* R92: colores del post + tablas vestidas también en el
@@ -767,20 +661,27 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
       /* R77: el fade avisa que hay más texto y se retira al llegar
          al final del scroll para leer completo. Si el texto no
-         desborda, el fade se retira de una vez. */
-      function revisarFadeDesc() {
+         desborda, el fade se retira de una vez.
+         R95: el MISMO scroll del content maneja el volver-arriba
+         (aparece pasados ~120px, desaparece al llegar arriba).
+         Ambos son overlays locales: 0 llamadas a la BD. */
+      function revisarOverlaysDesc() {
         var fade = document.getElementById('postDescSheetFade');
-        if (!fade) return;
+        var top  = document.getElementById('postDescSheetTop');
         var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
-        fade.classList.toggle('fin', alFinal);
+        if (fade) fade.classList.toggle('fin', alFinal);
+        if (top)  top.classList.toggle('visible', content.scrollTop > 120);
       }
       if (!descFadeEnganchado) {
         descFadeEnganchado = true;
-        content.addEventListener('scroll', revisarFadeDesc, { passive: true });
+        root.querySelector('#postDescSheetTop').addEventListener('click', function () {
+          content.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        content.addEventListener('scroll', revisarOverlaysDesc, { passive: true });
       }
 
       content.scrollTop = 0;
-      revisarFadeDesc();
+      revisarOverlaysDesc();
       root.classList.add('abierto');
     }
 

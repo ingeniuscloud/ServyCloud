@@ -3,22 +3,13 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-VERSIÓN:         1.4.2
-CAMBIOS:         R91: VUELO MÁS LARGO — el recorrido terminaba en
-                 -150% de la caja (28px reales de vuelo, se veía
-                 un brinco corto); ahora termina en -800% de la
-                 caja (≈210px de recorrido real) con duración
-                 0.8s→1.05s para que el tramo largo se vea suelto
-                 y no apurado. El arranque sigue siendo el centro
-                 EXACTO del corazón (fix R90 intacto).
-                 R90: CORAZÓN VOLADOR FIJO — .heart-pop-wrap con
-                 tamaño propio (28×28px) para que el centrado con
-                 translate(-50%,-50%) sea exacto dentro del botón
-                 (que lo aloja desde su 50%/50%); antes la caja
-                 medía lo que su contenido y el anclaje flotaba.
-                 R90 (interna del dueño): Se recibe el CSS de los
-                 botones sociales del hero (antes en Seccion_CSS).
-                 Se ajusta el tamaño de los iconos a 24px.
+VERSIÓN:         1.5.0
+CAMBIOS:         R95: LIKE LIMPIO — sin efectos de tamaño en ningún
+                 lado: el corazón solo se desplaza (vuelo -800%
+                 ≈ 210px, 1.05s, con fade de entrada/salida) y el
+                 botón ya no escala al tocar (:active scale fuera).
+                 El origen sigue siendo el centro EXACTO del
+                 corazón (fix R90 intacto).
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -38,10 +29,12 @@ CAMBIOS:         R91: VUELO MÁS LARGO — el recorrido terminaba en
     display: flex; align-items: center; justify-content: center;
     padding: 0; cursor: pointer;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
-    transition: transform 0.15s ease, color 0.2s ease;
+    transition: color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .app-hero-social-btn:active { transform: scale(0.92); }
+  /* R95: SIN efecto de tamaño al tocar (el scale lo veía el dueño
+     como el botón "pegado"). Queda el cambio de color; el like
+     responde con el corazón en vuelo (solo desplazamiento). */
   
   /* R90: Iconos más grandes para llenar mejor el círculo */
   .app-hero-social-btn svg { 
@@ -72,10 +65,12 @@ CAMBIOS:         R91: VUELO MÁS LARGO — el recorrido terminaba en
     display: block; fill: #ef4444; stroke: #ef4444; 
   }
 
-  /* R91: caja 28px → -800% = -224px: el corazón sube ≈210px
-     reales desde el centro del botón (antes 28px). */
+  /* R95: SOLO DESPLAZAMIENTO — sin scale en ningún frame: el
+     corazón nace ya del tamaño del like y vuela directo hasta
+     -800% (≈210px) con fade de entrada/salida. Sin pop de
+     tamaño (eso era lo que lo veía pegado al botón). */
   @keyframes heartFly {
-    0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-    15%  { transform: translate(-50%, -85%) scale(1.25); opacity: 1; }
-    100% { transform: translate(-50%, -800%) scale(1); opacity: 0; }
+    0%   { transform: translate(-50%, -50%); opacity: 0; }
+    12%  { opacity: 1; }
+    100% { transform: translate(-50%, -800%); opacity: 0; }
   }

@@ -14,56 +14,12 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  con skeleton que carga TODAS las preguntas y
                  respuestas del post en UNA llamada (acción
                  `preguntas`). Sin borrado y sin nombre.
-VERSIÓN:         1.2.0
-CAMBIOS:         R86: (1) FECHAS VISIBLES: la pregunta lleva su
-                 fecha (TIMESTAMPINI) y la respuesta la suya
-                 (TIMESTAMPFIN) en .cita con el formato
-                 "20-10-2026 9:23 pm" (formatoFecha) — el usuario
-                 ve la rapidez de respuesta. (2) La respuesta se
-                 pinta como CITA: línea vertical a la izquierda,
-                 texto .textoPrimario, su fecha y debajo la firma
-                 "Respuesta de " (.textoSecundario) + nombre del
-                 partner (.textoPrimario) — el nombre llega desde
-                 Seccion_Script con poner(idPost, data, nombre);
-                 si no hay, cae "nuestro partner". (3) El nuevo
-                 backend (02 Tablas 1.7) trae cada respuesta
-                 embebida en su misma fila (RESPUESTA +
-                 TIMESTAMPFIN): el shape cliente sigue siendo
-                 {texto, fecha, respuesta:{texto, fecha}}.
-CAMBIOS:         R84: (1) Las últimas 2 preguntas NO se piden
-                 aparte: llegan con el post (postDetalle.preguntas)
-                 y el lienzo las pinta con poner() — se acabó el
-                 “se me mostraron y al recargar desaparecieron”:
-                 lo que se publica viaja también a la caché del
-                 cliente (PostFull.anotarPregunta) y la
-                 revalidación muda repinta la vista previa
-                 (evento post:actualizado). (2) El sheet “Ver
-                 todas” pide TODAS las preguntas y respuestas en
-                 UNA llamada (acción `preguntas`) con SKELETON
-                 mientras llega (antes: hasta 10 pedidos paginados
-                 y texto de “Cargando...”). (3) La respuesta se
-                 pinta bajo su pregunta como burbuja suave, en el
-                 lienzo y en el sheet.
-                 R83: (1) El contador sale de debajo del botón enviar
-                 y comparte LA MISMA FILA con el aviso: al escribir ya
-                 no se mueve nada de sitio. (2) El contador queda
-                 SIEMPRE visible en tenue (0/250 con el campo vacío).
-                 (3) El error de envío toma el lugar del aviso dentro
-                 de esa misma fila y al curarse vuelve el aviso.
-CAMBIOS:         R77B: El contador pasa a formato N/250 (cuánto
-                 lleva y cuánto queda) centrado bajo el botón
-                 enviar; el aviso corto lleva el icono info de
-                 Iconos; al publicar el campo se limpia y pierde
-                 el foco aunque venga del Enter; si el backend
-                 falla se avisa con un mensaje suave y el botón
-                 vuelve a su estado. Lee el total desde
-                 data.pregunta (o data.comenta de transición).
-                 R77: Nace el archivo. Reemplaza al módulo de
-                 comentarios del post: mismo camino de backend
-                 (acciones comentario/comentarios y notificación
-                 Telegram al partner, intactas) contra la tabla
-                 "Pregunta" (IDPOST, IDDISPOSITIVO, TEXTO, FECHA,
-                 ESTADO). No se puede borrar una pregunta publicada.
+VERSIÓN:         1.3.0
+CAMBIOS:         R95: en el sheet "Ver todas las preguntas" el fade
+                 pasa a overlay del .mk-sheet y entra el botón
+                 VOLVER ARRIBA (izquierda): el mismo scroll del
+                 content maneja ambos. 0 llamadas a la BD.
+
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Iconos.html (pintarGlifos), Seccion_Script.html
                  (monta buildHTML/enganchar/cargar), Seccion_CSS.html
@@ -386,15 +342,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       sheetRoot = document.createElement('div');
       sheetRoot.className = 'mk-sheet-root preg-root';
       sheetRoot.id = 'pregSheetRoot';
+      /* R95: fade y volver-arriba como OVERLAYS del .mk-sheet
+         (hermanos del content): el degradado pega al borde inferior
+         visible y el botón circular aparece con el scroll. */
       sheetRoot.innerHTML =
         '<div class="mk-sheet-backdrop" id="pregSheetBackdrop"></div>' +
         '<div class="mk-sheet" id="pregSheet">' +
           '<div class="mk-sheet-handle-area"><div class="mk-sheet-handle"></div></div>' +
           '<button type="button" class="mk-sheet-close" id="pregSheetClose" data-glifo="close" aria-label="Cerrar"></button>' +
+          '<button type="button" class="mk-sheet-top" id="pregSheetTop" data-glifo="flechaArriba" aria-label="Volver arriba"></button>' +
           '<div class="mk-sheet-content preg-sheet-content" id="pregSheetContent">' +
             '<div class="preg-sheet-lista" id="pregSheetLista"></div>' +
-            '<div class="preg-sheet-fade" id="pregSheetFade"></div>' +
           '</div>' +
+          '<div class="preg-sheet-fade" id="pregSheetFade"></div>' +
         '</div>';
 
       area.appendChild(sheetRoot);
@@ -404,12 +364,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       sheetRoot.querySelector('#pregSheetClose').addEventListener('click', cerrarSheet);
 
       var content = sheetRoot.querySelector('#pregSheetContent');
+      /* R95: el MISMO scroll maneja fade y volver-arriba (aparece
+         pasados ~120px; 0 llamadas a la BD). */
       content.addEventListener('scroll', function () {
         var fade = sheetRoot.querySelector('#pregSheetFade');
-        if (!fade) return;
+        var top  = sheetRoot.querySelector('#pregSheetTop');
         var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
-        fade.classList.toggle('fin', alFinal);
+        if (fade) fade.classList.toggle('fin', alFinal);
+        if (top)  top.classList.toggle('visible', content.scrollTop > 120);
       }, { passive: true });
+
+      sheetRoot.querySelector('#pregSheetTop').addEventListener('click', function () {
+        content.scrollTo({ top: 0, behavior: 'smooth' });
+      });
 
       return sheetRoot;
     }
@@ -454,12 +421,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var content = sheetRoot.querySelector('#pregSheetContent');
       if (!content) return;
       content.scrollTop = 0;
-      /* Si la lista no desborda, el fade se retira de una vez */
+      /* Si la lista no desborda, el fade se retira de una vez.
+         R95: el volver-arriba también se resetea. */
       var fade = sheetRoot.querySelector('#pregSheetFade');
-      if (fade) {
-        var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
-        fade.classList.toggle('fin', alFinal);
-      }
+      var top  = sheetRoot.querySelector('#pregSheetTop');
+      var alFinal = (content.scrollTop + content.clientHeight) >= (content.scrollHeight - 4);
+      if (fade) fade.classList.toggle('fin', alFinal);
+      if (top)  top.classList.remove('visible');
     }
 
     function abrirSheet() {

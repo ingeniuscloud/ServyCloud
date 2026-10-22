@@ -5,10 +5,18 @@ ESPEJO GITHUB:   github/js/Reserva_Script.js (subir a GitHub Pages; editar en GA
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Orquestador. Abre directo al formulario de horario
                  + datos. Envía la reserva y maneja errores.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.3.0
+CAMBIOS:         R95: (1) PLANJSON NUEVO — el plan llega como array
+                 directo [{dias, horario, cupo}] (getPlanes).
+                 (2) El POST compuesto que viaja al backend es
+                 código_dias_horario con '_' (ej:
+                 EXCEL-001_Lunes a Jueves_5:30 pm a 6:25 pm).
+                 (3) SIN_CUPOS del backend se muestra como
+                 "Cupos agotados. Elige otro horario."
+                 (4) El color del sheet es el colorOficial del
+                 índice (meta.color[0]); la lectura vieja de
+                 seccionJson (caía en azul) salió.
+
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -67,10 +75,13 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       for (var i = 0; i < arr.length; i++) if (arr[i].idOrigen === id) return arr[i];
       return null;
     }
+    /* R95 · PLANJSON NUEVO: el detalle llega como ARRAY directo
+       [{dias, horario, cupo}] (ya no {planes:[...]} con idTurno).
+       Solo cambia de dónde se lee; la pintada es intacta. */
     function getPlanes() {
       var post = getPostActivo();
-      if (!post || !post.planJson) return [];
-      return post.planJson.planes || [];
+      if (!post || !Array.isArray(post.planJson)) return [];
+      return post.planJson;
     }
     function getTurnoPorIndice(i) {
       return (getPlanes())[i] || null;
@@ -259,7 +270,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       if (!post) { banner('No hay publicación activa', 'error'); return; }
 
       var plan = getTurnoPorIndice(state.turnoSeleccionado);
-      if (!plan || !plan.idTurno) { banner('Selecciona un horario válido', 'error'); return; }
+      if (!plan || !plan.dias || !plan.horario) { banner('Selecciona un horario válido', 'error'); return; }
 
       state.formSnapshot = {
         nombre:            (el.inputNombre.value || '').trim(),
@@ -276,7 +287,11 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       }
 
       var payload = {
-        post: post.id + '_' + plan.idTurno,
+        /* R95 · POST COMPUESTO NUEVO (formato confirmado por el
+           dueño): código + _ + dias + _ + horario, todo separado
+           con guion bajo. Ej:
+           EXCEL-001_Lunes a Jueves_5:30 pm a 6:25 pm */
+        post: post.id + '_' + plan.dias + '_' + plan.horario,
         correo: state.formSnapshot.correo,
         contactoIni: contactoParaEnviar,
         alumnoJson: {
@@ -319,7 +334,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
           if (msg === 'RESERVA_ACTIVA') {
             state.reservaErrorTexto = 'Ese correo ya tiene una reserva activa.';
           } else if (msg === 'SIN_CUPOS') {
-            state.reservaErrorTexto = 'Este horario se quedó sin cupo. Elige otro turno.';
+            state.reservaErrorTexto = 'Cupos agotados. Elige otro horario.';
           } else if (msg.indexOf('RATE_LIMIT') === 0) {
             state.reservaErrorTexto = 'Demasiadas reservas seguidas. Intenta en unos minutos.';
           } else {
@@ -366,9 +381,9 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       haptic([15, 10, 15]);
 
-      var sj = state.postActivo.seccionJson || {};
-      var meta = sj.meta || {};
-      var color = meta.colorOficial || '#1d4ed8';
+      /* R95: color OFICIAL del índice (meta.color[0]). La lectura
+         vieja de seccionJson era camino muerto y caía en azul. */
+      var color = state.postActivo.colorOficial || '#475569';
 
       Sheet.abrir({
         color:   color,

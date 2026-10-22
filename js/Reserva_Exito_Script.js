@@ -8,10 +8,12 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.2.0
+CAMBIOS:         R95: la pantalla de éxito lee el horario del item
+                 nuevo del PLANJSON ({dias, horario, cupo}) y el
+                 título directo del índice; fuera las lecturas
+                 muertas (plan.turno, seccionJson).
+
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
                  Index.html (TABLAS), Reserva_CSS.html (clases
@@ -28,13 +30,10 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       });
     }
 
-    /* Título del post · lee del post enriquecido, con fallback */
+    /* Título del post · del índice liviano. R95: fuera la lectura
+       de seccionJson (camino muerto desde la migración POSTJSON). */
     function tituloDelPost(post) {
       if (!post) return '';
-      var sj = post.seccionJson || {};
-      var sp = sj.seccionPresentacion || {};
-      var t = String(sp.titulo || '').trim();
-      if (t) return t;
       return String(post.titulo || '').trim();
     }
 
@@ -90,9 +89,10 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       var checkSvg = '<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
 
+      /* R95 · PLANJSON NUEVO: item {dias, horario, cupo} */
       var plan = (state.planes || [])[state.turnoSeleccionado] || {};
-      var dias = (plan.turno && plan.turno.dias && plan.turno.dias.join(' · ')) || '';
-      var hora = (plan.turno && plan.turno.textoMostrar) || '';
+      var dias = String(plan.dias || '');
+      var hora = String(plan.horario || '');
       var turnoFull = dias + (hora ? ' · ' + hora : '');
 
       var origenTxt = state.origenTitulo || state.conocioSeleccionado || '';

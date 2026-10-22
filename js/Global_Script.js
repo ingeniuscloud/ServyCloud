@@ -20,13 +20,12 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  y aplicarPlaceholders.
                  El módulo window.Global (menú + subvistas) vive en
                  Global_Sheet_Script.html.
-VERSIÓN:         1.7
-CAMBIOS:         R68: solo encabezado — la mención del menú global
-                 pasa a Global_Sheet_Script (renombrado R68). Ni
-                 una línea de código tocada.
-                 R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.15.0
+CAMBIOS:         R95: (1) La pantalla de error de token ya no lleva
+                 botón ni pie de WhatsApp — queda la invitación a
+                 cerrar y reabrir la app. (2) Fuera 'cupos' de
+                 ACCIONES_IDEMPOTENTES (acción retirada).
+
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -124,26 +123,10 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     try { sessionStorage.removeItem('tokenReloads'); } catch (_) {}
   }
 
+  /* R95: la pantalla de error ya NO lleva botón ni pie de
+     WhatsApp — solo la invitación amable a cerrar y reabrir la
+     app (la misma de siempre, sin enlaces externos). */
   function _mostrarErrorToken() {
-    var numeroRaw = '';
-    try {
-      var root = (window.SISTEMA && window.SISTEMA.root) || {};
-      var admin = root.admin || {};
-      numeroRaw = String(admin.whatsapp || '').trim();
-    } catch (_) {}
-
-    var numero = '';
-    if (numeroRaw) {
-      numero = String(numeroRaw).replace(/\D/g, '');
-      if (numero.charAt(0) === '0') numero = numero.substring(1);
-      if (numero.indexOf('58') !== 0) numero = '58' + numero;
-    }
-
-    var waMsg = 'Hola, la app no me carga. ¿Podés revisar?';
-    var waHref = numero
-      ? ('https://wa.me/' + numero + '?text=' + encodeURIComponent(waMsg))
-      : '';
-
     var html = '' +
       '<div style="position:fixed;inset:0;background:#f8fafc;' +
                   'display:flex;align-items:center;justify-content:center;' +
@@ -155,18 +138,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
                      'letter-spacing:-0.02em;">Algo salió mal</h1>' +
           '<p style="font-size:14px;line-height:1.5;color:#64748b;margin:0 0 24px;">' +
             'No pudimos conectar con el servidor. Cerrá la app y volvé a abrirla.' +
-          '</p>' +
-          (waHref
-            ? '<a href="' + waHref + '" target="_top" rel="noopener" ' +
-                 'style="display:inline-block;background:#25d366;color:#fff;' +
-                        'text-decoration:none;font-weight:700;font-size:15px;' +
-                        'padding:12px 24px;border-radius:999px;' +
-                        'box-shadow:0 4px 12px rgba(37,211,102,0.3);">' +
-                'Escribir al admin' +
-              '</a>'
-            : '') +
-          '<p style="font-size:11px;color:#94a3b8;margin:24px 0 0;line-height:1.5;">' +
-            'Si esto se repite, avisanos por WhatsApp.' +
           '</p>' +
         '</div>' +
       '</div>';
@@ -293,7 +264,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     var ACCIONES_IDEMPOTENTES = {
     catalogo:         true,
     postDetalle:      true,
-    cupos:            true,
     comentarios:      true
   };
 

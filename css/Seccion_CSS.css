@@ -9,104 +9,15 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.3.6
-CAMBIOS:         R93: CONFIGURACIÓN TIPOGRÁFICA DEL MARKDOWN —
-                 (1) CITAS (">"): el blockquote de la descripción
-                 lleva su LÍNEA a la izquierda (3px en el pastel del
-                 post) y la tipografía .cita del Core en el
-                 blockquote y en sus párrafos (selectores con
-                 especificidad alta para vencer al .textoPrimario p
-                 del Core, que pinta los <p> a 14px). (2) CITA CON
-                 LLAMADO ("^"): .mk-cita-llamado quita la línea y el
-                 padding — solo queda la tipografía .cita. (3) FILA
-                 [VALOR BCV]: ahora es una cita completa en UNA
-                 fila — .mk-bcv deja el flex space-between y pasa a
-                 bloque nowrap (separador fijo de 7 espacios duros),
-                 todo en .cita y con el color del post. (4) PLAN DE
-                 INVERSIÓN: .mk-plan-tabla pasa a table-layout fixed
-                 con anchos fijos (col2 28% acortada, col3 40% ancha)
-                 y la celda de precios con nowrap para que el valor
-                 se lea SIEMPRE en una sola fila.
-                 R92: TABLA MARKDOWN DEL POST + FILA [VALOR BCV]
-                 — las tablas que marked produce en la
-                 descripción (excerpt y sheet completo) se pintan
-                 con bordes sutiles (hairline 0.10/0.07),
-                 esquinas redondeadas y encabezado sobre el PASTEL
-                 del post (--post-pastel, que ahora viaja en el
-                 wrap/sheet desde Seccion_Script 2.4.4); las
-                 tipografías las ponen las clases del Core que el
-                 decorador añade (th textoPrimario, td
-                 textoSecundario). .mk-plan-tabla (tabla de 3
-                 columnas: plan de inversión) alinea la columna
-                 de precios a la derecha. La fila .mk-bcv repite
-                 el diseño del plan viejo: Tasa BCV {fecha} a la
-                 izquierda y Bs. {dolar} a la derecha, en el color
-                 del post.
-                 R94: SIN SKELETON INDIVIDUAL DE IMAGEN — el
-                 esqueleto por-imagen del hero (R91: shimmer,
-                 cargando/cargada/error) se retira: código muerto
-                 en la pantalla real. La img del hero vuelve a
-                 pintarse directa y la default del Setup queda en
-                 0.32 incondicional (R90 intacto); la espera del
-                 post la cubre el esqueleto GENERAL del detalle.
-                 La alimentación va por la L2 propia
-                 (SeccionImagen.poblarConL2, R94).
-                 R90: IMAGEN POR DEFECTO CASI TRANSPARENTE — la
-                 imagen que el backend entrega para posts SIN foto
-                 propia (la del Setup) se pinta con opacity 0.32
-                 (.post-hero-img-default) para que no compita con
-                 el CTA del lienzo; SOLO esa imagen, las fotos
-                 reales siguen opacas y el lightbox la muestra
-                 completa.
-                 R89: AVATAR DEL PARTNER 56PX — el avatar de la
-                 fila del partner (lienzo del post) y de la
-                 identidad (lienzo del partner) pasa de 40px a
-                 56px, el tamaño exacto que traía el Partner_Sheet
-                 viejo (el dueño lo aprobó ahí). La inicial escala
-                 16→22px y el badge de verificación 20→24px para
-                 guardar la proporción. Una sola clase (.mk-partner-
-                 avatar, compartida por ambos lienzos), cero
-                 overrides en otras hojas.
-                 R86: FIX IPHONE — la imagen del hero salía CORTADA
-                 en iOS (Safari y PWA; en PC y Android bien): el
-                 height:100% de la img dentro del marco 1:1 con
-                 aspect-ratio (y el track flex de por medio)
-                 Safari lo resuelve como auto y overflow:hidden
-                 recorta. La imagen y el carrusel viven AHORA
-                 absolutos con inset:0 (tamaño exacto del marco,
-                 contain proporcional) + respaldo @supports para
-                 iOS sin aspect-ratio. Nada cambia a la vista en
-                 PC/Android.
-                 R84: (1) El fondo del hero pasa a VIDRIO (blanco
-                 translúcido + blur): el color fuerte debajo de la
-                 imagen — y antes de cargar — rayía; el glass
-                 además rellena el marco 1:1 donde la imagen no
-                 cubre. (2) La imagen del hero entra CONTAIN:
-                 ajustada, proporcional, sin desbordarse ni
-                 deformarse (si es 1:1 llena el marco; si no, el
-                 glass completa). (3) Promo del post SIN cursiva.
-                 (4) Avatar del cross-sell blanco con la inicial
-                 en el color pastel del post. (5) Sale el bloque
-                 de "post sin foto" (.post-hero-vacio): código
-                 muerto, el backend entrega la imagen por defecto.
-                 R83: (1) Divisoras visibles: la línea #f1f5f9 se
-                 perdía con el fondo — pasa a un gris que sí se ve.
-                 (2) Promo del post en CLARITO: el banner fuerte
-                 competía con el CTA; ahora banner tintado con el
-                 badge de la promo a la DERECHA y precios sobre
-                 blanco. (3) Tarjetas del cross-sell en clarito
-                 (banner tintado + avatar del color). (4) Fondo de
-                 la sección de relacionados en grisesito tenue
-                 (#f3f4f6) y tarjetas In Company y Servy publicidad
-                 DENTRO de esa sección sobre blanco.
-                 R77B: (1) Los puntos del carrusel adoptan el
-                 tratamiento de los botones sociales del hero
-                 (fondo blanco, borde suave y sombra). (2) Entran los
-                 estilos del bloque de bienvenida de los posts sin
-                 foto (.post-hero-vacio).
-                 R77: (1) La sombra del .mk-sheet solo se pinta con
-                 el sheet abierto. (2) Fade del final del sheet de
-                 descripción (.mk-sheet-fade).
+VERSIÓN:         2.4.0
+CAMBIOS:         R95: (1) El fade del sheet de descripción es OVERLAY
+                 absoluto del .mk-sheet (hermano del content que
+                 scrollea): el degradado vive SIEMPRE pegado al
+                 borde inferior visible del sheet y el texto nunca
+                 se ve pasar por debajo; Seccion_Script lo retira
+                 (.fin) al llegar al final. (2) El sheet lleva el
+                 botón VOLVER ARRIBA (.mk-sheet-top del Core).
+
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -463,13 +374,19 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .mk-sheet-content::-webkit-scrollbar { display: none; }
 
   /* ============================================================
-     FADE DEL SHEET DE DESCRIPCIÓN (R77)
-     Avisa que hay más texto con el scroll; Seccion_Script lo
-     retira al llegar al final para no tapar la última línea.
+     FADE DEL SHEET DE DESCRIPCIÓN (R77 · R95 OVERLAY)
+     R95: deja de ser el último hijo del content (sticky) y pasa
+     a OVERLAY absoluto del .mk-sheet (hermano del content, que
+     es el que scrollea): el gradiente cubre SIEMPRE el borde
+     inferior visible del sheet — cualquier texto que pase por
+     ahí queda debajo del degradado, nunca “más abajo del fade”.
+     Seccion_Script le pone .fin al llegar al final del scroll
+     (opacity 0) y se re-muestra al subir. No ocupa espacio del
+     contenido (pointer-events: none, altura propia).
      ============================================================ */
   .mk-sheet-fade {
-    position: sticky; bottom: 0; display: block; height: 56px;
-    margin: -40px 0 0; pointer-events: none;
+    position: absolute; left: 0; right: 0; bottom: 0; display: block; height: 56px;
+    margin: 0; pointer-events: none; z-index: 6;
     background: linear-gradient(to top, #ffffff 24%, rgba(255, 255, 255, 0));
     opacity: 1; transition: opacity 0.25s ease;
   }

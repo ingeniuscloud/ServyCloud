@@ -10,10 +10,15 @@ RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
                  Validaciones delegadas a window.ReservaValida.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.2.0
+CAMBIOS:         R95: (1) datosPlan lee el PLANJSON nuevo
+                 [{dias, horario, cupo}] — la pintada de opciones
+                 y el texto de cupos por item quedan intactos.
+                 (2) El CTA de confirmar se apaga si el horario
+                 elegido tiene cupo en cero (el backend revalida).
+                 (3) Fuera la lectura muerta de seccionJson del
+                 título del post.
+
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),
                  Reserva_Sheet_Script.html (window.Sheet),
@@ -40,23 +45,18 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
     var validarTelefono = V.telefono;
     var validarCorreo   = V.correo;
 
-    function textoCupos(cupoLibre) {
-      var n = Number(cupoLibre || 0);
+    function textoCupos(cupo) {
+      var n = Number(cupo || 0);
       if (n === 0) return 'Sin cupos';
       if (n === 1) return '1 cupo';
       return n + ' cupos';
     }
 
-    /* Título del post · lee del post enriquecido, con fallback */
+    /* Título del post · del índice liviano (tituloPost del detalle) */
     function tituloDelPost(post) {
       if (!post) return 'esta publicación';
-      var sj = post.seccionJson || {};
-      var sp = sj.seccionPresentacion || {};
-      var t = String(sp.titulo || '').trim();
-      if (t) return t;
-      t = String(post.titulo || '').trim();
-      if (t) return t;
-      return 'esta publicación';
+      var t = String(post.titulo || '').trim();
+      return t || 'esta publicación';
     }
 
     function getHeaderHTML(nombrePost) {
@@ -78,11 +78,13 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         '</svg>' +
       '</span>';
 
+    /* R95 · PLANJSON NUEVO [{dias, horario, cupo}]: solo cambia
+       de dónde se leen los datos; la pintada queda intacta. */
     function datosPlan(p) {
       return {
-        dias:  (p.turno && p.turno.dias && p.turno.dias.join(' · ')) || '',
-        hora:  (p.turno && p.turno.textoMostrar) || '',
-        cupos: textoCupos(p.cupoLibre)
+        dias:  String((p && p.dias) || ''),
+        hora:  String((p && p.horario) || ''),
+        cupos: textoCupos(p && p.cupo)
       };
     }
 
@@ -588,10 +590,16 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       function actualizarEstadoFormulario() {
         if (!el.btnConfirmar) return;
 
+        /* R95: el CTA se apaga si el horario elegido está en cero
+           (cupo: 0 del PLANJSON). El backend revalida igual. */
+        var planSel = (state.planes || [])[state.turnoSeleccionado || 0] || null;
+        var conCupo = !planSel || Number(planSel.cupo || 0) > 0;
+
         var ok = validarNombre(el.inputNombre.value)
               && validarTelefono(el.inputTelefono.value)
               && state.correoValidado
               && !!state.horarioConfirmado
+              && conCupo
               && !!state.conocioSeleccionado
               && el.inputPrivacidad.checked;
 

@@ -11,22 +11,12 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.30
-CAMBIOS:         R84: (1) La revalidación muda del detalle emite
-                 `post:actualizado` — el Q&A del post activo
-                 repinta sus últimas preguntas (la caché L2 vieja
-                 se cura sola al volver a primer plano). (2)
-                 PostFull.anotarPregunta: la pregunta recién
-                 publicada queda anotada en la caché del cliente
-                 para que no "desaparezca" al reabrir el post.
-                 R83: El gradiente del post adopta EL MISMO FORMATO
-                 del lienzo principal: blanco 0-5% → color claro del
-                 post 15% → 24% → blanco 36%. Antes el clarito se
-                 estiraba hasta el final del post.
-                 R77: El refresco en segundo plano apunta a
-                 window.Pregunta (estaAbierto/refrescar), el módulo
-                 del Q&A del post. Encabezado saneado: solo queda
-                 lo vigente.
+VERSIÓN:         1.31.0
+CAMBIOS:         R95: calcularTotalCupos suma el campo cupo del
+                 PLANJSON nuevo (array directo); el CTA del post
+                 se apaga cuando el total es 0. Con post sin
+                 planes no cambia nada.
+
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -492,14 +482,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       }
     }
 
+    /* R95 · PLANJSON NUEVO: array directo [{dias, horario, cupo}].
+       Suma los cupos disponibles del post (null si no hay plan:
+       posts sin horarios no se bloquean por esta vía). */
     function calcularTotalCupos(post) {
-      if (!post || !post.planJson || !post.planJson.planes) return null;
-      if (!Array.isArray(post.planJson.planes) || post.planJson.planes.length === 0) {
-        return null;
-      }
+      if (!post || !Array.isArray(post.planJson)) return null;
+      if (post.planJson.length === 0) return null;
       var total = 0;
-      post.planJson.planes.forEach(function (p) {
-        total += Number(p.cupoLibre || 0);
+      post.planJson.forEach(function (p) {
+        total += Number(p.cupo || 0);
       });
       return total;
     }

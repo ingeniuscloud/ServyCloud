@@ -12,46 +12,13 @@ RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
                  fecha y firma del partner) y el sheet al 90%
                  para ver todas con SKELETON de carga.
 VERSIÓN:         1.2.0
-CAMBIOS:         R86: (1) La respuesta pasa de burbuja a CITA:
-                 línea vertical gris a la izquierda (la línea de
-                 cita del test), texto .textoPrimario, su fecha
-                 en .cita y debajo la firma "Respuesta de "
-                 (.textoSecundario) + nombre del partner
-                 (.textoPrimario). (2) La pregunta lleva su fecha
-                 en .cita (formato "20-10-2026 9:23 pm") bajo el
-                 texto — el usuario ve la rapidez de respuesta.
-                 (3) Fuera la etiqueta "Respuesta" de la burbuja:
-                 la firma ya dice quién responde.
-                 R84: (1) El contador queda en tipografía .cita
-                 PURA (sin Overrides de tamaño/color: manda la
-                 clase maestra; naranja solo al llegar al tope).
-                 (2) Burbuja de respuesta (.preg-respuesta) bajo su
-                 pregunta, en el lienzo y en el sheet: fondo gris
-                 tenue del sistema, etiqueta “Respuesta” en .cita.
-                 (3) Skeleton del sheet (.preg-skel) con brillo
-                 suave mientras llegan las preguntas.
-                 R83: (1) La X de limpiar recupera su círculo ahora
-                 en gris tenue: se distinguía del texto escrito.
-                 (2) El contador sale de debajo del enviar y comparte
-                 LA MISMA FILA con el aviso (derecha): al escribir ya
-                 no se mueve nada de sitio. (3) El contador queda
-                 SIEMPRE visible en tenue (aunque el campo esté
-                 vacío) para no desequilibrar la fila con el aviso.
-                 (4) El icono info se alinea con el inicio del
-                 placeholder del campo. (5) El error de envío toma el
-                 lugar del aviso EN ESA MISMA FILA (sin saltos).
-                 R77B: El botón enviar queda de fondo blanco con el
-                 glifo naranja (sin competir con el CTA, igual que
-                 los botones sociales del hero); el aviso corto se
-                 acompaña con el icono info; entra el mensaje suave
-                 de error de envío.
-                 R77: Nace el archivo. El Q&A se maneja completo en
-                 el lienzo (sin sheet para escribir) y el sheet queda
-                 solo para ver todas las preguntas, igual que "Ver
-                 descripción completa": solo lectura, sin botones
-                 internos. Placeholder con la voz de textoSecundario,
-                 enlace con .enlacesOpciones, contador y aviso con
-                 .cita. Sin borrado y sin nombre de quien pregunta.
+CAMBIOS:         R95: el fade del sheet "Ver todas" pasa a overlay
+                 absoluto del .mk-sheet (era hijo del content y se
+                 desplazaba con el scroll): el degradado vive
+                 SIEMPRE pegado al borde inferior visible del
+                 sheet. El content pierde su position:relative
+                 (ya no ancla nada).
+
 DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
                  Seccion_CSS.html (infra .mk-sheet-* del sheet),
                  Social_CSS.html (colores del post vía --post-color)
@@ -206,7 +173,9 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
      ============================================================ */
   .preg-root { overflow: hidden; }
 
-  .preg-sheet-content { padding: 0 5% calc(26px + env(safe-area-inset-bottom, 0px)); position: relative; }
+  /* R95: sin position relative — el fade ya no vive dentro del
+     content (se desplazaba con el scroll): es overlay del sheet. */
+  .preg-sheet-content { padding: 0 5% calc(26px + env(safe-area-inset-bottom, 0px)); }
 
   .preg-sheet-lista { padding-top: 4px; }
 
@@ -235,10 +204,16 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
     to   { background-position: -200% 0; }
   }
 
-  /* Fade del final del sheet: desaparece al llegar al final del scroll */
+  /* R95 · FADE OVERLAY DEL SHEET: deja de ser hijo del content
+     (se desplazaba con el scroll y aparecía solo al acercarse al
+     final) y pasa a overlay absoluto del .mk-sheet: el degradado
+     vive SIEMPRE pegado al borde inferior visible del sheet y el
+     texto nunca se ve pasar por debajo. Pregunta_Script lo
+     retira (.fin) al llegar al final del scroll. */
   .preg-sheet-fade {
     position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
     background: linear-gradient(to top, #ffffff 22%, rgba(255, 255, 255, 0));
     pointer-events: none; opacity: 1; transition: opacity 0.25s ease;
+    z-index: 6;
   }
   .preg-sheet-fade.fin { opacity: 0; }

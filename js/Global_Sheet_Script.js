@@ -15,39 +15,13 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  está instalada, el aviso vive DENTRO de la
                  pantalla como banner; Android no instalada lleva
                  botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.5
-CAMBIOS:         R68: RENOMBRADO por orden del dueño: Global_Menu_
-                 Script pasa a Global_Sheet_Script — ya están
-                 identificados Resrva_Sheet_, Orden_Sheet_,
-                 Ciudad_Sheet_ y Global_Sheet_ (los 4 sheets con
-                 la misma raíz de nombre). Ni una línea de lógica
-                 tocada; el módulo window.Global y la base .sheet
-                 (altura 90%, igual que Reserva) siguen intactos.
-                 R64: tocar "Instalar la app" SIEMPRE abre la
-                 ayuda (fuera el aviso-instantáneo que tapaba el
-                 contenido): si la app ya está instalada el aviso
-                 es un BANNER interno (.pwa-instalada-aviso) y la
-                 guía sigue visible; el botón manual
-                 (.pwa-instalar) sale SIEMPRE en Android (con
-                 boleto lanza el diálogo nativo; sin boleto lo
-                 pide al envoltorio o avisa el camino manual —
-                 pedirBoletoAlPadre ya no navega: avisa)
-                 instalarPwa() se volvió intentarInstalar()
-                 (handler del botón).
-                 R63: la subvista PWA se reconstruye — pestañas
-                 Android/iPhone (glifos android/apple de Iconos)
-                 con la del dispositivo activa por defecto,
-                 TIMELINE de pasos (puntos numerados + línea
-                 vertical, entrada escalonada — "los puntos tienen
-                 vida") todo en el NARANJA oficial, nota por
-                 versión. La guía ya no depende de la plataforma
-                 del usuario: muestra AMBAS versiones y el dueño
-                 las ve de una vez. Compatibilidad: si la BD solo
-                 trae una plataforma, sale una sola pestaña; si no
-                 trae pwa, "Próximamente" como siempre.
-                 R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+VERSIÓN:         1.11.0
+CAMBIOS:         R95: VOLVER ARRIBA en el menú global — botón circular
+                 (.mk-sheet-top del Core) a la izquierda que
+                 aparece pasados ~120px de scroll y sube suave al
+                 tocar. En subvista comparte esquina con Volver
+                 (sheet.profundo lo alterna). 0 llamadas a la BD.
+
 DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
@@ -71,6 +45,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
     var content    = null;
     var btnClose   = null;
     var btnBack    = null;
+    var btnTop     = null;
     var titulo     = null;
 
     var dragActivo = false;
@@ -658,6 +633,11 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
               '<polyline points="15 18 9 12 15 6"/>' +
             '</svg>' +
           '</button>' +
+          '<button class="mk-sheet-top" type="button" id="sheetTop" aria-label="Volver arriba">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<polyline points="6 15 12 9 18 15"/>' +
+            '</svg>' +
+          '</button>' +
           '<div class="sheet-back-titulo">Volver</div>' +
           '<div class="sheet-content"></div>' +
         '</div>';
@@ -670,15 +650,33 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       content    = raiz.querySelector('.sheet-content');
       btnClose   = raiz.querySelector('.sheet-close');
       btnBack    = raiz.querySelector('.sheet-back');
+      btnTop     = raiz.querySelector('#sheetTop');
       titulo     = raiz.querySelector('.sheet-back-titulo');
 
       backdrop.addEventListener('click', cerrar);
       btnClose.addEventListener('click', cerrar);
       btnBack.addEventListener('click', volverAlMenu);
 
+      /* R95 · VOLVER ARRIBA: mismo botón circular de los sheets
+         (izquierda). Solo con scroll: 0 llamadas a la BD. En
+         subvista comparte la esquina con Volver: mientras estás
+         scrolleado, la flecha arriba lo reemplaza (sheet.profundo). */
+      btnTop.addEventListener('click', function () {
+        haptic(8);
+        content.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
       handleArea.addEventListener('pointerdown', onHandleDown);
       content.addEventListener('pointerdown', onContentDown);
       content.addEventListener('scroll', actualizarGradientePrivacidad);
+      content.addEventListener('scroll', actualizarVolverArriba, { passive: true });
+    }
+
+    function actualizarVolverArriba() {
+      if (!sheet || !content) return;
+      var abajo = content.scrollTop > 120;
+      if (btnTop) btnTop.classList.toggle('visible', abajo);
+      sheet.classList.toggle('profundo', abajo);
     }
 
     function inyectarDirecto(k) {
@@ -693,6 +691,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       if (k === 'pwa')  engancharPWA();
 
       actualizarGradientePrivacidad();
+      actualizarVolverArriba();
     }
 
     function inyectarConFade(k) {
@@ -713,6 +712,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
           requestAnimationFrame(function () {
             content.classList.remove('saliendo', 'entrando');
             actualizarGradientePrivacidad();
+            actualizarVolverArriba();
           });
         });
       }, 140);

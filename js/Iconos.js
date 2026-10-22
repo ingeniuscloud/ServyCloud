@@ -6,11 +6,11 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Repositorio único de glifos SVG (data URI) y del
                  pintador window.pintarGlifos. Nada de la app lleva
                  SVG hardcodeado: todo pasa por aquí.
-VERSIÓN:         2.3.0
-CAMBIOS:         R77B: Se agrega el glifo `imagen` para el bloque
-                 de bienvenida de los posts que no traen foto.
-                 R77: Se agrega el glifo `enviar` para el botón de
-                 publicar pregunta del Q&A del lienzo.
+VERSIÓN:         2.4.0
+CAMBIOS:         R95: glifo flechaArriba (chevron hacia arriba, mismo
+                 lenguaje del close) para el botón VOLVER ARRIBA
+                 de los bottom sheets.
+
 DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
                  pintan con data-glifo)
 ════════════════════════════════════════════════════════════════════*/
@@ -48,7 +48,8 @@ DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
     share:          "data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M%2030%2014%20L%2017%202%20L%2017%208%20C%207%208%202%2015%202%2029%20C%207%2020%2012%2018%2017%2018%20L%2017%2025%20Z%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E",
     close:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2218%22%20y1%3D%226%22%20x2%3D%226%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%226%22%20x2%3D%2218%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",
     enviar:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M22%202%2011%2013%22%2F%3E%3Cpath%20d%3D%22M22%202%2015%2022%2011%2013%202%209z%22%2F%3E%3C%2Fsvg%3E",
-    imagen:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2218%22%20height%3D%2218%22%20rx%3D%222%22%20ry%3D%222%22%2F%3E%3Ccircle%20cx%3D%228.5%22%20cy%3D%228.5%22%20r%3D%221.5%22%2F%3E%3Cpath%20d%3D%22m21%2015-5-5L5%2021%22%2F%3E%3C%2Fsvg%3E"
+    imagen:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2218%22%20height%3D%2218%22%20rx%3D%222%22%20ry%3D%222%22%2F%3E%3Ccircle%20cx%3D%228.5%22%20cy%3D%228.5%22%20r%3D%221.5%22%2F%3E%3Cpath%20d%3D%22m21%2015-5-5L5%2021%22%2F%3E%3C%2Fsvg%3E",
+    flechaArriba:   "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%2015%2012%209%2018%2015%22%2F%3E%3C%2Fsvg%3E"
   };
 
   function pintarUno(el) {

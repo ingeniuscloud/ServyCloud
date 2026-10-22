@@ -14,15 +14,12 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.7
-CAMBIOS:         R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+VERSIÓN:         1.12.0
+CAMBIOS:         R95: en las subvistas del menú global, mientras
+                 hay scroll abajo (sheet.profundo) el botón
+                 circular VOLVER ARRIBA (.mk-sheet-top del Core)
+                 reemplaza a Volver en la esquina izquierda; al
+                 llegar arriba, Volver vuelve.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -203,6 +200,15 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
   }
   .sheet-back svg { width: 22px; height: 22px; display: block; }
   .sheet.subvista .sheet-back { display: flex; }
+
+  /* ============================================================
+     R95 · VOLVER ARRIBA · el botón circular (clase compartida
+     .mk-sheet-top del Core) vive en la MISMA esquina que Volver.
+     En subvista, mientras hay scroll abajo (sheet.profundo) la
+     flecha hacia arriba reemplaza a Volver; al llegar arriba,
+     Volver vuelve. Fuera de subvista la esquina es libre.
+     ============================================================ */
+  .sheet.profundo.subvista .sheet-back { opacity: 0; pointer-events: none; }
 
   /* ============================================================
      TÍTULO DE SUBVISTA
