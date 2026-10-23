@@ -4,14 +4,43 @@ ARCHIVO:         Opend_Ad_CSS.html
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del intersticial de apertura (estilo App
                  Open Ad). Capa fija sobre TODA la app mientras
-                 carga: velo tenue (la app se intuye detrás),
-                 creativo 9:16 centrado ocupando ~90% con radio y
-                 sombra, X de cierre SIEMPRE visible en la esquina
-                 del creativo y botón "Saber más" (texto de la BD)
-                 debajo. El texto del botón y la imagen salen de
+                 carga. El creativo 9:16 es EL PROTAGONISTA:
+                 fondo de la capa TENUE (sin velo oscuro), sin
+                 sombra en la imagen, la X de cierre es solo la X
+                 (sin borde ni fondo) DENTRO de la imagen y el
+                 botón "Saber más" (texto de la BD) DESCANSA
+                 DENTRO de la imagen, en la franja limpia inferior,
+                 con la flechita a la derecha igual que el CTA del
+                 post. El texto del botón y la imagen salen de
                  PROMOJSON.intersticial (cero textos fijos).
-VERSIÓN:         1.0.0
-CAMBIOS:         R98: primera entrega. Entrada con fade y
+VERSIÓN:         1.1.0
+CAMBIOS:         R101 (ajustes del dueño tras ver el Open Ad
+                 montado):
+                 · X DENTRO de la imagen (esquina superior
+                   derecha), SIN borde, SIN fondo, sin sombra de
+                   círculo: solo la X blanca (sombra mínima de
+                   trazo para leerla sobre zonas claras).
+                 · CTA DENTRO de la imagen, centrado, recostado en
+                   la franja limpia inferior del creativo
+                   (bottom: 4% del alto del creativo — con una
+                   imagen 9:16 de 312×554 px el botón queda entre
+                   el 4% y el 12% del alto, la zona que toda
+                   pieza de campaña deja libre abajo; nunca tapa
+                   texto).
+                 · CTA con FLECHITA alineada a la derecha, igual
+                   que el CTA del post (.mk-cta-arrow-icon).
+                 · CTA un 20% MÁS ANCHO: antes medía ~140 px
+                   (texto + padding); ahora min-width del 58% del
+                   creativo (≈181 px en un 312 px → +29%).
+                 · SIN la sombra fea de la imagen (box-shadow
+                   fuera) y el fondo de la capa pasa de velo
+                   oscuro (rgba 26,22,16,.84) a un tono TENUE
+                   clarito: menos oscuridad y contraste, la
+                   publicidad manda.
+                 · Tamaño reducido al 10% lateral exacto: el
+                   creativo pasa de 92vw a 80vw (10% de aire por
+                   lado; la app respira).
+                 R98: primera entrega. Entrada con fade y
                  escala sutil (respetando prefers-reduced-motion),
                  cierre instantáneo, bloqueo del scroll de fondo y
                  respeto de las safe areas del teléfono.
@@ -21,21 +50,21 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CAPA · velo sobre la app
+     CAPA · fondo tenue (R101): la protagonista es la publicidad.
+     Un color suave y cálido de la familia de la app; sin velo
+     oscuro ni contraste fuerte.
      ============================================================ */
   .intersticial {
     position: fixed;
     inset: 0;
     z-index: 9999;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
     padding: 16px;
     padding-top: calc(16px + env(safe-area-inset-top));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
-    background: rgba(26, 22, 16, 0.84);
+    background: rgba(251, 236, 224, 0.96);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
@@ -46,14 +75,15 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
   body.intersticial-abierto { overflow: hidden; }
 
   /* ============================================================
-     CREATIVO · imagen 9:16 al ~90% de la pantalla
-     El ancho máximo reserva lugar para el botón (96px) para
-     que en pantallas cuadradas nada se salga.
+     CREATIVO · imagen 9:16 con el 10% de aire POR LADO (R101:
+     antes 92vw — la app se sentía ahogada). El alto queda limitado
+     por pantalla (56px de holgura para padding + safe areas).
+     La X y el CTA viven DENTRO de esta figura.
      ============================================================ */
   .intersticial-creativo {
     position: relative;
     margin: 0;
-    width: min(92vw, calc((100vh - 96px) * 9 / 16));
+    width: min(80vw, calc((100vh - 56px) * 9 / 16));
     animation: intersticial-entra 0.24s ease-out both;
   }
 
@@ -67,66 +97,100 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
     width: 100%;
     height: auto;
     border-radius: 18px;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    /* R101: SIN sombra — el creativo no necesita efecto;
+       con el fondo tenue ya resalta solo. */
     background: rgba(255, 255, 255, 0.06);
   }
 
   /* ============================================================
-     X DE CIERRE · inmediata, siempre visible
-     Círculo blanco montado en la esquina del creativo (la mitad
-     afuera) para que se vea sobre cualquier imagen.
+     X DE CIERRE · DENTRO de la imagen, solo la X (R101)
+     Sin borde, sin círculo, sin fondo y sin sombra de botón:
+     la X blanca desnuda sobre la esquina superior derecha,
+     como en la pieza de referencia. El blanco del trazo lleva
+     una sombra de trazo mínima (legibilidad sobre zonas claras
+     de la imagen; no es un borde ni un fondo).
+     Área táctil 44px (norma de la app) con la X de ~20px.
      ============================================================ */
   .intersticial-cerrar {
     position: absolute;
-    top: -13px;
-    right: -13px;
-    width: 40px;
-    height: 40px;
-    min-width: 44px;
-    min-height: 44px;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     border: none;
-    border-radius: 50%;
-    background: #ffffff;
-    color: #1f1b16;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    z-index: 2;
   }
-  .intersticial-cerrar:active { transform: scale(0.94); }
+  .intersticial-cerrar:active { transform: scale(0.92); }
   .intersticial-cerrar svg {
-    width: 19px;
-    height: 19px;
-    stroke: #1f1b16;
-    stroke-width: 2.4;
+    width: 21px;
+    height: 21px;
+    stroke: #ffffff;
+    stroke-width: 2.6;
     stroke-linecap: round;
     fill: none;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
   }
 
   /* ============================================================
-     BOTÓN "SABER MÁS" · texto de la BD, sin coacción
-     Píldora clara sobre el velo: visible, tranquila, con el
-     texto exacto de PROMOJSON.intersticial.textoBoton.
+     BOTÓN "SABER MÁS" · DENTRO de la imagen, franja limpia inferior
+     (R101) Igual lenguaje que el CTA del post (naranja, píldora,
+     flechita blanca a la DERECHA como .mk-cta-arrow-icon).
+     Ubicación calculada sobre el creativo real (312×554 en un
+     teléfono 390×844): bottom 4% del alto del creativo → el botón
+     reposa entre el 4% y el ~12.5% del alto, la franja sin texto
+     de la pieza; centrado horizontal. 20% MÁS ANCHO que antes:
+     min-width 58% del creativo (≈181px vs ~140px anteriores).
      ============================================================ */
   .intersticial-boton {
-    min-height: 46px;
-    padding: 12px 34px;
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    transform: translateX(-50%);
+    min-width: 58%;
+    max-width: 88%;
+    min-height: 47px;
+    padding: 12px 42px;
     border: none;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #1f1b16;
+    background: rgba(249, 115, 22, 0.95);
+    color: #ffffff;
     font-family: inherit;
     font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.01em;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.32);
     -webkit-tap-highlight-color: transparent;
+    z-index: 2;
   }
-  .intersticial-boton:active { transform: scale(0.97); }
+  .intersticial-boton:active { transform: translateX(-50%) scale(0.97); }
   .intersticial-boton[hidden] { display: none !important; }
+
+  /* Flechita del CTA · anclada a la derecha, centrada en alto:
+     MISMA geometría que el CTA del post (flecha blanca →) */
+  .intersticial-boton .cta-flecha {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
 
   /* Menos movimiento: sin animación de entrada */
   @media (prefers-reduced-motion: reduce) {

@@ -7,9 +7,12 @@ RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                  app —sin esperar el catálogo— lee
                  SISTEMA.promo.intersticial y si HOY toca, monta la
                  capa sobre la app mientras termina de cargar:
-                 creativo 9:16 al ~90% con la app atenuada detrás,
-                 X de cierre INMEDIATA y botón "Saber más" que
-                 abre el WhatsApp del admin.
+                 creativo 9:16 protagonista con fondo tenue detrás,
+                 X de cierre INMEDIATA (solo la X, dentro de la
+                 imagen) y botón "Saber más" DENTRO del creativo,
+                 en la franja limpia inferior, con flechita a la
+                 derecha como el CTA del post; abre el WhatsApp
+                 del admin.
                  Reglas del dueño que gobiernan TODO:
                  · activo + imagen + ventana vigente (reloj del
                    teléfono via ventanaVigente de Global_Script:
@@ -32,8 +35,15 @@ RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                    y se re-intenta UNA sola vez (misma promesa que
                    ya comparte Core). En la página de GAS SISTEMA
                    ya viaja en el HTML y el reintento no corre.
-VERSIÓN:         1.0.0
-CAMBIOS:         R98: primera entrega. GA4: intersticial_view al
+VERSIÓN:         1.1.0
+CAMBIOS:         R101 (ajustes del dueño): el botón "Saber más"
+                 pasa a montarse DENTRO del creativo (franja
+                 limpia inferior) con su flechita SVG a la derecha
+                 (misma geometría que el CTA del post) — antes
+                 quedaba fuera, debajo de la imagen. La X ya vive
+                 dentro de la imagen (solo CSS). GA4 y la cadena de
+                 WhatsApp intactos.
+                 R98: primera entrega. GA4: intersticial_view al
                  mostrarse e intersticial_click en "Saber más".
 DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
                  (ventanaVigente, abrirWhatsapp),
@@ -98,6 +108,11 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
       var mensaje    = String(it.mensaje || '').trim() ||
                        String(admin().mensajeWhatsapp || '').trim();
 
+      /* R101: la X y el CTA viven DENTRO del creativo. El CTA
+         lleva su flechita a la derecha (misma geometría del
+         glifo "flecha" del CTA del post: trazo blanco 2.5,
+         linecap/linejoin round). El texto va en un span para
+         que quede centrado con la flecha anclada a la derecha. */
       capa.innerHTML =
         '<figure class="intersticial-creativo">' +
           '<img class="intersticial-img" alt="" draggable="false">' +
@@ -107,15 +122,26 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
               '<line x1="18" y1="6" x2="6" y2="18"/>' +
             '</svg>' +
           '</button>' +
-        '</figure>' +
-        ((textoBoton && numero)
-          ? '<button type="button" class="intersticial-boton"></button>'
-          : '');
+          ((textoBoton && numero)
+            ? '<button type="button" class="intersticial-boton">' +
+                '<span class="intersticial-boton-texto"></span>' +
+                '<svg class="cta-flecha" viewBox="0 0 24 24" fill="none"' +
+                     ' stroke="#ffffff" stroke-width="2.5"' +
+                     ' stroke-linecap="round" stroke-linejoin="round"' +
+                     ' aria-hidden="true">' +
+                  '<path d="M4 12h15"/>' +
+                  '<path d="m13 6 6 6-6 6"/>' +
+                '</svg>' +
+              '</button>'
+            : '') +
+        '</figure>';
 
       capa.querySelector('.intersticial-img').src = urlImagen;
 
       var btn = capa.querySelector('.intersticial-boton');
-      if (btn) btn.textContent = textoBoton;
+      if (btn) {
+        capa.querySelector('.intersticial-boton-texto').textContent = textoBoton;
+      }
 
       function cerrar() {
         capa.classList.remove('intersticial-visible');

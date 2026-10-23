@@ -7,8 +7,27 @@ RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
                  orbital y píldora "Instalar app". Nació con el
                  envoltorio (R26) y desde R29 vive como archivo
                  propio. El dueño no necesita tocarlo.
-VERSIÓN:         1.4
-CAMBIOS:         R86: panel del MODO MANUAL de instalación
+VERSIÓN:         1.5
+CAMBIOS:         R101 (falla del dueño, capturas PC vs teléfono): el
+                 preloader se veía PERFECTO en la PC pero en el
+                 TELÉFONO dejaba una franja BLANCA/crema arriba (en
+                 la zona del reloj/señal). Causa: en la app
+                 instalada (standalone) iOS no siempre deja que un
+                 elemento fixed pinte DENTRO de la franja del
+                 estado — y esa franja la pinta el fondo del
+                 DOCUMENTO, que es el crema #fdf3ec de la app.
+                 Arreglo en DOS cinturones: (1) mientras el
+                 preloader vive, la clase html.preloader-activo
+                 pinta el fondo del DOCUMENTO con el MISMO
+                 degradado naranja del preloader — la franja queda
+                 naranja y se funde con la capa; (2) la capa
+                 estira su caja hacia arriba/abajo
+                 (−env(safe-area-inset-*)) para cubrir la franja
+                 aunque el navegador la subjecte. Al retirarse el
+                 preloader la clase se quita y el degradado crema
+                 R70 de la app vuelve solo. La PC no cambia (env
+                 vale 0 y la clase va y viene sin efecto visible).
+                 R86: panel del MODO MANUAL de instalación
                  (#zona-instalar-pasos): tarjeta blanca encima de la
                  píldora con los 3 pasos para Androids donde Chrome
                  no ofrece el diálogo nativo (Android Go/básicos):
@@ -46,6 +65,12 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
     .preloader-overlay {
       position: fixed;
       inset: 0;
+      /* R101 · FRANJA DEL TELÉFONO: la caja estira su techo y su
+         piso hacia las safe areas (reloj / barra de gestos) para
+         que el degradado naranja llegue DE UNA VEZ a la punta.
+         En la PC env() vale 0 y esto no cambia nada. */
+      top: calc(0px - env(safe-area-inset-top, 0px));
+      bottom: calc(0px - env(safe-area-inset-bottom, 0px));
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -54,6 +79,18 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
       opacity: 1;
       transition: opacity 0.32s ease;
       pointer-events: none;
+    }
+
+    /* R101 · CINTURÓN 1: mientras el preloader vive, el FONDO DEL
+       DOCUMENTO (la lona que iOS pinta también en la franja del
+       estado) viste el MISMO degradado naranja. Así la franja
+       superior del teléfono queda naranja y se funde con la capa —
+       adiós al defecto blanco. Al retirarse el preloader, el js
+       quita la clase y vuelve el degradado crema de la app (R70). */
+    html.preloader-activo {
+      background-color: #fb923c;
+      background-image: linear-gradient(180deg, #fb923c 0%, #fdba74 100%);
+      background-repeat: no-repeat;
     }
     .preloader-overlay.saliendo { opacity: 0; }
     .preloader-overlay[hidden]  { display: none; }

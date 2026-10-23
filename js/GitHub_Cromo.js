@@ -9,8 +9,15 @@ RESPONSABILIDAD: Cromo de la página estática: preloader orbital,
                  píldora "Instalar app" (Android) y registro del
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
-VERSIÓN:         1.2
-CAMBIOS:         R86: MODO MANUAL de instalación: en Androids Go/
+VERSIÓN:         1.3
+CAMBIOS:         R101 (falla del dueño en el teléfono): mientras el
+                 preloader vive se pone la clase
+                 html.preloader-activo y al retirarse se quita — el
+                 CSS pinta con ella el fondo del documento con el
+                 mismo degradado naranja y la franja del estado del
+                 teléfono deja de verse blanca (detalle en
+                 GitHub_Cromo.css). Nada más cambia.
+                 R86: MODO MANUAL de instalación: en Androids Go/
                  básicos (Redmi A3x y compañía) Chrome NO dispara
                  beforeinstallprompt (no crea WebAPK) y el menú
                  ni siquiera muestra "Instalar aplicación": la
@@ -80,10 +87,22 @@ DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
           const preloader = crearPreloader('Servy', 'Cargando catálogo');
           document.body.appendChild(preloader);
 
+          /* R101 · FRANJA DEL TELÉFONO: con la clase activa, el
+             fondo del DOCUMENTO (lo que iOS pinta detrás de la
+             hora/señal) viste el mismo degradado naranja del
+             preloader — la punta de la pantalla queda naranja,
+             sin la franja blanca. Al retirarse la capa, la clase
+             se quita y el degradado crema de la app vuelve solo. */
+          document.documentElement.classList.add('preloader-activo');
+
           function retirarPreloader() {
               if (preloaderRetirado) return;
               preloaderRetirado = true;
               if (timerFallback) { clearTimeout(timerFallback); timerFallback = null; }
+
+              // R101: la lona vuelve al crema de la app; la capa
+              // sigue de izquierda en su fade y tapa el cambio.
+              document.documentElement.classList.remove('preloader-activo');
 
               // Aviso para el botón "Instalar app": aquí arranca su
               // cuenta de 2.5 seg antes de evaluarse.
