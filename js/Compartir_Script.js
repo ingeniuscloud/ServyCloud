@@ -43,8 +43,15 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         2.2
-CAMBIOS:         R98: urlDePost entrega la PAGE de GitHub Pages
+VERSIÓN:         2.2.1
+CAMBIOS:         R103: urlPages() se arma con app.urlApp + /e cuando
+                 la BD no trae urlPages Y urlApp es de GitHub Pages
+                 (tu ROOTJSON actual: la URL del repo en urlApp) —
+                 las pages e/ comparten SIN editar la BD. Si escribes
+                 app.urlPages (terminada en /e, como siempre), esa
+                 manda; y si urlApp dejara de ser de Pages, vuelve
+                 el enlace ?s= de siempre. Nada más cambia.
+                 R98: urlDePost entrega la PAGE de GitHub Pages
                  para los posts con meta.promo (post.promo del
                  catálogo) cuando la BD trae app.urlPages: base +
                  /e/ + id + .html + ?v= (pide a WhatsApp releer la
@@ -254,14 +261,29 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     /* ============================================================
        R98 · BASE DE PAGES · ROOTJSON.app.urlPages (carpeta e/ del
-       repo, terminada en /e). Vacía → no hay pages y todo
-       comparte el enlace ?s= de siempre (comportamiento intacto).
+       repo, terminada en /e). R103: si la BD no la trae, se arma
+       con app.urlApp + /e cuando urlApp es de GitHub Pages.
+       Vacía → no hay pages y todo comparte el enlace ?s= de
+       siempre (comportamiento intacto).
        ============================================================ */
     function urlPages() {
       try {
         var root = (window.SISTEMA && window.SISTEMA.root) || {};
-        return String((root.app && root.app.urlPages) || '')
-          .trim().replace(/[\/\?]+$/, '');
+        var app  = root.app || {};
+        var propia = String(app.urlPages || '').trim().replace(/[\/\?]+$/, '');
+        if (propia) return propia;
+        /* R103: si la BD no trae urlPages, se arma con app.urlApp
+           (tu ROOTJSON actual pone ahí la URL del repo de GitHub
+           Pages) + la carpeta e/. Solo si urlApp es de Pages
+           (github.io): si mañana urlApp volviera a ser la /exec,
+           no se inventan pages y vuelve el enlace ?s= de siempre.
+           Si escribes urlPages (terminada en /e), esa manda:
+           semántica R98 intacta. */
+        var porApp = String(app.urlApp || '').trim();
+        if (porApp.indexOf('github.io') !== -1) {
+          return porApp.replace(/[\/\?]+$/, '') + '/e';
+        }
+        return '';
       } catch (_) {
         return '';
       }
