@@ -16,12 +16,19 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  usuario ya tiene contenido en pantalla.
                  Guardia anti-loop de token: corta a los 3 intentos.
                  Pantalla de error de red si catalogo falla del todo.
-                 Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
-                 y aplicarPlaceholders.
+                 Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
+                 aplicarPlaceholders y ventanaVigente (R98: lectura
+                 tolerante de ventanas inicia/termina — fecha sola o
+                 fecha + hora — usada por promo e intersticial).
                  El módulo window.Global (menú + subvistas) vive en
                  Global_Sheet_Script.html.
-VERSIÓN:         1.15.0
-CAMBIOS:         R95: (1) La pantalla de error de token ya no lleva
+VERSIÓN:         1.16.0
+CAMBIOS:         R98: ventanaVigente(inicia, termina) — compara con
+                 el RELOJ DEL TELÉFONO; "inicia" acepta fecha o
+                 fecha+hora (sin hora = desde 00:00), "termina"
+                 acepta fecha (vigente todo el día) o fecha+hora.
+                 Fechas inválidas no bloquean: fallan abiertas.
+                 R95: (1) La pantalla de error de token ya no lleva
                  botón ni pie de WhatsApp — queda la invitación a
                  cerrar y reabrir la app. (2) Fuera 'cupos' de
                  ACCIONES_IDEMPOTENTES (acción retirada).
@@ -462,4 +469,41 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     return String(mensaje || '')
       .replace(/\{titulo\}/g,  cursoJson.titulo  || '')
       .replace(/\{tagline\}/g, cursoJson.tagline || '');
+  }
+
+  /* ============================================================
+     R98 · HELPERS GLOBALES · VENTANAS (promo + intersticial)
+     ventanaVigente(inicia, termina): ¿el reloj del teléfono está
+     dentro de la ventana?
+       · inicia "2026-10-25"          → desde 00:00 de ese día
+       · inicia "2026-10-25 08:00"    → desde esa hora
+       · termina "2026-11-01"         → todo el día (hasta 23:59:59)
+       · termina "2026-11-01 22:00"   → hasta esa hora
+     Vacíos o fechas rotas = extremo abierto (no bloquean).
+     Comparación local (Venezuela no maneja horario de verano):
+     la hora del teléfono manda, igual que decide el dueño.
+     ============================================================ */
+  function _parseVentana(valor, finDeDia) {
+    var m = String(valor || '').trim()
+      .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (!m) return null;
+
+    var d = new Date(
+      Number(m[1]), Number(m[2]) - 1, Number(m[3]),
+      m[4] ? Number(m[4]) : (finDeDia ? 23 : 0),
+      m[5] ? Number(m[5]) : (finDeDia ? 59 : 0),
+      m[6] ? Number(m[6]) : (finDeDia ? 59 : 0),
+      0
+    );
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function ventanaVigente(inicia, termina) {
+    var ahora = new Date();
+    var desde = _parseVentana(inicia, false);
+    var hasta = _parseVentana(termina, true);
+
+    if (desde && ahora < desde) return false;
+    if (hasta && ahora > hasta) return false;
+    return true;
   }

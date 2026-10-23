@@ -11,8 +11,14 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.31.0
-CAMBIOS:         R95: calcularTotalCupos suma el campo cupo del
+VERSIÓN:         1.32.0
+CAMBIOS:         R98: (1) La lista blanca de GA4 suma
+                 intersticial_view e intersticial_click (el ad de
+                 apertura los emite). (2) CacheL2 ENV_VERSION pasa
+                 a 2: el catálogo ahora trae el bloque promo del
+                 POSTJSON en cada post — el envoltorio viejo se
+                 descarta solo una vez y se re-descarga fresco.
+                 R95: calcularTotalCupos suma el campo cupo del
                  PLANJSON nuevo (array directo); el CTA del post
                  se apaga cuando el total es 0. Con post sin
                  planes no cambia nada.
@@ -39,7 +45,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var K_POST      = 'sv_l2_post_';
     var MAX_POSTS   = 30;
     var TTL_MS      = 7 * 24 * 60 * 60 * 1000;
-    var ENV_VERSION = 1;
+    var ENV_VERSION = 2;   /* R98: el catálogo lleva post.promo */
 
     function _valido(env, requiereSecciones) {
       if (!env || env.v !== ENV_VERSION) return false;
@@ -345,6 +351,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       post_open: 1, post_close: 1, search: 1,
       like: 1, whatsapp_click: 1,
       promo_click: 1, promo_swipe: 1,
+      intersticial_view: 1, intersticial_click: 1,
       reserva_start: 1, otp_request: 1
     };
 

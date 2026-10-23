@@ -6,36 +6,31 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  #promoSlot es TRANSPARENTE sobre el lienzo y cada
                  promo es una TARJETA con degradado PROPIO del
-                 colorOficial del post (R62: claro → base →
-                 oscuro, diagonal 135°, y su sombra acompaña; sin
-                 color en la BD, el respaldo naranja queda abajo):
-                 radio, sombra y contenido en blanco — R96: las
-                 tres líneas del texto en blanco con las
-                 tipografías del Core — fila del TÍTULO (item.
-                 titulo de PROMOJSON en .subtitulo) con el badge
-                 PROMOCIONADO a su derecha en la MISMA fila,
-                 DESCRIPCIÓN (item.descripcion en .textoPrimario)
-                 y TÍTULO DEL POST (tituloPost del POSTJSON en
-                 .cita) — y la flecha circular ANCLADA A LA
-                 ESQUINA INFERIOR DERECHA (R62). La tarjeta es
-                 MÁS ANCHA (R96: +15% para las líneas largas del
-                 texto nuevo) y el GRID de la marquesina queda
-                 TRANSPARENTE (R61). Encabezado propio ("Promos
-                 cerca de ti" en peso normal R62, color de los
-                 títulos de sección) y FADE a los laterales de la
-                 marquesina hacia el color del lienzo. El avance
-                 continuo lo lleva Promo_Script (rAF sobre
-                 scrollLeft). El badge vive SOLO aquí y en el
-                 post. Vive fuera del scroll en modo lista. Se
-                 oculta en modo detalle.
-VERSIÓN:         2.7
-CAMBIOS:         R96: las 3 líneas con las tipografías del Core
-                 en blanco (titulo .subtitulo, descripcion
-                 .textoPrimario, tituloPost .cita nueva clase
-                 .promo-cita) y tarjeta +15% de ancho (87→100%
-                 escritorio, 77→89% móvil). Fuera la fila del
-                 partner y su check (el título del post cierra
-                 la tarjeta).
+                 colorOficial del post (estilo inline 2026: claro →
+                 base → oscuro, diagonal 135°, y su sombra
+                 acompaña; sin color en la BD, el respaldo naranja
+                 queda abajo): radio, sombra y contenido en blanco
+                 — las tres líneas del texto en blanco con las
+                 tipografías del Core — fila del TÍTULO
+                 (promo.titulo del POSTJSON en .subtitulo) con el
+                 badge (promo.idBadge en BADGEJSON) a su derecha
+                 en la MISMA fila, DESCRIPCIÓN (promo.descripcion
+                 en .textoPrimario) y TÍTULO DEL POST (tituloPost
+                 del POSTJSON en .cita) — y la flecha circular
+                 ANCLADA A LA ESQUINA INFERIOR DERECHA (R62). La
+                 tarjeta es ANCHA (100% escritorio, 89% móvil) y
+                 el GRID de la marquesina queda TRANSPARENTE.
+                 Encabezado propio ("Promos cerca de ti" en peso
+                 normal, color de los títulos de sección) y FADE
+                 a los laterales de la marquesina hacia el color
+                 del lienzo. El avance continuo lo lleva
+                 Promo_Script (rAF sobre scrollLeft). El badge
+                 vive SOLO aquí y en el post. Vive fuera del
+                 scroll en modo lista. Se oculta en modo detalle.
+VERSIÓN:         2.8
+CAMBIOS:         R98: solo encabezado — los textos de la tarjeta
+                 ahora salen del POSTJSON (meta.promo del post).
+                 El CSS no cambia.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================

@@ -5,14 +5,21 @@ ESPEJO GITHUB:   github/js/Compartir_Script.js (subir a GitHub Pages; editar en 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
-                 su mensaje de WhatsApp lleva el enlace profundo;
+                 su mensaje de WhatsApp lleva el enlace; R98: si el
+                 post trae meta.promo en su POSTJSON (viaja en el
+                 catálogo como post.promo) y la BD define
+                 ROOTJSON.app.urlPages, el enlace es la PAGE de
+                 GitHub Pages (e/<id>.html, generada con la
+                 MAQUINITA): tarjeta OG completa + redirección al
+                 enlace profundo. Sin urlPages o sin meta.promo →
+                 enlace ?s= de siempre.
                  (2) LISTA FILTRADA — el TEXTO "Compartir lista
                  filtrada" sobre la lista (R64: vive en el respiro
                  entre filtros y items; Lista_Script decide su
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-                 El enlace viaja en UN parámetro corto ?s= con el
+                 El enlace ?s= viaja en UN parámetro corto con el
                  payload compacto y OFUSCADO (XOR con clave
                  embebida + base64url): el ID del post o el
                  término NUNCA van planos en la URL. Los enlaces
@@ -36,8 +43,17 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  NO cambia: se hace desde la app con el enlace
                  principal (menú / píldora), nunca desde el enlace
                  compartido.
-VERSIÓN:         2.1
-CAMBIOS:         R64: la visibilidad del botón la lleva
+VERSIÓN:         2.2
+CAMBIOS:         R98: urlDePost entrega la PAGE de GitHub Pages
+                 para los posts con meta.promo (post.promo del
+                 catálogo) cuando la BD trae app.urlPages: base +
+                 /e/ + id + .html + ?v= (pide a WhatsApp releer la
+                 tarjeta en cada compartir). La page (subida con la
+                 MAQUINITA) lleva la tarjeta OG completa y
+                 redirige al enlace profundo ?s=. Sin urlPages o
+                 sin meta.promo el enlace ?s= queda EXACTO como
+                 siempre. La LISTA FILTRADA no cambia.
+                 R64: la visibilidad del botón la lleva
                  Lista_Script (lo enciende con items en la
                  lista) — FUERA los listeners 'buscar:estado' y
                  'buscar:resultados'; el enlace de LISTA admite
@@ -237,6 +253,21 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
+       R98 · BASE DE PAGES · ROOTJSON.app.urlPages (carpeta e/ del
+       repo, terminada en /e). Vacía → no hay pages y todo
+       comparte el enlace ?s= de siempre (comportamiento intacto).
+       ============================================================ */
+    function urlPages() {
+      try {
+        var root = (window.SISTEMA && window.SISTEMA.root) || {};
+        return String((root.app && root.app.urlPages) || '')
+          .trim().replace(/[\/\?]+$/, '');
+      } catch (_) {
+        return '';
+      }
+    }
+
+    /* ============================================================
        Estado
        ============================================================ */
     var modoCompartido = null;   /* 'post' | 'lista' | null */
@@ -249,9 +280,24 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     /* ============================================================
        Emisor · POST (lo consume Social)
+       R98 · PAGE DE ENLACE: post con meta.promo (post.promo viaja
+       en el catálogo desde 02 Cache.gs) + app.urlPages en la BD →
+       el enlace compartido es la page e/<id>.html (subida con la
+       MAQUINITA): WhatsApp lee la tarjeta OG completa y la page
+       redirige al enlace profundo. ?v= en el enlace pide releer
+       la tarjeta en cada compartir (ediciones sin esperar caché).
+       IMPORTANTE: la page debe estar SUBIDA antes de activar la
+       promo del post (receta en el LEEME de la ronda).
        ============================================================ */
     function urlDePost(post) {
       if (!post || !post.id) return Promise.resolve(urlBase());
+
+      var base = urlPages();
+      if (base && post.promo) {
+        return Promise.resolve(
+          base + '/' + encodeURIComponent(post.id) + '.html?v=' + Date.now()
+        );
+      }
 
       return Promise.resolve(
         armarEnlace(empaquetar('p', [String(post.id)]))

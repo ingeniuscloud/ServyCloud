@@ -7,9 +7,15 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  del scroll en modo lista. Se oculta en modo
                  detalle y cuando la ciudad no tiene promos
                  vigentes.
-                 Lee SISTEMA.promo.porCiudad[ciudadActiva],
-                 filtra por fecha (inicia <= hoy <= termina) y por
-                 estado del post (solo activo).
+                 Lee SISTEMA.promo.porCiudad[ciudadActiva]: PROMOJSON
+                 SOLO registra idPost + ventanas (inicia/termina);
+                 el CONTENIDO de cada tarjeta vive en el POSTJSON
+                 del post (meta.promo: titulo, descripcion,
+                 idBadge) y llega por el catálogo (02 Cache.gs lo
+                 extrae al índice, 0 lecturas nuevas). Filtra por
+                 ventana (reloj del teléfono, fecha o fecha+hora
+                 via ventanaVigente de Global_Script) y por estado
+                 del post (solo activo).
                  El riel avanza SOLO y sin parar: un bucle de
                  requestAnimationFrame suma a scrollLeft. Se usa
                  scrollLeft y no transform para que el dedo pueda
@@ -30,39 +36,42 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  con la inercia del arrastre).
                  Se detiene además si el slot está oculto y si el
                  sistema pide menos movimiento.
-                 Tarjeta (R96): TRES LÍNEAS de texto en blanco —
-                 1ª = item.titulo de PROMOJSON (tipografía
-                 .subtitulo), 2ª = item.descripcion
+                 Tarjeta: TRES LÍNEAS de texto en blanco —
+                 1ª = promo.titulo del POSTJSON (tipografía
+                 .subtitulo), 2ª = promo.descripcion
                  (.textoPrimario) y 3ª = tituloPost del post
-                 (POSTJSON, .cita) — con el BADGE a la derecha
-                 de la primera fila y la flecha circular a la
-                 esquina inferior derecha. La pintura (degradado
-                 del colorOficial, sombra, badge, flecha) y el
-                 proceso (riel, bucle, pausa con el dedo) quedan
-                 igual; solo cambió el texto a mostrar. Cada tarjeta lleva el
-                 DEGRADADO de su colorOficial (R62: estilo
-                 inline 2026 — diagonal 135°, claro → base →
-                 oscuro — y su sombra; los clones llevan el MISMO
-                 estilo que su original para que la vuelta no
-                 cambie de color). El encabezado "Promos cerca de
-                 ti" + "Toca para conocer más" se muestra/oculta
-                 junto con el slot.
-VERSIÓN:         2.0.0
-CAMBIOS:         R96: PROMOJSON nuevo (titulo + descripcion por
-                 item). La tarjeta muestra: titulo en .subtitulo,
-                 descripcion en .textoPrimario y el tituloPost
-                 del post en .cita — las tres en blanco. Fuera la
-                 fila del partner (el título del post ahora
-                 cierra la tarjeta en .cita).
-                 R95: textoDePromo sin la lectura muerta de
-                 seccionJson (migración POSTJSON).
-
+                 (.cita) — con el BADGE (promo.idBadge buscado en
+                 BADGEJSON) a la derecha de la primera fila y la
+                 flecha circular a la esquina inferior derecha. La
+                 pintura (degradado del colorOficial, sombra,
+                 badge, flecha) y el proceso (riel, bucle, pausa
+                 con el dedo) quedan igual. Cada tarjeta lleva el
+                 DEGRADADO de su colorOficial (estilo inline 2026
+                 — diagonal 135°, claro → base → oscuro — y su
+                 sombra; los clones llevan el MISMO estilo que su
+                 original para que la vuelta no cambie de color).
+                 El encabezado "Promos cerca de ti" + "Toca para
+                 conocer más" se muestra/oculta junto con el slot.
+VERSIÓN:         2.1.0
+CAMBIOS:         R98: FUENTE ÚNICA = POSTJSON. Los textos y el
+                 badge de la tarjeta se leen de post.promo
+                 (meta.promo del POSTJSON, viajando en el
+                 catálogo) y NO del item de PROMOJSON, que ahora
+                 solo trae idPost + inicia + termina. Sin
+                 meta.promo la tarjeta cae al tituloPost del post
+                 (nunca queda muda). La vigencia pasa por
+                 ventanaVigente (Global_Script): inicia con hora
+                 = ventana horaria; sin hora = todo el día.
+                 Fuera la lectura de textos del item (titulo,
+                 texto, promoTexto, mensaje, descripcion) y del
+                 idPostActual (shape viejo).
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
-                 #promoEncabezado),
-                 Ciudad_Sheet_Script.html (getActual),
-                 Chips_Script.html (getChipActivo, seleccionar),
-                 Iconos.html (pintarGlifos), Promo_CSS.html,
-                 Lista_CSS.html (clase .lista-item compartida)
+                 #promoEncabezado), Global_Script.html
+                 (ventanaVigente), Ciudad_Sheet_Script.html
+                 (getActual), Chips_Script.html (getChipActivo,
+                 seleccionar), Iconos.html (pintarGlifos),
+                 Promo_CSS.html, Lista_CSS.html (clase .lista-item
+                 compartida)
 ════════════════════════════════════════════════════════════════════*/
 
   window.Promo = (function () {
@@ -176,10 +185,19 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       return y + '-' + m + '-' + dd;
     }
 
+    /* R98 · VIGENCIA TOLERANTE (reloj del teléfono): la ventana
+       vive en ventanaVigente (Global_Script) — inicia con hora
+       = ventana horaria; sin hora = todo el día. */
     function estaVigente(item) {
+      if (typeof window.ventanaVigente === 'function') {
+        return window.ventanaVigente(item.inicia, item.termina);
+      }
+      /* Respaldo sin Global (no debería pasar): fecha plana. */
       var hoy = hoyISO();
-      if (item.inicia && item.inicia > hoy) return false;
-      if (item.termina && item.termina < hoy) return false;
+      var inicia = String(item.inicia || '').slice(0, 10);
+      var termina = String(item.termina || '').slice(0, 10);
+      if (inicia && inicia > hoy) return false;
+      if (termina && termina < hoy) return false;
       return true;
     }
 
@@ -235,28 +253,29 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       });
     }
 
-    /* R96 · TEXTOS DE LA TARJETA — el PROMOJSON nuevo trae
-       titulo y descripcion por item:
-       · TITULO   (1ª línea, .subtitulo): item.titulo, con
-         respaldo en texto/mensaje de la estructura vieja para
-         que una promo sin migrar no se quede muda.
-       · DESCRIPCION (2ª línea, .textoPrimario): item.descripcion.
+    /* R98 · TEXTOS DE LA TARJETA — el CONTENIDO vive en el
+       POSTJSON del post (post.promo viaja en el catálogo desde
+       02 Cache.gs) y NO en el item de PROMOJSON:
+       · TITULO   (1ª línea, .subtitulo): post.promo.titulo.
+       · DESCRIPCION (2ª línea, .textoPrimario):
+         post.promo.descripcion.
+       · BADGE: post.promo.idBadge (buscado en BADGEJSON).
        · TITULOpOST (3ª línea, .cita): el tituloPost del post —
-         el índice del catálogo ya lo trae en post.titulo
-         (02 Cache.gs: titulo = postJson.descripcion.tituloPost);
-         si el post trae el detalle montado, manda el postJson. */
-    function tituloDePromo(item, post) {
-      var campos = ['titulo', 'texto', 'promoTexto', 'mensaje'];
-      for (var i = 0; i < campos.length; i++) {
-        var v = item ? item[campos[i]] : null;
-        if (typeof v === 'string' && v.trim()) return v.trim();
-      }
-      var t = post ? post.promoTexto : null;
+         el índice del catálogo ya lo trae en post.titulo;
+         si el post trae el detalle montado, manda el postJson.
+       Sin meta.promo el post cae al tituloPost (nunca muda). */
+    function tituloDePromo(post) {
+      var t = post && post.promo ? post.promo.titulo : null;
       return (typeof t === 'string' && t.trim()) ? t.trim() : '';
     }
 
-    function descripcionDePromo(item) {
-      var v = item ? item.descripcion : null;
+    function descripcionDePromo(post) {
+      var v = post && post.promo ? post.promo.descripcion : null;
+      return (typeof v === 'string' && v.trim()) ? v.trim() : '';
+    }
+
+    function idBadgeDePromo(post) {
+      var v = post && post.promo ? post.promo.idBadge : null;
       return (typeof v === 'string' && v.trim()) ? v.trim() : '';
     }
 
@@ -269,14 +288,15 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     }
 
     function buildItemHTML(item, post) {
-      /* R96 · el badge vive en el ITEM de PROMOJSON (con
-         respaldo en el post) y sigue a la derecha de la 1ª
-         fila. Las 3 líneas las pinta Promo_CSS: titulo en
-         .subtitulo, descripcion en .textoPrimario y tituloPost
-         en .cita — todas en blanco sobre el degradado. */
-      var badge = buscarBadge((item && (item.idBadge || item.idBadgeActual)) || post.idBadge);
-      var tituloPromo = tituloDePromo(item, post);
-      var descripcion = descripcionDePromo(item);
+      /* R98 · badge y textos salen del POSTJSON (post.promo);
+         el item de PROMOJSON solo decidió QUE post sale y
+         CUÁNDO. El badge sigue a la derecha de la 1ª fila. Las
+         3 líneas las pinta Promo_CSS: titulo en .subtitulo,
+         descripcion en .textoPrimario y tituloPost en .cita —
+         todas en blanco sobre el degradado. */
+      var badge = buscarBadge(idBadgeDePromo(post));
+      var tituloPromo = tituloDePromo(post);
+      var descripcion = descripcionDePromo(post);
       var tituloPost  = tituloPostDe(post);
 
       var badgeHtml = (badge && badge.titulo)
@@ -438,25 +458,22 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       if (!ciudad) return;
 
       var raw  = (promo.porCiudad && promo.porCiudad[ciudad]) || null;
-      /* R67 · FIX: el PROMOJSON real de la hoja trae porCiudad
-         como OBJETO (idPostActual + proximaRotación — la rotación
-         la lleva el backend), no como array. Antes el pool
-         quedaba en el objeto y la marquesina se APAGABA en
-         silencio (if (!pool.length) return). Se normalizan los
-         DOS formatos antes de filtrar vigentes. */
+      /* R98 · el PROMOJSON del dueño trae porCiudad como ARRAY
+         de items { idPost, inicia, termina }. Se acepta también
+         un item suelto por ciudad. */
       var pool = [];
       if (Array.isArray(raw)) {
         pool = raw;
-      } else if (raw && (raw.idPost || raw.idPostActual)) {
+      } else if (raw && raw.idPost) {
         pool = [raw];
       }
       if (!pool.length) return;
 
-      /* Filtrar por fecha + estado del post */
+      /* Filtrar por ventana + estado del post */
       var vigentes = [];
       pool.forEach(function (item) {
         if (!item) return;
-        var idPost = item.idPost || item.idPostActual;
+        var idPost = item.idPost;
         if (!idPost) return;
         if (!estaVigente(item)) return;
         var post = buscarPost(idPost);

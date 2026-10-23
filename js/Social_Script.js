@@ -8,10 +8,22 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  contadores): corazón volador al dar like, share
                  nativo con fallback WhatsApp y contador de
                  compartidos en el backend. El mensaje de WhatsApp
-                 lleva el formato del dueño y el enlace profundo de
-                 Compartir. Key localStorage: post_likes.
-VERSIÓN:         2.0.2
-CAMBIOS:         R91: LIMPIEZA ALINEADA AL VUELO LARGO — la animación
+                 lleva el FORMATO RICO del dueño (R98): emoji og +
+                 *título* + _og.descripcion_ + línea de confianza +
+                 enlace — todo con datos ya en memoria (0 lecturas
+                 nuevas). Key localStorage: post_likes.
+VERSIÓN:         2.1.0
+CAMBIOS:         R98: MENSAJE RICO de WhatsApp. El texto sale del
+                 bloque og del POSTJSON (meta.og): 1ª línea emoji +
+                 *título* (og.titulo → tituloPost → post.titulo),
+                 2ª _og.descripcion_ completa (se omite si viene
+                 vacía), línea de confianza según el tipo (la misma
+                 de siempre) y el enlace al final. Fuera el saludo,
+                 el nombre del partner y el tagline (ya no existen en
+                 el formato). El título para navigator.share lleva
+                 el emoji. Sin og el mensaje cae al título en
+                 negrita y no se rompe nada.
+                 R91: LIMPIEZA ALINEADA AL VUELO LARGO — la animación
                  del corazón pasó de 0.8s a 1.05s (recorrido más
                  largo, ver Social_CSS 1.4.2) y la limpieza del
                  wrap pasa de 850ms a 1150ms para no cortarla.
@@ -56,17 +68,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return getLikes().indexOf(id) !== -1;
     }
 
-    function buscarPartner(idPartner) {
-      if (!idPartner) return null;
-      var partners = (window.TABLAS && window.TABLAS.partners) || [];
-      for (var i = 0; i < partners.length; i++) {
-        if (partners[i].id === idPartner) return partners[i];
-      }
-      return null;
-    }
-
-    /* Tipo del post en SINGULAR y MAYÚSCULAS para la negrita de
-       WhatsApp (los chips viven en plural: "Cursos" → "CURSO"). */
+    /* Tipo del post en SINGULAR y MAYÚSCULAS (los chips viven en
+       plural: "Cursos" → "CURSO"). Decide la línea de confianza. */
     function tipoSingularDePost(post) {
       var id = String(((post && post.idChips) || [])[0] || '').trim();
       if (!id) return '';
@@ -85,17 +88,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return String(tipoSingular || '').indexOf('SERVIC') === 0;
     }
 
-    /* Ciudad del post (la primera declarada) en texto natural. */
-    function ciudadDePost(post) {
-      var id = String(((post && post.idCiudad) || [])[0] || '').trim();
-      if (!id) return '';
-      var ciudades = (window.SISTEMA && window.SISTEMA.ciudades) || [];
-      for (var i = 0; i < ciudades.length; i++) {
-        if (ciudades[i].idCiudad === id) return String(ciudades[i].titulo || '').trim();
-      }
-      return '';
-    }
-
     function urlApp() {
       try {
         var root = (window.SISTEMA && window.SISTEMA.root) || {};
@@ -107,44 +99,46 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Texto a compartir (formato del dueño) · R77: el título viene
-       de postJson.descripcion.tituloPost.
+       Texto a compartir (R98 · FORMATO RICO del dueño, igual que
+       entrega la MAQUINITA):
+         {emoji og} *{título}*
+         _{og.descripcion completa}_   (se omite si viene vacía)
+         {línea de confianza}
+
+         🔗 {enlace}
+       · Título: og.titulo → tituloPost → post.titulo (la misma
+         cadena del servidor, 00 DoGet).
+       · Todo sale del POSTJSON ya en memoria + el enlace de
+         Compartir: 0 lecturas nuevas.
+       · Sin og el mensaje cae al título en negrita y no se rompe.
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
-      var pj = post.postJson || {};
+      var pj   = post.postJson || {};
+      var meta = pj.meta || {};
+      var og   = (meta.og && typeof meta.og === 'object') ? meta.og : {};
       var desc = pj.descripcion || {};
 
-      var titulo  = String(desc.tituloPost || post.titulo || '').trim() || 'Publicación';
-      var tagline = String(desc.tagline || '').trim();
-
-      var partner = buscarPartner(post.idPartner);
-      var nombre  = partner ? String(partner.nombre || '').trim() : '';
+      var tituloBase = String(og.titulo || '').trim() ||
+                       String(desc.tituloPost || '').trim() ||
+                       String(post.titulo || '').trim() || 'Publicación';
+      var emoji = String(og.emoji || '').trim();
+      var lineaOg = String(og.descripcion || '').trim();
 
       var url = String(urlEnlace || '').trim() || urlApp();
 
-      var tipo   = tipoSingularDePost(post);
-      var ciudad = ciudadDePost(post);
-
+      var tipo = tipoSingularDePost(post);
       var confianza = esServicio(tipo)
         ? 'Te lo recomiendo'
         : 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy';
 
-      var saludo;
-      if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';
-      else if (tipo)      saludo = '🖐️ ¡Mira este *' + tipo + '*! 🔎';
-      else if (ciudad)    saludo = '🖐️ ¡Mira esto en ' + ciudad + '! 🔎';
-      else                saludo = '🖐️ ¡Mira esto! 🔎';
-
       var texto =
-        saludo + '\n\n' +
-        (nombre ? '✨ ' + nombre + '\n' : '') +
-        '*' + titulo + '*\n' +
-        (tagline ? tagline + '\n' : '') +
+        (emoji ? emoji + ' ' : '') + '*' + tituloBase + '*\n' +
+        (lineaOg ? '_' + lineaOg + '_\n' : '') +
+        '\n' +
         confianza + '\n\n' +
-        '🔗 Abre la app para ver toda la información' +
-        (url ? '\n' + url : '');
+        '🔗 ' + url;
 
-      return { titulo: titulo, texto: texto };
+      return { titulo: (emoji ? emoji + ' ' : '') + tituloBase, texto: texto };
     }
 
     function textoCompartirDe(post) {
