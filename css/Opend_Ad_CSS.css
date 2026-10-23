@@ -1,0 +1,135 @@
+/*════════════════════════════════════════════════════════════════════
+
+ARCHIVO:         Opend_Ad_CSS.html
+PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos del intersticial de apertura (estilo App
+                 Open Ad). Capa fija sobre TODA la app mientras
+                 carga: velo tenue (la app se intuye detrás),
+                 creativo 9:16 centrado ocupando ~90% con radio y
+                 sombra, X de cierre SIEMPRE visible en la esquina
+                 del creativo y botón "Saber más" (texto de la BD)
+                 debajo. El texto del botón y la imagen salen de
+                 PROMOJSON.intersticial (cero textos fijos).
+VERSIÓN:         1.0.0
+CAMBIOS:         R98: primera entrega. Entrada con fade y
+                 escala sutil (respetando prefers-reduced-motion),
+                 cierre instantáneo, bloqueo del scroll de fondo y
+                 respeto de las safe areas del teléfono.
+DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
+                 (R100: el archivo se llama Opend_Ad_CSS — nombre del
+                 dueño; la BD sigue usando PROMOJSON.intersticial)
+════════════════════════════════════════════════════════════════════*/
+
+  /* ============================================================
+     CAPA · velo sobre la app
+     ============================================================ */
+  .intersticial {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    background: rgba(26, 22, 16, 0.84);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .intersticial.intersticial-visible { opacity: 1; }
+  .intersticial[hidden] { display: none !important; }
+
+  /* Mientras la capa vive, la app de atrás no scrollea */
+  body.intersticial-abierto { overflow: hidden; }
+
+  /* ============================================================
+     CREATIVO · imagen 9:16 al ~90% de la pantalla
+     El ancho máximo reserva lugar para el botón (96px) para
+     que en pantallas cuadradas nada se salga.
+     ============================================================ */
+  .intersticial-creativo {
+    position: relative;
+    margin: 0;
+    width: min(92vw, calc((100vh - 96px) * 9 / 16));
+    animation: intersticial-entra 0.24s ease-out both;
+  }
+
+  @keyframes intersticial-entra {
+    from { opacity: 0; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .intersticial-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* ============================================================
+     X DE CIERRE · inmediata, siempre visible
+     Círculo blanco montado en la esquina del creativo (la mitad
+     afuera) para que se vea sobre cualquier imagen.
+     ============================================================ */
+  .intersticial-cerrar {
+    position: absolute;
+    top: -13px;
+    right: -13px;
+    width: 40px;
+    height: 40px;
+    min-width: 44px;
+    min-height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #1f1b16;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .intersticial-cerrar:active { transform: scale(0.94); }
+  .intersticial-cerrar svg {
+    width: 19px;
+    height: 19px;
+    stroke: #1f1b16;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  /* ============================================================
+     BOTÓN "SABER MÁS" · texto de la BD, sin coacción
+     Píldora clara sobre el velo: visible, tranquila, con el
+     texto exacto de PROMOJSON.intersticial.textoBoton.
+     ============================================================ */
+  .intersticial-boton {
+    min-height: 46px;
+    padding: 12px 34px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1f1b16;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .intersticial-boton:active { transform: scale(0.97); }
+  .intersticial-boton[hidden] { display: none !important; }
+
+  /* Menos movimiento: sin animación de entrada */
+  @media (prefers-reduced-motion: reduce) {
+    .intersticial { transition: none; }
+    .intersticial-creativo { animation: none; }
+  }

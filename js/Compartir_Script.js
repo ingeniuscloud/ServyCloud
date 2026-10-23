@@ -10,7 +10,7 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  catálogo como post.promo) y la BD define
                  ROOTJSON.app.urlPages, el enlace es la PAGE de
                  GitHub Pages (e/<id>.html, generada con la
-                 MAQUINITA): tarjeta OG completa + redirección al
+                 Generador OG): tarjeta OG completa + redirección al
                  enlace profundo. Sin urlPages o sin meta.promo →
                  enlace ?s= de siempre.
                  (2) LISTA FILTRADA — el TEXTO "Compartir lista
@@ -49,7 +49,7 @@ CAMBIOS:         R98: urlDePost entrega la PAGE de GitHub Pages
                  catálogo) cuando la BD trae app.urlPages: base +
                  /e/ + id + .html + ?v= (pide a WhatsApp releer la
                  tarjeta en cada compartir). La page (subida con la
-                 MAQUINITA) lleva la tarjeta OG completa y
+                 Generador OG) lleva la tarjeta OG completa y
                  redirige al enlace profundo ?s=. Sin urlPages o
                  sin meta.promo el enlace ?s= queda EXACTO como
                  siempre. La LISTA FILTRADA no cambia.
@@ -283,7 +283,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
        R98 · PAGE DE ENLACE: post con meta.promo (post.promo viaja
        en el catálogo desde 02 Cache.gs) + app.urlPages en la BD →
        el enlace compartido es la page e/<id>.html (subida con la
-       MAQUINITA): WhatsApp lee la tarjeta OG completa y la page
+       Generador OG): WhatsApp lee la tarjeta OG completa y la page
        redirige al enlace profundo. ?v= en el enlace pide releer
        la tarjeta en cada compartir (ediciones sin esperar caché).
        IMPORTANTE: la page debe estar SUBIDA antes de activar la

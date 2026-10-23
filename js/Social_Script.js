@@ -100,7 +100,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
     /* ============================================================
        Texto a compartir (R98 · FORMATO RICO del dueño, igual que
-       entrega la MAQUINITA):
+       entrega el Generador OG):
          {emoji og} *{título}*
          _{og.descripcion completa}_   (se omite si viene vacía)
          {línea de confianza}

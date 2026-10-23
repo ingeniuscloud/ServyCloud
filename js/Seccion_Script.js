@@ -10,8 +10,17 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.6.0
-CAMBIOS:         R96: (1) la promo del lienzo lee el PROMOJSON
+VERSIÓN:         2.7.0
+CAMBIOS:         R100: FIX de la promo MUDA en el lienzo del post
+                 (regresión R98): buildPromoHTML seguía leyendo
+                 titulo/descripcion/idBadge del ITEM de
+                 PROMOJSON, que con la fuente única ya solo trae
+                 idPost + inicia + termina. Ahora lee del bloque
+                 meta.promo del POSTJSON — el catálogo lo trae en
+                 post.promo y el detalle en postJson.meta.promo
+                 (misma fuente que la marquesina) — con los
+                 campos viejos del item como último respaldo.
+                 R96: (1) la promo del lienzo lee el PROMOJSON
                  nuevo y muestra titulo (.subtitulo) y
                  descripcion (.textoPrimario) con entrada
                  suave; (2) dots del carrusel al instante (rAF,
@@ -363,22 +372,37 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var post = postActivo;
       if (!post) return '';
       var item = _promoDelPost(post);
-      /* R84: el badge vive en el ITEM de PROMOJSON (con respaldo
-         en el post). Si hay texto y la BD no trae badge, la
-         píldora PROMO identifica la etiqueta igualmente. */
-      var badge = _badgeDelPost(item) || _badgeDelPost(post);
-      if (!item && !badge) return '';
-
+      /* R100 · FUENTE ÚNICA (misma regla de la marquesina): el
+         CONTENIDO vive en meta.promo del POSTJSON. El catálogo
+         lo trae en post.promo (02 Cache.gs lo extrae al índice)
+         y el detalle en postJson.meta.promo — son EL MISMO
+         bloque; si el catálogo viniera sin él, el detalle lo
+         cubre. El item de PROMOJSON solo decidió QUÉ post y
+         CUÁNDO: con el shape nuevo ya no trae textos, y leer
+         ahí dejaba la promo del post muda. Los campos viejos
+         del item quedan como último respaldo. */
+      var promoIdx = (post.promo && typeof post.promo === 'object') ? post.promo : null;
       var metaPost = (post.postJson && post.postJson.meta) || {};
+      var promoDet = (metaPost.promo && typeof metaPost.promo === 'object') ? metaPost.promo : null;
 
-      /* R96 · textos nuevos: titulo + descripcion del item.
-         Respaldo en la estructura vieja (texto/mensaje) y en el
-         promoTexto del post para que una promo sin migrar
-         también se pinte. */
-      var tituloPromo = _primerTexto(item, ['titulo', 'texto', 'promoTexto', 'mensaje']) ||
+      var badge = _badgeDelPost(promoIdx) ||
+                  _badgeDelPost(promoDet) ||
+                  _badgeDelPost(item) || _badgeDelPost(post);
+      /* R100 · el bloque solo aparece si el post ES la promo
+         vigente de la ciudad (item del PROMOJSON con fechas al
+         día) — igual que R96. El badge solo acompaña al texto:
+         un post con meta.promo guardado pero fuera de agenda no
+         pinta el bloque. */
+      if (!item) return '';
+
+      var tituloPromo = _primerTexto(promoIdx, ['titulo']) ||
+                        _primerTexto(promoDet, ['titulo']) ||
+                        _primerTexto(item, ['titulo', 'texto', 'promoTexto', 'mensaje']) ||
                         _primerTexto(post, ['promoTexto']) ||
                         _primerTexto(metaPost, ['promoTexto']);
-      var descripcionPromo = _primerTexto(item, ['descripcion']);
+      var descripcionPromo = _primerTexto(promoIdx, ['descripcion']) ||
+                             _primerTexto(promoDet, ['descripcion']) ||
+                             _primerTexto(item, ['descripcion']);
 
       var viejo     = _primerTexto(item, ['precioAnterior', 'precioViejo', 'oldPrice', 'precioAntes']);
       var actual    = _primerTexto(item, ['precioActual', 'precio', 'newPrice', 'precioNuevo']);
