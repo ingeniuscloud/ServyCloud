@@ -5,85 +5,51 @@ ESPEJO GITHUB:   github/js/Compartir_Script.js (subir a GitHub Pages; editar en 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (1) POST — Social pide Compartir.urlDePost(post) y
-                 su mensaje de WhatsApp lleva el enlace; R98: si el
-                 post trae meta.promo en su POSTJSON (viaja en el
-                 catálogo como post.promo) y la BD define
-                 ROOTJSON.app.urlPages, el enlace es la PAGE de
-                 GitHub Pages (e/<id>.html, generada con la
-                 Generador OG): tarjeta OG completa + redirección al
-                 enlace profundo. Sin urlPages o sin meta.promo →
-                 enlace ?s= de siempre.
+                 su mensaje de WhatsApp lleva el enlace del post;
                  (2) LISTA FILTRADA — el TEXTO "Compartir lista
-                 filtrada" sobre la lista (R64: vive en el respiro
-                 entre filtros y items; Lista_Script decide su
+                 filtrada" sobre la lista (Lista_Script decide su
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-                 El enlace ?s= viaja en UN parámetro corto con el
-                 payload compacto y OFUSCADO (XOR con clave
-                 embebida + base64url): el ID del post o el
+                 El enlace del POST apunta a la PÁGINA GEMELA del
+                 post en GitHub Pages (root.app.urlPages): ahí vive
+                 el OG que WhatsApp previsualiza y la página abre la
+                 app GitHub AL INSTANTE (location.replace, sin
+                 pantalla intermedia y NUNCA al /exec de GAS). Si el
+                 ROOT no trae urlPages, el enlace va directo a la
+                 app (root.app.urlApp) con el payload corto ?s=.
+                 El enlace de LISTA va SIEMPRE directo a la app con
+                 el payload corto ?s= (una lista filtrada no tiene
+                 página propia). El payload viaja OFUSCADO (XOR con
+                 clave embebida + base64url): el ID del post o el
                  término NUNCA van planos en la URL. Los enlaces
                  antiguos ?d= (AES-256-GCM) siguen abriendo.
-                 Receptor: Core llama
-                 Compartir.recibir() cuando TABLAS cargó y el lienzo
-                 está inyectado; se aplica ciudad + contenido y la
-                 app entra en MODO COMPARTIDO: ciudad VISTA pero
-                 BLOQUEADA, campo de búsqueda fijado SIN foco y la
-                 X del campo libera la vista (sin menú global ni
-                 compartir). El header del detalle lo decide el
-                 TIPO de enlace (esta ronda marca el body): con UN
-                 post la fila sustituye al par volver/título del
-                 modo detalle y la salida es la X; con
-                 una LISTA cada post abre con volver/título normales
-                 para recorrer los demás posts del filtro, y
-                 la X queda en la lista. Al limpiar
-                 vuelve todo el catálogo (la ciudad del enlace queda
-                 como la del receptor). Aviso amable si el contenido
-                 compartido ya no existe. La instalación de la PWA
-                 NO cambia: se hace desde la app con el enlace
-                 principal (menú / píldora), nunca desde el enlace
-                 compartido.
-VERSIÓN:         2.2.1
-CAMBIOS:         R103: urlPages() se arma con app.urlApp + /e cuando
-                 la BD no trae urlPages Y urlApp es de GitHub Pages
-                 (tu ROOTJSON actual: la URL del repo en urlApp) —
-                 las pages e/ comparten SIN editar la BD. Si escribes
-                 app.urlPages (terminada en /e, como siempre), esa
-                 manda; y si urlApp dejara de ser de Pages, vuelve
-                 el enlace ?s= de siempre. Nada más cambia.
-                 R98: urlDePost entrega la PAGE de GitHub Pages
-                 para los posts con meta.promo (post.promo del
-                 catálogo) cuando la BD trae app.urlPages: base +
-                 /e/ + id + .html + ?v= (pide a WhatsApp releer la
-                 tarjeta en cada compartir). La page (subida con la
-                 Generador OG) lleva la tarjeta OG completa y
-                 redirige al enlace profundo ?s=. Sin urlPages o
-                 sin meta.promo el enlace ?s= queda EXACTO como
-                 siempre. La LISTA FILTRADA no cambia.
-                 R64: la visibilidad del botón la lleva
-                 Lista_Script (lo enciende con items en la
-                 lista) — FUERA los listeners 'buscar:estado' y
-                 'buscar:resultados'; el enlace de LISTA admite
-                 compartir por CHIP sin término (payload
-                 'l·ciudad·q·chip' con '-' como término vacío;
-                 los de 2 partes antiguos siguen abriendo): si el
-                 enlace trae término se filtra como siempre, y si
-                 trae chip se selecciona el chip en el receptor.
-                 La X del campo libera la vista (el trabajo que
-                 hacía CANCELAR).
-                 R61: el emisor de LISTA FILTRADA es el TEXTO
-                 "Compartir lista filtrada" (el estilo lo viste
-                 Chips_CSS). El modo compartido lo retira con
-                 body.modo-compartido.
-                 R43: lista compartida — activarModo marca el body
-                 con compartido-lista / compartido-post y limpiar
-                 los retira; con eso Chips_CSS devuelve el par
-                 volver/título dentro de cada post de una lista
-                 compartida (el receptor puede verlos todos y
-                 regresar). El post compartido solitario queda
-                 exactamente igual: la fila con la X es su
-                 salida. Enlace corto ?s=, receptor legacy ?d= y
-                 línea de confianza intactos.
+                 Receptor: Core llama Compartir.recibir() cuando
+                 TABLAS cargó y el lienzo está inyectado; se aplica
+                 ciudad + contenido y la app entra en MODO
+                 COMPARTIDO: ciudad VISTA pero BLOQUEADA, campo de
+                 búsqueda fijado SIN foco y la X del campo libera la
+                 vista (sin menú global ni compartir). El header del
+                 detalle lo decide el TIPO de enlace: con UN post la
+                 fila sustituye al par volver/título del modo
+                 detalle y la salida es la X; con una LISTA cada
+                 post abre con volver/título normales para recorrer
+                 los demás posts del filtro, y la X queda en la
+                 lista. Al limpiar vuelve todo el catálogo (la
+                 ciudad del enlace queda como la del receptor).
+                 Aviso amable si el contenido compartido ya no
+                 existe. La instalación de la PWA NO cambia: se hace
+                 desde la app con el enlace principal (menú /
+                 píldora), nunca desde el enlace compartido.
+VERSIÓN:         2.2
+CAMBIOS:         R105: el enlace del POST sale de
+                 root.app.urlPages + IDPOST + .html?v= (la página
+                 gemela que WhatsApp previsualiza y que abre la app
+                 GitHub al instante); FUERA el respaldo URL_EXEC —
+                 ningún enlace compartido vuelve al /exec de GAS.
+                 Las líneas de confianza del mensaje salen de
+                 root.app.mensajesWS (curso / servicio) con los
+                 textos de siempre como respaldo.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Lista_Script.html (TABLAS.posts,
                  visibilidad de #btnCompartir),
@@ -183,9 +149,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     /* Inverso EXACTO de empaquetar. Valida la estructura: si el
        token no decodifica a post o lista completa, falla (el
-       receptor lo trata como enlace no válido). R64: la lista
-       acepta el chip como tercer campo (q '-' = sin término).
-       Los de 2 partes (solo ciudad+término) siguen abriendo. */
+       receptor lo trata como enlace no válido). La lista acepta
+       el chip como tercer campo (q '-' = sin término); los de 2
+       partes (solo ciudad+término) siguen abriendo. */
     function desempaquetar(token) {
       var partes = new TextDecoder()
         .decode(xorBytes(b64urlABytes(token)))
@@ -240,18 +206,51 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
-       URL base · la misma que comparte la app (urlApp del Root),
-       con la URL_EXEC de respaldo. La instalación de la PWA
-       sigue siendo cosa de la app (menú), no del enlace.
+       URLS DE COMPARTIR · SOLO GitHub Pages, NUNCA el /exec de GAS
+       · urlApp()   → la app (root.app.urlApp): aterrizaje de los
+                      enlaces y respaldo del post sin página gemela.
+       · urlPages() → la carpeta de páginas gemelas
+                      (root.app.urlPages): ahí vive el OG por post.
+       R105: FUERA el respaldo URL_EXEC. Si el ROOT no trae las
+       URLs de GitHub no se inventa destino: el enlace queda vacío
+       (Social manda el mensaje sin enlace) — jamás un /exec.
        ============================================================ */
-    function urlBase() {
-      var url = '';
+    function rootApp() {
       try {
         var root = (window.SISTEMA && window.SISTEMA.root) || {};
-        url = String((root.app && root.app.urlApp) || '').trim();
-      } catch (_) {}
-      if (!url) url = String(window.URL_EXEC || '').trim();
-      return url.replace(/\?+$/, '');
+        return (root.app && typeof root.app === 'object') ? root.app : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function urlApp() {
+      /* Raíz de la app con SU raya final (como viene en el ROOT):
+         el aterrizaje ?s= no debe pasar por un salto de GitHub. */
+      return String(rootApp().urlApp || '').trim().replace(/\?+$/, '');
+    }
+
+    function urlPages() {
+      return String(rootApp().urlPages || '').trim().replace(/\?+$/, '').replace(/\/+$/, '');
+    }
+
+    function urlBase() {
+      return urlApp() || urlPages();
+    }
+
+    /* Enlace del POST: página gemela del post en GitHub Pages.
+       El ?v= (timestamp) renueva la previsualización de WhatsApp
+       cada vez que se comparte: si el dueño regeneró la página
+       con otra imagen o texto, el scrape no queda pegado al
+       cache viejo. Sin urlPages en el ROOT, enlace directo a la
+       app con el token corto (mismo receptor de siempre). */
+    function armarEnlacePost(idPost) {
+      var pages = urlPages();
+      if (pages) {
+        return pages + '/' + encodeURIComponent(idPost) + '.html?v=' + Date.now();
+      }
+      var token = empaquetar('p', [String(idPost)]);
+      return token ? armarEnlace(token) : urlBase();
     }
 
     function armarEnlace(token) {
@@ -259,34 +258,14 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return urlBase() + '?s=' + token;
     }
 
-    /* ============================================================
-       R98 · BASE DE PAGES · ROOTJSON.app.urlPages (carpeta e/ del
-       repo, terminada en /e). R103: si la BD no la trae, se arma
-       con app.urlApp + /e cuando urlApp es de GitHub Pages.
-       Vacía → no hay pages y todo comparte el enlace ?s= de
-       siempre (comportamiento intacto).
-       ============================================================ */
-    function urlPages() {
-      try {
-        var root = (window.SISTEMA && window.SISTEMA.root) || {};
-        var app  = root.app || {};
-        var propia = String(app.urlPages || '').trim().replace(/[\/\?]+$/, '');
-        if (propia) return propia;
-        /* R103: si la BD no trae urlPages, se arma con app.urlApp
-           (tu ROOTJSON actual pone ahí la URL del repo de GitHub
-           Pages) + la carpeta e/. Solo si urlApp es de Pages
-           (github.io): si mañana urlApp volviera a ser la /exec,
-           no se inventan pages y vuelve el enlace ?s= de siempre.
-           Si escribes urlPages (terminada en /e), esa manda:
-           semántica R98 intacta. */
-        var porApp = String(app.urlApp || '').trim();
-        if (porApp.indexOf('github.io') !== -1) {
-          return porApp.replace(/[\/\?]+$/, '') + '/e';
-        }
-        return '';
-      } catch (_) {
-        return '';
-      }
+    /* Líneas de confianza del mensaje (ROOT: app.mensajesWS).
+       Respaldo: los textos de siempre si el ROOT aún no los trae. */
+    function mensajesWS() {
+      var m = rootApp().mensajesWS || {};
+      return {
+        curso:    String(m.curso    || 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy'),
+        servicio: String(m.servicio || 'Te lo recomiendo')
+      };
     }
 
     /* ============================================================
@@ -302,28 +281,11 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
     /* ============================================================
        Emisor · POST (lo consume Social)
-       R98 · PAGE DE ENLACE: post con meta.promo (post.promo viaja
-       en el catálogo desde 02 Cache.gs) + app.urlPages en la BD →
-       el enlace compartido es la page e/<id>.html (subida con la
-       Generador OG): WhatsApp lee la tarjeta OG completa y la page
-       redirige al enlace profundo. ?v= en el enlace pide releer
-       la tarjeta en cada compartir (ediciones sin esperar caché).
-       IMPORTANTE: la page debe estar SUBIDA antes de activar la
-       promo del post (receta en el LEEME de la ronda).
        ============================================================ */
     function urlDePost(post) {
       if (!post || !post.id) return Promise.resolve(urlBase());
 
-      var base = urlPages();
-      if (base && post.promo) {
-        return Promise.resolve(
-          base + '/' + encodeURIComponent(post.id) + '.html?v=' + Date.now()
-        );
-      }
-
-      return Promise.resolve(
-        armarEnlace(empaquetar('p', [String(post.id)]))
-      );
+      return Promise.resolve(armarEnlacePost(post.id));
     }
 
     /* ============================================================
@@ -350,10 +312,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
           ? window.Chips.getChipActivo() : null;
       } catch (_) {}
 
-      /* R64: sin término de búsqueda se comparte la lista del
-         CHIP activo (el botón vive con items, no solo en
-         búsqueda). Sin término y sin chip no hay nada que
-         compartir. */
+      /* Sin término de búsqueda se comparte la lista del CHIP
+         activo (el botón vive con items, no solo en búsqueda).
+         Sin término y sin chip no hay nada que compartir. */
       if (!termino && !chipActivo) return;
 
       var ciudad = null;
@@ -392,10 +353,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         if (tipo)  que += ' de *' + tipo + '*';
         if (grupo) que += ' de ' + grupo;
 
-        /* Línea de confianza según el caso (decisión del dueño) */
-        var confianza = esServicio(tipo)
-          ? 'Te lo recomiendo'
-          : 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy';
+        /* Línea de confianza según el caso (mensajesWS del ROOT) */
+        var confianzas = mensajesWS();
+        var confianza = esServicio(tipo) ? confianzas.servicio : confianzas.curso;
 
         var texto =
           saludo + '\n\n' +
@@ -423,9 +383,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
-       Botón compartir (R64) · la visibilidad la decide
-       Lista_Script (lo muestra cuando la lista trae items); aquí
-       solo vive el binding del click y el envío.
+       Botón compartir · la visibilidad la decide Lista_Script
+       (lo muestra cuando la lista trae items); aquí solo vive el
+       binding del click y el envío.
        ============================================================ */
     function pintar() {
       if (window.__compartirBound === '1') return;
@@ -473,7 +433,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       limpiarUrl();
 
       /* Enlace corto ?s= → desempaquetar. Enlace legacy ?d=
-         (compartido antes de R40) → descifrar AES. */
+         (compartido antes del enlace corto) → descifrar AES. */
       var tarea = corto
         ? Promise.resolve().then(function () { return desempaquetar(corto); })
         : descifrar(crudo);
@@ -549,10 +509,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       var fila  = document.querySelector('.filtros-fila');
       var input = document.getElementById('buscarInput');
 
-      /* R60: la CÁPSULA queda desplegada y bloqueada — la clase
+      /* La CÁPSULA queda desplegada y bloqueada — la clase
          .compartida viste la fila (chips/lupa/compartir fuera,
-         solo CANCELAR activo) y la cabecera (menú global
-         fuera). */
+         solo CANCELAR activo) y la cabecera (menú global fuera). */
       if (wrap) wrap.classList.add('compartida');
       if (fila) fila.classList.add('compartida');
       if (input) {
@@ -565,7 +524,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
          compartido-lista → dentro del post vuelve el par
          volver/título (Chips_CSS) para recorrer la lista;
          compartido-post  → la fila con CANCELAR sigue
-         sustituyendo a ese par, como siempre. */
+         sustituyendo a ese par. */
       document.body.classList.remove('compartido-post');
       document.body.classList.remove('compartido-lista');
       document.body.classList.add(
@@ -593,7 +552,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
       activarModo('post', post.titulo || post.boton || 'Publicación');
 
-      /* Mismo camino probado del cross-sell (R19): ciudad con
+      /* Mismo camino probado del cross-sell: ciudad con
          aplicarGuardada + chip + apertura diferida. Los eventos
          que dispara (ciudad:change / chips:change) no limpian el
          modo porque aplicando está en true. */
@@ -630,7 +589,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       var termino = String(datos.q || '').trim().slice(0, 40);
       var chip = String(datos.g || '').trim();
 
-      /* R64: el enlace puede venir por término de búsqueda (de
+      /* El enlace puede venir por término de búsqueda (de
          siempre) o por CHIP sin término (compartir en modo
          chip). Sin ninguno de los dos no hay lista que abrir. */
       if (!termino && !chip) { aplicando = false; return; }
@@ -667,9 +626,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
             detail: { termino: termino, enLimite: false }
           }));
         } else if (chip) {
-          /* R64 · lista compartida POR CHIP: se selecciona el
-             chip del enlace (Lista repinta con su filtro). El
-             campo queda limpio: el filtro real es el chip. */
+          /* Lista compartida POR CHIP: se selecciona el chip del
+             enlace (Lista repinta con su filtro). El campo queda
+             limpio: el filtro real es el chip. */
           if (window.Chips && typeof window.Chips.seleccionar === 'function') {
             window.Chips.seleccionar(chip);
           }

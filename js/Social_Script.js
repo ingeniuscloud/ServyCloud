@@ -8,44 +8,16 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  contadores): corazón volador al dar like, share
                  nativo con fallback WhatsApp y contador de
                  compartidos en el backend. El mensaje de WhatsApp
-                 (R102) lleva SOLO la FRASE de confianza + el
-                 enlace: el curso ya viaja en la TARJETA OG de la
-                 página e/ (og:título + og:descripción), repetirlo
-                 en el texto duplicaba la información. La frase es
-                 ÁGIL: ROOTJSON › app › mensajesWS (curso/servicio)
-                 con respaldo interno si la BD no la trae. Key
-                 localStorage: post_likes.
-VERSIÓN:         2.2.0
-CAMBIOS:         R102 (decisión del dueño): el TEXTO del mensaje
-                 queda en la FRASE de confianza + 🔗 enlace. La
-                 info del curso NO se repite en el texto porque
-                 ya vive en la descripción de la tarjeta OG (el
-                 dueño: "el resto ya no importa porque está en la
-                 descripción del og"). Y la frase pasa de fija en
-                 el código a ÁGIL en ROOTJSON.app.mensajesWS
-                 (decisión del dueño: "hay que ponerlo ágil en el
-                 JSON de ROOTJSON para no tener que andar
-                 buscando") — sin esa clave en la BD se usan los
-                 textos de siempre, la app no se rompe.
-                 R98: MENSAJE RICO de WhatsApp (emoji + *título* +
-                 _descripción_ + frase + enlace) — reemplazado por
-                 el formato R102. El título para navigator.share
-                 sigue llevando el emoji + título (no sale en el
-                 texto de WhatsApp).
-                 R91: LIMPIEZA ALINEADA AL VUELO LARGO — la animación
-                 del corazón pasó de 0.8s a 1.05s (recorrido más
-                 largo, ver Social_CSS 1.4.2) y la limpieza del
-                 wrap pasa de 850ms a 1150ms para no cortarla.
-                 R90: EL CORAZÓN VOLADOR SALE DESDE EL LUGAR JUSTO —
-                 antes se calculaba su posición con rects contra el
-                 contenedor (#heroSocialButtons) y en el teléfono
-                 arrancaba desplazado de donde está el corazón.
-                 Ahora el wrap nace DENTRO del botón (que ya es
-                 position:relative para esto) anclado a left/top
-                 50%: el translate(-50%,-50%) del keyframe lo centra
-                 EXACTO en el centro del corazón, sin cálculos ni
-                 dependencia del offset parent. El tiempo de limpieza
-                 se alinea a la animación (700→850ms).
+                 lleva el formato del dueño, la línea de confianza
+                 de root.app.mensajesWS (curso / servicio) y el
+                 enlace del post que arma Compartir (página gemela
+                 en GitHub Pages). Key localStorage: post_likes.
+VERSIÓN:         2.1
+CAMBIOS:         R105: la línea de confianza del mensaje sale de
+                 root.app.mensajesWS (curso → "Inscripciones
+                 abiertas..." · servicio → "Te lo recomiendo") con
+                 los textos de siempre como respaldo si el ROOT
+                 aún no los trae.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Lista_Script.html (window.Lista:
@@ -77,8 +49,17 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return getLikes().indexOf(id) !== -1;
     }
 
-    /* Tipo del post en SINGULAR y MAYÚSCULAS (los chips viven en
-       plural: "Cursos" → "CURSO"). Decide la línea de confianza. */
+    function buscarPartner(idPartner) {
+      if (!idPartner) return null;
+      var partners = (window.TABLAS && window.TABLAS.partners) || [];
+      for (var i = 0; i < partners.length; i++) {
+        if (partners[i].id === idPartner) return partners[i];
+      }
+      return null;
+    }
+
+    /* Tipo del post en SINGULAR y MAYÚSCULAS para la negrita de
+       WhatsApp (los chips viven en plural: "Cursos" → "CURSO"). */
     function tipoSingularDePost(post) {
       var id = String(((post && post.idChips) || [])[0] || '').trim();
       if (!id) return '';
@@ -91,38 +72,38 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return '';
     }
 
-    /* ============================================================
-       FRASES DE CONFIANZA (R102 · ÁGILES en la BD)
-       Viven en ROOTJSON › app › mensajesWS:
-         "mensajesWS": {
-           "curso":    "Inscripciones abiertas, reserva tu cupo
-                        desde ya en la app Servy",
-           "servicio": "Te lo recomiendo"
-         }
-       · La app decide CUÁL por el tipo del post (chip →
-         singular: "Cursos" → CURSO / "Servicios" → SERVICIO).
-       · Si la BD no trae mensajesWS (o una de las dos frases),
-         se usan los textos de SIEMPRE (respaldo interno): la
-         app nunca se queda sin frase ni se rompe.
-       ============================================================ */
-    var FRASES_WS_RESPALDO = {
-      curso:    'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy',
-      servicio: 'Te lo recomiendo'
-    };
-
-    function frasesWS() {
-      var bd = {};
-      try {
-        bd = ((((window.SISTEMA || {}).root || {}).app || {}).mensajesWS) || {};
-      } catch (_) { bd = {}; }
-      return {
-        curso:    String(bd.curso    || '').trim() || FRASES_WS_RESPALDO.curso,
-        servicio: String(bd.servicio || '').trim() || FRASES_WS_RESPALDO.servicio
-      };
-    }
-
+    /* Línea de confianza del mensaje: ROOT app.mensajesWS
+       (decisión del dueño) con los textos de siempre como
+       respaldo. curso → inscripciones · servicio → recomendación. */
     function esServicio(tipoSingular) {
       return String(tipoSingular || '').indexOf('SERVIC') === 0;
+    }
+
+    function mensajesWS() {
+      try {
+        var root = (window.SISTEMA && window.SISTEMA.root) || {};
+        var m = (root.app && root.app.mensajesWS) || {};
+        return {
+          curso:    String(m.curso    || 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy'),
+          servicio: String(m.servicio || 'Te lo recomiendo')
+        };
+      } catch (_) {
+        return {
+          curso:    'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy',
+          servicio: 'Te lo recomiendo'
+        };
+      }
+    }
+
+    /* Ciudad del post (la primera declarada) en texto natural. */
+    function ciudadDePost(post) {
+      var id = String(((post && post.idCiudad) || [])[0] || '').trim();
+      if (!id) return '';
+      var ciudades = (window.SISTEMA && window.SISTEMA.ciudades) || [];
+      for (var i = 0; i < ciudades.length; i++) {
+        if (ciudades[i].idCiudad === id) return String(ciudades[i].titulo || '').trim();
+      }
+      return '';
     }
 
     function urlApp() {
@@ -136,42 +117,43 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Texto a compartir (R102 · decisión del dueño):
-         {frase de confianza}
-
-         🔗 {enlace}
-       · La info del curso NO va en el texto: ya vive en la
-         TARJETA OG de la página e/ (og:title + og:description) —
-         repetirla duplicaba la información en la pantalla del
-         cliente. La tarjeta muestra el título y la descripción
-         (recortados por WhatsApp, con la sensación de "entra a
-         ver todo").
-       · Frase ÁGIL: ROOTJSON › app › mensajesWS (curso /
-         servicio) con respaldo interno. Tipo: idChips → chip →
-         singular ("Cursos" → CURSO).
-       · El título de navigator.share sigue llevando el emoji +
-         título (no aparece en el texto de WhatsApp).
+       Texto a compartir (formato del dueño) · R77: el título viene
+       de postJson.descripcion.tituloPost.
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
-      var pj   = post.postJson || {};
-      var meta = pj.meta || {};
-      var og   = (meta.og && typeof meta.og === 'object') ? meta.og : {};
+      var pj = post.postJson || {};
       var desc = pj.descripcion || {};
 
-      var tituloBase = String(og.titulo || '').trim() ||
-                       String(desc.tituloPost || '').trim() ||
-                       String(post.titulo || '').trim() || 'Publicación';
-      var emoji = String(og.emoji || '').trim();
+      var titulo  = String(desc.tituloPost || post.titulo || '').trim() || 'Publicación';
+      var tagline = String(desc.tagline || '').trim();
+
+      var partner = buscarPartner(post.idPartner);
+      var nombre  = partner ? String(partner.nombre || '').trim() : '';
 
       var url = String(urlEnlace || '').trim() || urlApp();
 
-      var tipo = tipoSingularDePost(post);
-      var frases = frasesWS();
-      var confianza = esServicio(tipo) ? frases.servicio : frases.curso;
+      var tipo   = tipoSingularDePost(post);
+      var ciudad = ciudadDePost(post);
 
-      var texto = confianza + '\n\n' + '🔗 ' + url;
+      var confianzas = mensajesWS();
+      var confianza = esServicio(tipo) ? confianzas.servicio : confianzas.curso;
 
-      return { titulo: (emoji ? emoji + ' ' : '') + tituloBase, texto: texto };
+      var saludo;
+      if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';
+      else if (tipo)      saludo = '🖐️ ¡Mira este *' + tipo + '*! 🔎';
+      else if (ciudad)    saludo = '🖐️ ¡Mira esto en ' + ciudad + '! 🔎';
+      else                saludo = '🖐️ ¡Mira esto! 🔎';
+
+      var texto =
+        saludo + '\n\n' +
+        (nombre ? '✨ ' + nombre + '\n' : '') +
+        '*' + titulo + '*\n' +
+        (tagline ? tagline + '\n' : '') +
+        confianza + '\n\n' +
+        '🔗 Abre la app para ver toda la información' +
+        (url ? '\n' + url : '');
+
+      return { titulo: titulo, texto: texto };
     }
 
     function textoCompartirDe(post) {
