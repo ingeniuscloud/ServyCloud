@@ -5,7 +5,17 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.34.0
+VERSIÓN:         1.35.0
+CAMBIOS:         R109: (1) El include del intersticial pasa de
+                 js/Opend_Ad_Scriot.js (typo) a js/Opend_Ad_Script.js
+                 — el repositorio DEBE BORRAR el Scriot viejo. (2)
+                 Entra el OG POR DEFECTO en la raíz (título,
+                 descripción e imagenDefault de app.compartir):
+                 antes la raíz no tenía OG y cualquier preview que
+                 cayera aquí salía sin imagen ni datos. (3) Los
+                 gemelos R109 (Seccion/Social/Compartir/Global/
+                 Opend_Ad_Script + Chips_CSS) vienen byte-idénticos
+                 al GAS.
 CAMBIOS:         R94: Vienen byte-idénticos al GAS: js/Seccion_Imagen_Script.js
                  + js/Seccion_Script.js + css/Seccion_CSS.css (L2 PROPIA
                  DE LAS IMÁGENES: la app guarda su copia en Cache API
@@ -130,6 +140,22 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ServyCloud</title>
+
+  <!-- ═══ R109 · OG POR DEFECTO de la RAÍZ de la app. Los fijos
+       viven en ROOTJSON.app.compartir y la imagen es
+       app.compartir.imagenDefault convertida a lh3 (el formato
+       que WhatsApp previsualiza). Este OG solo viste la raíz:
+       las compartidas reales (post/lista) aterrizan en las
+       páginas gemelas e/, cada una con su OG propio. ═══ -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ServyCloud">
+  <meta property="og:description" content="Encuentra el servicio que necesitas">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/1z4AhOLUuKqFKj1SjHHVpfmibtUApJC61">
+  <meta property="og:url" content="https://ingeniuscloud.github.io/ServyCloud/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ServyCloud">
+  <meta name="twitter:description" content="Encuentra el servicio que necesitas">
+  <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/1z4AhOLUuKqFKj1SjHHVpfmibtUApJC61">
 
   <!-- FUENTE INTER -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

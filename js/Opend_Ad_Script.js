@@ -1,75 +1,58 @@
 /*════════════════════════════════════════════════════════════════════
 
 ARCHIVO:         Opend_Ad_Script.html
+ESPEJO GITHUB:   github/js/Opend_Ad_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                  Mercado Libre/Yummy/Cashea, casero). Al cargar la
                  app —sin esperar el catálogo— lee
-                 SISTEMA.promo.intersticial y si HOY toca, monta la
-                 capa sobre la app mientras termina de cargar:
-                 creativo 9:16 protagonista con fondo tenue detrás,
-                 X de cierre INMEDIATA (solo la X, dentro de la
-                 imagen) y botón "Saber más" DENTRO del creativo,
-                 en la franja limpia inferior, con flechita a la
-                 derecha, como el CTA del post; abre el WhatsApp
-                 del admin.
-                 R102: la flechita del CTA pasa a trazo OSCURO
-                 (#1f1b16) porque el botón volvió al FONDO BLANCO
-                 del plan original (R98). Nada más cambia.
-                 Reglas del dueño que gobiernan TODO:
-                 · activo + imagen + ventana vigente (reloj del
-                   teléfono via ventanaVigente de Global_Script:
-                   inicia con hora = ventana horaria; termina con
-                   fecha sola = todo el día).
-                 · Sin imagen válida, sin ventana o imagen rota /
-                   lenta (más de 6s) → NO se muestra y la app carga
-                   normal (nunca bloquea el boot).
-                 · La imagen viaja de Drive a lh3 directo (misma
-                   conversión de SeccionImagen): no pasa por la
-                   cuota de GAS.
-                 · X cierra al instante; "Saber más" abre WhatsApp
-                   (admin.whatsapp de ROOTJSON) con mensaje de la
-                   BD (intersticial.mensaje → admin.mensajeWhatsapp).
-                 · Se muestra en cada arranque mientras la campaña
-                   esté en ventana (igual que un App Open Ad).
-                 · Página de GitHub Pages: SISTEMA no viaja
-                   inyectado, llega POR DATOS (abrirSesion). Si al
-                   arrancar aún no está, el módulo espera la sesión
-                   y se re-intenta UNA sola vez (misma promesa que
-                   ya comparte Core). En la página de GAS SISTEMA
-                   ya viaja en el HTML y el reintento no corre.
-VERSIÓN:         1.2.0
-CAMBIOS:         R102 (ajuste del dueño): CTA con FONDO BLANCO
-                 otra vez (el plan original) → la flechita va
-                 oscura #1f1b16 sobre el botón blanco.
-                 R101 (ajustes del dueño): el botón "Saber más"
-                 pasa a montarse DENTRO del creativo (franja
-                 limpia inferior) con su flechita SVG a la derecha
-                 (misma geometría que el CTA del post) — antes
-                 quedaba fuera, debajo de la imagen. La X ya vive
-                 dentro de la imagen (solo CSS). GA4 y la cadena de
-                 WhatsApp intactos.
-                 R98: primera entrega. GA4: intersticial_view al
-                 mostrarse e intersticial_click en "Saber más".
-DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
-                 (ventanaVigente, abrirWhatsapp),
-                 Seccion_Imagen_Script.html (urlImagenDirecta),
-                 Opend_Ad_CSS.html, Iconos.html no requiere
-                 (R100: el archivo se llama Opend_Ad_Scriot — nombre
-                 del dueño; el módulo interno window.Intersticial y
-                 el campo BD PROMOJSON.intersticial NO cambian)
+                 SISTEMA.promo.openAd y si HOY toca (dentro de una
+                 ventana vigente), monta la capa sobre la app:
+                 creativo 9:16 protagonista, X de cierre INMEDIATA
+                 dentro de la imagen y botón "Saber más" DENTRO del
+                 creativo que abre el WhatsApp del admin.
+                 HORARIO ESTRICTO (R108): sin ventanas, ventanas
+                 vacías o ventana sin extremos válidos → NO se
+                 muestra (ventanaVigente de Global_Script, reloj
+                 del teléfono; "2026-10-24 15:00" → "23:00" con
+                 hora en ambos extremos; fecha sola = día
+                 completo). La imagen viaja de Drive a lh3 directo
+                 y si tarda más de 6s no molesta: la app carga
+                 normal. En GitHub Pages SISTEMA llega POR DATOS:
+                 espera la sesión y re-intenta UNA sola vez.
+VERSIÓN:         1.4.0
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS y
+                 RENOMBRADO: este archivo era js/Opend_Ad_Scriot.js
+                 (con "t", typo del dueño corregido en R108 solo
+                 del lado GAS). EL REPOSITORIO DEBE BORRAR
+                 js/Opend_Ad_Scriot.js — el index.html ya carga
+                 Opend_Ad_Script.js. Entra además el campo nuevo
+                 de la BD: PROMOJSON.openAd (antes intersticial)
+                 con respaldo del nombre viejo. Y entra el
+                 HORARIO ESTRICTO R108 que este gemelo nunca
+                 recibió (mostraba el ad fuera de las ventanas).
+                 R102: CTA con fondo blanco, flechita oscura.
+                 R101: botón "Saber más" dentro del creativo.
+DEPENDENCIAS:    Index (SISTEMA), Global_Script.js (ventanaVigente,
+                 abrirWhatsapp), Seccion_Imagen_Script.js
+                 (urlImagenDirecta), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
-
   window.Intersticial = (function () {
 
     var MAX_ESPERA_IMG = 6000;  /* ms: imagen lenta → no molesta */
 
     /* ============================================================
-       DATOS · SISTEMA.promo.intersticial
+       DATOS · SISTEMA.promo.openAd
+       R109 · el campo se llama openAd (antes intersticial); se
+       lee el nuevo con respaldo del nombre viejo.
+       R108 · HORARIO ESTRICTO: la decisión de mostrar exige
+       ventana vigente. Sin ventanas declaradas NO se muestra
+       (antes: sin ventanas se mostraba siempre que hubiera
+       imagen). Sin ventanaVigente disponible NO se muestra.
        ============================================================ */
     function datos() {
       var promo = (window.SISTEMA && window.SISTEMA.promo) || {};
-      var it = promo.intersticial;
+      var it = promo.openAd || promo.intersticial;
       if (!it || typeof it !== 'object') return null;
       if (it.activo === false) return null;
 
@@ -77,13 +60,14 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
       if (!imagen) return null;
 
       var ventanas = Array.isArray(it.ventanas) ? it.ventanas : [];
+      if (!ventanas.length) return null;   /* R108: sin horario no hay ad */
+
       var enVentana = ventanas.some(function (v) {
         if (!v) return false;
-        return typeof window.ventanaVigente === 'function'
-          ? window.ventanaVigente(v.inicia, v.termina)
-          : true;
+        if (typeof window.ventanaVigente !== 'function') return false;
+        return window.ventanaVigente(v.inicia, v.termina) === true;
       });
-      if (ventanas.length && !enVentana) return null;
+      if (!enVentana) return null;         /* R108: fuera de horario no hay ad */
 
       return it;
     }

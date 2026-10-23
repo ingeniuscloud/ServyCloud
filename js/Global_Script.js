@@ -17,13 +17,22 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Guardia anti-loop de token: corta a los 3 intentos.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
-                 aplicarPlaceholders y ventanaVigente (R98: lectura
-                 tolerante de ventanas inicia/termina — fecha sola o
-                 fecha + hora — usada por promo e intersticial).
+                 aplicarPlaceholders y ventanaVigente (R108:
+                 ESTRICTA — exige ambos extremos válidos; fecha
+                 sola o fecha + hora; "24:00" = medianoche — usada
+                 por promo y openAd).
                  El módulo window.Global (menú + subvistas) vive en
                  Global_Sheet_Script.html.
-VERSIÓN:         1.16.0
-CAMBIOS:         R98: ventanaVigente(inicia, termina) — compara con
+VERSIÓN:         1.17.0
+CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
+                 ventanaVigente ESTRICTA de R108 que este js/ nunca
+                 recibió (el GAS la corrigió y aquí quedó la R98
+                 tolerante: un extremo roto dejaba la ventana
+                 "abierta" y el openAd se mostraba fuera de
+                 horario). Ahora exige inicia+termina válidos;
+                 termina con fecha sola = día completo y "24:00" =
+                 medianoche.
+                 R98: ventanaVigente(inicia, termina) — compara con
                  el RELOJ DEL TELÉFONO; "inicia" acepta fecha o
                  fecha+hora (sin hora = desde 00:00), "termina"
                  acepta fecha (vigente todo el día) o fecha+hora.
@@ -472,16 +481,20 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
   }
 
   /* ============================================================
-     R98 · HELPERS GLOBALES · VENTANAS (promo + intersticial)
+     R108 · HELPERS GLOBALES · VENTANAS (promo + openAd)
      ventanaVigente(inicia, termina): ¿el reloj del teléfono está
      dentro de la ventana?
        · inicia "2026-10-25"          → desde 00:00 de ese día
        · inicia "2026-10-25 08:00"    → desde esa hora
        · termina "2026-11-01"         → todo el día (hasta 23:59:59)
        · termina "2026-11-01 22:00"   → hasta esa hora
-     Vacíos o fechas rotas = extremo abierto (no bloquean).
-     Comparación local (Venezuela no maneja horario de verano):
-     la hora del teléfono manda, igual que decide el dueño.
+       · termina "2026-11-01 24:00"   → medianoche: cierra el día
+     ESTRICTA (R108): exige AMBOS extremos válidos. Un extremo
+     vacío o roto → la ventana NO cuenta (devuelve false): el
+     openAd jamás se muestra fuera de horario por datos malos.
+     Comparación local (Venezuela no maneja horario de
+     verano): la hora del teléfono manda, igual que decide el
+     dueño.
      ============================================================ */
   function _parseVentana(valor, finDeDia) {
     var m = String(valor || '').trim()
@@ -499,11 +512,15 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
   }
 
   function ventanaVigente(inicia, termina) {
-    var ahora = new Date();
+    /* R108 · ESTRICTA: sin ambos extremos válidos la ventana no
+       existe. Antes un extremo roto quedaba "abierto" y el
+       intersticial se mostraba fuera de horario. */
     var desde = _parseVentana(inicia, false);
     var hasta = _parseVentana(termina, true);
+    if (!desde || !hasta) return false;
 
-    if (desde && ahora < desde) return false;
-    if (hasta && ahora > hasta) return false;
+    var ahora = new Date();
+    if (ahora < desde) return false;
+    if (ahora > hasta) return false;
     return true;
   }

@@ -8,24 +8,27 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  contadores): corazón volador al dar like, share
                  nativo con fallback WhatsApp y contador de
                  compartidos en el backend. El mensaje de WhatsApp
-                 lleva el formato del dueño, la línea de confianza
-                 de root.app.mensajesWS (curso / servicio) y el
-                 enlace del post que arma Compartir (página gemela
-                 en GitHub Pages). Key localStorage: post_likes.
-VERSIÓN:         2.1
-CAMBIOS:         R105: la línea de confianza del mensaje sale de
-                 root.app.mensajesWS (curso → "Inscripciones
-                 abiertas..." · servicio → "Te lo recomiendo") con
-                 los textos de siempre como respaldo si el ROOT
-                 aún no los trae.
-DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
-                 Index.html (SISTEMA, TABLAS), Iconos.html
-                 (pintarGlifos), Lista_Script.html (window.Lista:
-                 getPostActivo), Compartir_Script.html
-                 (window.Compartir: urlDePost), Social_CSS.html,
-                 Core_CSS.html
+                 sale COMPLETO del BD (POSTJSON.compartir.
+                 mensajeWhatsapp — texto del dueño en PostDetalle)
+                 con el enlace del post que arma Compartir (página
+                 gemela en GitHub Pages). Key localStorage:
+                 post_likes.
+VERSIÓN:         2.3
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS
+                 (R108 tocó solo el GAS: este js/ viejo compartía
+                 el formato armado y por eso WhatsApp no recibía el
+                 texto rico de la BD). Orden R109 incluida: el
+                 mensaje es SOLO compartir.mensajeWhatsapp + el
+                 enlace; si el post no trae mensaje sale el enlace
+                 pelado. FUERA el formato armado de respaldo
+                 (saludo, línea de confianza de app.mensajesWS,
+                 "🔗 Abre la app...") y sus helpers muertos.
+DEPENDENCIAS:    Global_Script.js (postBackend, getDeviceId),
+                 Index (SISTEMA, TABLAS), Iconos.js (pintarGlifos),
+                 Lista_Script.js (window.Lista: getPostActivo),
+                 Compartir_Script.js (window.Compartir: urlDePost),
+                 Social_CSS.css, Core_CSS.css
 ════════════════════════════════════════════════════════════════════*/
-
   window.Social = (function () {
 
     var STORAGE_KEY_LIKES = 'post_likes';
@@ -49,111 +52,30 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return getLikes().indexOf(id) !== -1;
     }
 
-    function buscarPartner(idPartner) {
-      if (!idPartner) return null;
-      var partners = (window.TABLAS && window.TABLAS.partners) || [];
-      for (var i = 0; i < partners.length; i++) {
-        if (partners[i].id === idPartner) return partners[i];
-      }
-      return null;
-    }
-
-    /* Tipo del post en SINGULAR y MAYÚSCULAS para la negrita de
-       WhatsApp (los chips viven en plural: "Cursos" → "CURSO"). */
-    function tipoSingularDePost(post) {
-      var id = String(((post && post.idChips) || [])[0] || '').trim();
-      if (!id) return '';
-      var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
-      for (var i = 0; i < chips.length; i++) {
-        if (chips[i].idChip === id) {
-          return String(chips[i].titulo || '').trim().toUpperCase().replace(/S$/, '');
-        }
-      }
-      return '';
-    }
-
-    /* Línea de confianza del mensaje: ROOT app.mensajesWS
-       (decisión del dueño) con los textos de siempre como
-       respaldo. curso → inscripciones · servicio → recomendación. */
-    function esServicio(tipoSingular) {
-      return String(tipoSingular || '').indexOf('SERVIC') === 0;
-    }
-
-    function mensajesWS() {
-      try {
-        var root = (window.SISTEMA && window.SISTEMA.root) || {};
-        var m = (root.app && root.app.mensajesWS) || {};
-        return {
-          curso:    String(m.curso    || 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy'),
-          servicio: String(m.servicio || 'Te lo recomiendo')
-        };
-      } catch (_) {
-        return {
-          curso:    'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy',
-          servicio: 'Te lo recomiendo'
-        };
-      }
-    }
-
-    /* Ciudad del post (la primera declarada) en texto natural. */
-    function ciudadDePost(post) {
-      var id = String(((post && post.idCiudad) || [])[0] || '').trim();
-      if (!id) return '';
-      var ciudades = (window.SISTEMA && window.SISTEMA.ciudades) || [];
-      for (var i = 0; i < ciudades.length; i++) {
-        if (ciudades[i].idCiudad === id) return String(ciudades[i].titulo || '').trim();
-      }
-      return '';
-    }
-
-    function urlApp() {
-      try {
-        var root = (window.SISTEMA && window.SISTEMA.root) || {};
-        var app  = root.app || {};
-        return String(app.urlApp || '').trim();
-      } catch (_) {
-        return '';
-      }
-    }
-
     /* ============================================================
-       Texto a compartir (formato del dueño) · R77: el título viene
-       de postJson.descripcion.tituloPost.
+       Texto a compartir · R109 SOLO BD (orden del dueño: fuera
+       mensajes hardcodeados): el MENSAJE COMPLETO sale del campo
+       compartir.mensajeWhatsapp del POSTJSON (tabla PostDetalle).
+       Solo se le pega el enlace al final. Si el post no trae
+       mensaje en la BD, sale el enlace pelado: el texto lo
+       escribe el dueño en la BD, nunca el código.
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
       var pj = post.postJson || {};
       var desc = pj.descripcion || {};
+      var compartir = (pj.compartir && typeof pj.compartir === 'object') ? pj.compartir : {};
 
-      var titulo  = String(desc.tituloPost || post.titulo || '').trim() || 'Publicación';
-      var tagline = String(desc.tagline || '').trim();
+      var url = String(urlEnlace || '').trim();
 
-      var partner = buscarPartner(post.idPartner);
-      var nombre  = partner ? String(partner.nombre || '').trim() : '';
+      var mensajeBD = String(compartir.mensajeWhatsapp || '').trim();
+      var titulo    = String(desc.tituloPost || post.titulo || '').trim();
 
-      var url = String(urlEnlace || '').trim() || urlApp();
-
-      var tipo   = tipoSingularDePost(post);
-      var ciudad = ciudadDePost(post);
-
-      var confianzas = mensajesWS();
-      var confianza = esServicio(tipo) ? confianzas.servicio : confianzas.curso;
-
-      var saludo;
-      if (tipo && ciudad) saludo = '🖐️ ¡Mira este *' + tipo + '* en ' + ciudad + '! 🔎';
-      else if (tipo)      saludo = '🖐️ ¡Mira este *' + tipo + '*! 🔎';
-      else if (ciudad)    saludo = '🖐️ ¡Mira esto en ' + ciudad + '! 🔎';
-      else                saludo = '🖐️ ¡Mira esto! 🔎';
-
-      var texto =
-        saludo + '\n\n' +
-        (nombre ? '✨ ' + nombre + '\n' : '') +
-        '*' + titulo + '*\n' +
-        (tagline ? tagline + '\n' : '') +
-        confianza + '\n\n' +
-        '🔗 Abre la app para ver toda la información' +
-        (url ? '\n' + url : '');
-
-      return { titulo: titulo, texto: texto };
+      return {
+        titulo: titulo,
+        texto:  mensajeBD
+          ? mensajeBD + (url ? '\n' + url : '')
+          : url
+      };
     }
 
     function textoCompartirDe(post) {

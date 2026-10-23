@@ -10,39 +10,25 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.7.0
-CAMBIOS:         R100: FIX de la promo MUDA en el lienzo del post
-                 (regresión R98): buildPromoHTML seguía leyendo
-                 titulo/descripcion/idBadge del ITEM de
-                 PROMOJSON, que con la fuente única ya solo trae
-                 idPost + inicia + termina. Ahora lee del bloque
-                 meta.promo del POSTJSON — el catálogo lo trae en
-                 post.promo y el detalle en postJson.meta.promo
-                 (misma fuente que la marquesina) — con los
-                 campos viejos del item como último respaldo.
-                 R96: (1) la promo del lienzo lee el PROMOJSON
-                 nuevo y muestra titulo (.subtitulo) y
-                 descripcion (.textoPrimario) con entrada
-                 suave; (2) dots del carrusel al instante (rAF,
-                 sin retardo) y visibles sobre fondo claro;
-                 (3) la fila BCV pasa al naranja de la app
-                 (#f97316) para que siempre sea legible.
-                 R95: en el sheet de descripción, el fade pasa a overlay
-                 del .mk-sheet (fuera del scroll) y entra el botón
-                 VOLVER ARRIBA (izquierda): el MISMO scroll del
-                 content maneja ambos — fade .fin al llegar al
-                 final, flecha visible pasados ~120px. Ambos son
-                 locales: 0 llamadas a la BD, 0 temporizadores.
-
-DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
-                 (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
-                 Seccion_Imagen_Script.html, Pregunta_Script.html
-                 (window.Pregunta), Social_Script.html (window.Social),
-                 Partner_Script.html, Ciudad_Script (window.Ciudad),
-                 Chips_Script (window.Chips), Seccion_CSS.html,
-                 Pregunta_CSS.html, Core_CSS.html
+VERSIÓN:         2.8.0
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
+                 R108 tocó solo el GAS y este js/ quedó atrás — por
+                 eso el lienzo del post NO pintaba la promo
+                 individual: aquí entra la lectura del bloque
+                 promocion del POSTJSON (titulo/descripcion/
+                 idBadge, hermano de meta; respaldo meta.promo), la
+                 regla del dueño de MOSTRARLA aunque el post no
+                 esté agendado en PROMOJSON (fuera el cortón
+                 if(!item)) y el badge desde BADGEJSON via idBadge
+                 (apagado → sin píldora, el texto queda).
+                 R100: FIX de la promo muda (lee del POSTJSON, no
+                 del item de PROMOJSON).
+DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
+                 TABLAS), Iconos.js (pintarGlifos), Lista_Script.js
+                 (window.Lista: getPostActivo),
+                 Seccion_Imagen_Script.js, Seccion_CSS.css,
+                 Promo_CSS.css, Core_CSS.css
 ════════════════════════════════════════════════════════════════════*/
-
   window.Secciones = (function () {
 
     var postActivo = null;
@@ -372,36 +358,38 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var post = postActivo;
       if (!post) return '';
       var item = _promoDelPost(post);
-      /* R100 · FUENTE ÚNICA (misma regla de la marquesina): el
-         CONTENIDO vive en meta.promo del POSTJSON. El catálogo
-         lo trae en post.promo (02 Cache.gs lo extrae al índice)
-         y el detalle en postJson.meta.promo — son EL MISMO
-         bloque; si el catálogo viniera sin él, el detalle lo
-         cubre. El item de PROMOJSON solo decidió QUÉ post y
-         CUÁNDO: con el shape nuevo ya no trae textos, y leer
-         ahí dejaba la promo del post muda. Los campos viejos
-         del item quedan como último respaldo. */
+      /* R108 · FUENTE: la promo INDIVIDUAL del post vive en el
+         bloque promocion del POSTJSON (hermano de meta) — con
+         meta.promo como respaldo por si una fila vieja lo trae.
+         El catálogo lo trae en post.promo (02 Cache.gs lo extrae
+         al índice desde la misma fuente) y el detalle en
+         postJson.promocion.
+         REGLA DEL DUEÑO (R108): la agenda de PROMOJSON (item)
+         gobierna SOLO los titulares del lienzo principal; la
+         promo del post SE MUESTRE siempre que el post la traiga,
+         aunque no esté agendada en la ciudad. Por eso ya no
+         existe el cortón "if (!item) return ''" de R96/R100. */
       var promoIdx = (post.promo && typeof post.promo === 'object') ? post.promo : null;
-      var metaPost = (post.postJson && post.postJson.meta) || {};
-      var promoDet = (metaPost.promo && typeof metaPost.promo === 'object') ? metaPost.promo : null;
+      var postJson = post.postJson || {};
+      var metaPost = postJson.meta || {};
+      var promoDet = (postJson.promocion && typeof postJson.promocion === 'object')
+        ? postJson.promocion
+        : ((metaPost.promo && typeof metaPost.promo === 'object') ? metaPost.promo : null);
 
-      var badge = _badgeDelPost(promoIdx) ||
-                  _badgeDelPost(promoDet) ||
+      /* Sin promo propia y sin item agendado no hay nada que pintar. */
+      if (!promoDet && !item) return '';
+
+      var badge = _badgeDelPost(promoDet) ||
+                  _badgeDelPost(promoIdx) ||
                   _badgeDelPost(item) || _badgeDelPost(post);
-      /* R100 · el bloque solo aparece si el post ES la promo
-         vigente de la ciudad (item del PROMOJSON con fechas al
-         día) — igual que R96. El badge solo acompaña al texto:
-         un post con meta.promo guardado pero fuera de agenda no
-         pinta el bloque. */
-      if (!item) return '';
 
-      var tituloPromo = _primerTexto(promoIdx, ['titulo']) ||
-                        _primerTexto(promoDet, ['titulo']) ||
+      var tituloPromo = _primerTexto(promoDet, ['titulo']) ||
+                        _primerTexto(promoIdx, ['titulo']) ||
                         _primerTexto(item, ['titulo', 'texto', 'promoTexto', 'mensaje']) ||
                         _primerTexto(post, ['promoTexto']) ||
                         _primerTexto(metaPost, ['promoTexto']);
-      var descripcionPromo = _primerTexto(promoIdx, ['descripcion']) ||
-                             _primerTexto(promoDet, ['descripcion']) ||
+      var descripcionPromo = _primerTexto(promoDet, ['descripcion']) ||
+                             _primerTexto(promoIdx, ['descripcion']) ||
                              _primerTexto(item, ['descripcion']);
 
       var viejo     = _primerTexto(item, ['precioAnterior', 'precioViejo', 'oldPrice', 'precioAntes']);
@@ -428,9 +416,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       /* R96 · fila del texto = titulo en .subtitulo + descripcion
          en .textoPrimario (el CSS les da la entrada suave), con
          el BADGE a la derecha (misma anatomía de la marquesina).
-         R84: si el item no trae idBadge, la píldora PROMO
+         R84/R108: si el post trae idBadge y el badge está
+         ENCENDIDO en BADGEJSON va su píldora; si está apagado
+         (estado false) no se pinta píldora — el texto queda
+         solo. Sin idBadge y con texto, la píldora PROMO
          identifica la etiqueta (nunca queda ciega). */
-      var badgeTitulo = (badge && badge.titulo) ? badge.titulo : ((tituloPromo || descripcionPromo) ? 'PROMO' : '');
+      var badgeTitulo = '';
+      if (badge && badge.titulo) {
+        badgeTitulo = badge.titulo;
+      } else if (!(promoDet && String(promoDet.idBadge || '').trim()) &&
+                 (tituloPromo || descripcionPromo)) {
+        badgeTitulo = 'PROMO';
+      }
       var badgeHtml = badgeTitulo
         ? '<span class="mk-promo-badge">' + escapeHtml(badgeTitulo) + '</span>'
         : '';

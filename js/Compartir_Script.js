@@ -3,65 +3,39 @@
 ARCHIVO:         Compartir_Script.html
 ESPEJO GITHUB:   github/js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Compartir por enlace. Dos emisores:
-                 (1) POST — Social pide Compartir.urlDePost(post) y
-                 su mensaje de WhatsApp lleva el enlace del post;
-                 (2) LISTA FILTRADA — el TEXTO "Compartir lista
-                 filtrada" sobre la lista (Lista_Script decide su
-                 visibilidad con los items) comparte el filtro
-                 visible: término de búsqueda O chip activo, más
-                 la ciudad.
-                 El enlace del POST apunta a la PÁGINA GEMELA del
-                 post en GitHub Pages (root.app.urlPages): ahí vive
-                 el OG que WhatsApp previsualiza y la página abre la
-                 app GitHub AL INSTANTE (location.replace, sin
-                 pantalla intermedia y NUNCA al /exec de GAS). Si el
-                 ROOT no trae urlPages, el enlace va directo a la
-                 app (root.app.urlApp) con el payload corto ?s=.
-                 El enlace de LISTA va SIEMPRE directo a la app con
-                 el payload corto ?s= (una lista filtrada no tiene
-                 página propia). El payload viaja OFUSCADO (XOR con
-                 clave embebida + base64url): el ID del post o el
-                 término NUNCA van planos en la URL. Los enlaces
-                 antiguos ?d= (AES-256-GCM) siguen abriendo.
-                 Receptor: Core llama Compartir.recibir() cuando
-                 TABLAS cargó y el lienzo está inyectado; se aplica
-                 ciudad + contenido y la app entra en MODO
-                 COMPARTIDO: ciudad VISTA pero BLOQUEADA, campo de
-                 búsqueda fijado SIN foco y la X del campo libera la
-                 vista (sin menú global ni compartir). El header del
-                 detalle lo decide el TIPO de enlace: con UN post la
-                 fila sustituye al par volver/título del modo
-                 detalle y la salida es la X; con una LISTA cada
-                 post abre con volver/título normales para recorrer
-                 los demás posts del filtro, y la X queda en la
-                 lista. Al limpiar vuelve todo el catálogo (la
-                 ciudad del enlace queda como la del receptor).
-                 Aviso amable si el contenido compartido ya no
-                 existe. La instalación de la PWA NO cambia: se hace
-                 desde la app con el enlace principal (menú /
-                 píldora), nunca desde el enlace compartido.
-VERSIÓN:         2.2
-CAMBIOS:         R105: el enlace del POST sale de
-                 root.app.urlPages + IDPOST + .html?v= (la página
-                 gemela que WhatsApp previsualiza y que abre la app
-                 GitHub al instante); FUERA el respaldo URL_EXEC —
-                 ningún enlace compartido vuelve al /exec de GAS.
-                 Las líneas de confianza del mensaje salen de
-                 root.app.mensajesWS (curso / servicio) con los
-                 textos de siempre como respaldo.
-DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
-                 TABLAS), Lista_Script.html (TABLAS.posts,
-                 visibilidad de #btnCompartir),
-                 Ciudad_Sheet_Script.html (getActual, getLista,
-                 aplicarGuardada), Chips_Script.html (chips:change,
-                 getChipActivo, seleccionar),
-                 Seccion_Script.html (irAPost público),
-                 Core_Script.html (llama pintar/recibir),
-                 Social_Script.html (urlDePost), Chips_CSS.html
-                 (.btn-compartir / .compartida)
+RESPONSABILIDAD: Compartir por enlace. Dos emisores: (1) POST —
+                 Social pide Compartir.urlDePost(post) y su mensaje
+                 lleva el enlace de la PÁGINA GEMELA del post en
+                 GitHub Pages (root.app.compartir.urlPages), que es
+                 donde vive el OG que WhatsApp previsualiza; la
+                 gemela abre la app al instante (location.replace,
+                 nunca al /exec de GAS). Sin urlPages, el enlace va
+                 a la app (root.app.urlApp) con el payload corto
+                 ?s=. (2) LISTA FILTRADA — el enlace apunta a la
+                 PAGE BASE de la carpeta (urlPages): esa page
+                 muestra el OG POR DEFECTO y reenvía el ?s= para
+                 que el receptor aterrice con su lista intacta.
+                 MENSAJES: · POST → compartir.mensajeWhatsapp del
+                 POSTJSON + enlace. · LISTA →
+                 app.compartir.mensajeListaWhatsapp con [ciudad]
+                 (UPPERCASE) y [textoBuscado] (buscador, chip o
+                 "lista general"). Sin plantilla, enlace pelado.
+VERSIÓN:         2.4
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
+                 Este js/ viejo leía root.app.urlPages — campo que
+                 YA NO EXISTE (vive en app.compartir.urlPages) — y
+                 por eso el enlace del post caía en la RAÍZ de la
+                 app: WhatsApp previsualizaba la tarjeta sin imagen
+                 y sin datos del post. Entra además la orden R109:
+                 fuera el mensaje hardcodeado de lista (saludo +
+                 confianza de mensajesWS + "🔗 Abre el enlace..."),
+                 sin plantilla en el BD el mensaje es SOLO el
+                 enlace; helpers muertos retirados.
+                 R108: urlPages desde app.compartir.urlPages;
+                 enlace de LISTA a la page base con reenvío del
+                 ?s=; mensaje de lista desde
+                 mensajeListaWhatsapp con placeholders.
 ════════════════════════════════════════════════════════════════════*/
-
   window.Compartir = (function () {
 
     /* ============================================================
@@ -209,8 +183,11 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
        URLS DE COMPARTIR · SOLO GitHub Pages, NUNCA el /exec de GAS
        · urlApp()   → la app (root.app.urlApp): aterrizaje de los
                       enlaces y respaldo del post sin página gemela.
-       · urlPages() → la carpeta de páginas gemelas
-                      (root.app.urlPages): ahí vive el OG por post.
+       · urlPages() → la carpeta de páginas gemelas: R108 la lee
+                      de root.app.compartir.urlPages (nueva
+                      ubicación del ROOT) con respaldo en
+                      app.urlPages. Ahí vive el OG por post y la
+                      page base que previsualiza las listas.
        R105: FUERA el respaldo URL_EXEC. Si el ROOT no trae las
        URLs de GitHub no se inventa destino: el enlace queda vacío
        (Social manda el mensaje sin enlace) — jamás un /exec.
@@ -231,7 +208,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     function urlPages() {
-      return String(rootApp().urlPages || '').trim().replace(/\?+$/, '').replace(/\/+$/, '');
+      var compartir = rootApp().compartir || {};
+      return String(compartir.urlPages || rootApp().urlPages || '')
+        .trim().replace(/\?+$/, '').replace(/\/+$/, '');
     }
 
     function urlBase() {
@@ -258,15 +237,10 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return urlBase() + '?s=' + token;
     }
 
-    /* Líneas de confianza del mensaje (ROOT: app.mensajesWS).
-       Respaldo: los textos de siempre si el ROOT aún no los trae. */
-    function mensajesWS() {
-      var m = rootApp().mensajesWS || {};
-      return {
-        curso:    String(m.curso    || 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy'),
-        servicio: String(m.servicio || 'Te lo recomiendo')
-      };
-    }
+    /* Líneas de confianza · RETIRADAS (R109): los textos de
+       WhatsApp viven en la BD, no en el código. La plantilla de
+       lista sale de app.compartir.mensajeListaWhatsapp y la del
+       post de compartir.mensajeWhatsapp (Social). */
 
     /* ============================================================
        Estado
@@ -300,6 +274,27 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       }
     }
 
+    /* R108 · MENSAJE DE LISTA desde el BD:
+       app.compartir.mensajeListaWhatsapp con [ciudad] →
+       UPPERCASE del título de la ciudad activa y [textoBuscado] →
+       el texto del buscador; si comparte por chip, el título del
+       chip; si comparte TODA la lista sin filtro, "lista
+       general". Respaldo: el formato armado de siempre si el
+       ROOT aún no trae la plantilla. */
+    function mensajeLista(plantilla, ciudad, termino, chipActivo) {
+      var textoBuscado = String(termino || '').trim();
+      if (!textoBuscado && chipActivo) textoBuscado = tituloChip(chipActivo);
+      if (!textoBuscado) textoBuscado = 'lista general';
+
+      var ciudadTxt = (ciudad && ciudad.titulo)
+        ? String(ciudad.titulo).trim().toUpperCase()
+        : '';
+
+      return String(plantilla || '')
+        .replace(/\[ciudad\]/g, ciudadTxt)
+        .replace(/\[textoBuscado\]/g, textoBuscado);
+    }
+
     function compartirLista() {
       if (!btn || btn.disabled) return;
 
@@ -312,57 +307,51 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
           ? window.Chips.getChipActivo() : null;
       } catch (_) {}
 
-      /* Sin término de búsqueda se comparte la lista del CHIP
-         activo (el botón vive con items, no solo en búsqueda).
-         Sin término y sin chip no hay nada que compartir. */
-      if (!termino && !chipActivo) return;
-
+      /* R108 · también se puede compartir TODA la lista (sin
+         término y sin chip): el mensaje dice "lista general".
+         Lo único imprescindible es la ciudad (viaja en el
+         token). */
       var ciudad = null;
       try {
         ciudad = (window.Ciudad && typeof window.Ciudad.getActual === 'function')
           ? window.Ciudad.getActual() : null;
       } catch (_) {}
-
-      /* El mensaje describe la lista VISIBLE: el primer item en
-         pantalla da el chip y el grupo (curso/servicio). */
-      var primer = null;
-      var item = document.querySelector('#listaWrap .lista-item[data-post]');
-      if (item) primer = buscarPost(item.getAttribute('data-post'));
-
-      var tipo = singularDe(tituloChip(primer && (primer.idChips || [])[0]));
-      var grupo = tituloGrupo(primer && (primer.idGrupo || [])[0]);
+      if (!ciudad || !ciudad.idCiudad) return;
 
       haptic(10);
 
-      var token = (ciudad && ciudad.idCiudad)
-        ? empaquetar('l', [
-            String(ciudad.idCiudad),
-            termino ? termino.slice(0, 40) : '-',
-            String(chipActivo || '')
-          ])
-        : null;
+      var token = empaquetar('l', [
+        String(ciudad.idCiudad),
+        termino ? termino.slice(0, 40) : '-',
+        String(chipActivo || '')
+      ]);
 
       try {
-        var url = armarEnlace(token);
+        /* R108 · el enlace de lista apunta a la PAGE BASE de la
+           carpeta e/ (urlPages): ahí WhatsApp previsualiza el OG
+           POR DEFECTO (fijo del ROOT). La page reenvía el ?s= a
+           la app, así el receptor aterriza con su lista. Sin
+           urlPages, el enlace va directo a la app como siempre. */
+        var pages = urlPages();
+        var url = pages
+          ? pages + '/?s=' + token
+          : armarEnlace(token);
 
-        var saludo = (ciudad && ciudad.titulo)
-          ? '🖐️ ¡Mira esto en *' + String(ciudad.titulo).trim().toUpperCase() + '*! 🔎'
-          : '🖐️ ¡Mira esto! 🔎';
+        var root = (window.SISTEMA && window.SISTEMA.root) || {};
+        var comp = (root.app && root.app.compartir) || {};
+        var plantilla = String(comp.mensajeListaWhatsapp || '').trim();
 
-        var que = '✨ Lista';
-        if (tipo)  que += ' de *' + tipo + '*';
-        if (grupo) que += ' de ' + grupo;
-
-        /* Línea de confianza según el caso (mensajesWS del ROOT) */
-        var confianzas = mensajesWS();
-        var confianza = esServicio(tipo) ? confianzas.servicio : confianzas.curso;
-
-        var texto =
-          saludo + '\n\n' +
-          que + '\n' +
-          confianza + '\n\n' +
-          '🔗 Abre el enlace para ver la lista en la app' +
-          '\n' + url;
+        var texto;
+        if (plantilla) {
+          /* R108 · plantilla del BD + enlace al final. */
+          texto = mensajeLista(plantilla, ciudad, termino, chipActivo) +
+                  (url ? '\n' + url : '');
+        } else {
+          /* R109 · sin plantilla en el BD NO se inventa texto:
+             sale el enlace pelado (los mensajes de WhatsApp
+             viven en la BD, nunca en el código). */
+          texto = url;
+        }
 
         if (navigator.share) {
           return navigator.share({ title: marcaApp(), text: texto })
@@ -464,10 +453,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return null;
     }
 
-    /* Nombres legibles para el mensaje de WhatsApp. Los chips se
-       escriben en plural ("Cursos", "Servicios"): al usuario se le
-       habla en singular ("CURSO", "SERVICIO") con mayúsculas para
-       la negrita de WhatsApp. */
+    /* Nombres legibles para la plantilla del BD: [textoBuscado]
+       toma el título del chip cuando se comparte por chip (los
+       chips se escriben en plural: "Cursos"). */
     function tituloChip(idChip) {
       var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
       var id = String(idChip || '').trim();
@@ -475,24 +463,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         if (chips[i].idChip === id) return String(chips[i].titulo || '').trim();
       }
       return '';
-    }
-
-    function tituloGrupo(idGrupo) {
-      var grupos = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
-      var id = String(idGrupo || '').trim();
-      for (var i = 0; i < grupos.length; i++) {
-        if (grupos[i].idGrupo === id) return String(grupos[i].titulo || '').trim();
-      }
-      return '';
-    }
-
-    function singularDe(titulo) {
-      var t = String(titulo || '').trim().toUpperCase();
-      return t.replace(/S$/, '');
-    }
-
-    function esServicio(tipoSingular) {
-      return String(tipoSingular || '').indexOf('SERVIC') === 0;
     }
 
     function avisoAmable(texto) {
