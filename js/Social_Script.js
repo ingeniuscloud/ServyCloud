@@ -8,21 +8,30 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  contadores): corazón volador al dar like, share
                  nativo con fallback WhatsApp y contador de
                  compartidos en el backend. El mensaje de WhatsApp
-                 lleva el FORMATO RICO del dueño (R98): emoji og +
-                 *título* + _og.descripcion_ + línea de confianza +
-                 enlace — todo con datos ya en memoria (0 lecturas
-                 nuevas). Key localStorage: post_likes.
-VERSIÓN:         2.1.0
-CAMBIOS:         R98: MENSAJE RICO de WhatsApp. El texto sale del
-                 bloque og del POSTJSON (meta.og): 1ª línea emoji +
-                 *título* (og.titulo → tituloPost → post.titulo),
-                 2ª _og.descripcion_ completa (se omite si viene
-                 vacía), línea de confianza según el tipo (la misma
-                 de siempre) y el enlace al final. Fuera el saludo,
-                 el nombre del partner y el tagline (ya no existen en
-                 el formato). El título para navigator.share lleva
-                 el emoji. Sin og el mensaje cae al título en
-                 negrita y no se rompe nada.
+                 (R102) lleva SOLO la FRASE de confianza + el
+                 enlace: el curso ya viaja en la TARJETA OG de la
+                 página e/ (og:título + og:descripción), repetirlo
+                 en el texto duplicaba la información. La frase es
+                 ÁGIL: ROOTJSON › app › mensajesWS (curso/servicio)
+                 con respaldo interno si la BD no la trae. Key
+                 localStorage: post_likes.
+VERSIÓN:         2.2.0
+CAMBIOS:         R102 (decisión del dueño): el TEXTO del mensaje
+                 queda en la FRASE de confianza + 🔗 enlace. La
+                 info del curso NO se repite en el texto porque
+                 ya vive en la descripción de la tarjeta OG (el
+                 dueño: "el resto ya no importa porque está en la
+                 descripción del og"). Y la frase pasa de fija en
+                 el código a ÁGIL en ROOTJSON.app.mensajesWS
+                 (decisión del dueño: "hay que ponerlo ágil en el
+                 JSON de ROOTJSON para no tener que andar
+                 buscando") — sin esa clave en la BD se usan los
+                 textos de siempre, la app no se rompe.
+                 R98: MENSAJE RICO de WhatsApp (emoji + *título* +
+                 _descripción_ + frase + enlace) — reemplazado por
+                 el formato R102. El título para navigator.share
+                 sigue llevando el emoji + título (no sale en el
+                 texto de WhatsApp).
                  R91: LIMPIEZA ALINEADA AL VUELO LARGO — la animación
                  del corazón pasó de 0.8s a 1.05s (recorrido más
                  largo, ver Social_CSS 1.4.2) y la limpieza del
@@ -82,8 +91,36 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return '';
     }
 
-    /* Línea de confianza del mensaje (decisión del dueño):
-       curso → inscripciones abiertas · servicio → recomendación. */
+    /* ============================================================
+       FRASES DE CONFIANZA (R102 · ÁGILES en la BD)
+       Viven en ROOTJSON › app › mensajesWS:
+         "mensajesWS": {
+           "curso":    "Inscripciones abiertas, reserva tu cupo
+                        desde ya en la app Servy",
+           "servicio": "Te lo recomiendo"
+         }
+       · La app decide CUÁL por el tipo del post (chip →
+         singular: "Cursos" → CURSO / "Servicios" → SERVICIO).
+       · Si la BD no trae mensajesWS (o una de las dos frases),
+         se usan los textos de SIEMPRE (respaldo interno): la
+         app nunca se queda sin frase ni se rompe.
+       ============================================================ */
+    var FRASES_WS_RESPALDO = {
+      curso:    'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy',
+      servicio: 'Te lo recomiendo'
+    };
+
+    function frasesWS() {
+      var bd = {};
+      try {
+        bd = ((((window.SISTEMA || {}).root || {}).app || {}).mensajesWS) || {};
+      } catch (_) { bd = {}; }
+      return {
+        curso:    String(bd.curso    || '').trim() || FRASES_WS_RESPALDO.curso,
+        servicio: String(bd.servicio || '').trim() || FRASES_WS_RESPALDO.servicio
+      };
+    }
+
     function esServicio(tipoSingular) {
       return String(tipoSingular || '').indexOf('SERVIC') === 0;
     }
@@ -99,18 +136,21 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Texto a compartir (R98 · FORMATO RICO del dueño, igual que
-       entrega el Generador OG):
-         {emoji og} *{título}*
-         _{og.descripcion completa}_   (se omite si viene vacía)
-         {línea de confianza}
+       Texto a compartir (R102 · decisión del dueño):
+         {frase de confianza}
 
          🔗 {enlace}
-       · Título: og.titulo → tituloPost → post.titulo (la misma
-         cadena del servidor, 00 DoGet).
-       · Todo sale del POSTJSON ya en memoria + el enlace de
-         Compartir: 0 lecturas nuevas.
-       · Sin og el mensaje cae al título en negrita y no se rompe.
+       · La info del curso NO va en el texto: ya vive en la
+         TARJETA OG de la página e/ (og:title + og:description) —
+         repetirla duplicaba la información en la pantalla del
+         cliente. La tarjeta muestra el título y la descripción
+         (recortados por WhatsApp, con la sensación de "entra a
+         ver todo").
+       · Frase ÁGIL: ROOTJSON › app › mensajesWS (curso /
+         servicio) con respaldo interno. Tipo: idChips → chip →
+         singular ("Cursos" → CURSO).
+       · El título de navigator.share sigue llevando el emoji +
+         título (no aparece en el texto de WhatsApp).
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
       var pj   = post.postJson || {};
@@ -122,21 +162,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                        String(desc.tituloPost || '').trim() ||
                        String(post.titulo || '').trim() || 'Publicación';
       var emoji = String(og.emoji || '').trim();
-      var lineaOg = String(og.descripcion || '').trim();
 
       var url = String(urlEnlace || '').trim() || urlApp();
 
       var tipo = tipoSingularDePost(post);
-      var confianza = esServicio(tipo)
-        ? 'Te lo recomiendo'
-        : 'Inscripciones abiertas, reserva tu cupo desde ya en la app Servy';
+      var frases = frasesWS();
+      var confianza = esServicio(tipo) ? frases.servicio : frases.curso;
 
-      var texto =
-        (emoji ? emoji + ' ' : '') + '*' + tituloBase + '*\n' +
-        (lineaOg ? '_' + lineaOg + '_\n' : '') +
-        '\n' +
-        confianza + '\n\n' +
-        '🔗 ' + url;
+      var texto = confianza + '\n\n' + '🔗 ' + url;
 
       return { titulo: (emoji ? emoji + ' ' : '') + tituloBase, texto: texto };
     }

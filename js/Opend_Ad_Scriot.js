@@ -11,8 +11,11 @@ RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                  X de cierre INMEDIATA (solo la X, dentro de la
                  imagen) y botón "Saber más" DENTRO del creativo,
                  en la franja limpia inferior, con flechita a la
-                 derecha como el CTA del post; abre el WhatsApp
+                 derecha, como el CTA del post; abre el WhatsApp
                  del admin.
+                 R102: la flechita del CTA pasa a trazo OSCURO
+                 (#1f1b16) porque el botón volvió al FONDO BLANCO
+                 del plan original (R98). Nada más cambia.
                  Reglas del dueño que gobiernan TODO:
                  · activo + imagen + ventana vigente (reloj del
                    teléfono via ventanaVigente de Global_Script:
@@ -35,8 +38,11 @@ RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                    y se re-intenta UNA sola vez (misma promesa que
                    ya comparte Core). En la página de GAS SISTEMA
                    ya viaja en el HTML y el reintento no corre.
-VERSIÓN:         1.1.0
-CAMBIOS:         R101 (ajustes del dueño): el botón "Saber más"
+VERSIÓN:         1.2.0
+CAMBIOS:         R102 (ajuste del dueño): CTA con FONDO BLANCO
+                 otra vez (el plan original) → la flechita va
+                 oscura #1f1b16 sobre el botón blanco.
+                 R101 (ajustes del dueño): el botón "Saber más"
                  pasa a montarse DENTRO del creativo (franja
                  limpia inferior) con su flechita SVG a la derecha
                  (misma geometría que el CTA del post) — antes
@@ -110,9 +116,10 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
 
       /* R101: la X y el CTA viven DENTRO del creativo. El CTA
          lleva su flechita a la derecha (misma geometría del
-         glifo "flecha" del CTA del post: trazo blanco 2.5,
-         linecap/linejoin round). El texto va en un span para
-         que quede centrado con la flecha anclada a la derecha. */
+         glifo "flecha" del CTA del post). R102: trazo OSCURO
+         (#1f1b16) — el botón volvió al fondo blanco del plan
+         original. El texto va en un span para que quede
+         centrado con la flecha anclada a la derecha. */
       capa.innerHTML =
         '<figure class="intersticial-creativo">' +
           '<img class="intersticial-img" alt="" draggable="false">' +
@@ -126,7 +133,7 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.html
             ? '<button type="button" class="intersticial-boton">' +
                 '<span class="intersticial-boton-texto"></span>' +
                 '<svg class="cta-flecha" viewBox="0 0 24 24" fill="none"' +
-                     ' stroke="#ffffff" stroke-width="2.5"' +
+                     ' stroke="#1f1b16" stroke-width="2.5"' +
                      ' stroke-linecap="round" stroke-linejoin="round"' +
                      ' aria-hidden="true">' +
                   '<path d="M4 12h15"/>' +

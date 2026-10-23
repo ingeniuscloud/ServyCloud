@@ -5,16 +5,31 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del intersticial de apertura (estilo App
                  Open Ad). Capa fija sobre TODA la app mientras
                  carga. El creativo 9:16 es EL PROTAGONISTA:
-                 fondo de la capa TENUE (sin velo oscuro), sin
-                 sombra en la imagen, la X de cierre es solo la X
+                 fondo de la capa TENUE (velo oscuro suave que
+                 deja ver la app atenuada), sin sombra en la
+                 imagen, la X de cierre es solo la X
                  (sin borde ni fondo) DENTRO de la imagen y el
                  botón "Saber más" (texto de la BD) DESCANSA
                  DENTRO de la imagen, en la franja limpia inferior,
                  con la flechita a la derecha igual que el CTA del
                  post. El texto del botón y la imagen salen de
                  PROMOJSON.intersticial (cero textos fijos).
-VERSIÓN:         1.1.0
-CAMBIOS:         R101 (ajustes del dueño tras ver el Open Ad
+VERSIÓN:         1.2.0
+CAMBIOS:         R102 (ajustes del dueño tras ver la R101):
+                 · CTA con FONDO BLANCO otra vez, como el plan
+                   original de la R98: píldora blanca (rgba
+                   255,255,255,.95) con texto oscuro #1f1b16 y la
+                   flechita oscura a la derecha. Tamaños intactos
+                   (el dueño los aprobó: 80vw, X a 10px, CTA
+                   min-width 58% recostado al 4% del creativo).
+                 · FONDO de la capa: el tono clarito de la R101
+                   quedó "casi blanco" y tapaba la app entera
+                   (96% opaco). Ahora es un velo oscuro SUAVE
+                   (rgba 26,22,16,.55): el fondo se ve TENUE — la
+                   app se intuye detrás, atenuada, sin taparla ni
+                   competir con la publicidad (la pieza blanca
+                   resalta sola).
+                 R101 (ajustes del dueño tras ver el Open Ad
                  montado):
                  · X DENTRO de la imagen (esquina superior
                    derecha), SIN borde, SIN fondo, sin sombra de
@@ -50,9 +65,10 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CAPA · fondo tenue (R101): la protagonista es la publicidad.
-     Un color suave y cálido de la familia de la app; sin velo
-     oscuro ni contraste fuerte.
+     CAPA · fondo TENUE (R102): la R101 lo dejó casi blanco (96%
+     opaco) y tapaba la app entera. Ahora un velo oscuro suave
+     deja VER el fondo atenuado — tenue de verdad, sin taparlo —
+     y la pieza blanca de la publicidad resalta sola.
      ============================================================ */
   .intersticial {
     position: fixed;
@@ -64,7 +80,7 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
     padding: 16px;
     padding-top: calc(16px + env(safe-area-inset-top));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
-    background: rgba(251, 236, 224, 0.96);
+    background: rgba(26, 22, 16, 0.55);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
@@ -141,14 +157,13 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
   }
 
   /* ============================================================
-     BOTÓN "SABER MÁS" · DENTRO de la imagen, franja limpia inferior
-     (R101) Igual lenguaje que el CTA del post (naranja, píldora,
-     flechita blanca a la DERECHA como .mk-cta-arrow-icon).
-     Ubicación calculada sobre el creativo real (312×554 en un
-     teléfono 390×844): bottom 4% del alto del creativo → el botón
-     reposa entre el 4% y el ~12.5% del alto, la franja sin texto
-     de la pieza; centrado horizontal. 20% MÁS ANCHO que antes:
-     min-width 58% del creativo (≈181px vs ~140px anteriores).
+     BOTÓN "SABER MÁS" · DENTRO de la imagen, franja limpia inferior.
+     R102: FONDO BLANCO otra vez, como el plan original (R98):
+     píldora blanca rgba(255,255,255,.95), texto oscuro #1f1b16 y
+     sombra neutra — sin naranja. Se conservan intactos los
+     tamaños que el dueño aprobó: posición bottom 4% del creativo
+     (franja limpia de la pieza), centrado, min-width 58% (los
+     "20% más ancho") y flechita a la DERECHA como el CTA del post.
      ============================================================ */
   .intersticial-boton {
     position: absolute;
@@ -161,8 +176,8 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
     padding: 12px 42px;
     border: none;
     border-radius: 999px;
-    background: rgba(249, 115, 22, 0.95);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1f1b16;
     font-family: inherit;
     font-size: 15px;
     font-weight: 600;
@@ -172,7 +187,7 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.32);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
     -webkit-tap-highlight-color: transparent;
     z-index: 2;
   }
@@ -180,7 +195,8 @@ DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
   .intersticial-boton[hidden] { display: none !important; }
 
   /* Flechita del CTA · anclada a la derecha, centrada en alto:
-     MISMA geometría que el CTA del post (flecha blanca →) */
+     MISMA geometría que el CTA del post (flecha oscura →, R102:
+     sobre fondo blanco del botón) */
   .intersticial-boton .cta-flecha {
     position: absolute;
     right: 16px;
