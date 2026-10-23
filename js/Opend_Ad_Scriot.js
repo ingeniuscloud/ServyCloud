@@ -1,6 +1,6 @@
 /*════════════════════════════════════════════════════════════════════
 
-ARCHIVO:         Opend_Ad_Scriot.html
+ARCHIVO:         Opend_Ad_Script.html
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                  Mercado Libre/Yummy/Cashea, casero). Al cargar la
