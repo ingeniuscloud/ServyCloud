@@ -10,7 +10,14 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.9.0
+VERSIÓN:         2.10.0
+CAMBIOS:         R118: la promo del post acepta además
+                 SUBRAYADO con +texto+ → <u> (waFormato definida
+                 DENTRO de este módulo). Regla del dueño:
+                 símbolo PEGADO a la palabra en ambos extremos
+                 — +palabra+ o +frase larga+ se procesan;
+                 + palabra+, +palabra + y ++ quedan literales.
+                 Badge y precios igual.
 CAMBIOS:         R117: el titulo y la descripcion de la promo
                  del post aceptan el formato estilo WhatsApp
                  escrito en la BD (waFormato definida DENTRO de
@@ -62,7 +69,7 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
     }
 
     /* ============================================================
-       R117 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
+       R117/R118 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
        waFormato(texto) devuelve HTML SEGURO (escapeHtml
        incluido) con los efectos que el dueño escribe en la BD:
          *negrita*   → <strong>     (también **negrita**)
@@ -72,6 +79,9 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
                        NO se aplica ningún otro efecto
          > cita      → <span class="wa-cita"> (bloque con barra;
                        solo si > abre la línea)
+         +subrayado+ → <u> (R118: pegado a la palabra en ambos
+                       extremos — +palabra+, +frase larga+;
+                       + palabra+, +palabra + y ++ literales)
        Los símbolos se convierten en el efecto y DESAPARECEN.
        Reglas: el símbolo de apertura no puede venir pegado a
        letra/número (a*b*c queda literal), el contenido no puede
@@ -98,6 +108,11 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
       });
       t = t.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, function (m, pre, c) {
         return /^\s|\s$/.test(c) ? m : pre + '<em>' + c + '</em>';
+      });
+      /* R118: +subrayado+ — pegado a la palabra en ambos
+         extremos; ++ y extremos con espacio quedan literales. */
+      t = t.replace(/(^|[^\w])\+([^+\n]+)\+(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<u>' + c + '</u>';
       });
       return t;
     }

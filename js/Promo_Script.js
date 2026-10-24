@@ -52,8 +52,16 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.2.0
-CAMBIOS:         R117: FORMATO ESTILO WHATSAPP en el titulo y la
+VERSIÓN:         2.3.0
+CAMBIOS:         R118: el formato de la R117 gana SUBRAYADO —
+                 +texto+ → <u>. Regla del dueño: el símbolo va
+                 PEGADO a la palabra en ambos extremos —
+                 +palabra+ o +frase larga+ se procesan;
+                 + palabra+, +palabra + y ++ quedan literales.
+                 Mismo blindaje del resto: 2+2 y 3+3, teléfonos
+                 +58 y a+b+c salen literales. Todo lo demás de
+                 la R117 sigue igual.
+                 R117: FORMATO ESTILO WHATSAPP en el titulo y la
                  descripcion de la tarjeta — SOLO esos dos textos;
                  tituloPost (3ª línea) y badge quedan en
                  escapeHtml puro. Lo que el dueño escribe en la
@@ -268,7 +276,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     }
 
     /* ============================================================
-       R117 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
+       R117/R118 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
        waFormato(texto) devuelve HTML SEGURO (escapeHtml
        incluido) con los efectos que el dueño escribe en la BD:
          *negrita*   → <strong>     (también **negrita**)
@@ -278,6 +286,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                        NO se aplica ningún otro efecto
          > cita      → <span class="wa-cita"> (bloque con barra;
                        solo si > abre la línea)
+         +subrayado+ → <u> (R118: pegado a la palabra en ambos
+                       extremos — +palabra+, +frase larga+;
+                       + palabra+, +palabra + y ++ literales)
        Los símbolos se convierten en el efecto y DESAPARECEN.
        Reglas: el símbolo de apertura no puede venir pegado a
        letra/número (a*b*c queda literal), el contenido no puede
@@ -304,6 +315,11 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       });
       t = t.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, function (m, pre, c) {
         return /^\s|\s$/.test(c) ? m : pre + '<em>' + c + '</em>';
+      });
+      /* R118: +subrayado+ — pegado a la palabra en ambos
+         extremos; ++ y extremos con espacio quedan literales. */
+      t = t.replace(/(^|[^\w])\+([^+\n]+)\+(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<u>' + c + '</u>';
       });
       return t;
     }
