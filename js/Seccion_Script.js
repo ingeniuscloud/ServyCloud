@@ -10,8 +10,15 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.8.0
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
+VERSIÓN:         2.9.0
+CAMBIOS:         R115: el titulo y la descripcion de la promo
+                 del post aceptan el formato estilo WhatsApp
+                 escrito en la BD (via Global.waFormato):
+                 *negrita*, _cursiva_, ~tachado~, `codigo` y
+                 > cita — los símbolos se convierten en el efecto
+                 y desaparecen; sin pareja se pintan tal cual. El
+                 badge y los precios quedan igual.
+                 R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
                  Entra la lectura del bloque
                  promocion del POSTJSON (titulo/descripcion/
                  idBadge, hermano de meta; respaldo meta.promo), la
@@ -412,7 +419,9 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
 
       var html = '<div class="mk-promo-block" style="--post-color:' + escapeHtml(colorOficial) + '; --post-claro:' + escapeHtml(colorPastel) + '">';
       /* R96 · fila del texto = titulo en .subtitulo + descripcion
-         en .textoPrimario (el CSS les da la entrada suave), con
+         en .textoPrimario (el CSS les da la entrada suave) —
+         AMBAS con formato estilo WhatsApp (R115, via
+         Global.waFormato) —, con
          el BADGE a la derecha (misma anatomía de la marquesina).
          R84/R108: si el post trae idBadge y el badge está
          ENCENDIDO en BADGEJSON va su píldora; si está apagado
@@ -433,10 +442,10 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
         html += '<div class="mk-promo-banner">' +
                   '<div class="mk-promo-banner-textos">';
         if (tituloPromo) {
-          html += '<span class="mk-promo-titulo subtitulo">' + escapeHtml(tituloPromo) + '</span>';
+          html += '<span class="mk-promo-titulo subtitulo">' + Global.waFormato(tituloPromo) + '</span>';
         }
         if (descripcionPromo) {
-          html += '<span class="mk-promo-descripcion textoPrimario">' + escapeHtml(descripcionPromo) + '</span>';
+          html += '<span class="mk-promo-descripcion textoPrimario">' + Global.waFormato(descripcionPromo) + '</span>';
         }
         html +=   '</div>' + badgeHtml +
                 '</div>';

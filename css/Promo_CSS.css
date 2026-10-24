@@ -27,8 +27,14 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  Promo_Script (rAF sobre scrollLeft). El badge
                  vive SOLO aquí y en el post. Vive fuera del
                  scroll en modo lista. Se oculta en modo detalle.
-VERSIÓN:         2.8
-CAMBIOS:         R98: solo encabezado — los textos de la tarjeta
+VERSIÓN:         2.9
+CAMBIOS:         R115: efectos del formato estilo WhatsApp en
+                 los textos de promo de las DOS superficies (caja
+                 tenue para `codigo` que sirve sobre el degradado
+                 de la marquesina y sobre la tarjeta clara del
+                 post; cita en bloque con barra currentColor).
+                 Los aplica Global.waFormato. Nada más cambia.
+                 R98: solo encabezado — los textos de la tarjeta
                  ahora salen del POSTJSON (meta.promo del post).
                  El CSS no cambia.
 ════════════════════════════════════════════════════════════════════*/
@@ -304,3 +310,36 @@ CAMBIOS:         R98: solo encabezado — los textos de la tarjeta
     .lista-item.promo-item .promo-flecha svg { width: 16px; height: 16px; }
     #promoSlot::before, #promoSlot::after { width: 22px; }
   }
+  /* ============================================================
+     R115 · FORMATO ESTILO WHATSAPP (efectos de los textos de
+     promo escritos en la BD). Los aplica Global.waFormato; aquí
+     solo el look, compartido por las DOS superficies: la
+     tarjeta de la marquesina (lienzo principal, texto blanco
+     sobre el degradado) y la tarjeta de promo del post
+     (lienzo del post, .mk-promo-* de Seccion_CSS). Caja del
+     código NEUTRA (gris translúcido) para leerse bien sobre
+     claro y sobre oscuro; la cita usa currentColor.
+     ============================================================ */
+  .promo-titulo .wa-cod, .promo-sub .wa-cod,
+  .mk-promo-titulo .wa-cod, .mk-promo-descripcion .wa-cod {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: rgba(127, 127, 127, 0.18);
+    border-radius: 6px;
+    padding: 1px 5px;
+  }
+  .promo-titulo .wa-cita, .promo-sub .wa-cita,
+  .mk-promo-titulo .wa-cita, .mk-promo-descripcion .wa-cita {
+    display: block;
+    border-left: 3px solid currentColor;
+    padding-left: 8px;
+    margin: 3px 0;
+    opacity: 0.85;
+  }
+  /* El strong del UA es "bolder" (relativo): con el peso 300 del
+     .subtitulo la negrita del título del post quedaba invisible
+     (400). La fijo al 600 del Core (mismo estándar de las
+     descripciones). La de la marquesina ya nace 700 (bolder del
+     peso de su fila) y la de descripción la manda
+     .textoPrimario strong (600) — no se tocan. */
+  .mk-promo-titulo strong { font-weight: 600 !important; }

@@ -17,13 +17,22 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Guardia anti-loop de token: corta a los 3 intentos.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
-                 Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
-                 y ventanaVigente (R108: ESTRICTA — exige ambos
+                 waFormato (R115: formato estilo WhatsApp para los
+                 textos de promo) y ventanaVigente (R108: ESTRICTA
+                 — exige ambos
                  extremos válidos; fecha sola o fecha + hora;
                  "24:00" = medianoche — usada por promo y openAd).
                  Global_Sheet_Script.html.
-VERSIÓN:         1.17.0
-CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
+VERSIÓN:         1.18.0
+CAMBIOS:         R115: entra waFormato(texto) — formato estilo
+                 WhatsApp para los TEXTOS DE PROMO (marquesina del
+                 lienzo principal y tarjeta de promo del post):
+                 *negrita*, _cursiva_, ~tachado~, `codigo` y
+                 > cita al inicio de línea. Escapa HTML SIEMPRE
+                 (devuelve HTML seguro para innerHTML); símbolo
+                 sin pareja se pinta literal, nada se rompe.
+                 Nada más cambia.
+                 R109: GEMELO SINCRONIZADO con el GAS: entra la
                  ventanaVigente ESTRICTA de R108 que este js/ nunca
                  recibió (el GAS la corrigió y aquí quedó la R98
                  tolerante: un extremo roto dejaba la ventana
@@ -515,4 +524,68 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     if (ahora < desde) return false;
     if (ahora > hasta) return false;
     return true;
+  }
+
+  /* ============================================================
+     R115 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
+     waFormato(texto) devuelve HTML SEGURO (escape incluido) con
+     los efectos que el dueño escribe en la BD:
+       *negrita*   → <strong>     (también **negrita**)
+       _cursiva_   → <em>
+       ~tachado~   → <del>        (también ~~tachado~~)
+       `codigo`    → <code class="wa-cod"> — dentro de código
+                     NO se aplica ningún otro efecto
+       > cita      → <span class="wa-cita"> (bloque con barra;
+                     solo si > abre la línea)
+     Los símbolos se convierten en el efecto y DESAPARECEN.
+     Reglas: el símbolo de apertura no puede venir pegado a
+     letra/número (a*b*c queda literal), el contenido no puede
+     empezar ni terminar en espacio ("2 * 3 * 4" queda literal)
+     y un símbolo sin pareja se pinta tal cual: NADA se rompe.
+     La consumen Promo_Script (tarjeta de la marquesina del
+     lienzo principal) y Seccion_Script (tarjeta de promo del
+     post). 0 lecturas nuevas: el texto ya viaja en el catálogo.
+     ============================================================ */
+  function waInline(t) {
+    t = t.replace(/(^|[^\w])\*\*([^*\n]+)\*\*(?!\*)/g, function (m, pre, c) {
+      return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+    });
+    t = t.replace(/(^|[^\w])\*([^*\n]+)\*(?!\w)/g, function (m, pre, c) {
+      return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+    });
+    t = t.replace(/(^|[^\w])~~([^~\n]+)~~(?!\w)/g, function (m, pre, c) {
+      return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+    });
+    t = t.replace(/(^|[^\w])~([^~\n]+)~(?!\w)/g, function (m, pre, c) {
+      return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+    });
+    t = t.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, function (m, pre, c) {
+      return /^\s|\s$/.test(c) ? m : pre + '<em>' + c + '</em>';
+    });
+    return t;
+  }
+
+  function waFormato(texto) {
+    var s = String(texto == null ? '' : texto);
+    /* 1 · Escape HTML SIEMPRE: el contenido de la hoja nunca pinta tags. */
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    /* 2 · `codigo` primero y congelado (placeholder invulnerable). */
+    var codigos = [];
+    s = s.replace(/`([^`\n]+)`/g, function (m, c) {
+      codigos.push(c);
+      return '\u0001' + (codigos.length - 1) + '\u0001';
+    });
+    /* 3 · Cita por línea (> ya escapado) + efectos en línea. */
+    var lineas = s.split('\n');
+    for (var i = 0; i < lineas.length; i++) {
+      lineas[i] = /^&gt;\s?/.test(lineas[i])
+        ? '<span class="wa-cita">' + waInline(lineas[i].replace(/^&gt;\s?/, '')) + '</span>'
+        : waInline(lineas[i]);
+    }
+    s = lineas.join('\n');
+    /* 4 · Restaurar código. */
+    return s.replace(/\u0001(\d+)\u0001/g, function (m, k) {
+      return '<code class="wa-cod">' + codigos[Number(k)] + '</code>';
+    });
   }

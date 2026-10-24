@@ -38,8 +38,10 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  sistema pide menos movimiento.
                  Tarjeta: TRES LÍNEAS de texto en blanco —
                  1ª = promo.titulo del POSTJSON (tipografía
-                 .subtitulo), 2ª = promo.descripcion
-                 (.textoPrimario) y 3ª = tituloPost del post
+                 .subtitulo) y 2ª = promo.descripcion
+                 (.textoPrimario) — las DOS aceptan formato
+                 estilo WhatsApp desde R115 (Global.waFormato) —
+                 y 3ª = tituloPost del post
                  (.cita) — con el BADGE (promo.idBadge buscado en
                  BADGEJSON) a la derecha de la primera fila y la
                  flecha circular a la esquina inferior derecha. La
@@ -52,8 +54,15 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.1.0
-CAMBIOS:         R98: FUENTE ÚNICA = POSTJSON. Los textos y el
+VERSIÓN:         2.2.0
+CAMBIOS:         R115: el TITULO y la DESCRIPCIÓN de la tarjeta
+                 aceptan el formato estilo WhatsApp escrito en la
+                 BD (via Global.waFormato): *negrita*, _cursiva_,
+                 ~tachado~, `codigo` y > cita — los símbolos se
+                 convierten en el efecto y desaparecen; sin
+                 pareja se pintan tal cual. El tituloPost (3ª
+                 línea) y el badge quedan igual.
+                 R98: FUENTE ÚNICA = POSTJSON. Los textos y el
                  badge de la tarjeta se leen de post.promo
                  (meta.promo del POSTJSON, viajando en el
                  catálogo) y NO del item de PROMOJSON, que ahora
@@ -259,6 +268,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
        · TITULO   (1ª línea, .subtitulo): post.promo.titulo.
        · DESCRIPCION (2ª línea, .textoPrimario):
          post.promo.descripcion.
+       (R115: titulo y descripcion aceptan formato estilo
+       WhatsApp via Global.waFormato; tituloPost y badge quedan
+       igual.)
        · BADGE: post.promo.idBadge (buscado en BADGEJSON).
        · TITULOpOST (3ª línea, .cita): el tituloPost del post —
          el índice del catálogo ya lo trae en post.titulo;
@@ -293,7 +305,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
          CUÁNDO. El badge sigue a la derecha de la 1ª fila. Las
          3 líneas las pinta Promo_CSS: titulo en .subtitulo,
          descripcion en .textoPrimario y tituloPost en .cita —
-         todas en blanco sobre el degradado. */
+         todas en blanco sobre el degradado. R115: el titulo y
+         la descripcion aceptan formato estilo WhatsApp (via
+         Global.waFormato). */
       var badge = buscarBadge(idBadgeDePromo(post));
       var tituloPromo = tituloDePromo(post);
       var descripcion = descripcionDePromo(post);
@@ -305,12 +319,12 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
 
       var html = '<span class="promo-fila-titulo">' +
                    '<span class="promo-titulo">' +
-                     escapeHtml(tituloPromo || tituloPost || post.id) +
+                     Global.waFormato(tituloPromo || tituloPost || post.id) +
                    '</span>' + badgeHtml +
                  '</span>';
 
       if (descripcion) {
-        html += '<span class="promo-sub">' + escapeHtml(descripcion) + '</span>';
+        html += '<span class="promo-sub">' + Global.waFormato(descripcion) + '</span>';
       }
 
       if (tituloPost) {
