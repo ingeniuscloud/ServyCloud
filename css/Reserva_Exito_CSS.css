@@ -8,12 +8,12 @@ RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
                  resumen, WhatsApp), skeleton mientras procesa la
                  reserva y pantalla de error. Los consume
                  Reserva_Exito_Script.html.
-VERSIÓN:         1.3
-CAMBIOS:         R96: bloque PLAN DE ESTUDIOS (.exito-plan) — la
-                 sección del markdown del post (inicio, duración,
-                 inversión…) que ahora se muestra en la pantalla
-                 de éxito y viaja al correo. Mismo lenguaje
-                 visual de .exito-lista y entrada escalonada.
+VERSIÓN:         1.4
+CAMBIOS:         R114: comentarios al día — el bloque PLAN DE
+                 ESTUDIOS (.exito-plan) muestra del markdown los
+                 datos clave: inicio, duración, inscripción y
+                 pagos. Mismo lenguaje visual de .exito-lista y
+                 entrada escalonada.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -113,10 +113,10 @@ CAMBIOS:         R96: bloque PLAN DE ESTUDIOS (.exito-plan) — la
   }
 
   /* ============================================================
-     R96 · PLAN DE ESTUDIOS — la sección del markdown del post
-     (inicio, duración, inversión…) bajo el resumen de la
-     reserva. Mismo card gris de .exito-lista con la barra
-     naranja de la app como firma.
+     R114 · PLAN DE ESTUDIOS — los datos clave del markdown
+     del post (inicio, duración, inscripción, pagos) bajo el
+     resumen de la reserva. Mismo card gris de .exito-lista
+     con la barra naranja de la app como firma.
      ============================================================ */
   .exito-plan {
     width: 100%;

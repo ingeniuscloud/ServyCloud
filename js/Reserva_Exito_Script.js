@@ -8,17 +8,20 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.3.0
-CAMBIOS:         R96: la pantalla de éxito muestra el PLAN DE
-                 ESTUDIOS — se extrae del markdown del post
-                 activo (sección "### Plan de Estudios" hasta el
-                 final, sin las líneas de horario: el horario
-                 elegido ya aparece en la lista). Sin sección:
-                 la pantalla queda como siempre. Mismo bloque
-                 que viaja al correo del alumno.
+VERSIÓN:         1.4.0
+CAMBIOS:         R114: el Plan de Estudios se simplifica — del
+                 markdown solo se muestran los datos clave:
+                 Inicio, Duración, Inscripción y Pago único /
+                 cada Cuota (arriba la pantalla ya informa el
+                 horario elegido y los datos de la reserva).
+                 Sin sección: la pantalla queda como siempre.
+                 Mismo bloque que viaja al correo del alumno.
+                 R96: la pantalla de éxito muestra el PLAN DE
+                 ESTUDIOS extraído del markdown del post activo
+                 (sección "### Plan de Estudios" hasta el final).
                  R95: la pantalla de éxito lee el horario del item
-                 nuevo del PLANJSON ({dias, horario, cupo}) y el
-                  título directo del índice.
+                 del PLANJSON ({dias, horario, cupo}) y el título
+                 directo del índice.
 
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
@@ -43,12 +46,21 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     }
 
     /* ============================================================
-       R96 · PLAN DE ESTUDIOS — misma extracción que hace
+       R114 · PLAN DE ESTUDIOS — misma extracción que hace
        03 Correo.gs para el correo: sección "### Plan de
-       Estudios" hasta el final, SIN las líneas de horario (el
-       horario elegido ya viaja en la lista de la pantalla) y
-       sin el marcador de cita ^.
+       Estudios" hasta el final y LISTA BLANCA de datos clave
+       (esDatoPlan): Inicio, Duración, Inscripción y Pago
+       único / cada Cuota. El resto de líneas del markdown
+       (horarios, notas) no se muestra: arriba la pantalla ya
+       informa el horario elegido y los datos de la reserva.
        ============================================================ */
+    function esDatoPlan(linea) {
+      var t = String(linea || '').trim()
+        .replace(/^[-*]\s+/, '')
+        .replace(/^\*+\s*/, '');
+      return /^(inicio|d[uú]raci[oó]n|inscripci[oó]n|pago|cuota)\b/i.test(t);
+    }
+
     function extraerPlanEstudios(markdown) {
       var lineas = String(markdown == null ? '' : markdown).split(/\r?\n/);
       var inicio = -1;
@@ -62,8 +74,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
         var l = lineas[j].trim();
         if (!l) { if (salida.length) salida.push(''); continue; }
         if (/^#{1,6}\s/.test(l)) continue;
-        if (/^[-*]?\s*\*{0,2}\s*horario\b/i.test(l)) continue;
-        l = l.replace(/^\s*\^\s?/, '');
+        if (!esDatoPlan(l)) continue;
         salida.push(l);
       }
       while (salida.length && !salida[salida.length - 1]) salida.pop();
@@ -148,7 +159,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       var checkSvg = '<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
 
-      /* R95 · PLANJSON NUEVO: item {dias, horario, cupo} */
+      /* R95 · PLANJSON: item {dias, horario, cupo} */
       var plan = (state.planes || [])[state.turnoSeleccionado] || {};
       var dias = String(plan.dias || '');
       var hora = String(plan.horario || '');
@@ -207,8 +218,8 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       html += fila('¿Cómo nos conociste?:', origenTxt);
       html += '</ul>';
 
-      /* R96 · Plan de Estudios del markdown del post (si lo
-         trae): inicio, duración, inversión… sin el horario. */
+      /* R114 · Plan de Estudios del markdown del post (si lo
+         trae): solo Inicio, Duración, Inscripción y Pagos. */
       html += htmlPlanEstudios(post);
 
       html += '<div class="exito-aviso warning">' +
