@@ -11,8 +11,16 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.33.0
-CAMBIOS:         R100: CacheL2 ENV_VERSION pasa a 3 — el
+VERSIÓN:         1.34.0
+CAMBIOS:         R110: Capa 1 GA4 resucitada — desde R105 (app
+                 única, sin envoltorio/iframe) window.Puente ya no
+                 existe y el guard viejo mataba TODOS los eventos
+                 client-side (app_ready, post_open, whatsapp_click,
+                 like, promo_click, intersticial_view…): a GA4 solo
+                 entraban los page_view. Sin puente, los eventos
+                 van DIRECTOS a gtag de index.html; con puente
+                 (legado) se retransmiten como antes.
+                 R100: CacheL2 ENV_VERSION pasa a 3 — el
                  dispositivo se trae catálogo y detalles UNA vez
                  tras desplegar (arranque limpio garantizado:
                  el snapshot viejo pudo nacer de un SISTEMA a
@@ -363,7 +371,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     function enviar(evento, params) {
       try {
         if (!EVENTOS_OK[evento]) return;
-        if (!window.Puente || !window.Puente.hayPuente()) return;
 
         var p = {};
         if (params && typeof params === 'object') {
@@ -375,11 +382,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
           }
         }
 
-        window.Puente.retransmitir({
-          tipo: 'ga-event',
-          evento: String(evento),
-          params: p
-        });
+        /* R110 · los eventos NO mueren si no hay puente: en la app
+           única (R105 retiró el envoltorio/iframe) window.Puente ya
+           no existe y el return viejo mataba TODA la Capa 1 GA4.
+           Ahora: con puente se retransmite (legado); sin puente el
+           evento va DIRECTO a gtag de la página (index.html lo
+           carga); si gtag no está (DNT o bloqueo), queda en nada. */
+        if (window.Puente && window.Puente.hayPuente()) {
+          window.Puente.retransmitir({
+            tipo: 'ga-event',
+            evento: String(evento),
+            params: p
+          });
+          return;
+        }
+
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', String(evento), p);
+        }
       } catch (_) {}
     }
 
