@@ -5,9 +5,9 @@ ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  filtrados por ciudad activa + chip activo sobre
-                 TABLAS.posts. Item: avatar redondo a tamaño
-                 del item (la INICIAL DEL TÍTULO con el color
-                 suave de siempre; sin imagen) + título
+                 TABLAS.posts. Item: avatar circular con la
+                 INICIAL DEL TÍTULO (tipografía .tituloPost y
+                 color oficial del post; sin imagen) + título
                  (.subtitulo) + estrella métrica pasiva + fila con
                  "Ver publicación". Decide el botón "Compartir lista"
                  con la cantidad de items. Ordenamiento por
@@ -17,13 +17,17 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.14
-CAMBIOS:         R111: el avatar del item pasa a la COLUMNA
-                 IZQUIERDA a tamaño del item: REDONDO y SOLO la
-                 INICIAL DEL TÍTULO — sin imagen, el avatar
-                 nunca lleva foto. Color suave intacto
-                 (--post-claro / --post-color). El pie pierde el
-                 avatar chico; el texto de la marca se queda.
+VERSIÓN:         2.15
+CAMBIOS:         R112: el avatar del item es un CÍRCULO
+                 PERFECTO (64×64) centrado verticalmente — no
+                 se estira con el alto de la fila. La inicial
+                 lleva la tipografía .tituloPost con el COLOR
+                 OFICIAL del post; fondo suave de siempre.
+                 R111: el avatar del item pasa a la COLUMNA
+                 IZQUIERDA: SOLO la INICIAL DEL TÍTULO — sin
+                 imagen, el avatar nunca lleva foto. El pie
+                 pierde el avatar chico; el texto de la marca
+                 se queda.
                  R87: NACE EL MODO 'partner' — el perfil del
                  vendedor es un LIENZO propio (#partnerTrack, lo
                  pinta window.Partner), hijo del detalle: el
@@ -464,10 +468,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
 
-        /* R111 · AVATAR DEL ITEM: REDONDO, a tamaño del item,
-           SOLO la INICIAL DEL TÍTULO — sin imagen (el avatar
-           nunca lleva foto). Color suave de la misma fuente de
-           siempre: colorClaro y colorOficial del post. */
+        /* R112 · AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo
+           centra y le da 64×64), SOLO la INICIAL DEL TÍTULO —
+           sin imagen (el avatar nunca lleva foto). La letra
+           lleva la tipografía .tituloPost y el colorOficial
+           del post; fondo colorClaro de siempre. */
         var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
 
         var btn = document.createElement('button');

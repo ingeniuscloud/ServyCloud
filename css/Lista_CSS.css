@@ -2,24 +2,26 @@
 
 ARCHIVO:         Lista_CSS.html
 ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
-ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  categoría, alternancia lista ↔ detalle con fade,
-                 items con línea tenue (avatar redondo del item
-                 a tamaño del item + título .subtitulo + estrella
+                 items con línea tenue (avatar circular del item
+                 con la inicial del título + título .subtitulo + estrella
                  métrica + fila con "Ver publicación" naranja),
                  cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.14
-CAMBIOS:         R111: el item muestra el AVATAR REDONDO
-                 (border-radius 50%) a tamaño del item en la
-                 columna izquierda (align-self: stretch) y SOLO
-                 con la INICIAL DEL TÍTULO — sin imagen ni capa
-                 img. Mismo color suave de siempre (--post-claro
-                 / --post-color). El skeleton de lista y el corte
-                 móvil espejan la anatomía.
+VERSIÓN:         2.15
+CAMBIOS:         R112: el avatar del item es un CÍRCULO
+                 PERFECTO (64×64 px, border-radius 50%)
+                 centrado verticalmente — nunca se estira con el
+                 alto de la fila. La inicial lleva la tipografía
+                 de la maestra .tituloPost (mismas variables del
+                 Core) y el COLOR OFICIAL del post (--post-color);
+                 fondo suave de siempre (--post-claro). El
+                 skeleton y el corte móvil espejan el círculo.
+                 R111: el item muestra SOLO la INICIAL DEL
+                 TÍTULO en el avatar — sin imagen ni capa img.
                  R87: (1) "Compartir lista" con la tipografía
                  .enlacesOpciones (13px/400/#f97316 vía variables
                  del Core; sigue a la derecha). (2) Cinturón de
@@ -375,25 +377,29 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     AVATAR DEL ITEM (R111) · columna izquierda a TAMAÑO DEL
-     ITEM (align-self: stretch) y REDONDO (border-radius 50%):
-     SOLO la INICIAL DEL TÍTULO — sin imagen, el avatar nunca
-     lleva foto. COLOR de la misma fuente de siempre: fondo
-     colorClaro del post (--post-claro) y letra colorOficial
-     (--post-color).
+     AVATAR DEL ITEM (R112) · CÍRCULO PERFECTO de 64×64 px
+     (border-radius 50%), centrado verticalmente en el item —
+     nunca se estira con el alto de la fila. SOLO la INICIAL
+     DEL TÍTULO — sin imagen, el avatar nunca lleva foto.
+     LETRA con la tipografía de la maestra .tituloPost (las
+     mismas variables del Core) y el COLOR OFICIAL del post
+     (--post-color); fondo colorClaro de siempre (--post-claro).
      ============================================================ */
   .lista-item .item-avatar {
     position: relative;
     flex: 0 0 auto;
-    align-self: stretch;
+    align-self: center;
     width: 64px;
+    height: 64px;
     margin-right: 12px;
     border-radius: 50%;
     overflow: hidden;
     background: var(--post-claro, #f1f5f9);
     color: var(--post-color, #475569);
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--size-tituloPost, 24px);
+    font-weight: var(--weight-tituloPost, 300);
+    letter-spacing: -0.5px;
+    line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -600,8 +606,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
-  /* Espejo del item real (R111): avatar redondo a tamaño del
-   item a la izquierda + barras del título, la marca y el "Ver
+  /* Espejo del item real (R112): avatar circular de 64×64 a
+   la izquierda + barras del título, la marca y el "Ver
    publicación" a la derecha. */
   .lista-skeleton-pie {
     display: flex;
@@ -611,8 +617,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   .lista-skeleton-avatar {
     flex: 0 0 auto;
-    align-self: stretch;
+    align-self: center;
     width: 64px;
+    height: 64px;
     margin-right: 12px;
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.06);
@@ -661,7 +668,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
-    .lista-item .item-avatar { width: 54px; font-size: 20px; }
+    .lista-item .item-avatar { width: 54px; height: 54px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -669,6 +676,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .skeleton-detalle { padding: 12px 0 40px; }
 
     .lista-skeleton-item { padding: 12px 14px; }
-    .lista-skeleton-avatar { width: 54px; }
+    .lista-skeleton-avatar { width: 54px; height: 54px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }
