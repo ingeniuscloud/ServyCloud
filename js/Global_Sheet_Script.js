@@ -20,10 +20,9 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
                  los lienzos: círculo con chevron a la izquierda
                  (el estilo lo pinta Global_CSS); (2) fuera el
                  texto "Volver" de la cabecera (el botón se
-                 explica solo); (3) el volver-arriba vivió en su
-                 esquina y pasó abajo a la derecha (Core_CSS),
-                 así que el relevo sheet.profundo ya no existe:
-                 Volver siempre visible en subvista.
+                  explica solo); (3) el volver-arriba vive abajo a
+                  la derecha (Core_CSS). Volver siempre visible en
+                  subvista.
                  R95: VOLVER ARRIBA en el menú global — botón circular
                  (.mk-sheet-top del Core) que
                  aparece pasados ~120px de scroll y sube suave al

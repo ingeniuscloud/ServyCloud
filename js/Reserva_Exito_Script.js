@@ -18,8 +18,7 @@ CAMBIOS:         R96: la pantalla de éxito muestra el PLAN DE
                  que viaja al correo del alumno.
                  R95: la pantalla de éxito lee el horario del item
                  nuevo del PLANJSON ({dias, horario, cupo}) y el
-                 título directo del índice; fuera las lecturas
-                 muertas (plan.turno, seccionJson).
+                  título directo del índice.
 
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
@@ -37,8 +36,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       });
     }
 
-    /* Título del post · del índice liviano. R95: fuera la lectura
-       de seccionJson (camino muerto desde la migración POSTJSON). */
+    /* Título del post · del índice liviano. */
     function tituloDelPost(post) {
       if (!post) return '';
       return String(post.titulo || '').trim();

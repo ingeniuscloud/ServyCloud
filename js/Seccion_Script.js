@@ -12,9 +12,7 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  La sección Q&A la aporta window.Pregunta.
 VERSIÓN:         2.8.0
 CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
-                 R108 tocó solo el GAS y este js/ quedó atrás — por
-                 eso el lienzo del post NO pintaba la promo
-                 individual: aquí entra la lectura del bloque
+                 Entra la lectura del bloque
                  promocion del POSTJSON (titulo/descripcion/
                  idBadge, hermano de meta; respaldo meta.promo), la
                  regla del dueño de MOSTRARLA aunque el post no

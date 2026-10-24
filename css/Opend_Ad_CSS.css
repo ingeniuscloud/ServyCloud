@@ -59,9 +59,7 @@ CAMBIOS:         R102 (ajustes del dueño tras ver la R101):
                  escala sutil (respetando prefers-reduced-motion),
                  cierre instantáneo, bloqueo del scroll de fondo y
                  respeto de las safe areas del teléfono.
-DEPENDENCIAS:    Opend_Ad_Scriot.html (crea el nodo), Index.html
-                 (R100: el archivo se llama Opend_Ad_CSS — nombre del
-                 dueño; la BD sigue usando PROMOJSON.intersticial)
+DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================

@@ -21,16 +21,10 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores: (1) POST —
                  (UPPERCASE) y [textoBuscado] (buscador, chip o
                  "lista general"). Sin plantilla, enlace pelado.
 VERSIÓN:         2.4
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
-                 Este js/ viejo leía root.app.urlPages — campo que
-                 YA NO EXISTE (vive en app.compartir.urlPages) — y
-                 por eso el enlace del post caía en la RAÍZ de la
-                 app: WhatsApp previsualizaba la tarjeta sin imagen
-                 y sin datos del post. Entra además la orden R109:
-                 fuera el mensaje hardcodeado de lista (saludo +
-                 confianza de mensajesWS + "🔗 Abre el enlace..."),
-                 sin plantilla en el BD el mensaje es SOLO el
-                 enlace; helpers muertos retirados.
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS:
+                 urlPages desde app.compartir.urlPages (el enlace
+                 del post aterriza en la página gemela con su OG)
+                 y mensaje SOLO de la BD.
                  R108: urlPages desde app.compartir.urlPages;
                  enlace de LISTA a la page base con reenvío del
                  ?s=; mensaje de lista desde

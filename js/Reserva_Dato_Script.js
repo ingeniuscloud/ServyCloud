@@ -16,8 +16,6 @@ CAMBIOS:         R95: (1) datosPlan lee el PLANJSON nuevo
                  y el texto de cupos por item quedan intactos.
                  (2) El CTA de confirmar se apaga si el horario
                  elegido tiene cupo en cero (el backend revalida).
-                 (3) Fuera la lectura muerta de seccionJson del
-                 título del post.
 
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),

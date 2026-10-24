@@ -9,11 +9,10 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  ordenar, chips de categorías, botón ciudad,
                  fila de promos y envoltorios de filtros.
 VERSIÓN:         2.8
-CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS (R108 tocó solo
-                 el GAS y el css/ quedó atrás): entra la regla R108 del
-                 MENÚ GLOBAL siempre visible en lista compartida
-                 (body.compartido-lista ... .menu-global → display:flex),
-                 la misma que el GAS trae desde R108. Nada más cambia.
+CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
+                 regla R108 del MENÚ GLOBAL siempre visible en
+                 lista compartida (body.compartido-lista ...
+                 .menu-global → display:flex). Nada más cambia.
                  R77B: El texto de los chips pasa a la voz del
                  textoPrimario (variables del Core) para acompañar
                  la centralización tipográfica del dueño.

@@ -14,8 +14,7 @@ CAMBIOS:         R95: (1) PLANJSON NUEVO — el plan llega como array
                  (3) SIN_CUPOS del backend se muestra como
                  "Cupos agotados. Elige otro horario."
                  (4) El color del sheet es el colorOficial del
-                 índice (meta.color[0]); la lectura vieja de
-                 seccionJson (caía en azul) salió.
+                  índice (meta.color[0]).
 
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
@@ -381,8 +380,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       haptic([15, 10, 15]);
 
-      /* R95: color OFICIAL del índice (meta.color[0]). La lectura
-         vieja de seccionJson era camino muerto y caía en azul. */
+      /* R95: color OFICIAL del índice (meta.color[0]). */
       var color = state.postActivo.colorOficial || '#475569';
 
       Sheet.abrir({

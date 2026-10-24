@@ -14,15 +14,11 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  gemela en GitHub Pages). Key localStorage:
                  post_likes.
 VERSIÓN:         2.3
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS
-                 (R108 tocó solo el GAS: este js/ viejo compartía
-                 el formato armado y por eso WhatsApp no recibía el
-                 texto rico de la BD). Orden R109 incluida: el
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
+                 Orden R109 incluida: el
                  mensaje es SOLO compartir.mensajeWhatsapp + el
                  enlace; si el post no trae mensaje sale el enlace
-                 pelado. FUERA el formato armado de respaldo
-                 (saludo, línea de confianza de app.mensajesWS,
-                 "🔗 Abre la app...") y sus helpers muertos.
+                  pelado.
 DEPENDENCIAS:    Global_Script.js (postBackend, getDeviceId),
                  Index (SISTEMA, TABLAS), Iconos.js (pintarGlifos),
                  Lista_Script.js (window.Lista: getPostActivo),

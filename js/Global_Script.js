@@ -17,11 +17,10 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Guardia anti-loop de token: corta a los 3 intentos.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
-                 aplicarPlaceholders y ventanaVigente (R108:
-                 ESTRICTA — exige ambos extremos válidos; fecha
-                 sola o fecha + hora; "24:00" = medianoche — usada
-                 por promo y openAd).
-                 El módulo window.Global (menú + subvistas) vive en
+                 Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
+                 y ventanaVigente (R108: ESTRICTA — exige ambos
+                 extremos válidos; fecha sola o fecha + hora;
+                 "24:00" = medianoche — usada por promo y openAd).
                  Global_Sheet_Script.html.
 VERSIÓN:         1.17.0
 CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
@@ -471,13 +470,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     a.click();
     document.body.removeChild(a);
     return true;
-  }
-
-  function aplicarPlaceholders(mensaje, cursoJson) {
-    cursoJson = cursoJson || {};
-    return String(mensaje || '')
-      .replace(/\{titulo\}/g,  cursoJson.titulo  || '')
-      .replace(/\{tagline\}/g, cursoJson.tagline || '');
   }
 
   /* ============================================================

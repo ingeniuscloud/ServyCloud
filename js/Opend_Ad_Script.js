@@ -21,16 +21,11 @@ RESPONSABILIDAD: Intersticial de apertura (estilo App Open Ad de
                  normal. En GitHub Pages SISTEMA llega POR DATOS:
                  espera la sesión y re-intenta UNA sola vez.
 VERSIÓN:         1.4.0
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS y
-                 RENOMBRADO: este archivo era js/Opend_Ad_Scriot.js
-                 (con "t", typo del dueño corregido en R108 solo
-                 del lado GAS). EL REPOSITORIO DEBE BORRAR
-                 js/Opend_Ad_Scriot.js — el index.html ya carga
-                 Opend_Ad_Script.js. Entra además el campo nuevo
-                 de la BD: PROMOJSON.openAd (antes intersticial)
-                 con respaldo del nombre viejo. Y entra el
-                 HORARIO ESTRICTO R108 que este gemelo nunca
-                 recibió (mostraba el ad fuera de las ventanas).
+CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
+                 Entra PROMOJSON.openAd (con respaldo en
+                 intersticial) y el HORARIO ESTRICTO R108 que
+                 este gemelo nunca recibió (mostraba el ad fuera
+                 de las ventanas).
                  R102: CTA con fondo blanco, flechita oscura.
                  R101: botón "Saber más" dentro del creativo.
 DEPENDENCIAS:    Index (SISTEMA), Global_Script.js (ventanaVigente,
@@ -43,8 +38,7 @@ DEPENDENCIAS:    Index (SISTEMA), Global_Script.js (ventanaVigente,
 
     /* ============================================================
        DATOS · SISTEMA.promo.openAd
-       R109 · el campo se llama openAd (antes intersticial); se
-       lee el nuevo con respaldo del nombre viejo.
+     R109 · se lee PROMOJSON.openAd con respaldo en intersticial.
        R108 · HORARIO ESTRICTO: la decisión de mostrar exige
        ventana vigente. Sin ventanas declaradas NO se muestra
        (antes: sin ventanas se mostraba siempre que hubiera

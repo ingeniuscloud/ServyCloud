@@ -5,8 +5,13 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía
                  maestra y de la voz única de los placeholders.
-VERSIÓN:         2.11.1
-CAMBIOS:         R98.1: RESTAURACIÓN (orden del dueño) del
+VERSIÓN:         2.12
+CAMBIOS:         R111: .mk-sheet-top (VOLVER ARRIBA de los bottom
+                 sheets) en TONO TENUE: borde #cbd5e1, flecha
+                 #94a3b8 y sombra más suave — el color fuerte
+                 friccionaba con el texto del sheet. Tamaño,
+                 ubicación y comportamiento intactos.
+                 R98.1: RESTAURACIÓN (orden del dueño) del
                  degradado del documento en body.is-mobile — el
                  bloque R70 exacto: color sólido #fdf3ec para la
                  franja + degradado R69 (clarito arriba, blanco
@@ -279,8 +284,8 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 
   /* ============================================================
      R96 · VOLVER ARRIBA DE LOS BOTTOM SHEETS (clase compartida)
-     Mismo botón circular del volver de la app (34px, borde fino
-     #475569) pero con la flecha hacia ARRIBA y — como manda el
+     Mismo botón circular del volver de la app (34px, borde
+     fino tenue) pero con la flecha hacia ARRIBA y — como manda el
      uso normal de apps y web — en la ESQUINA INFERIOR DERECHA
      del sheet (el dueño corrigió la ubicación de la R95: arriba
      a la izquierda estaba mal). Aparece solo cuando hay scroll
@@ -291,10 +296,10 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      ============================================================ */
   .mk-sheet-top {
     position: absolute; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 14px; width: 34px; height: 34px;
-    border: 1.2px solid #475569; background: #ffffff; color: #475569; cursor: pointer;
+    border: 1.2px solid #cbd5e1; background: #ffffff; color: #94a3b8; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%; z-index: 8; padding: 0;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
     opacity: 0; pointer-events: none; transform: translateY(4px);
     transition: opacity 0.2s ease, transform 0.22s ease;
     -webkit-tap-highlight-color: transparent;

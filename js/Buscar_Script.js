@@ -5,8 +5,7 @@ ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pega
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  vez en la FILA 1 de la sección de filtros (sin
-                 estados de apertura — la lupa-botón, la cápsula
-                 que se desplegaba y el texto CANCELAR murieron).
+                  estados de apertura).
                  Al escribir emite 'buscar:change' con el término
                  y el flag de límite alcanzado, y enciende la X
                  circular naranja (.con-texto en la cápsula) que

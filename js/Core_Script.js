@@ -11,8 +11,14 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.34.0
-CAMBIOS:         R110: Capa 1 GA4 resucitada — desde R105 (app
+VERSIÓN:         1.35.0
+CAMBIOS:         R111: (1) CacheL2 ENV_VERSION pasa a 4 — el
+                 catálogo ahora trae la imagen principal de cada
+                 item (el avatar del lienzo) y el dispositivo se
+                 trae el snapshot UNA vez tras desplegar.
+                 (2) El skeleton de lista espeja la nueva anatomía
+                 del item (avatar a la izquierda).
+                 R110: Capa 1 GA4 resucitada — desde R105 (app
                  única, sin envoltorio/iframe) window.Puente ya no
                  existe y el guard viejo mataba TODOS los eventos
                  client-side (app_ready, post_open, whatsapp_click,
@@ -31,10 +37,6 @@ CAMBIOS:         R110: Capa 1 GA4 resucitada — desde R105 (app
                  a 2: el catálogo ahora trae el bloque promo del
                  POSTJSON en cada post — el envoltorio viejo se
                  descarta solo una vez y se re-descarga fresco.
-                 R95: calcularTotalCupos suma el campo cupo del
-                 PLANJSON nuevo (array directo); el CTA del post
-                 se apaga cuando el total es 0. Con post sin
-                 planes no cambia nada.
 
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
@@ -46,7 +48,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
   /* ============================================================
      CACHEL2 · capa del dispositivo
-     R76: ahora persiste/lee `postJson` (antes `seccionJson`).
+     R76: persiste/lee `postJson`.
      La clave de localStorage se mantiene (sv_l2_post_<id>):
      el dueño ejecuta invalidarTodo() antes de cargar la app,
      y el cliente purga el shape viejo porque _valido() exige
@@ -58,7 +60,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var K_POST      = 'sv_l2_post_';
     var MAX_POSTS   = 30;
     var TTL_MS      = 7 * 24 * 60 * 60 * 1000;
-    var ENV_VERSION = 3;   /* R100: arranque limpio tras el despliegue */
+    var ENV_VERSION = 4;   /* R111: el catálogo ahora trae la imagen del item */
 
     function _valido(env, requiereSecciones) {
       if (!env || env.v !== ENV_VERSION) return false;
@@ -142,7 +144,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
   /* ============================================================
      POSTFULL · caché cliente de detalles bajo demanda
-     R76: `postJson` (antes `seccionJson`).
+     (clave `postJson`).
      ============================================================ */
   window.PostFull = (function () {
     var _cache = {};
@@ -873,11 +875,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       for (var i = 0; i < 5; i++) {
         html +=
           '<div class="lista-skeleton-item">' +
+            '<div class="lista-skeleton-avatar"></div>' +
             '<div class="lista-skeleton-body">' +
               '<div class="lista-skeleton-line short"></div>' +
               '<div class="lista-skeleton-line long"></div>' +
               '<div class="lista-skeleton-pie">' +
-                '<div class="lista-skeleton-avatar"></div>' +
                 '<div class="lista-skeleton-line nombre"></div>' +
                 '<div class="lista-skeleton-line ver"></div>' +
               '</div>' +

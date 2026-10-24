@@ -5,9 +5,11 @@ ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  filtrados por ciudad activa + chip activo sobre
-                 TABLAS.posts. Item: título (.subtitulo) + estrella
-                 métrica pasiva + fila del partner con "Ver
-                 publicación". Decide el botón "Compartir lista"
+                 TABLAS.posts. Item: avatar a tamaño del item (la
+                 imagen principal del post o, sin foto, la inicial
+                 del título con el color de siempre) + título
+                 (.subtitulo) + estrella métrica pasiva + fila con
+                 "Ver publicación". Decide el botón "Compartir lista"
                  con la cantidad de items. Ordenamiento por
                  'orden:change': recomendado, nombre, categoría
                  (con cabecera de grupo), más compartidos y mejor
@@ -15,8 +17,14 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.12
-CAMBIOS:         R87: NACE EL MODO 'partner' — el perfil del
+VERSIÓN:         2.13
+CAMBIOS:         R111: el avatar del item pasa a la COLUMNA
+                 IZQUIERDA a tamaño del item: pinta la imagen
+                 principal del post (post.imagen del catálogo, a
+                 lh3 w400) y, si el post no trae fotos, la INICIAL
+                 DEL TÍTULO con el color de siempre. El pie pierde
+                 el avatar chico; el texto de la marca se queda.
+                 R87: NACE EL MODO 'partner' — el perfil del
                  vendedor es un LIENZO propio (#partnerTrack, lo
                  pinta window.Partner), hijo del detalle: el
                  título del header pasa a "Perfil del vendedor",
@@ -26,16 +34,11 @@ CAMBIOS:         R87: NACE EL MODO 'partner' — el perfil del
                  R86: el SKELETON del detalle se actualiza a la
                  anatomía real del post de hoy: marco 1:1 con
                  vidrio, título, promo, descripción, CTA píldora
-                 y fila del partner. Fuera la "identidad"
-                 centrada (marca/tagline) del post viejo.
+                 y fila del partner.
                  R84: el detalle sube con las ÚLTIMAS 2 preguntas
                  del post (post.preguntas, ya vienen dentro de
                  postDetalle): el Q&A del lienzo se pinta con la
                  misma llamada, sin pedido extra.
-                 R77: El título del item usa la clase maestra
-                 .subtitulo (el .titulo era demasiado grande para
-                 la pantalla). Encabezado saneado: solo queda lo
-                 vigente.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -201,8 +204,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Skeleton del detalle
        R86: actualizado a la ANATOMÍA REAL del post de hoy — marco
        1:1 con vidrio (hero), título, promo, descripción, CTA
-       píldora y fila del partner. Ya no muestra la "identidad"
-       centrada del post viejo (marca/tagline), que ya no existe.
+       píldora y fila del partner.
        ============================================================ */
     function htmlSkeletonDetalle() {
       return '' +
@@ -461,7 +463,21 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var claro   = post.colorClaro || '#f1f5f9';
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
-        var inicial = marca ? marca.charAt(0).toUpperCase() : 'S';
+
+        /* R111 · AVATAR DEL ITEM: la IMAGEN PRINCIPAL del post
+           (meta.imagenes[0], viaja en el catálogo como post.imagen)
+           a tamaño del item; sin foto, la INICIAL DEL TÍTULO con
+           el color de siempre. La foto va a w400 (lh3 reescala al
+           vuelo): un avatar chico no baja fotos de 1600. */
+        var imagen    = String(post.imagen || '').trim();
+        var srcAvatar = '';
+        if (imagen) {
+          srcAvatar = (window.SeccionImagen && typeof window.SeccionImagen.urlImagenDirecta === 'function')
+            ? window.SeccionImagen.urlImagenDirecta(imagen)
+            : imagen;
+          srcAvatar = String(srcAvatar).replace('=w1600', '=w400');
+        }
+        var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
 
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -472,13 +488,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         btn.style.setProperty('--post-claro', claro);
 
         var html = '';
+        html += '<span class="item-avatar" aria-hidden="true">' +
+                escapeHtml(inicial);
+        if (imagen) {
+          html +=   '<img class="item-avatar-img" alt="" loading="lazy" decoding="async" src="' +
+                    escapeHtml(srcAvatar) + '" onerror="this.remove()">';
+        }
+        html += '</span>';
         html += '<span class="body">';
         html +=   '<span class="fila-titulo">';
         html +=     '<span class="subtitulo">' + escapeHtml(titulo) + '</span>';
         html +=   '</span>';
         html +=   '<span class="pie">';
-        html +=     '<span class="partner-avatar" aria-hidden="true">' +
-                    escapeHtml(inicial) + '</span>';
         if (marca) {
           html +=   '<span class="marca">' +
                     '<span class="marca-texto">' + escapeHtml(marca) + '</span>' +
@@ -603,8 +624,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       window.PostFull.obtener(idPost)
         .then(function (det) {
-          /* R76: postJson (antes seccionJson). planJson intacto.
-             R84: las últimas 2 preguntas (con respuesta) viajan
+          /* R84: las últimas 2 preguntas (con respuesta) viajan
              dentro del detalle y suben con el post. */
           post.postJson = det.postJson || {};
           post.planJson = det.planJson || null;

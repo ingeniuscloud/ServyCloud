@@ -5,13 +5,20 @@ ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  categoría, alternancia lista ↔ detalle con fade,
-                 items con línea tenue (título .subtitulo +
-                 estrella métrica + fila del partner con "Ver
-                 publicación" naranja), cabecera de grupo,
+                 items con línea tenue (avatar del item a
+                 tamaño del item + título .subtitulo + estrella
+                 métrica + fila con "Ver publicación" naranja),
+                 cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.12
-CAMBIOS:         R87: (1) "Compartir lista" con la tipografía
+VERSIÓN:         2.13
+CAMBIOS:         R111: el item muestra el AVATAR a tamaño del
+                 item en la columna izquierda (align-self:
+                 stretch): imagen principal del post en cover
+                 sobre la inicial, con el MISMO color de siempre
+                 (--post-claro / --post-color). El skeleton de
+                 lista y el corte móvil espejan la nueva anatomía.
+                 R87: (1) "Compartir lista" con la tipografía
                  .enlacesOpciones (13px/400/#f97316 vía variables
                  del Core; sigue a la derecha). (2) Cinturón de
                  seguridad: body.modo-partner apaga el compartir.
@@ -22,8 +29,7 @@ CAMBIOS:         R87: (1) "Compartir lista" con la tipografía
                  R77: El título del item pasa a la clase maestra
                  .subtitulo (Lista_Script): aquí solo queda el
                  recorte a 2 líneas; el tamaño/peso/color lo pone
-                 el Core. Se retira el override muerto de .titulo.
-                 Encabezado saneado: solo queda lo vigente.
+                 el Core.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -299,12 +305,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   .lista-item:active { background: rgba(15, 23, 42, 0.03); }
 
-  /* ============================================================
-     (R62) La fila "Explorar" con su contador y su cápsula de
-     modo de vista se ELIMINARON — sus estilos murieron con la
-     fila (el dueño no aplica los tipos de vista).
-     ============================================================ */
-
   /* Estrella métrica (R56) · fila horizontal arriba a la derecha:
      glifo + contador a su derecha (★ 23). Anclada ABSOLUTE a la
      esquina para NO reservar carril. Métrica PASIVA: no es botón
@@ -373,29 +373,38 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     PARTNER · avatar de la inicial + nombre (R64 sin check)
-     Avatar circular con la PRIMERA letra de la marca del
-     partner: fondo colorClaro del post (--post-claro) y letra
-     colorOficial (--post-color). SIN BORDES (R59): la regla
-     global .partner-avatar de Partner_Sheet_CSS trae un borde
-     1.5px #475569 que se colaba aquí y le quitaba
-     protagonismo al título — el item lo apaga. Nombre en peso
-     normal. El CHECK verificado verde SALIÓ en R64 (orden del
-     dueño: la fila queda limpia).
+     AVATAR DEL ITEM (R111) · columna izquierda a TAMAÑO DEL
+     ITEM (align-self: stretch): muestra la IMAGEN PRINCIPAL
+     del post (img en cover sobre la letra) o, sin foto, la
+     INICIAL DEL TÍTULO. COLOR INTACTO: fondo colorClaro del
+     post (--post-claro) y letra colorOficial (--post-color),
+     como era. La imagen carga ENCIMA de la letra: mientras
+     baja (o si falla) se ve la inicial, nunca un hueco.
      ============================================================ */
-  .lista-item .partner-avatar {
+  .lista-item .item-avatar {
+    position: relative;
     flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 0;
+    align-self: stretch;
+    width: 64px;
+    margin-right: 12px;
+    border-radius: 12px;
+    overflow: hidden;
     background: var(--post-claro, #f1f5f9);
     color: var(--post-color, #475569);
-    font-size: 14px;
+    font-size: 24px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+  .lista-item .item-avatar-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .lista-item .marca {
@@ -599,8 +608,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
-  /* Espejo de la fila del partner (R58): avatar circular +
-   barra del nombre + barra del "Ver publicación" a la derecha. */
+  /* Espejo del item real (R111): avatar a tamaño del item a
+   la izquierda + barras del título, la marca y el "Ver
+   publicación" a la derecha. */
   .lista-skeleton-pie {
     display: flex;
     align-items: center;
@@ -609,9 +619,10 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   .lista-skeleton-avatar {
     flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    align-self: stretch;
+    width: 64px;
+    margin-right: 12px;
+    border-radius: 12px;
     background: rgba(15, 23, 42, 0.06);
   }
 
@@ -658,7 +669,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
-    .lista-item .partner-avatar { width: 30px; height: 30px; font-size: 13px; }
+    .lista-item .item-avatar { width: 54px; font-size: 20px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -666,6 +677,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .skeleton-detalle { padding: 12px 0 40px; }
 
     .lista-skeleton-item { padding: 12px 14px; }
-    .lista-skeleton-avatar { width: 30px; height: 30px; }
+    .lista-skeleton-avatar { width: 54px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }
