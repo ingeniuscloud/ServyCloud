@@ -11,15 +11,18 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.15
-CAMBIOS:         R112: el avatar del item es un CÍRCULO
-                 PERFECTO (64×64 px, border-radius 50%)
-                 centrado verticalmente — nunca se estira con el
-                 alto de la fila. La inicial lleva la tipografía
-                 de la maestra .tituloPost (mismas variables del
-                 Core) y el COLOR OFICIAL del post (--post-color);
-                 fondo suave de siempre (--post-claro). El
-                 skeleton y el corte móvil espejan el círculo.
+VERSIÓN:         2.16
+CAMBIOS:         R113: el avatar pasa a 52×52 px y se
+                 reajusta lo derivado: skeleton de lista y
+                 corte móvil (44×44 en ≤360px) espejan el
+                 nuevo tamaño.
+                 R112: el avatar del item es un CÍRCULO
+                 PERFECTO (border-radius 50%) centrado
+                 verticalmente — nunca se estira con el alto de
+                 la fila. La inicial lleva la tipografía de la
+                 maestra .tituloPost (mismas variables del Core)
+                 y el COLOR OFICIAL del post (--post-color);
+                 fondo suave de siempre (--post-claro).
                  R111: el item muestra SOLO la INICIAL DEL
                  TÍTULO en el avatar — sin imagen ni capa img.
                  R87: (1) "Compartir lista" con la tipografía
@@ -377,8 +380,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     AVATAR DEL ITEM (R112) · CÍRCULO PERFECTO de 64×64 px
-     (border-radius 50%), centrado verticalmente en el item —
+     AVATAR DEL ITEM (R113) · CÍRCULO PERFECTO de 52×52 px
+     (44×44 en ≤360px), centrado verticalmente en el item —
      nunca se estira con el alto de la fila. SOLO la INICIAL
      DEL TÍTULO — sin imagen, el avatar nunca lleva foto.
      LETRA con la tipografía de la maestra .tituloPost (las
@@ -389,8 +392,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     position: relative;
     flex: 0 0 auto;
     align-self: center;
-    width: 64px;
-    height: 64px;
+    width: 52px;
+    height: 52px;
     margin-right: 12px;
     border-radius: 50%;
     overflow: hidden;
@@ -606,7 +609,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
-  /* Espejo del item real (R112): avatar circular de 64×64 a
+  /* Espejo del item real (R113): avatar circular de 52×52 a
    la izquierda + barras del título, la marca y el "Ver
    publicación" a la derecha. */
   .lista-skeleton-pie {
@@ -618,8 +621,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-avatar {
     flex: 0 0 auto;
     align-self: center;
-    width: 64px;
-    height: 64px;
+    width: 52px;
+    height: 52px;
     margin-right: 12px;
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.06);
@@ -668,7 +671,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-item .marca { font-size: 12px; }
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
-    .lista-item .item-avatar { width: 54px; height: 54px; }
+    .lista-item .item-avatar { width: 44px; height: 44px; }
     .btn-volver { width: 32px; height: 32px; margin-left: 8px; margin-right: 8px; }
     .btn-volver svg { width: 16px; height: 16px; }
     .titulo-categoria { font-size: 16px; }
@@ -676,6 +679,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .skeleton-detalle { padding: 12px 0 40px; }
 
     .lista-skeleton-item { padding: 12px 14px; }
-    .lista-skeleton-avatar { width: 54px; height: 54px; }
+    .lista-skeleton-avatar { width: 44px; height: 44px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
   }

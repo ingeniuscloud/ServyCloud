@@ -17,9 +17,11 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.15
-CAMBIOS:         R112: el avatar del item es un CÍRCULO
-                 PERFECTO (64×64) centrado verticalmente — no
+VERSIÓN:         2.16
+CAMBIOS:         R113: comentario del avatar al día con el
+                 nuevo tamaño (52×52); sin cambio de código.
+                 R112: el avatar del item es un CÍRCULO
+                 PERFECTO centrado verticalmente — no
                  se estira con el alto de la fila. La inicial
                  lleva la tipografía .tituloPost con el COLOR
                  OFICIAL del post; fondo suave de siempre.
@@ -468,8 +470,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
 
-        /* R112 · AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo
-           centra y le da 64×64), SOLO la INICIAL DEL TÍTULO —
+        /* R113 · AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo
+           centra y le da 52×52), SOLO la INICIAL DEL TÍTULO —
            sin imagen (el avatar nunca lleva foto). La letra
            lleva la tipografía .tituloPost y el colorOficial
            del post; fondo colorClaro de siempre. */
