@@ -2,22 +2,24 @@
 
 ARCHIVO:         Lista_CSS.html
 ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  categoría, alternancia lista ↔ detalle con fade,
-                 items con línea tenue (avatar del item a
-                 tamaño del item + título .subtitulo + estrella
+                 items con línea tenue (avatar redondo del item
+                 a tamaño del item + título .subtitulo + estrella
                  métrica + fila con "Ver publicación" naranja),
                  cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.13
-CAMBIOS:         R111: el item muestra el AVATAR a tamaño del
-                 item en la columna izquierda (align-self:
-                 stretch): imagen principal del post en cover
-                 sobre la inicial, con el MISMO color de siempre
-                 (--post-claro / --post-color). El skeleton de
-                 lista y el corte móvil espejan la nueva anatomía.
+VERSIÓN:         2.14
+CAMBIOS:         R111: el item muestra el AVATAR REDONDO
+                 (border-radius 50%) a tamaño del item en la
+                 columna izquierda (align-self: stretch) y SOLO
+                 con la INICIAL DEL TÍTULO — sin imagen ni capa
+                 img. Mismo color suave de siempre (--post-claro
+                 / --post-color). El skeleton de lista y el corte
+                 móvil espejan la anatomía.
                  R87: (1) "Compartir lista" con la tipografía
                  .enlacesOpciones (13px/400/#f97316 vía variables
                  del Core; sigue a la derecha). (2) Cinturón de
@@ -374,12 +376,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* ============================================================
      AVATAR DEL ITEM (R111) · columna izquierda a TAMAÑO DEL
-     ITEM (align-self: stretch): muestra la IMAGEN PRINCIPAL
-     del post (img en cover sobre la letra) o, sin foto, la
-     INICIAL DEL TÍTULO. COLOR INTACTO: fondo colorClaro del
-     post (--post-claro) y letra colorOficial (--post-color),
-     como era. La imagen carga ENCIMA de la letra: mientras
-     baja (o si falla) se ve la inicial, nunca un hueco.
+     ITEM (align-self: stretch) y REDONDO (border-radius 50%):
+     SOLO la INICIAL DEL TÍTULO — sin imagen, el avatar nunca
+     lleva foto. COLOR de la misma fuente de siempre: fondo
+     colorClaro del post (--post-claro) y letra colorOficial
+     (--post-color).
      ============================================================ */
   .lista-item .item-avatar {
     position: relative;
@@ -387,7 +388,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     align-self: stretch;
     width: 64px;
     margin-right: 12px;
-    border-radius: 12px;
+    border-radius: 50%;
     overflow: hidden;
     background: var(--post-claro, #f1f5f9);
     color: var(--post-color, #475569);
@@ -396,15 +397,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-  .lista-item .item-avatar-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
   }
 
   .lista-item .marca {
@@ -608,8 +600,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
-  /* Espejo del item real (R111): avatar a tamaño del item a
-   la izquierda + barras del título, la marca y el "Ver
+  /* Espejo del item real (R111): avatar redondo a tamaño del
+   item a la izquierda + barras del título, la marca y el "Ver
    publicación" a la derecha. */
   .lista-skeleton-pie {
     display: flex;
@@ -622,7 +614,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     align-self: stretch;
     width: 64px;
     margin-right: 12px;
-    border-radius: 12px;
+    border-radius: 50%;
     background: rgba(15, 23, 42, 0.06);
   }
 

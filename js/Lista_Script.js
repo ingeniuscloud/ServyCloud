@@ -5,9 +5,9 @@ ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  filtrados por ciudad activa + chip activo sobre
-                 TABLAS.posts. Item: avatar a tamaño del item (la
-                 imagen principal del post o, sin foto, la inicial
-                 del título con el color de siempre) + título
+                 TABLAS.posts. Item: avatar redondo a tamaño
+                 del item (la INICIAL DEL TÍTULO con el color
+                 suave de siempre; sin imagen) + título
                  (.subtitulo) + estrella métrica pasiva + fila con
                  "Ver publicación". Decide el botón "Compartir lista"
                  con la cantidad de items. Ordenamiento por
@@ -17,13 +17,13 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.13
+VERSIÓN:         2.14
 CAMBIOS:         R111: el avatar del item pasa a la COLUMNA
-                 IZQUIERDA a tamaño del item: pinta la imagen
-                 principal del post (post.imagen del catálogo, a
-                 lh3 w400) y, si el post no trae fotos, la INICIAL
-                 DEL TÍTULO con el color de siempre. El pie pierde
-                 el avatar chico; el texto de la marca se queda.
+                 IZQUIERDA a tamaño del item: REDONDO y SOLO la
+                 INICIAL DEL TÍTULO — sin imagen, el avatar
+                 nunca lleva foto. Color suave intacto
+                 (--post-claro / --post-color). El pie pierde el
+                 avatar chico; el texto de la marca se queda.
                  R87: NACE EL MODO 'partner' — el perfil del
                  vendedor es un LIENZO propio (#partnerTrack, lo
                  pinta window.Partner), hijo del detalle: el
@@ -42,8 +42,8 @@ CAMBIOS:         R111: el avatar del item pasa a la COLUMNA
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
-                 window.Secciones), Seccion_Imagen_Script.html,
-                 Chips_Script.html, Buscar_Script.html,
+                 window.Secciones), Chips_Script.html,
+                 Buscar_Script.html,
                  Ciudad_Script (window.Ciudad), Compartir_Script.html
                  (window.Compartir), Orden_Sheet_Script.html,
                  Core_CSS.html, Lista_CSS.html, Promo_CSS.html
@@ -464,19 +464,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
 
-        /* R111 · AVATAR DEL ITEM: la IMAGEN PRINCIPAL del post
-           (meta.imagenes[0], viaja en el catálogo como post.imagen)
-           a tamaño del item; sin foto, la INICIAL DEL TÍTULO con
-           el color de siempre. La foto va a w400 (lh3 reescala al
-           vuelo): un avatar chico no baja fotos de 1600. */
-        var imagen    = String(post.imagen || '').trim();
-        var srcAvatar = '';
-        if (imagen) {
-          srcAvatar = (window.SeccionImagen && typeof window.SeccionImagen.urlImagenDirecta === 'function')
-            ? window.SeccionImagen.urlImagenDirecta(imagen)
-            : imagen;
-          srcAvatar = String(srcAvatar).replace('=w1600', '=w400');
-        }
+        /* R111 · AVATAR DEL ITEM: REDONDO, a tamaño del item,
+           SOLO la INICIAL DEL TÍTULO — sin imagen (el avatar
+           nunca lleva foto). Color suave de la misma fuente de
+           siempre: colorClaro y colorOficial del post. */
         var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
 
         var btn = document.createElement('button');
@@ -489,12 +480,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
         var html = '';
         html += '<span class="item-avatar" aria-hidden="true">' +
-                escapeHtml(inicial);
-        if (imagen) {
-          html +=   '<img class="item-avatar-img" alt="" loading="lazy" decoding="async" src="' +
-                    escapeHtml(srcAvatar) + '" onerror="this.remove()">';
-        }
-        html += '</span>';
+                escapeHtml(inicial) +
+                '</span>';
         html += '<span class="body">';
         html +=   '<span class="fila-titulo">';
         html +=     '<span class="subtitulo">' + escapeHtml(titulo) + '</span>';

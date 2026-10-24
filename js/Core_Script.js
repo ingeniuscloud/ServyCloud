@@ -2,6 +2,7 @@
 
 ARCHIVO:         Core_Script.html
 ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  arranca los componentes con datos; inyecta el
@@ -11,13 +12,14 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.35.0
-CAMBIOS:         R111: (1) CacheL2 ENV_VERSION pasa a 4 — el
-                 catálogo ahora trae la imagen principal de cada
-                 item (el avatar del lienzo) y el dispositivo se
-                 trae el snapshot UNA vez tras desplegar.
-                 (2) El skeleton de lista espeja la nueva anatomía
-                 del item (avatar a la izquierda).
+VERSIÓN:         1.36.0
+CAMBIOS:         R111: (1) El catálogo NO trae la imagen del
+                 item (el avatar del lienzo es solo la inicial
+                 del título, sin foto): CacheL2 ENV_VERSION
+                 regresa a 3 y el dispositivo que bajó el
+                 catálogo con imagen lo renueva UNA vez.
+                 (2) El skeleton de lista espeja la anatomía del
+                 item (avatar a la izquierda).
                  R110: Capa 1 GA4 resucitada — desde R105 (app
                  única, sin envoltorio/iframe) window.Puente ya no
                  existe y el guard viejo mataba TODOS los eventos
@@ -60,7 +62,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var K_POST      = 'sv_l2_post_';
     var MAX_POSTS   = 30;
     var TTL_MS      = 7 * 24 * 60 * 60 * 1000;
-    var ENV_VERSION = 4;   /* R111: el catálogo ahora trae la imagen del item */
+    var ENV_VERSION = 3;   /* R111: el catálogo vuelve a su shape sin imagen */
 
     function _valido(env, requiereSecciones) {
       if (!env || env.v !== ENV_VERSION) return false;
