@@ -10,7 +10,15 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.8.0
+VERSIÓN:         2.9.0
+CAMBIOS:         R117: el titulo y la descripcion de la promo
+                 del post aceptan el formato estilo WhatsApp
+                 escrito en la BD (waFormato definida DENTRO de
+                 este módulo — sin Global, lección R115/R116):
+                 *negrita*, _cursiva_, ~tachado~, `codigo` y
+                 > cita — los símbolos se convierten en el efecto
+                 y desaparecen; sin pareja se pintan tal cual. El
+                 badge y los precios quedan igual.
 CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
                  Entra la lectura del bloque
                  promocion del POSTJSON (titulo/descripcion/
@@ -51,6 +59,73 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
         return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
       });
+    }
+
+    /* ============================================================
+       R117 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
+       waFormato(texto) devuelve HTML SEGURO (escapeHtml
+       incluido) con los efectos que el dueño escribe en la BD:
+         *negrita*   → <strong>     (también **negrita**)
+         _cursiva_   → <em>
+         ~tachado~   → <del>        (también ~~tachado~~)
+         `codigo`    → <code class="wa-cod"> — dentro de código
+                       NO se aplica ningún otro efecto
+         > cita      → <span class="wa-cita"> (bloque con barra;
+                       solo si > abre la línea)
+       Los símbolos se convierten en el efecto y DESAPARECEN.
+       Reglas: el símbolo de apertura no puede venir pegado a
+       letra/número (a*b*c queda literal), el contenido no puede
+       empezar ni terminar en espacio ("2 * 3 * 4" queda literal)
+       y un símbolo sin pareja se pinta tal cual: NADA se rompe.
+       AUTOCONTENIDA (lección R115/R116): vive DENTRO de este
+       módulo — 0 dependencia de Global o de otro archivo — y si
+       algo impensado fallara, el try/catch devuelve el
+       escapeHtml de siempre. Consumidor: SOLO el titulo y la
+       descripcion de la promo del post (buildPromoHTML).
+       ============================================================ */
+    function waInline(t) {
+      t = t.replace(/(^|[^\w])\*\*([^*\n]+)\*\*(?!\*)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+      });
+      t = t.replace(/(^|[^\w])\*([^*\n]+)\*(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+      });
+      t = t.replace(/(^|[^\w])~~([^~\n]+)~~(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+      });
+      t = t.replace(/(^|[^\w])~([^~\n]+)~(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+      });
+      t = t.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<em>' + c + '</em>';
+      });
+      return t;
+    }
+
+    function waFormato(texto) {
+      try {
+        var s = escapeHtml(String(texto == null ? '' : texto));
+        /* `codigo` primero y congelado (placeholder invulnerable). */
+        var codigos = [];
+        s = s.replace(/`([^`\n]+)`/g, function (m, c) {
+          codigos.push(c);
+          return '\u0001' + (codigos.length - 1) + '\u0001';
+        });
+        /* Cita por línea (> ya escapado) + efectos en línea. */
+        var lineas = s.split('\n');
+        for (var i = 0; i < lineas.length; i++) {
+          lineas[i] = /^&gt;\s?/.test(lineas[i])
+            ? '<span class="wa-cita">' + waInline(lineas[i].replace(/^&gt;\s?/, '')) + '</span>'
+            : waInline(lineas[i]);
+        }
+        s = lineas.join('\n');
+        /* Restaurar código. */
+        return s.replace(/\u0001(\d+)\u0001/g, function (m, k) {
+          return '<code class="wa-cod">' + codigos[Number(k)] + '</code>';
+        });
+      } catch (e) {
+        return escapeHtml(texto);
+      }
     }
 
     function _urlImagen(u) {
@@ -433,10 +508,12 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
         html += '<div class="mk-promo-banner">' +
                   '<div class="mk-promo-banner-textos">';
         if (tituloPromo) {
-          html += '<span class="mk-promo-titulo subtitulo">' + escapeHtml(tituloPromo) + '</span>';
+          /* R117: el titulo pasa por waFormato (formato WhatsApp,
+             definida aquí dentro); el badge sigue escapeHtml. */
+          html += '<span class="mk-promo-titulo subtitulo">' + waFormato(tituloPromo) + '</span>';
         }
         if (descripcionPromo) {
-          html += '<span class="mk-promo-descripcion textoPrimario">' + escapeHtml(descripcionPromo) + '</span>';
+          html += '<span class="mk-promo-descripcion textoPrimario">' + waFormato(descripcionPromo) + '</span>';
         }
         html +=   '</div>' + badgeHtml +
                 '</div>';
@@ -453,6 +530,7 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
       html += '</div>';
       return html;
     }
+
     function buildPresentacion() {
       var post = postActivo;
       if (!post) return '';

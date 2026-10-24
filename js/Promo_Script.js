@@ -52,8 +52,22 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.1.0
-CAMBIOS:         R98: FUENTE ÚNICA = POSTJSON. Los textos y el
+VERSIÓN:         2.2.0
+CAMBIOS:         R117: FORMATO ESTILO WHATSAPP en el titulo y la
+                 descripcion de la tarjeta — SOLO esos dos textos;
+                 tituloPost (3ª línea) y badge quedan en
+                 escapeHtml puro. Lo que el dueño escribe en la
+                 BD se pinta con el efecto real y los símbolos
+                 DESAPARECEN: *negrita*, _cursiva_, ~tachado~,
+                 `codigo` y > cita al inicio de línea. Símbolo
+                 sin pareja se pinta tal cual (nada se rompe) y
+                 texto sin símbolos sale byte-idéntico al
+                 escapeHtml de siempre. waFormato/waInline viven
+                 DEFINIDAS AQUÍ DENTRO del módulo — cero
+                 dependencia de Global o de cualquier otro
+                 archivo (lección R115/R116) — y con respaldo
+                 try/catch al escapeHtml de siempre.
+                 R98: FUENTE ÚNICA = POSTJSON. Los textos y el
                  badge de la tarjeta se leen de post.promo
                  (meta.promo del POSTJSON, viajando en el
                  catálogo) y NO del item de PROMOJSON, que ahora
@@ -253,6 +267,73 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       });
     }
 
+    /* ============================================================
+       R117 · FORMATO ESTILO WHATSAPP PARA LOS TEXTOS DE PROMO
+       waFormato(texto) devuelve HTML SEGURO (escapeHtml
+       incluido) con los efectos que el dueño escribe en la BD:
+         *negrita*   → <strong>     (también **negrita**)
+         _cursiva_   → <em>
+         ~tachado~   → <del>        (también ~~tachado~~)
+         `codigo`    → <code class="wa-cod"> — dentro de código
+                       NO se aplica ningún otro efecto
+         > cita      → <span class="wa-cita"> (bloque con barra;
+                       solo si > abre la línea)
+       Los símbolos se convierten en el efecto y DESAPARECEN.
+       Reglas: el símbolo de apertura no puede venir pegado a
+       letra/número (a*b*c queda literal), el contenido no puede
+       empezar ni terminar en espacio ("2 * 3 * 4" queda literal)
+       y un símbolo sin pareja se pinta tal cual: NADA se rompe.
+       AUTOCONTENIDA (lección R115/R116): vive DENTRO de este
+       módulo — 0 dependencia de Global o de otro archivo — y si
+       algo impensado fallara, el try/catch devuelve el
+       escapeHtml de siempre. Consumidor: SOLO el titulo y la
+       descripcion de la tarjeta (buildItemHTML).
+       ============================================================ */
+    function waInline(t) {
+      t = t.replace(/(^|[^\w])\*\*([^*\n]+)\*\*(?!\*)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+      });
+      t = t.replace(/(^|[^\w])\*([^*\n]+)\*(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<strong>' + c + '</strong>';
+      });
+      t = t.replace(/(^|[^\w])~~([^~\n]+)~~(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+      });
+      t = t.replace(/(^|[^\w])~([^~\n]+)~(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<del>' + c + '</del>';
+      });
+      t = t.replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, function (m, pre, c) {
+        return /^\s|\s$/.test(c) ? m : pre + '<em>' + c + '</em>';
+      });
+      return t;
+    }
+
+    function waFormato(texto) {
+      try {
+        var s = escapeHtml(String(texto == null ? '' : texto));
+        /* `codigo` primero y congelado (placeholder invulnerable). */
+        var codigos = [];
+        s = s.replace(/`([^`\n]+)`/g, function (m, c) {
+          codigos.push(c);
+          return '\u0001' + (codigos.length - 1) + '\u0001';
+        });
+        /* Cita por línea (> ya escapado) + efectos en línea. */
+        var lineas = s.split('\n');
+        for (var i = 0; i < lineas.length; i++) {
+          lineas[i] = /^&gt;\s?/.test(lineas[i])
+            ? '<span class="wa-cita">' + waInline(lineas[i].replace(/^&gt;\s?/, '')) + '</span>'
+            : waInline(lineas[i]);
+        }
+        s = lineas.join('\n');
+        /* Restaurar código. */
+        return s.replace(/\u0001(\d+)\u0001/g, function (m, k) {
+          return '<code class="wa-cod">' + codigos[Number(k)] + '</code>';
+        });
+      } catch (e) {
+        return escapeHtml(texto);
+      }
+    }
+
     /* R98 · TEXTOS DE LA TARJETA — el CONTENIDO vive en el
        POSTJSON del post (post.promo viaja en el catálogo desde
        02 Cache.gs) y NO en el item de PROMOJSON:
@@ -303,14 +384,17 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
         ? '<span class="badge">' + escapeHtml(badge.titulo) + '</span>'
         : '';
 
+      /* R117: el titulo y la descripcion pasan por waFormato
+         (formato WhatsApp, definida aquí dentro); el badge y el
+         tituloPost (3ª línea) siguen en escapeHtml puro. */
       var html = '<span class="promo-fila-titulo">' +
                    '<span class="promo-titulo">' +
-                     escapeHtml(tituloPromo || tituloPost || post.id) +
+                     waFormato(tituloPromo || tituloPost || post.id) +
                    '</span>' + badgeHtml +
                  '</span>';
 
       if (descripcion) {
-        html += '<span class="promo-sub">' + escapeHtml(descripcion) + '</span>';
+        html += '<span class="promo-sub">' + waFormato(descripcion) + '</span>';
       }
 
       if (tituloPost) {
