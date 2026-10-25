@@ -3,19 +3,21 @@
 ARCHIVO:         Promo_Script.html
 ESPEJO GITHUB:   github/js/Promo_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
+RESPONSABILIDAD: Marquesina de titulares destacados. Vive fuera
                  del scroll en modo lista. Se oculta en modo
-                 detalle y cuando la ciudad no tiene promos
+                 detalle y cuando la ciudad no tiene titulares
                  vigentes.
-                 Lee SISTEMA.promo.porCiudad[ciudadActiva]: PROMOJSON
-                 SOLO registra idPost + ventanas (inicia/termina);
-                 el CONTENIDO de cada tarjeta vive en el POSTJSON
-                 del post (meta.promo: titulo, descripcion,
-                 idBadge) y llega por el catálogo (02 Cache.gs lo
-                 extrae al índice, 0 lecturas nuevas). Filtra por
-                 ventana (reloj del teléfono, fecha o fecha+hora
-                 via ventanaVigente de Global_Script) y por estado
-                 del post (solo activo).
+                 Lee SISTEMA.promo.titulares (R121): bloque
+                 { activo, autoAvanceSeg, items[] } — cada item
+                 trae idPost + SU ciudad (campo `ciudad`, vacío []
+                 = todas las ciudades) + inicia/termina (fecha con
+                 o sin hora); el CONTENIDO de cada tarjeta vive en
+                 el POSTJSON del post (meta.promo: titulo,
+                 descripcion, idBadge) y llega por el catálogo (02
+                 Cache.gs lo extrae al índice, 0 lecturas nuevas).
+                 Filtra por ciudad del item, por ventana (reloj
+                 del teléfono via ventanaVigente de Global_Script)
+                 y por estado del post (solo activo).
                  El riel avanza SOLO y sin parar: un bucle de
                  requestAnimationFrame suma a scrollLeft. Se usa
                  scrollLeft y no transform para que el dedo pueda
@@ -52,41 +54,16 @@ RESPONSABILIDAD: Marquesina de promoción destacada. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.3.0
-CAMBIOS:         R118: el formato de la R117 gana SUBRAYADO —
-                 +texto+ → <u>. Regla del dueño: el símbolo va
-                 PEGADO a la palabra en ambos extremos —
-                 +palabra+ o +frase larga+ se procesan;
-                 + palabra+, +palabra + y ++ quedan literales.
-                 Mismo blindaje del resto: 2+2 y 3+3, teléfonos
-                 +58 y a+b+c salen literales. Todo lo demás de
-                 la R117 sigue igual.
-                 R117: FORMATO ESTILO WHATSAPP en el titulo y la
-                 descripcion de la tarjeta — SOLO esos dos textos;
-                 tituloPost (3ª línea) y badge quedan en
-                 escapeHtml puro. Lo que el dueño escribe en la
-                 BD se pinta con el efecto real y los símbolos
-                 DESAPARECEN: *negrita*, _cursiva_, ~tachado~,
-                 `codigo` y > cita al inicio de línea. Símbolo
-                 sin pareja se pinta tal cual (nada se rompe) y
-                 texto sin símbolos sale byte-idéntico al
-                 escapeHtml de siempre. waFormato/waInline viven
-                 DEFINIDAS AQUÍ DENTRO del módulo — cero
-                 dependencia de Global o de cualquier otro
-                 archivo (lección R115/R116) — y con respaldo
-                 try/catch al escapeHtml de siempre.
-                 R98: FUENTE ÚNICA = POSTJSON. Los textos y el
-                 badge de la tarjeta se leen de post.promo
-                 (meta.promo del POSTJSON, viajando en el
-                 catálogo) y NO del item de PROMOJSON, que ahora
-                 solo trae idPost + inicia + termina. Sin
-                 meta.promo la tarjeta cae al tituloPost del post
-                 (nunca queda muda). La vigencia pasa por
-                 ventanaVigente (Global_Script): inicia con hora
-                 = ventana horaria; sin hora = todo el día.
-                 Fuera la lectura de textos del item (titulo,
-                 texto, promoTexto, mensaje, descripcion) y del
-                 idPostActual (shape viejo).
+VERSIÓN:         2.4.0
+CAMBIOS:         R121: (1) El carrusel se llama TITULARES y lee la
+                 estructura nueva: promo.titulares.{activo,
+                 autoAvanceSeg, items[]}. (2) Cada item trae SU
+                 ciudad (campo `ciudad`;
+                 vacío [] = se muestra en todas). (3) Fechas con o
+                 sin horario (misma gramática ventanaVigente).
+                 El formato WhatsApp del texto (waFormato/waInline
+                 autocontenidos) y todo el proceso del riel quedan
+                 intactos.
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  #promoEncabezado), Global_Script.html
                  (ventanaVigente), Ciudad_Sheet_Script.html
@@ -95,7 +72,6 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  Promo_CSS.html, Lista_CSS.html (clase .lista-item
                  compartida)
 ════════════════════════════════════════════════════════════════════*/
-
   window.Promo = (function () {
 
     var track = null;
@@ -437,8 +413,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       /* Se conserva el significado de autoAvanceSeg: segundos por
          tarjeta. La marquesina avanza a esa misma cadencia, así que
          el ritmo configurado en PROMOJSON sigue mandando. */
-      var seg = Number((window.SISTEMA && window.SISTEMA.promo &&
-                        window.SISTEMA.promo.autoAvanceSeg) || 7);
+      var promo = (window.SISTEMA && window.SISTEMA.promo) || null;
+      var titulares = promo && promo.titulares;
+      var seg = Number((titulares && titulares.autoAvanceSeg) || 7);
       if (!(seg >= 3)) seg = 7;
 
       var porItem = items.length ? (anchoVuelta / items.length) : 0;
@@ -552,29 +529,25 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
       if (encabezado) encabezado.hidden = true;
 
       var promo = window.SISTEMA && window.SISTEMA.promo;
-      if (!promo || promo.activo === false) return;
+      var bloque = promo && promo.titulares;
+      if (!bloque || bloque.activo !== true) return;
 
       var ciudad = ciudadActiva();
       if (!ciudad) return;
 
-      var raw  = (promo.porCiudad && promo.porCiudad[ciudad]) || null;
-      /* R98 · el PROMOJSON del dueño trae porCiudad como ARRAY
-         de items { idPost, inicia, termina }. Se acepta también
-         un item suelto por ciudad. */
-      var pool = [];
-      if (Array.isArray(raw)) {
-        pool = raw;
-      } else if (raw && raw.idPost) {
-        pool = [raw];
-      }
+      /* R121 · titulares.items: cada item trae SU ciudad (vacío
+         [] = todas). */
+      var pool = Array.isArray(bloque.items) ? bloque.items : [];
       if (!pool.length) return;
 
-      /* Filtrar por ventana + estado del post */
+      /* Filtrar por ciudad + ventana + estado del post */
       var vigentes = [];
       pool.forEach(function (item) {
         if (!item) return;
         var idPost = item.idPost;
         if (!idPost) return;
+        var cs = Array.isArray(item.ciudad) ? item.ciudad : [];
+        if (cs.length && cs.indexOf(ciudad) === -1) return;
         if (!estaVigente(item)) return;
         var post = buscarPost(idPost);
         if (!post) return;

@@ -18,45 +18,25 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  la fila de filtros desde R62) y emite
                  'ciudad:change' cuando cambia.
                  Ordena las ciudades alfabéticamente por título.
-                 R65: el sheet pinta el STACK NATIVO que trajo el
-                 dueño de referencia — tarjetas apiladas (una por
-                 fila): nombre en negrita + badge "Activo"
+                 El sheet pinta el STACK NATIVO: tarjetas apiladas
+                 (una por fila): nombre en negrita + badge "Activo"
                  (solo la activa lo muestra) y pills horizontales
                  "N Servicios · N Cursos · N Promos" (la de
                  Promos destacada); al tocar, aplicar + cerrar
-                 como siempre. Las métricas siguen calculándose
-                 con TABLAS.posts y SISTEMA.promo.
-VERSIÓN:         1.8
-CAMBIOS:         R67: FIX de métricas — el PROMOJSON real trae
-                 porCiudad como OBJETO (idPostActual, el mismo
-                 que lee Promo_Script) y metricasDe llamaba
-                 forEach sobre él: la excepción congelaba el
-                 sheet (aviso de cookies pegado, sin lista de
-                 ciudades). Ahora se normaliza el formato (array
-                 u objeto) antes de contar.
-                 R65: pintarContenido() cambia de MODELO — fuera
-                 la rejilla 2 columnas con punto de selección
-                 (el dueño lo vio plano); entra el stack
-                 vertical: .ciudad-card-top con nombre en
-                 negrita + .ciudad-card-badge "Activo"; pills
-                 .ciudad-card-metrica (la de Promos con clase
-                 .destacada); sin radio, sin punto, sin chevron.
-                 R62: las métricas de items ACTIVOS por ciudad —
-                 Servicios, Cursos y Promos — se calculan con
-                 metricasDe(idCiudad) sobre TABLAS.posts y
-                 SISTEMA.promo (mismas reglas de vigencia de la
-                 marquesina; cursos manda: un post con chip de
-                 curso cuenta como curso, CANON 3) y
-                 promoVigente() reutiliza las reglas de fecha.
-                 R40: el texto del aviso de cookies ya no vive
-                 aquí: llega en SISTEMA.avisos.cookies
-                 (03 Constantes.gs, única fuente de los textos);
-                 sin texto disponible el aviso muestra solo el
-                 icono y Aceptar.
+                 como siempre. Las métricas se calculan con
+                 TABLAS.posts y SISTEMA.promo.titulares (R121).
+VERSIÓN:         1.9
+CAMBIOS:         R121: (1) Las métricas por ciudad leen la
+                 estructura nueva SISTEMA.promo.titulares — cada
+                 item trae SU ciudad (vacío [] = cuenta en todas)
+                 y fechas con o sin hora (ventanaVigente, misma
+                 gramática del sistema). (2) Nada más cambia:
+                 bloqueo de primera carga, cookies, stack nativo y
+                 eventos intactos.
+
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
-
   window.Ciudad = (function () {
 
     var KEY_CIUDAD = 'app_ciudad';
@@ -179,36 +159,37 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       return '';
     }
 
+    /* R121 · vigencia con la MISMA gramática del sistema:
+       ventanaVigente (fecha con o sin hora); respaldo plano si
+       Global no llegó. */
     function promoVigente(item) {
+      if (typeof window.ventanaVigente === 'function') {
+        return window.ventanaVigente(item.inicia, item.termina) === true;
+      }
       var hoy = hoyISO();
-      if (item.inicia && item.inicia > hoy) return false;
-      if (item.termina && item.termina < hoy) return false;
+      var inicia = String(item.inicia || '').slice(0, 10);
+      var termina = String(item.termina || '').slice(0, 10);
+      if (inicia && inicia > hoy) return false;
+      if (termina && termina < hoy) return false;
       return true;
     }
 
     function metricasDe(idCiudad) {
       var posts = (window.TABLAS && window.TABLAS.posts) || [];
       var promo = (window.SISTEMA && window.SISTEMA.promo) || {};
-      var raw   = (promo.porCiudad && promo.porCiudad[idCiudad]) || null;
-      /* R67 · FIX: el PROMOJSON real de la hoja trae porCiudad
-         como OBJETO (idPostActual + proximaRotación, el mismo
-         que lee Promo_Script), no como array. Antes se llamaba
-         pool.forEach sobre el objeto y la excepción congelaba
-         el repintado del sheet (el aviso de cookies quedaba
-         pegado). Se normalizan los DOS formatos: array de
-         promos o objeto de una promo. */
-      var pool  = [];
-      if (Array.isArray(raw)) {
-        pool = raw;
-      } else if (raw) {
-        pool = [raw];
-      }
+      /* R121 · titulares.items: cada item trae SU ciudad (vacío
+         [] = todas). */
+      var bloque = promo && promo.titulares;
+      var pool   = (bloque && bloque.activo === true &&
+                    Array.isArray(bloque.items)) ? bloque.items : [];
 
       var promos = {};
       pool.forEach(function (item) {
         if (!item) return;
-        var idPost = item.idPost || item.idPostActual;
+        var idPost = item.idPost;
         if (!idPost) return;
+        var cs = Array.isArray(item.ciudad) ? item.ciudad : [];
+        if (cs.length && cs.indexOf(idCiudad) === -1) return;
         if (!promoVigente(item)) return;
         promos[idPost] = 1;
       });

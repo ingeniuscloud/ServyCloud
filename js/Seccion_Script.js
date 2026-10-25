@@ -10,37 +10,20 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.10.0
-CAMBIOS:         R118: la promo del post acepta además
-                 SUBRAYADO con +texto+ → <u> (waFormato definida
-                 DENTRO de este módulo). Regla del dueño:
-                 símbolo PEGADO a la palabra en ambos extremos
-                 — +palabra+ o +frase larga+ se procesan;
-                 + palabra+, +palabra + y ++ quedan literales.
-                 Badge y precios igual.
-CAMBIOS:         R117: el titulo y la descripcion de la promo
-                 del post aceptan el formato estilo WhatsApp
-                 escrito en la BD (waFormato definida DENTRO de
-                 este módulo — sin Global, lección R115/R116):
-                 *negrita*, _cursiva_, ~tachado~, `codigo` y
-                 > cita — los símbolos se convierten en el efecto
-                 y desaparecen; sin pareja se pintan tal cual. El
-                 badge y los precios quedan igual.
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
-                 Entra la lectura del bloque
-                 promocion del POSTJSON (titulo/descripcion/
-                 idBadge, hermano de meta; respaldo meta.promo), la
-                 regla del dueño de MOSTRARLA aunque el post no
-                 esté agendado en PROMOJSON (fuera el cortón
-                 if(!item)) y el badge desde BADGEJSON via idBadge
-                 (apagado → sin píldora, el texto queda).
-                 R100: FIX de la promo muda (lee del POSTJSON, no
-                 del item de PROMOJSON).
-DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
-                 TABLAS), Iconos.js (pintarGlifos), Lista_Script.js
-                 (window.Lista: getPostActivo),
-                 Seccion_Imagen_Script.js, Seccion_CSS.css,
-                 Promo_CSS.css, Core_CSS.css
+VERSIÓN:         2.11.0
+CAMBIOS:         R121: la promo del post lee la estructura nueva
+                 SISTEMA.promo.titulares (items con SU ciudad,
+                 vacío [] = todas, y fechas con o sin hora via
+                 ventanaVigente, con el activo del bloque). El
+                 formato WhatsApp del texto y todo lo demás quedan
+                 intactos.
+DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
+                 (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
+                 Seccion_Imagen_Script.html, Pregunta_Script.html
+                 (window.Pregunta), Social_Script.html (window.Social),
+                 Partner_Script.html, Ciudad_Script (window.Ciudad),
+                 Chips_Script (window.Chips), Seccion_CSS.html,
+                 Pregunta_CSS.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
   window.Secciones = (function () {
 
@@ -376,9 +359,9 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
     /* ============================================================
        PROMO DEL POST (R82) · tarjeta debajo del título
        La promo activa sale del mismo PROMOJSON que alimenta la
-       marquesina de la lista (SISTEMA.promo.porCiudad): si el post
-       abierto es el de la promo vigente (fechas + ciudad), se pinta
-       aquí como incentivo de compra.
+       marquesina (SISTEMA.promo.titulares): si el post abierto es
+       el de la titular vigente (fechas + ciudad del item), se
+       pinta aquí como incentivo de compra.
        R96 · el PROMOJSON nuevo trae titulo + descripcion por item:
        el bloque los muestra en DOS filas con entrada suave —
        titulo en tipografía .subtitulo (color del post) y abajo
@@ -390,9 +373,13 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
       return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
     }
 
+    /* R121 · la promo del post sale de titulares.items: cada item
+       trae SU ciudad (vacío [] = todas) y fechas con o sin hora
+       (misma gramática del sistema). */
     function _promoDelPost(post) {
       var promo = (window.SISTEMA && window.SISTEMA.promo) || null;
-      if (!promo || promo.activo === false || !post) return null;
+      var bloque = promo && promo.titulares;
+      if (!bloque || bloque.activo !== true || !post) return null;
       var ciudad = null;
       try {
         if (window.Ciudad && typeof window.Ciudad.getActual === 'function') {
@@ -401,20 +388,30 @@ DEPENDENCIAS:    Global_Script.js (postBackend), Index (SISTEMA,
         }
       } catch (e) {}
       if (!ciudad) return null;
-      var raw  = (promo.porCiudad && promo.porCiudad[ciudad]) || null;
-      var pool = [];
-      if (Array.isArray(raw)) { pool = raw; }
-      else if (raw && (raw.idPost || raw.idPostActual)) { pool = [raw]; }
-      var hoy = _hoyISO();
-      for (var i = 0; i < pool.length; i++) {
-        var item = pool[i]; if (!item) continue;
-        var idPost = item.idPost || item.idPostActual;
-        if (idPost !== post.id) continue;
-        if (item.inicia && item.inicia > hoy) continue;
-        if (item.termina && item.termina < hoy) continue;
+      var items = Array.isArray(bloque.items) ? bloque.items : [];
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i]; if (!item) continue;
+        if (String(item.idPost || '') !== post.id) continue;
+        var cs = Array.isArray(item.ciudad) ? item.ciudad : [];
+        if (cs.length && cs.indexOf(ciudad) === -1) continue;
+        if (!_titularVigente(item)) continue;
         return item;
       }
       return null;
+    }
+
+    /* Vigencia con la MISMA gramática del sistema: ventanaVigente
+       (fecha o fecha+hora); respaldo plano si Global no llegó. */
+    function _titularVigente(item) {
+      if (typeof window.ventanaVigente === 'function') {
+        return window.ventanaVigente(item.inicia, item.termina) === true;
+      }
+      var hoy = _hoyISO();
+      var inicia = String(item.inicia || '').slice(0, 10);
+      var termina = String(item.termina || '').slice(0, 10);
+      if (inicia && inicia > hoy) return false;
+      if (termina && termina < hoy) return false;
+      return true;
     }
 
     function _primerTexto(fuente, campos) {

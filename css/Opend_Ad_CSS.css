@@ -2,79 +2,61 @@
 
 ARCHIVO:         Opend_Ad_CSS.html
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del intersticial de apertura (estilo App
-                 Open Ad). Capa fija sobre TODA la app mientras
-                 carga. El creativo 9:16 es EL PROTAGONISTA:
-                 fondo de la capa TENUE (velo oscuro suave que
-                 deja ver la app atenuada), sin sombra en la
-                 imagen, la X de cierre es solo la X
-                 (sin borde ni fondo) DENTRO de la imagen y el
-                 botón "Saber más" (texto de la BD) DESCANSA
-                 DENTRO de la imagen, en la franja limpia inferior,
-                 con la flechita a la derecha igual que el CTA del
-                 post. El texto del botón y la imagen salen de
-                 PROMOJSON.intersticial (cero textos fijos).
-VERSIÓN:         1.3.0
-CAMBIOS:         R119: el creativo pasa de 80vw a 87.2vw
-                 (`min(87.2vw, calc((100vh - 56px) * 9 / 16))`)
-                 — se acerca al tamaño de las referencias del
-                 dueño (Cashea/KFC, medido en Consulta A) sin
-                 romper el ratio 9:16 ni el aire vertical
-                 reservado. X y CTA intactos.
-                 R102 (ajustes del dueño tras ver la R101):
-                 · CTA con FONDO BLANCO otra vez, como el plan
-                   original de la R98: píldora blanca (rgba
-                   255,255,255,.95) con texto oscuro #1f1b16 y la
-                   flechita oscura a la derecha. Tamaños intactos
-                   (el dueño los aprobó: 80vw, X a 10px, CTA
-                   min-width 58% recostado al 4% del creativo).
-                 · FONDO de la capa: el tono clarito de la R101
-                   quedó "casi blanco" y tapaba la app entera
-                   (96% opaco). Ahora es un velo oscuro SUAVE
-                   (rgba 26,22,16,.55): el fondo se ve TENUE — la
-                   app se intuye detrás, atenuada, sin taparla ni
-                   competir con la publicidad (la pieza blanca
-                   resalta sola).
-                 R101 (ajustes del dueño tras ver el Open Ad
-                 montado):
-                 · X DENTRO de la imagen (esquina superior
-                   derecha), SIN borde, SIN fondo, sin sombra de
-                   círculo: solo la X blanca (sombra mínima de
-                   trazo para leerla sobre zonas claras).
-                 · CTA DENTRO de la imagen, centrado, recostado en
-                   la franja limpia inferior del creativo
-                   (bottom: 4% del alto del creativo — con una
-                   imagen 9:16 de 312×554 px el botón queda entre
-                   el 4% y el 12% del alto, la zona que toda
-                   pieza de campaña deja libre abajo; nunca tapa
-                   texto).
-                 · CTA con FLECHITA alineada a la derecha, igual
-                   que el CTA del post (.mk-cta-arrow-icon).
-                 · CTA un 20% MÁS ANCHO: antes medía ~140 px
-                   (texto + padding); ahora min-width del 58% del
-                   creativo (≈181 px en un 312 px → +29%).
-                 · SIN la sombra fea de la imagen (box-shadow
-                   fuera) y el fondo de la capa pasa de velo
-                   oscuro (rgba 26,22,16,.84) a un tono TENUE
-                   clarito: menos oscuridad y contraste, la
-                   publicidad manda.
-                 · Tamaño reducido al 10% lateral exacto: el
-                   creativo pasa de 92vw a 80vw (10% de aire por
-                   lado; la app respira).
-                 R98: primera entrega. Entrada con fade y
-                 escala sutil (respetando prefers-reduced-motion),
-                 cierre instantáneo, bloqueo del scroll de fondo y
-                 respeto de las safe areas del teléfono.
+RESPONSABILIDAD: Estilos del Open Ad de apertura (estilo App Open
+                 Ad). Capa fija sobre TODA la app mientras carga.
+                 El creativo 9:16 es EL PROTAGONISTA: fondo de la
+                 capa TENUE (velo oscuro suave que deja ver la app
+                 atenuada), sin sombra en la imagen.
+                 R121 · LOS DOS BOTONES VIVEN FUERA DEL CREATIVO,
+                 colgando de sus bordes con ~95% de su alto por
+                 fuera (solo rozan la pieza):
+                 · CTA (clase .openad-boton) = botón PRIMARIO,
+                   MISMO estilo del CTA del post: píldora naranja
+                   rgba(249,115,22,.87) con texto y flecha blancos,
+                   borde naranja suave y su sombra del post —
+                   colgando del borde INFERIOR DERECHO (right 4%,
+                   translateY(95%)).
+                 · X de cierre (clase .openad-cerrar) = botón
+                   SECUNDARIO de la app: círculo con borde claro
+                   #e2e8f0, fondo blanco y X gris #475569 (misma
+                   familia del botón secundario; sobre el velo
+                   oscuro lleva fondo blanco para leerse igual que
+                   sobre las hojas blancas donde vive el
+                   secundario) — colgando del borde SUPERIOR
+                   DERECHO (right 12px, translateY(-95%)).
+                 · El creativo reserva 120px de aire vertical
+                   (antes 56px) SOLO en el término de alto de la
+                   fórmula: en teléfonos normales manda el ancho
+                   (87.2vw, intacto) y nada cambia visualmente; en
+                   pantallas cortas deja sitio a los dos botones
+                   colgantes sin recortarlos.
+                 El texto del botón y la imagen salen de
+                 PROMOJSON.openAd.items (cero textos fijos).
+VERSIÓN:         1.4.0
+CAMBIOS:         R121: (1) Clases .openad-* (cada cosa por su
+                 nombre). (2) CTA
+                 deja el fondo blanco y pasa a PRIMARIO naranja con
+                 flecha blanca (mismo estilo del CTA del post) y
+                 sale de la imagen: cuelga del borde inferior
+                 derecho con ~95% de su alto fuera. (3) La X deja de
+                 ser la X desnuda dentro de la imagen: es el botón
+                 SECUNDARIO en círculo (borde #e2e8f0, fondo blanco,
+                 X gris #475569) colgando del borde superior derecho
+                 con ~95% fuera. (4) Aire vertical del creativo
+                 56px → 120px en el término de alto para no recortar
+                 los colgantes en pantallas cortas. (5) Área táctil
+                 44px intacta, safe areas intactas, fade/escala
+                 intactos.
+
 DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CAPA · fondo TENUE (R102): la R101 lo dejó casi blanco (96%
-     opaco) y tapaba la app entera. Ahora un velo oscuro suave
-     deja VER el fondo atenuado — tenue de verdad, sin taparlo —
-     y la pieza blanca de la publicidad resalta sola.
+     CAPA · fondo TENUE: un velo oscuro suave deja VER el fondo
+     atenuado — la app se intuye detrás, sin taparla — y la
+     pieza de la publicidad resalta sola.
      ============================================================ */
-  .intersticial {
+  .openad {
     position: fixed;
     inset: 0;
     z-index: 9999;
@@ -88,100 +70,100 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
     opacity: 0;
     transition: opacity 0.2s ease;
   }
-  .intersticial.intersticial-visible { opacity: 1; }
-  .intersticial[hidden] { display: none !important; }
+  .openad.openad-visible { opacity: 1; }
+  .openad[hidden] { display: none !important; }
 
   /* Mientras la capa vive, la app de atrás no scrollea */
-  body.intersticial-abierto { overflow: hidden; }
+  body.openad-abierto { overflow: hidden; }
 
   /* ============================================================
-     CREATIVO · imagen 9:16 con el 10% de aire POR LADO (R101:
-     antes 92vw — la app se sentía ahogada). El alto queda limitado
-     por pantalla (56px de holgura para padding + safe areas).
-     La X y el CTA viven DENTRO de esta figura.
+     CREATIVO · imagen 9:16 protagonista. El ancho manda en
+     teléfonos (87.2vw, R119 intacto); el término de alto reserva
+     120px (antes 56px) para que los dos botones colgantes no se
+     recorten en pantallas cortas. La X y el CTA cuelgan de esta
+     figura por fuera (sin overflow hidden: nada se recorta).
      ============================================================ */
-  .intersticial-creativo {
+  .openad-creativo {
     position: relative;
     margin: 0;
-    width: min(87.2vw, calc((100vh - 56px) * 9 / 16));
-    animation: intersticial-entra 0.24s ease-out both;
+    width: min(87.2vw, calc((100vh - 120px) * 9 / 16));
+    animation: openad-entra 0.24s ease-out both;
   }
 
-  @keyframes intersticial-entra {
+  @keyframes openad-entra {
     from { opacity: 0; transform: scale(0.96); }
     to   { opacity: 1; transform: scale(1); }
   }
 
-  .intersticial-img {
+  .openad-img {
     display: block;
     width: 100%;
     height: auto;
     border-radius: 18px;
-    /* R101: SIN sombra — el creativo no necesita efecto;
-       con el fondo tenue ya resalta solo. */
     background: rgba(255, 255, 255, 0.06);
   }
 
   /* ============================================================
-     X DE CIERRE · DENTRO de la imagen, solo la X (R101)
-     Sin borde, sin círculo, sin fondo y sin sombra de botón:
-     la X blanca desnuda sobre la esquina superior derecha,
-     como en la pieza de referencia. El blanco del trazo lleva
-     una sombra de trazo mínima (legibilidad sobre zonas claras
-     de la imagen; no es un borde ni un fondo).
-     Área táctil 44px (norma de la app) con la X de ~20px.
+     X DE CIERRE · SECUNDARIA, EN CÍRCULO, FUERA de la imagen
+     Cuelga del borde SUPERIOR DERECHO con ~95% de su alto por
+     fuera (translateY(-95%)): solo el 5% inferior roza la pieza.
+     Características del botón secundario de la app: borde claro
+     #e2e8f0 de 1.5px y X gris #475569; sobre el velo oscuro lleva
+     fondo blanco (como las hojas blancas donde vive el
+     secundario) y una sombra suave de flotación.
+     Área táctil 44px (norma de la app).
      ============================================================ */
-  .intersticial-cerrar {
+  .openad-cerrar {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0;
+    right: 12px;
+    transform: translateY(-95%);
     width: 44px;
     height: 44px;
     padding: 0;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
     -webkit-tap-highlight-color: transparent;
     z-index: 2;
   }
-  .intersticial-cerrar:active { transform: scale(0.92); }
-  .intersticial-cerrar svg {
-    width: 21px;
-    height: 21px;
-    stroke: #ffffff;
+  .openad-cerrar:active { transform: translateY(-95%) scale(0.92); }
+  .openad-cerrar svg {
+    width: 20px;
+    height: 20px;
+    stroke: #475569;
     stroke-width: 2.6;
     stroke-linecap: round;
     fill: none;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
   }
 
   /* ============================================================
-     BOTÓN "SABER MÁS" · DENTRO de la imagen, franja limpia inferior.
-     R102: FONDO BLANCO otra vez, como el plan original (R98):
-     píldora blanca rgba(255,255,255,.95), texto oscuro #1f1b16 y
-     sombra neutra — sin naranja. Se conservan intactos los
-     tamaños que el dueño aprobó: posición bottom 4% del creativo
-     (franja limpia de la pieza), centrado, min-width 58% (los
-     "20% más ancho") y flechita a la DERECHA como el CTA del post.
+     CTA · PRIMARIO, FUERA de la imagen, abajo a la derecha
+     Cuelga del borde INFERIOR DERECHO con ~95% de su alto por
+     fuera (translateY(95%)): solo el 5% superior roza la pieza.
+     MISMO estilo del CTA del post: píldora naranja
+     rgba(249,115,22,.87), texto blanco, borde naranja suave y la
+     MISMA sombra del CTA (.cta-reservar), con la flechita blanca
+     anclada a la derecha (misma geometría del post).
      ============================================================ */
-  .intersticial-boton {
+  .openad-boton {
     position: absolute;
-    left: 50%;
-    bottom: 4%;
-    transform: translateX(-50%);
+    right: 4%;
+    bottom: 0;
+    transform: translateY(95%);
     min-width: 58%;
     max-width: 88%;
     min-height: 47px;
     padding: 12px 42px;
-    border: none;
+    border: 1px solid rgba(234, 88, 12, 0.4);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #1f1b16;
+    background: rgba(249, 115, 22, 0.87);
+    color: #ffffff;
     font-family: inherit;
     font-size: 15px;
     font-weight: 600;
@@ -191,17 +173,19 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24), 0 3px 8px rgba(15, 23, 42, 0.10);
     -webkit-tap-highlight-color: transparent;
     z-index: 2;
   }
-  .intersticial-boton:active { transform: translateX(-50%) scale(0.97); }
-  .intersticial-boton[hidden] { display: none !important; }
+  .openad-boton:active {
+    transform: translateY(95%) scale(0.97);
+    background: rgba(234, 88, 12, 0.92);
+  }
+  .openad-boton[hidden] { display: none !important; }
 
   /* Flechita del CTA · anclada a la derecha, centrada en alto:
-     MISMA geometría que el CTA del post (flecha oscura →, R102:
-     sobre fondo blanco del botón) */
-  .intersticial-boton .cta-flecha {
+     MISMA geometría que el CTA del post (flecha blanca →) */
+  .openad-boton .cta-flecha {
     position: absolute;
     right: 16px;
     top: 50%;
@@ -214,6 +198,6 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
 
   /* Menos movimiento: sin animación de entrada */
   @media (prefers-reduced-motion: reduce) {
-    .intersticial { transition: none; }
-    .intersticial-creativo { animation: none; }
+    .openad { transition: none; }
+    .openad-creativo { animation: none; }
   }
