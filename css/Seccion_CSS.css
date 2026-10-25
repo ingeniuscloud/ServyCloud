@@ -9,8 +9,15 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.4.0
-CAMBIOS:         R95: (1) El fade del sheet de descripción es OVERLAY
+VERSIÓN:         2.5.0
+CAMBIOS:         R119: el punto ACTIVO del carrusel viste EXACTAMENTE
+                 lo mismo que los inactivos (núcleo gris
+                 translúcido + aro blanco + sombrita, todo
+                 heredado del estilo base) y solo conserva su
+                 tamaño: píldora de 14px (radius 3px). Inactivos
+                 intactos. Decisión del dueño (C·3): la única
+                 diferencia entre puntos es el tamaño.
+                 R95: (1) El fade del sheet de descripción es OVERLAY
                  absoluto del .mk-sheet (hermano del content que
                  scrollea): el degradado vive SIEMPRE pegado al
                  borde inferior visible del sheet y el texto nunca
@@ -87,10 +94,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      fondo blanco + borde suave + sombra, visibles sobre
      cualquier imagen, también sobre fondos claros. */
   /* Dots del carrusel (R96): núcleo oscuro translúcido con halo
-     blanco — se ven sobre foto clara Y oscura; el activo pasa a
-     blanco con aro oscuro para no perderse nunca. */
+     blanco — se ven sobre foto clara Y oscura. R119 (dueño):
+     el activo viste EXACTAMENTE lo mismo que los inactivos;
+     su única diferencia es el tamaño (píldora 14px). */
   .app-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(15, 23, 42, 0.30); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85), 0 1px 2px rgba(0, 0, 0, 0.18); transition: width 0.2s, background 0.2s, border-radius 0.2s; }
-  .app-hero-dot.activo { width: 14px; border-radius: 3px; background: #ffffff; box-shadow: 0 0 0 1.5px rgba(15, 23, 42, 0.30), 0 1px 3px rgba(0, 0, 0, 0.25); }
+  .app-hero-dot.activo { width: 14px; border-radius: 3px; }
 
   /* ============================================================
      (R84) El bloque de "post sin foto" (.post-hero-vacio) salió

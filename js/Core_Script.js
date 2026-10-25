@@ -12,8 +12,18 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.36.0
-CAMBIOS:         R111: (1) El catálogo NO trae la imagen del
+VERSIÓN:         1.37.0
+CAMBIOS:         R119: chequeo VIVO de meta.expira al armar
+                 TABLAS.posts (helper propio _postExpiraVivo_,
+                 reloj del teléfono, misma gramática de
+                 _parseVentana R108): un post cuya ventana
+                 expiró DESPUÉS de que el catálogo llegó al
+                 dispositivo deja de existir en todas las
+                 superficies sin esperar la próxima descarga
+                 (cubre el hueco TTL). Sin expira o ilegible =
+                 siempre visible (compatibilidad). Los chequeos
+                 de estado viejos quedan intactos como red.
+                 R111: (1) El catálogo NO trae la imagen del
                  item (el avatar del lienzo es solo la inicial
                  del título, sin foto): CacheL2 ENV_VERSION
                  regresa a 3 y el dispositivo que bajó el
@@ -438,6 +448,35 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var promesaCarga = null;
     var datosListos = false;
 
+    /* R119 · VIDA DEL POST en el teléfono: filtra los posts cuya
+       ventana meta.expira ya pasó (reloj local, la misma
+       gramática de _parseVentana R108). Cubre el hueco TTL:
+       catálogo cargado a las 22:00, post muerto a las 23:00 →
+       el teléfono lo excluye en vivo sin esperar la próxima
+       descarga. Sin expira, fecha ilegible o entrada rara =
+       pasa intacta (NUNCA tumba el catálogo por datos malos). */
+    function _postExpiraVivo_(posts) {
+      if (!Array.isArray(posts)) return posts;
+
+      function _dos_(n) { return (n < 10 ? '0' : '') + n; }
+
+      var ahora = new Date();
+      var ahoraTxt = ahora.getFullYear() + '-'
+        + _dos_(ahora.getMonth() + 1) + '-' + _dos_(ahora.getDate())
+        + ' ' + _dos_(ahora.getHours()) + ':' + _dos_(ahora.getMinutes());
+
+      return posts.filter(function (p) {
+        if (!p || typeof p !== 'object') return true;
+        var m = String(p.expira || '').trim()
+          .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+        if (!m) return true;   /* sin expira o ilegible: viaja */
+
+        var limite = m[1] + '-' + m[2] + '-' + m[3] + ' '
+          + (m[4] ? (_dos_(Number(m[4])) + ':' + m[5]) : '23:59');
+        return ahoraTxt <= limite;
+      });
+    }
+
     /* R76: el modo whatsapp ahora se decide por meta.mensajeCta
        (antes meta.mensajeWhatsapp). */
     function esModoWhatsapp(post) {
@@ -733,7 +772,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     function cargarTablas() {
       var l2 = window.CacheL2.leerCatalogo();
       if (l2) {
-        window.TABLAS.posts    = l2.data.posts;
+        window.TABLAS.posts    = _postExpiraVivo_(l2.data.posts);   /* R119: expira en vivo también sobre el L2 */
         window.TABLAS.partners = l2.data.partners;
         datosListos = true;
         _revalidarCatalogo(l2.raw);
@@ -742,7 +781,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
       return postBackend('catalogo')
         .then(function (data) {
-          window.TABLAS.posts    = (data && Array.isArray(data.posts))    ? data.posts    : [];
+          window.TABLAS.posts    = _postExpiraVivo_((data && Array.isArray(data.posts)) ? data.posts : []);   /* R119 */
           window.TABLAS.partners = (data && Array.isArray(data.partners)) ? data.partners : [];
           datosListos = true;
           window.CacheL2.guardarCatalogo(data);
@@ -761,7 +800,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
           if (!data || !Array.isArray(data.posts) ||
               !Array.isArray(data.partners)) return;
 
-          window.TABLAS.posts    = data.posts;
+          window.TABLAS.posts    = _postExpiraVivo_(data.posts);   /* R119 */
           window.TABLAS.partners = data.partners;
           var rawNuevo = window.CacheL2.guardarCatalogo(data);
 
@@ -1052,7 +1091,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     function refrescarCatalogo() {
       return postBackend('catalogo', null, { mudo: true })
         .then(function (data) {
-          if (data && Array.isArray(data.posts))     window.TABLAS.posts    = data.posts;
+          if (data && Array.isArray(data.posts))     window.TABLAS.posts    = _postExpiraVivo_(data.posts);   /* R119 */
           if (data && Array.isArray(data.partners))  window.TABLAS.partners = data.partners;
           window.CacheL2.guardarCatalogo(data);
         })

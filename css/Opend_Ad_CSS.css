@@ -14,8 +14,14 @@ RESPONSABILIDAD: Estilos del intersticial de apertura (estilo App
                  con la flechita a la derecha igual que el CTA del
                  post. El texto del botón y la imagen salen de
                  PROMOJSON.intersticial (cero textos fijos).
-VERSIÓN:         1.2.0
-CAMBIOS:         R102 (ajustes del dueño tras ver la R101):
+VERSIÓN:         1.3.0
+CAMBIOS:         R119: el creativo pasa de 80vw a 87.2vw
+                 (`min(87.2vw, calc((100vh - 56px) * 9 / 16))`)
+                 — se acerca al tamaño de las referencias del
+                 dueño (Cashea/KFC, medido en Consulta A) sin
+                 romper el ratio 9:16 ni el aire vertical
+                 reservado. X y CTA intactos.
+                 R102 (ajustes del dueño tras ver la R101):
                  · CTA con FONDO BLANCO otra vez, como el plan
                    original de la R98: píldora blanca (rgba
                    255,255,255,.95) con texto oscuro #1f1b16 y la
@@ -97,7 +103,7 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
   .intersticial-creativo {
     position: relative;
     margin: 0;
-    width: min(80vw, calc((100vh - 56px) * 9 / 16));
+    width: min(87.2vw, calc((100vh - 56px) * 9 / 16));
     animation: intersticial-entra 0.24s ease-out both;
   }
 
