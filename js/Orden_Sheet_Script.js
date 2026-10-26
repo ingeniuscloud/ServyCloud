@@ -25,7 +25,8 @@ RESPONSABILIDAD: Módulo Ordenar (R66): el bottom sheet que abre el
                  velocidad, cierre, haptic) replica a
                  Ciudad_Sheet_Script — módulos hermanos. El orden
                  es de SESIÓN: al recargar vuelve a recomendado.
-VERSIÓN:         1.1
+VERSIÓN:         1.2
+CAMBIOS:         R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ordenar-close svg sigue mandando.
 CAMBIOS:         R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
                  pasa a Orden_Sheet_* (el sheet es de ordenamiento,
                  no de filtro — corrección de nombre del dueño).
@@ -42,6 +43,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
                  (consumidor del evento: Lista_Script),
                  Chips_CSS.html (.btn-ordenar .con-orden)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Ordenar = (function () {
 
@@ -169,13 +171,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
         '<div class="ordenar-backdrop"></div>' +
         '<div class="ordenar-sheet">' +
           '<div class="ordenar-handle-area"><div class="ordenar-handle"></div></div>' +
-          '<button class="ordenar-close" type="button" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button class="ordenar-close" type="button" aria-label="Cerrar" data-glifo="close"></button>' +
           '<div class="ordenar-content"></div>' +
         '</div>';
 
@@ -189,6 +185,13 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
       backdrop.addEventListener('click', cerrar);
       raiz.querySelector('.ordenar-close').addEventListener('click', cerrar);
       handleArea.addEventListener('pointerdown', onDragDown);
+
+      /* R128 · el esqueleto lleva glifos del registro (close/
+         volver/volver arriba): se pintan aquí. El pintador tiene
+         guardia por elemento: el repintado del content no duplica. */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(raiz);
+      }
     }
 
     /* ============================================================

@@ -25,7 +25,8 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  Promos destacada); al tocar, aplicar + cerrar
                  como siempre. Las métricas se calculan con
                  TABLAS.posts y SISTEMA.promo.titulares (R121).
-VERSIÓN:         1.9
+VERSIÓN:         1.10
+CAMBIOS:         R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ciudad-close svg sigue mandando.
 CAMBIOS:         R121: (1) Las métricas por ciudad leen la
                  estructura nueva SISTEMA.promo.titulares — cada
                  item trae SU ciudad (vacío [] = cuenta en todas)
@@ -37,6 +38,7 @@ CAMBIOS:         R121: (1) Las métricas por ciudad leen la
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
   window.Ciudad = (function () {
 
     var KEY_CIUDAD = 'app_ciudad';
@@ -392,13 +394,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
         '<div class="ciudad-backdrop"></div>' +
         '<div class="ciudad-sheet">' +
           '<div class="ciudad-handle-area"><div class="ciudad-handle"></div></div>' +
-          '<button class="ciudad-close" type="button" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                 'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button class="ciudad-close" type="button" aria-label="Cerrar" data-glifo="close"></button>' +
           '<div class="ciudad-content"></div>' +
         '</div>';
 
@@ -412,6 +408,13 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       backdrop.addEventListener('click', onBackdropClick);
       raiz.querySelector('.ciudad-close').addEventListener('click', cerrar);
       handleArea.addEventListener('pointerdown', onDragDown);
+
+      /* R128 · el esqueleto lleva glifos del registro (close/
+         volver/volver arriba): se pintan aquí. El pintador tiene
+         guardia por elemento: el repintado del content no duplica. */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(raiz);
+      }
     }
 
     function onBackdropClick() {

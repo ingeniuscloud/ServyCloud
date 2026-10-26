@@ -13,7 +13,8 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  con el enlace del post que arma Compartir (enlace
                  corto ?s= codificado, R124). Key localStorage:
                  post_likes.
-VERSIÓN:         2.4
+VERSIÓN:         2.5
+CAMBIOS:         R128: el corazón volador sale del registro (data-glifo like, el MISMO glifo del botón) y se pinta al crear el wrap. El CSS .heart-pop-svg sigue mandando (rojo #ef4444).
 CAMBIOS:         R124: SOLO COMENTARIO HONESTO (regla del dueño):
                  el enlace que arma Compartir ya no apunta a la
                  página gemela del post — es el enlace corto ?s=
@@ -35,6 +36,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  (window.Compartir: urlDePost), Social_CSS.html,
                  Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
   window.Social = (function () {
 
     var STORAGE_KEY_LIKES = 'post_likes';
@@ -175,13 +177,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       wrap.style.top = '50%';
 
       wrap.innerHTML =
-        '<div class="heart-pop-svg">' +
-          '<svg viewBox="0 0 24 24">' +
-            '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' +
-          '</svg>' +
-        '</div>';
+        '<div class="heart-pop-svg" data-glifo="like"></div>';
 
       btn.appendChild(wrap);
+
+      /* R128 · el corazón del vuelo sale del registro (like). */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(wrap);
+      }
 
       /* R91: limpieza alineada a la animación de 1.05s. */
       setTimeout(function () {

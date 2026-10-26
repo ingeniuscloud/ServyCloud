@@ -10,24 +10,47 @@ RESPONSABILIDAD: Repositorio único de glifos SVG (data URI) y del
                  ACTIVOS (en uso hoy) y los SIN USO EN EL CÓDIGO
                  HOY (reserva: el dueño decide si se borran o se
                  guardan para el futuro).
-VERSIÓN:         2.5.0
-CAMBIOS:         R127: gemelo del GAS — sustitución servicio/cursos
-                 + glifos NUEVOS eventos/ventas (chips) + auditoría
-                 en 2 secciones (ACTIVOS 29 · RESERVA 7).
+VERSIÓN:         2.6.0
+CAMBIOS:         R128: MIGRACIÓN TOTAL (orden del dueño: «ningún
+                 SVG hardcodeado»): entran 9 claves que vivían
+                 dibujadas a mano en el sistema — volver (chevron
+                 atrás de lienzos/sheets/Safari), menu (3 puntos
+                 del header), lupa (campo buscar), wifi y
+                 candadoUrl y tresPuntos (chrome del teléfono),
+                 instalar (píldora PWA del cromo), check
+                 (validación de formularios y éxito de reserva) y
+                 lapiz (editar datos de reserva). Reutilizadas SIN
+                 duplicar: close (las 7 X del sistema),
+                 flechaArriba (volver arriba) y like (corazón
+                 volador de Social). Registro: 38 ACTIVAS + 7 en
+                 reserva. Cero SVG dibujado a mano fuera de este
+                 archivo.
+                 R127: (1) Los 4 chips llevan su glifo: servicio y
+                 cursos SUSTITUIDOS por los SVG del dueño adaptados
+                 a la config del registro (viewBox 24, fill none,
+                 stroke currentColor, width 2, puntas redondas; el
+                 de servicio quedó BYTE-IDÉNTICO: era el mismo
+                 trazo) y ENTRAN eventos (micrófono) y ventas
+                 (carrito). (2) glifoDeChip (Chips_Script) resuelve
+                 evento→eventos y venta→ventas. (3) AUDITORÍA de
+                 SVG en todo el sistema → el registro dividido en
+                 2 secciones informativas.
 
 DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
                  pintan con data-glifo)
 ════════════════════════════════════════════════════════════════════*/
+
   const IMAGENES = {
 
   /* ╔══════════════════════════════════════════════════════════╗
-     ║ GLIFOS ACTIVOS · EN USO HOY (auditoría R127)              ║
+     ║ GLIFOS ACTIVOS · EN USO HOY (auditoría R127 + R128)       ║
      ║ Buscada cada clave en TODO el sistema: uso literal        ║
      ║ (data-glifo="clave"), dinámico (setAttribute / plantillas ║
      ║ del sheet PWA y del sheet Ordenar) o runtime (chips vía   ║
      ║ Chips.glifoDeChip). Las marcadas con comentario son las   ║
      ║ que un grep de data-glifo NO encuentra: así no se borran  ║
-     ║ por error.                                                ║
+     ║ por error. R128: migración total — los 9 glifos que       ║
+     ║ estaban dibujados a mano en el sistema VIVEN AQUÍ.        ║
      ╚══════════════════════════════════════════════════════════╝ */
 
     flecha:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
@@ -59,6 +82,19 @@ DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
     close:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2218%22%20y1%3D%226%22%20x2%3D%226%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%226%22%20x2%3D%2218%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",
     enviar:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M22%202%2011%2013%22%2F%3E%3Cpath%20d%3D%22M22%202%2015%2022%2011%2013%202%209z%22%2F%3E%3C%2Fsvg%3E",
     flechaArriba:   "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%2015%2012%209%2018%2015%22%2F%3E%3C%2Fsvg%3E",
+
+    /* ── Migración R128 (orden del dueño: cero SVG hardcodeado).
+          Estos 9 glifos vivían dibujados a mano en el sistema;
+          hoy VIVEN AQUÍ y se pintan con data-glifo. ── */
+    volver:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%2215%2018%209%2012%2015%206%22%2F%3E%3C%2Fsvg%3E",   /* lienzo btnVolver + sheets (.sheet-back) + Safari (.circle-btn) */
+    menu:           "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22currentColor%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%2212%22%20r%3D%221.7%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.7%22%2F%3E%3Ccircle%20cx%3D%2219%22%20cy%3D%2212%22%20r%3D%221.7%22%2F%3E%3C%2Fsvg%3E",     /* lienzo .menu-global (3 puntos del header) */
+    lupa:           "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%227%22%2F%3E%3Cline%20x1%3D%2221%22%20y1%3D%2221%22%20x2%3D%2216.65%22%20y2%3D%2216.65%22%2F%3E%3C%2Fsvg%3E",     /* lienzo .buscar-lupa */
+    wifi:           "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%226.3mm%22%20height%3D%224.2mm%22%20viewBox%3D%220%200%2017%2012%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M1.6%204.3a10%2010%200%200%201%2013.8%200%22%2F%3E%3Cpath%20d%3D%22M4.5%207a6%206%200%200%201%208%200%22%2F%3E%3Ccircle%20cx%3D%228.5%22%20cy%3D%2210.4%22%20r%3D%221%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3C%2Fsvg%3E",     /* chrome del teléfono: barra de estado (attrs EXACTOS: mm + #000) */
+    candadoUrl:     "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%2211%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M8%2011V7a4%204%200%200%201%208%200v4%22%2F%3E%3C%2Fsvg%3E",  /* chrome del teléfono: cápsula URL de Safari */
+    tresPuntos:     "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22currentColor%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%2212%22%20r%3D%220.9%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%220.9%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%2212%22%20r%3D%220.9%22%2F%3E%3C%2Fsvg%3E",     /* chrome del teléfono: .circle-btn derecho (CSS .circle-btn svg manda igual que hoy) */
+    instalar:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v12%22%2F%3E%3Cpath%20d%3D%22m7%2010%205%205%205-5%22%2F%3E%3Cpath%20d%3D%22M5%2021h14%22%2F%3E%3C%2Fsvg%3E", /* cromo Pages: píldora #btn-instalar (attrs EXACTOS: 16px + 2.4) */
+    check:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%224%2012%2010%2018%2020%206%22%2F%3E%3C%2Fsvg%3E",    /* reserva: .field-check / .form-check-box / .exito-check (el CSS manda el grosor) */
+    lapiz:          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%2020h9%22%2F%3E%3Cpath%20d%3D%22M16.5%203.5a2.121%202.121%200%200%201%203%203L7%2019l-4%201%201-4L16.5%203.5z%22%2F%3E%3C%2Fsvg%3E",    /* reserva: lápiz de editar (PENCIL_BTN + btnEditarCorreo; 16px) */
 
 
   /* ╔══════════════════════════════════════════════════════════╗

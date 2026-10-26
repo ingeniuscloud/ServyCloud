@@ -8,7 +8,8 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.4.0
+VERSIÓN:         1.5.0
+CAMBIOS:         R128: el check del éxito sale del registro (data-glifo de check); muere el svg armado a mano. El CSS .exito-check svg sigue vistiendo (grosor 3).
 CAMBIOS:         R114: el Plan de Estudios se simplifica — del
                  markdown solo se muestran los datos clave:
                  Inicio, Duración, Inscripción y Pago único /
@@ -30,6 +31,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  (clases reserva-exito/exito-*),
                  Reserva_Script.html (state + callbacks)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.ReservaExito = (function () {
 
@@ -157,8 +159,6 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       var post = state.postActivo || {};
       var nombrePost = tituloDelPost(post);
 
-      var checkSvg = '<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
-
       /* R95 · PLANJSON: item {dias, horario, cupo} */
       var plan = (state.planes || [])[state.turnoSeleccionado] || {};
       var dias = String(plan.dias || '');
@@ -196,7 +196,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       function fila(k, v) {
         if (v === null || v === undefined || v === '') return '';
         return '<li>' +
-          '<span class="exito-check">' + checkSvg + '</span>' +
+          '<span class="exito-check" data-glifo="check"></span>' +
           '<span class="exito-txt">' +
             '<span class="exito-k">' + escapeHtml(k) + '</span> ' +
             '<span class="exito-v">' + escapeHtml(v) + '</span>' +

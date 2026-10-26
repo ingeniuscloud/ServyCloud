@@ -10,7 +10,8 @@ RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
                  Validaciones delegadas a window.ReservaValida.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.2.0
+VERSIÓN:         1.3.0
+CAMBIOS:         R128: el check y los 2 lápices dejan de ser SVG a mano: .field-check y .form-check-box llevan data-glifo de check y el lápiz sale del registro (data-glifo de lapiz, 16px). El pintado lo hacen los flujos de Reserva (ya pintan tras cada setContent).
 CAMBIOS:         R95: (1) datosPlan lee el PLANJSON nuevo
                  [{dias, horario, cupo}] — la pintada de opciones
                  y el texto de cupos por item quedan intactos.
@@ -25,9 +26,12 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  vía state)
 ════════════════════════════════════════════════════════════════════*/
 
+
   window.ReservaDatos = (function () {
 
-    var CHECK_SVG = '<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>';
+    /* R128 · el check y el lápiz VIVEN en Iconos 2.6.0 (data-glifo):
+       el CSS de cada envoltorio (.field-check 2.6 · .form-check-box
+       3.2) sigue mandando el grosor, igual que antes. */
 
     function escapeHtml(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
@@ -66,14 +70,10 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
     }
 
     var PENCIL_BTN =
-      '<span aria-hidden="true" style="flex-shrink:0; display:flex; align-items:center; justify-content:center; ' +
+      '<span aria-hidden="true" data-glifo="lapiz" style="flex-shrink:0; display:flex; align-items:center; justify-content:center; ' +
         'width:34px; height:34px; border-radius:50%; ' +
         'background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 12%, transparent); ' +
         'color: var(--post-color, #1d4ed8); margin-left:8px;">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;">' +
-          '<path d="M12 20h9"/>' +
-          '<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>' +
-        '</svg>' +
       '</span>';
 
     /* R95 · PLANJSON NUEVO [{dias, horario, cupo}]: solo cambia
@@ -186,7 +186,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       html +=     '<div class="form-field" id="fieldNombre">' +
                     '<input type="text" id="inputNombre" placeholder=" " class="form-input" autocomplete="name">' +
                     '<label for="inputNombre" class="form-label">Nombre completo</label>' +
-                    '<span class="field-check">' + CHECK_SVG + '</span>' +
+                    '<span class="field-check" data-glifo="check"></span>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldTelefono">' +
@@ -195,7 +195,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                       '<input type="tel" id="inputTelefono" placeholder=" " autocomplete="tel" inputmode="numeric">' +
                     '</div>' +
                     '<label for="inputTelefono" class="form-label">Teléfono</label>' +
-                    '<span class="field-check">' + CHECK_SVG + '</span>' +
+                    '<span class="field-check" data-glifo="check"></span>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldCorreo">' +
@@ -203,19 +203,14 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                            'autocomplete="email" inputmode="email" ' +
                            'autocapitalize="off" autocorrect="off" spellcheck="false">' +
                     '<label for="inputCorreo" class="form-label">Correo electrónico</label>' +
-                    '<span class="field-check">' + CHECK_SVG + '</span>' +
-                    '<button type="button" id="btnEditarCorreo" aria-label="Editar correo" ' +
+                    '<span class="field-check" data-glifo="check"></span>' +
+                    '<button type="button" id="btnEditarCorreo" aria-label="Editar correo" data-glifo="lapiz" ' +
                       'style="display:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); ' +
                              'align-items:center; justify-content:center; ' +
                              'width:34px; height:34px; border-radius:50%; border:none; padding:0; ' +
                              'background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 12%, transparent); ' +
                              'color: var(--post-color, #1d4ed8); cursor:pointer; z-index:2; ' +
                              '-webkit-tap-highlight-color:transparent;">' +
-                      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
-                           'stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;">' +
-                        '<path d="M12 20h9"/>' +
-                        '<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>' +
-                      '</svg>' +
                     '</button>' +
                   '</div>';
 
@@ -285,7 +280,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                         'style="margin-top:10px">' +
                         '<input type="text" id="inputConocioOtro" placeholder=" " class="form-input">' +
                         '<label for="inputConocioOtro" class="form-label">¿Cuál medio?</label>' +
-                        '<span class="field-check">' + CHECK_SVG + '</span>' +
+                        '<span class="field-check" data-glifo="check"></span>' +
                       '</div>' +
                     '</fieldset>';
 
@@ -293,7 +288,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                       '<div class="form-check-wrap" id="checkPrivacidadWrap">' +
                         '<label class="form-check-inner">' +
                           '<input type="checkbox" id="inputPrivacidad">' +
-                          '<span class="form-check-box">' + CHECK_SVG + '</span>' +
+                          '<span class="form-check-box" data-glifo="check"></span>' +
                         '</label>' +
                         '<span class="form-check-texto">' +
                           'Acepto la ' +

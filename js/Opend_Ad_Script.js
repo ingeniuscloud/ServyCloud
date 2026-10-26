@@ -60,7 +60,8 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  6s no molesta: la app carga normal. En GitHub Pages
                  SISTEMA llega POR DATOS: espera la sesión y
                  re-intenta UNA sola vez.
-VERSIÓN:         1.6.0
+VERSIÓN:         1.7.0
+CAMBIOS:         R128: la X del openAd sale del registro (data-glifo close) y la capa se pinta al armarse. El CSS .openad-cerrar svg sigue mandando (blanca, 2.6).
 CAMBIOS:         R122: (1) La capa se monta DENTRO del vidrio del
                  simulador (.glass) con posición absoluta: en la PC el
                  marco recorta el openAd y el dueño ve en su filtro
@@ -89,6 +90,7 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  seleccionar), Ciudad_Script.js (getActual),
                  Telefono.css (.glass anfitrión), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
+
   window.OpenAd = (function () {
 
     var MAX_ESPERA_IMG = 6000;            /* ms: imagen lenta → no molesta */
@@ -301,13 +303,13 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
       capa.innerHTML =
         '<figure class="openad-creativo">' +
           '<img class="openad-img" alt="" draggable="false">' +
-          '<button type="button" class="openad-cerrar" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button type="button" class="openad-cerrar" aria-label="Cerrar" data-glifo="close"></button>' +
         '</figure>';
+
+      /* R128 · la X del openAd sale del registro (close). */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(capa);
+      }
 
       var img = capa.querySelector('.openad-img');
       img.src = urlImagen;

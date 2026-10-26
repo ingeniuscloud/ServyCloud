@@ -5,8 +5,23 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.36.0
-CAMBIOS:         R127: el botón CIUDAD vive en la FILA 1 del
+VERSIÓN:         1.37.0
+CAMBIOS:         R128: CERO SVG dibujado a mano (orden del dueño).
+                 Template: btnVolver data-glifo="volver",
+                 .menu-global data-glifo="menu", .buscar-lupa
+                 data-glifo="lupa", .buscar-limpiar
+                 data-glifo="close" (Core pinta el lienzo tras
+                 clonar). Chrome del teléfono: wifi con
+                 data-glifo="wifi" (span .wifi-glifo display
+                 contents), atrás de Safari data-glifo="volver",
+                 candado de la cápsula data-glifo="candadoUrl"
+                 (span .url-glifo display contents), tres puntos
+                 data-glifo="tresPuntos". Píldora instalar:
+                 data-glifo="instalar" (span .btn-instalar-glifo
+                 display contents). Todo vive en js/Iconos.js 2.6.0;
+                 los svg se pintan al DOMContentLoaded (y el lienzo
+                 al clonarse). CSS que viste cada icono: INTACTO.
+                 R127: el botón CIUDAD vive en la FILA 1 del
                  lienzo, a la IZQUIERDA del campo buscar (misma
                  fila que él, orden del dueño) y la FILA 2 queda
                  SOLO con los chips (reparten todo el ancho).
@@ -226,7 +241,7 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
 <!-- ═══ BOTÓN INSTALAR APP (solo Android; se muestra y se oculta solo) ═══ -->
   <div id="zona-instalar" hidden role="group" aria-label="Instalar aplicación">
       <button id="btn-instalar" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span class="btn-instalar-glifo" data-glifo="instalar" aria-hidden="true"></span>
           <span>Instalar app</span>
       </button>
       <span class="zona-instalar-divisor" aria-hidden="true"></span>
@@ -267,12 +282,7 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
       <div class="left" id="reloj-estado">9:41</div>
       <div class="right">
         <div class="signal"><i></i><i></i><i></i><i></i></div>
-        <svg width="6.3mm" height="4.2mm" viewBox="0 0 17 12" fill="none"
-             stroke="#000" stroke-width="1.6" stroke-linecap="round">
-          <path d="M1.6 4.3a10 10 0 0 1 13.8 0"/>
-          <path d="M4.5 7a6 6 0 0 1 8 0"/>
-          <circle cx="8.5" cy="10.4" r="1" fill="#000" stroke="none"/>
-        </svg>
+        <span class="wifi-glifo" data-glifo="wifi" aria-hidden="true"></span>
         <div class="battery"><span></span></div>
       </div>
     </div>
@@ -285,28 +295,15 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
 
       <!-- Barra inferior de Safari -->
       <div class="safari-bottom">
-        <div class="circle-btn" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </div>
+        <div class="circle-btn" aria-hidden="true" data-glifo="volver"></div>
 
         <div class="url-capsule">
-          <svg viewBox="0 0 24 24">
-            <rect x="5" y="11" width="14" height="10" rx="2"/>
-            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-          </svg>
+          <span class="url-glifo" data-glifo="candadoUrl" aria-hidden="true"></span>
           https://ingeniuscloud.github.io/ServyCloud/
         </div>
 
         <!-- Icono de tres puntos: simples, finos y grises -->
-        <div class="circle-btn" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
-            <circle cx="6" cy="12" r="0.9"/>
-            <circle cx="12" cy="12" r="0.9"/>
-            <circle cx="18" cy="12" r="0.9"/>
-          </svg>
-        </div>
+        <div class="circle-btn" aria-hidden="true" data-glifo="tresPuntos"></div>
       </div>
 
       <div class="home-bar"></div>
@@ -335,18 +332,14 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
              FILA DE CABECERA · Título (subtitulo) + Menú Global
              ============================================================ -->
         <div class="filtros-wrap">
-          <button type="button" class="btn-volver" id="btnVolver" aria-label="Volver" hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
+          <button type="button" class="btn-volver" id="btnVolver" aria-label="Volver" hidden data-glifo="volver"></button>
           
           <h1 class="titulo-header" id="tituloHeader" hidden></h1>
           
           <!-- El título usa .subtitulo para heredar 18px/300 del Core -->
           <div id="tituloCategoria" class="titulo-categoria subtitulo" hidden></div>
           
-          <button type="button" class="menu-global" aria-label="Menú">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
-          </button>
+          <button type="button" class="menu-global" aria-label="Menú" data-glifo="menu"></button>
         </div>
 
         <!-- ENCABEZADO DE PROMOS -->
@@ -367,9 +360,9 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
           </button>
           <div class="buscar-capsula" id="buscarFila">
             <div class="buscar-input-wrap">
-              <span class="buscar-lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <span class="buscar-lupa" aria-hidden="true" data-glifo="lupa"></span>
               <input type="text" class="buscar-input" id="buscarInput" placeholder="Buscar..." maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-              <button type="button" class="buscar-limpiar" id="btnLimpiarCampo" aria-label="Limpiar"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              <button type="button" class="buscar-limpiar" id="btnLimpiarCampo" aria-label="Limpiar" data-glifo="close"></button>
             </div>
           </div>
           <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar"><span data-glifo="ordenar" aria-hidden="true"></span></button>

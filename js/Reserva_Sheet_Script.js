@@ -7,13 +7,15 @@ RESPONSABILIDAD: Infraestructura del bottom sheet. Apertura,
                  cierre, drag con inercia, backdrop, scroll.
                  NO conoce el flujo de reserva: recibe HTML y
                  callbacks. Reutilizable para cualquier sheet.
-VERSIÓN:         1.1
+VERSIÓN:         1.2
+CAMBIOS:         R128: la X y el volver del esqueleto salen del registro (data-glifo close/volver) y el esqueleto se pinta en construir. El content lo pintan los flujos de reserva igual que hoy.
 CAMBIOS:         R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (.area-contenido), Global_CSS.html y
                  Reserva_CSS.html (clases .sheet-*, .reserva-root)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Sheet = (function () {
 
@@ -54,17 +56,8 @@ DEPENDENCIAS:    Index.html (.area-contenido), Global_CSS.html y
         '<div class="sheet-backdrop"></div>' +
         '<div class="sheet">' +
           '<div class="sheet-handle-area"><div class="sheet-handle"></div></div>' +
-          '<button class="sheet-close" type="button" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
-          '<button class="sheet-back" type="button" aria-label="Volver">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="15 18 9 12 15 6"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button class="sheet-close" type="button" aria-label="Cerrar" data-glifo="close"></button>' +
+          '<button class="sheet-back" type="button" aria-label="Volver" data-glifo="volver"></button>' +
           '<div class="sheet-content"></div>' +
         '</div>';
 
@@ -83,6 +76,13 @@ DEPENDENCIAS:    Index.html (.area-contenido), Global_CSS.html y
       content.addEventListener('scroll', function () {
         if (typeof onScrollCb === 'function') onScrollCb(content.scrollTop);
       });
+
+      /* R128 · el esqueleto lleva glifos del registro (close/
+         volver/volver arriba): se pintan aquí. El pintador tiene
+         guardia por elemento: el repintado del content no duplica. */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(raiz);
+      }
     }
 
     /* ============================================================

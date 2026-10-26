@@ -8,8 +8,15 @@ RESPONSABILIDAD: Shell visual del iPhone 11 con reloj dinámico en la
                  segundo). Barras superior e inferior en blanco
                  #ffffff (igual que el menú tabs). NO define colores
                  del área de trabajo.
-VERSIÓN:         1.2
-CAMBIOS:         R53: entra la shell del dueño TAL CUAL (Regla de
+VERSIÓN:         1.3
+CAMBIOS:         R128: 2 reglas NUEVAS para los envoltorios de los
+                 glifos que se pintan desde Iconos 2.6.0
+                 (.wifi-glifo y .url-glifo con display contents:
+                 el span NO existe para el layout y el svg pintado
+                 sigue siendo el hijo directo — el chrome queda
+                 idéntico). El resto de los estilos de los iconos
+                 INTACTO (el CSS sigue mandando igual que hoy).
+                 R53: entra la shell del dueño TAL CUAL (Regla de
                  Oro): cuerpo a 242.39 mm para más aire vertical del
                  lienzo, carcasa sin sombra, barra de estado con la
                  pila tipográfica del sistema, barra de Safari en
@@ -244,6 +251,14 @@ DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
     stroke-linejoin: round;
     flex-shrink: 0;
   }
+
+  /* R128 · envoltorios de los glifos pintados por Iconos
+     (data-glifo): display contents = el span NO existe para el
+     layout; el svg pintado sigue siendo el hijo directo de
+     .status .right y de .url-capsule, EXACTAMENTE como antes
+     de la migración. */
+  .wifi-glifo { display: contents; }
+  .url-glifo  { display: contents; }
 
   /* ---------- Home indicator ---------- */
   .home-bar {

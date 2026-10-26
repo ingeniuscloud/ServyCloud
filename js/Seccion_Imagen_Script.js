@@ -14,7 +14,8 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                    cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.3.0
+VERSIÓN:         1.4.0
+CAMBIOS:         R128: la X del lightbox sale del registro (data-glifo close) y se pinta al construir el diálogo. El CSS .lightbox-close svg sigue mandando.
 CAMBIOS:         R94: L2 PROPIA DE LAS IMÁGENES — el cache HTTP del
                  navegador no siempre conserva las fotos (en el
                  teléfono cada visita al mismo post volvía a
@@ -44,6 +45,7 @@ CAMBIOS:         R94: L2 PROPIA DE LAS IMÁGENES — el cache HTTP del
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
                  Seccion_Imagen_CSS.html (clases lightbox-*)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.SeccionImagen = (function () {
 
@@ -248,15 +250,15 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
         dlg.className = 'lightbox';
         dlg.innerHTML =
           '<div class="lightbox-backdrop"></div>' +
-          '<button type="button" class="lightbox-close" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button type="button" class="lightbox-close" aria-label="Cerrar" data-glifo="close"></button>' +
           '<img class="lightbox-img" alt="">';
 
         document.body.appendChild(dlg);
+
+        /* R128 · la X del lightbox sale del registro (close). */
+        if (typeof window.pintarGlifos === 'function') {
+          window.pintarGlifos(dlg);
+        }
 
         backdrop = dlg.querySelector('.lightbox-backdrop');
         img      = dlg.querySelector('.lightbox-img');

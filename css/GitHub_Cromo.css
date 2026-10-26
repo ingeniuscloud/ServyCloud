@@ -7,8 +7,13 @@ RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
                  orbital y píldora "Instalar app". Nació con el
                  envoltorio (R26) y desde R29 vive como archivo
                  propio. El dueño no necesita tocarlo.
-VERSIÓN:         1.5
-CAMBIOS:         R101 (falla del dueño, capturas PC vs teléfono): el
+VERSIÓN:         1.6
+CAMBIOS:         R128: el icono de la píldora se pinta desde
+                 js/Iconos.js 2.6.0 (data-glifo="instalar"): entra
+                 .btn-instalar-glifo con display contents para que
+                 el svg pintado siga siendo el hijo directo del
+                 botón flex y el layout no se mueva 1px.
+                 R101 (falla del dueño, capturas PC vs teléfono): el
                  preloader se veía PERFECTO en la PC pero en el
                  TELÉFONO dejaba una franja BLANCA/crema arriba (en
                  la zona del reloj/señal). Causa: en la app
@@ -241,6 +246,11 @@ DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
       height: 18px;
       background: rgba(255, 255, 255, 0.35);
     }
+
+    /* R128 · envoltorio del glifo instalar (data-glifo):
+       display contents = el svg pintado es el hijo directo del
+       botón, como antes de la migración. */
+    .btn-instalar-glifo { display: contents; }
 
     #btn-instalar-cerrar {
       width: 28px;

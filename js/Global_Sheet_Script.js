@@ -15,7 +15,8 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  está instalada, el aviso vive DENTRO de la
                  pantalla como banner; Android no instalada lleva
                  botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.12.0
+VERSIÓN:         1.13.0
+CAMBIOS:         R128: el esqueleto ya no dibuja su SVG: close, volver y volver-arriba salen del registro (data-glifo) y el esqueleto se pinta en construirDOM (pintarGlifos(raiz)); el content se sigue pintando igual.
 CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
                  los lienzos: círculo con chevron a la izquierda
                  (el estilo lo pinta Global_CSS); (2) fuera el
@@ -33,6 +34,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
 ════════════════════════════════════════════════════════════════════*/
+
 
   /* ============================================================
      MÓDULO GLOBAL · Menú (bottom sheet)
@@ -628,22 +630,9 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
         '<div class="sheet-backdrop"></div>' +
         '<div class="sheet">' +
           '<div class="sheet-handle-area"><div class="sheet-handle"></div></div>' +
-          '<button class="sheet-close" type="button" aria-label="Cerrar">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<line x1="18" y1="6" x2="6" y2="18"/>' +
-              '<line x1="6" y1="6" x2="18" y2="18"/>' +
-            '</svg>' +
-          '</button>' +
-          '<button class="sheet-back" type="button" aria-label="Volver">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="15 18 9 12 15 6"/>' +
-            '</svg>' +
-          '</button>' +
-          '<button class="mk-sheet-top" type="button" id="sheetTop" aria-label="Volver arriba">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-              '<polyline points="6 15 12 9 18 15"/>' +
-            '</svg>' +
-          '</button>' +
+          '<button class="sheet-close" type="button" aria-label="Cerrar" data-glifo="close"></button>' +
+          '<button class="sheet-back" type="button" aria-label="Volver" data-glifo="volver"></button>' +
+          '<button class="mk-sheet-top" type="button" id="sheetTop" aria-label="Volver arriba" data-glifo="flechaArriba"></button>' +
           '<div class="sheet-content"></div>' +
         '</div>';
 
@@ -675,6 +664,13 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       content.addEventListener('pointerdown', onContentDown);
       content.addEventListener('scroll', actualizarGradientePrivacidad);
       content.addEventListener('scroll', actualizarVolverArriba, { passive: true });
+
+      /* R128 · el esqueleto lleva glifos del registro (close/
+         volver/volver arriba): se pintan aquí. El pintador tiene
+         guardia por elemento: el repintado del content no duplica. */
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(raiz);
+      }
     }
 
     function actualizarVolverArriba() {
