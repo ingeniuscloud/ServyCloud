@@ -42,8 +42,23 @@ RESPONSABILIDAD: Estilos del Open Ad de apertura (estilo App Open
                  contra el vidrio COMPLETO y los laterales quedan
                  exactos. La imagen sale de PROMOJSON.openAd.items
                  (cero textos fijos).
-VERSIÓN:         1.6.0
-CAMBIOS:         R123: (1) LEY DE LOS LATERALES: el ancho del
+                 R124 · X ALINEADA (orden del dueño): el círculo de
+                 cerrar queda ALINEADO con el borde DERECHO de la
+                 imagen — right: 0 dentro de .openad-creativo (que
+                 mide lo mismo que la foto): el borde derecho del
+                 círculo y el de la imagen son UNO, todo se ve
+                 alineado. El «95% fuera» y sus colores se mantienen.
+VERSIÓN:         1.7.0
+CAMBIOS:         R124: (1) X ALINEADA A LA DERECHA (orden del
+                 dueño): right: 12px → right: 0 en .openad-cerrar.
+                 El botón cuelga de .openad-creativo (mismo ancho
+                 de la imagen): con right: 0 el borde derecho del
+                 círculo COINCIDE con el borde derecho de la foto
+                 — todo alineado. (2) «95% fuera»
+                 (translateY(-95%)), fondo transparente, X blanca,
+                 borde blanco, fade-in por esperaX, fade-out de
+                 cierre, área 44px y candado de scroll INTACTOS.
+                 R123: (1) LEY DE LOS LATERALES: el ancho del
                  creativo es 87.2% PLANO del vidrio (6.4% de aire
                  por lado, definición R119 del dueño). Muere el
                  min(87.2%, calc((100% - 120px)*9/16)) de R122:
@@ -180,6 +195,9 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
      X DE CIERRE · FUERA de la imagen, arriba a la derecha (R122)
      Cuelga del borde SUPERIOR DERECHO con ~95% de su alto por
      fuera (translateY(-95%)): solo el 5% inferior roza la pieza.
+     R124 · ALINEADA (orden del dueño): right: 0 — el borde
+     derecho del círculo y el de la imagen son UNO (el botón
+     cuelga de .openad-creativo, que mide lo mismo que la foto).
      Orden del dueño: FONDO TRANSPARENTE, X BLANCA y BORDE BLANCO.
      Nace OCULTA (la Ley de la X: siempre termina apareciendo) y
      entra con FADE-IN cuando el script pone .openad-x-visible al
@@ -189,7 +207,7 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
   .openad-cerrar {
     position: absolute;
     top: 0;
-    right: 12px;
+    right: 0;
     transform: translateY(-95%);
     width: 44px;
     height: 44px;

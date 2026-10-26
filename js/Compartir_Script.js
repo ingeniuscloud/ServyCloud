@@ -3,32 +3,99 @@
 ARCHIVO:         Compartir_Script.html
 ESPEJO GITHUB:   github/js/Compartir_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Compartir por enlace. Dos emisores: (1) POST —
-                 Social pide Compartir.urlDePost(post) y su mensaje
-                 lleva el enlace de la PÁGINA GEMELA del post en
-                 GitHub Pages (root.app.compartir.urlPages), que es
-                 donde vive el OG que WhatsApp previsualiza; la
-                 gemela abre la app al instante (location.replace,
-                 nunca al /exec de GAS). Sin urlPages, el enlace va
-                 a la app (root.app.urlApp) con el payload corto
-                 ?s=. (2) LISTA FILTRADA — el enlace apunta a la
-                 PAGE BASE de la carpeta (urlPages): esa page
-                 muestra el OG POR DEFECTO y reenvía el ?s= para
-                 que el receptor aterrice con su lista intacta.
-                 MENSAJES: · POST → compartir.mensajeWhatsapp del
-                 POSTJSON + enlace. · LISTA →
-                 app.compartir.mensajeListaWhatsapp con [ciudad]
-                 (UPPERCASE) y [textoBuscado] (buscador, chip o
-                 "lista general"). Sin plantilla, enlace pelado.
-VERSIÓN:         2.4
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS:
-                 urlPages desde app.compartir.urlPages (el enlace
-                 del post aterriza en la página gemela con su OG)
-                 y mensaje SOLO de la BD.
-                 R108: urlPages desde app.compartir.urlPages;
-                 enlace de LISTA a la page base con reenvío del
-                 ?s=; mensaje de lista desde
-                 mensajeListaWhatsapp con placeholders.
+RESPONSABILIDAD: Compartir por enlace. Dos emisores:
+                 (1) POST — Social pide Compartir.urlDePost(post) y
+                 su mensaje de WhatsApp lleva el enlace del post;
+                 (2) LISTA FILTRADA — el TEXTO "Compartir lista
+                 filtrada" sobre la lista (Lista_Script decide su
+                 visibilidad con los items) comparte el filtro
+                 visible: término de búsqueda O chip activo, más
+                 la ciudad.
+                 R124 · AMBOS ENLACES van CAMUFLADOS y al MISMO
+                 sitio: token corto ?s= apuntando a la PAGE BASE de
+                 la carpeta e/ (root.app.compartir.urlPages). La
+                 idPost del post NO viaja en la URL (diseño original
+                 del dueño): el token lo lleva OFUSCADO y el
+                 receptor de siempre lo abre (desempaquetar →
+                 tipo 'p' → recibirPost). Ahí WhatsApp previsualiza
+                 el OG POR DEFECTO (fijo del ROOT) y la page reenvía
+                 el ?s= a la app (location.replace, NUNCA al /exec
+                 de GAS). Sin urlPages, el enlace va directo a la
+                 app (root.app.urlApp) con el mismo payload ?s=.
+                 MENSAJES (R108 · nueva estructura):
+                 · POST → compartir.mensajeWhatsapp del POSTJSON
+                   (texto completo del dueño) + el enlace.
+                 · LISTA → root.app.compartir.mensajeListaWhatsapp
+                   con [ciudad] (UPPERCASE de la ciudad activa) y
+                   [textoBuscado] (texto del buscador; sin filtro =
+                   "lista general") + el enlace. Ahora se puede
+                   compartir TAMBIÉN la lista sin filtros.
+                 El payload viaja OFUSCADO (XOR con clave embebida +
+                 base64url): el ID del post o el término NUNCA van
+                 planos en la URL. Los enlaces antiguos ?d=
+                 (AES-256-GCM) siguen abriendo.
+                 Receptor: Core llama Compartir.recibir() cuando
+                 TABLAS cargó y el lienzo está inyectado; se aplica
+                 ciudad + contenido y la app entra en MODO
+                 COMPARTIDO: ciudad VISTA pero BLOQUEADA, campo de
+                 búsqueda fijado SIN foco y la X del campo libera la
+                 vista. R108: el MENÚ GLOBAL queda VISIBLE en modo
+                 lista compartida (decisión del dueño — CSS en
+                 Chips_CSS). El header del detalle lo decide el TIPO
+                 de enlace: con UN post la fila sustituye al par
+                 volver/título del modo detalle y la salida es la X;
+                 con una LISTA cada post abre con volver/título
+                 normales para recorrer los demás posts del filtro,
+                 y la X queda en la lista. Al limpiar vuelve todo el
+                 catálogo (la ciudad del enlace queda como la del
+                 receptor). Aviso amable si el contenido compartido
+                 ya no existe. La instalación de la PWA NO cambia:
+                 se hace desde la app con el enlace principal (menú /
+                 píldora), nunca desde el enlace compartido.
+VERSIÓN:         2.5
+CAMBIOS:         R124: ENLACE DE POST CAMUFLADO (orden del dueño:
+                 el idPost NO va en la URL — diseño original).
+                 armarEnlacePost arma el token corto
+                 empaquetar('p',[idPost]) y apunta a la PAGE BASE
+                 (urlPages + '/?s=' + token): el MISMO patrón
+                 convalidado del enlace de LISTA. Muere el enlace a
+                 la página gemela con ?v= (timestamp): el idPost
+                 viajaba PLANO en la URL. El receptor tipo 'p' ya
+                 existía (recibirPost → irAPost) — cero cambios en
+                 recepción. Las gemelas /e/ID.html siguen existiendo
+                 para OG/QR (Generador), solo dejan de ser destino
+                 del botón compartir.
+                 R109: FUERA el mensaje hardcodeado de lista (orden
+                 del dueño: los textos de WhatsApp viven en la BD).
+                 Sin plantilla en app.compartir.mensajeListaWhatsapp
+                 el mensaje es SOLO el enlace — el código no inventa
+                  texto. tituloChip sigue (lo usa la plantilla
+                  con [textoBuscado]) y buscarPost sigue (receptor).
+                 R108: (1) urlPages() lee root.app.compartir.urlPages
+                 (nueva ubicación del ROOT) con respaldo en
+                 app.urlPages. (2) El enlace de LISTA apunta a la
+                 page base (urlPages + '/?s=' + token) para que
+                 WhatsApp previsualice el OG POR DEFECTO; la page
+                 reenvía el ?s= y el receptor cae con su lista.
+                 (3) El mensaje de lista sale de
+                 app.compartir.mensajeListaWhatsapp con los
+                 placeholders [ciudad] (UPPERCASE) y [textoBuscado]
+                 (texto del buscador, título del chip si comparte
+                 por chip, o "lista general" si comparte todo); se
+                 puede compartir la lista SIN filtros. (4) El
+                 formato armado previo queda como respaldo si el
+                 ROOT aún no trae la plantilla — respaldo retirado
+                 en R109.
+DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
+                 TABLAS), Lista_Script.html (TABLAS.posts,
+                 visibilidad de #btnCompartir),
+                 Ciudad_Sheet_Script.html (getActual, getLista,
+                 aplicarGuardada), Chips_Script.html (chips:change,
+                 getChipActivo, seleccionar),
+                 Seccion_Script.html (irAPost público),
+                 Core_Script.html (llama pintar/recibir),
+                 Social_Script.html (urlDePost), Chips_CSS.html
+                 (.btn-compartir / .compartida)
 ════════════════════════════════════════════════════════════════════*/
   window.Compartir = (function () {
 
@@ -176,12 +243,14 @@ CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS:
     /* ============================================================
        URLS DE COMPARTIR · SOLO GitHub Pages, NUNCA el /exec de GAS
        · urlApp()   → la app (root.app.urlApp): aterrizaje de los
-                      enlaces y respaldo del post sin página gemela.
-       · urlPages() → la carpeta de páginas gemelas: R108 la lee
-                      de root.app.compartir.urlPages (nueva
-                      ubicación del ROOT) con respaldo en
-                      app.urlPages. Ahí vive el OG por post y la
-                      page base que previsualiza las listas.
+                      enlaces y respaldo de ambos emisores.
+       · urlPages() → la carpeta e/: R108 la lee de
+                      root.app.compartir.urlPages (ubicación del
+                      ROOT) con respaldo en app.urlPages. R124:
+                      AMBOS enlaces (post y lista) apuntan a su
+                      page base con el token ?s= — WhatsApp
+                      previsualiza el OG POR DEFECTO y la page
+                      reenvía el ?s= a la app.
        R105: FUERA el respaldo URL_EXEC. Si el ROOT no trae las
        URLs de GitHub no se inventa destino: el enlace queda vacío
        (Social manda el mensaje sin enlace) — jamás un /exec.
@@ -211,19 +280,23 @@ CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS:
       return urlApp() || urlPages();
     }
 
-    /* Enlace del POST: página gemela del post en GitHub Pages.
-       El ?v= (timestamp) renueva la previsualización de WhatsApp
-       cada vez que se comparte: si el dueño regeneró la página
-       con otra imagen o texto, el scrape no queda pegado al
-       cache viejo. Sin urlPages en el ROOT, enlace directo a la
-       app con el token corto (mismo receptor de siempre). */
+    /* Enlace del POST (R124 · orden del dueño: CAMUFLAJE TOTAL —
+       el idPost NUNCA viaja plano en la URL). MISMO patrón
+       convalidado del enlace de LISTA: token corto ?s= apuntando
+       a la PAGE BASE de la carpeta e/ (urlPages), donde WhatsApp
+       previsualiza el OG POR DEFECTO y la page reenvía el ?s= a
+       la app — el receptor aterriza y el receptor de siempre
+       (desempaquetar → tipo 'p' → recibirPost) abre el post
+       directo. El ?v= de la gemela MUERE (era cache-buster del
+       OG por post: sin enlace a la gemela no tiene sentido).
+       Sin urlPages en el ROOT, directo a la app con el token.
+       Sin token (fallo de empaquetado), enlace pelado a la base. */
     function armarEnlacePost(idPost) {
-      var pages = urlPages();
-      if (pages) {
-        return pages + '/' + encodeURIComponent(idPost) + '.html?v=' + Date.now();
-      }
       var token = empaquetar('p', [String(idPost)]);
-      return token ? armarEnlace(token) : urlBase();
+      if (!token) return urlBase();
+
+      var pages = urlPages();
+      return pages ? pages + '/?s=' + token : armarEnlace(token);
     }
 
     function armarEnlace(token) {

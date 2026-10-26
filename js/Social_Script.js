@@ -10,20 +10,30 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  compartidos en el backend. El mensaje de WhatsApp
                  sale COMPLETO del BD (POSTJSON.compartir.
                  mensajeWhatsapp — texto del dueño en PostDetalle)
-                 con el enlace del post que arma Compartir (página
-                 gemela en GitHub Pages). Key localStorage:
+                 con el enlace del post que arma Compartir (enlace
+                 corto ?s= codificado, R124). Key localStorage:
                  post_likes.
-VERSIÓN:         2.3
-CAMBIOS:         R109: GEMELO SINCRONIZADO byte-idéntico al GAS.
-                 Orden R109 incluida: el
-                 mensaje es SOLO compartir.mensajeWhatsapp + el
-                 enlace; si el post no trae mensaje sale el enlace
-                  pelado.
-DEPENDENCIAS:    Global_Script.js (postBackend, getDeviceId),
-                 Index (SISTEMA, TABLAS), Iconos.js (pintarGlifos),
-                 Lista_Script.js (window.Lista: getPostActivo),
-                 Compartir_Script.js (window.Compartir: urlDePost),
-                 Social_CSS.css, Core_CSS.css
+VERSIÓN:         2.4
+CAMBIOS:         R124: SOLO COMENTARIO HONESTO (regla del dueño):
+                 el enlace que arma Compartir ya no apunta a la
+                 página gemela del post — es el enlace corto ?s=
+                 codificado (ver Compartir_Script 2.5). Lógica
+                 INTACTA (like + share + contador).
+                 R109: FUERA el mensaje hardcodeado (orden del
+                 dueño: los textos de WhatsApp viven en la BD, no
+                 en el código). El texto es SOLO
+                 compartir.mensajeWhatsapp + el enlace; si el post
+                  no trae mensaje, sale el enlace pelado.
+                 R108: el mensaje de compartir del POST salió del
+                 campo compartir.mensajeWhatsapp del POSTJSON
+                 (nueva estructura) con respaldo del formato
+                 armado — respaldo retirado en R109.
+DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
+                 Index.html (SISTEMA, TABLAS), Iconos.html
+                 (pintarGlifos), Lista_Script.html (window.Lista:
+                 getPostActivo), Compartir_Script.html
+                 (window.Compartir: urlDePost), Social_CSS.html,
+                 Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
   window.Social = (function () {
 
