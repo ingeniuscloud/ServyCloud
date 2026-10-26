@@ -31,10 +31,39 @@ RESPONSABILIDAD: Estilos del Open Ad de apertura (estilo App Open
                  fijo del sistema (~0.3s, transición de la capa).
                  Mientras el anuncio vive, la app NO scrollea (ni el
                  body ni el lienzo del marco).
-                 La imagen sale de PROMOJSON.openAd.items (cero
-                 textos fijos).
-VERSIÓN:         1.5.0
-CAMBIOS:         R122: (1) La capa pasa de fija al viewport a
+                 R123 · LEY DE LOS LATERALES (orden del dueño): el
+                 creativo mide 87.2% del ancho del vidrio — 6.4% de
+                 aire POR LADO, la definición R119 ahora en porcen-
+                 tuajes del vidrio. Sin min() ni calc(): el término
+                 de alto que heredó R122 resolvía su 100% contra el
+                 ANCHO y el min() lo elegía en pantallas angostas,
+                 aplastando la pieza a ~33% (captura del dueño).
+                 La capa SIN padding horizontal: el 87.2% resuelve
+                 contra el vidrio COMPLETO y los laterales quedan
+                 exactos. La imagen sale de PROMOJSON.openAd.items
+                 (cero textos fijos).
+VERSIÓN:         1.6.0
+CAMBIOS:         R123: (1) LEY DE LOS LATERALES: el ancho del
+                 creativo es 87.2% PLANO del vidrio (6.4% de aire
+                 por lado, definición R119 del dueño). Muere el
+                 min(87.2%, calc((100% - 120px)*9/16)) de R122:
+                 el 100% del calc resolvía contra el ANCHO del
+                 vidrio (en width el porcentaje siempre es del
+                 ancho) y el min() elegía ese término chico en
+                 pantallas angostas → pieza a ~33% en PC y teléfo-
+                 no (captura del dueño). (2) La capa pierde el
+                 padding horizontal: el 87.2% resuelve contra el
+                 vidrio COMPLETO → laterales EXACTOS de 6.4% por
+                 lado, igual en PC y teléfono por construcción.
+                 El padding vertical (16px + safe areas) se con-
+                 serva para los colgantes. (3) El término de alto
+                 con su reserva de 120px MUERE: era guardia del
+                 CTA ya muerto; un 9:16 al 87.2% cabe en cual-
+                 quier teléfono moderno y en el vidrio de la PC,
+                 y un extremo lo recorta el vidrio IGUAL en ambos.
+                 (4) X «95% fuera», transparente/blanca, fade-in,
+                 fade-out de cierre y candado de scroll INTACTOS.
+                 R122: (1) La capa pasa de fija al viewport a
                  ABSOLUTA dentro del vidrio del simulador (.glass):
                  en la PC el openAd se recorta por el marco del
                  teléfono y se ve EXACTO a lo que verá el teléfono
@@ -81,7 +110,11 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    /* R123 · SIN padding horizontal: el 87.2% del creativo
+       resuelve contra el vidrio COMPLETO y los laterales quedan
+       en los 6.4% exactos de la ley del dueño. El vertical se
+       conserva (16px + safe areas) para los colgantes. */
+    padding: 16px 0;
     padding-top: calc(16px + env(safe-area-inset-top));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
     background: rgba(26, 22, 16, 0.55);
@@ -100,19 +133,23 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
   body.openad-abierto .lienzo { overflow: hidden; }
 
   /* ============================================================
-     CREATIVO · imagen 9:16 protagonista. Medidas RELATIVAS AL
-     VIDRIO (la pantalla del teléfono, R122): el ancho manda (87.2%
-     del vidrio, mismo espíritu R119) y el término de alto reserva
-     120px de aire SOLO en la fórmula para que los colgantes no se
-     recorten en pantallas cortas. Así la PC y el teléfono se ven
-     IGUAL por construcción (nada de vw/vh del monitor). La X cuelga
+     CREATIVO · imagen 9:16 protagonista. R123 · LEY DE LOS
+     LATERALES del dueño: ancho 87.2% PLANO del vidrio — 6.4% de
+     aire POR LADO (la definición R119, ahora en % del vidrio en
+     lugar de vw). SIN min() ni calc(): el término de alto que
+     heredó R122 resolvía su 100% contra el ANCHO (en width, el
+     porcentaje es siempre del ancho) y el min() lo elegía en
+     pantallas angostas → pieza a ~33% en PC y teléfono. La capa
+     (arriba) va SIN padding horizontal: el 87.2% resuelve contra
+     el vidrio COMPLETO → laterales EXACTOS, igual en PC y telé-
+     fono por construcción (nada de vw/vh del monitor). La X cuelga
      de esta figura por fuera (sin overflow hidden: nada se
      recorta).
      ============================================================ */
   .openad-creativo {
     position: relative;
     margin: 0;
-    width: min(87.2%, calc((100% - 120px) * 9 / 16));
+    width: 87.2%;
     animation: openad-entra 0.24s ease-out both;
   }
 
