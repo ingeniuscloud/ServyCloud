@@ -11,17 +11,24 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-                 R124 · AMBOS ENLACES van CAMUFLADOS y al MISMO
-                 sitio: token corto ?s= apuntando a la PAGE BASE de
-                 la carpeta e/ (root.app.compartir.urlPages). La
-                 idPost del post NO viaja en la URL (diseño original
-                 del dueño): el token lo lleva OFUSCADO y el
+                 R126 · ENLACE DE POST = GEMELA POR TOKEN (orden del
+                 dueño: cada post comparte SU OG real): urlPages +
+                 '/' + token + '.html' — la page e/<TOKEN>.html que
+                 el 04 Generador 2.0 escribe con la OG REAL del post
+                 y el salto ?s= instantáneo. WhatsApp previsualiza
+                 LA IMAGEN DEL POST (muere el OG POR DEFECTO para
+                 los posts) y el nombre del archivo muestra SOLO el
+                 token (cero idPost). El enlace de LISTA sigue en la
+                 page base (urlPages + '/?s=' + token, OG de marca:
+                 una lista no tiene imagen propia). Ambos llevan
+                 cache-bust ?v=. Sin urlPages, el enlace va directo
+                 a la app (root.app.urlApp) con el mismo payload ?s=.
+                 R124 · ambos enlaces siguen CAMUFLADOS: token corto
+                 ?s=, la idPost NUNCA en la URL (diseño original
+                 del dueño): el token la lleva OFUSCADO y el
                  receptor de siempre lo abre (desempaquetar →
-                 tipo 'p' → recibirPost). Ahí WhatsApp previsualiza
-                 el OG POR DEFECTO (fijo del ROOT) y la page reenvía
-                 el ?s= a la app (location.replace, NUNCA al /exec
-                 de GAS). Sin urlPages, el enlace va directo a la
-                 app (root.app.urlApp) con el mismo payload ?s=.
+                 tipo 'p' → recibirPost). La page reenvía el ?s= a
+                 la app (location.replace, NUNCA al /exec de GAS).
                  MENSAJES (R108 · nueva estructura):
                  · POST → compartir.mensajeWhatsapp del POSTJSON
                    (texto completo del dueño) + el enlace.
@@ -52,8 +59,25 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  ya no existe. La instalación de la PWA NO cambia:
                  se hace desde la app con el enlace principal (menú /
                  píldora), nunca desde el enlace compartido.
-VERSIÓN:         2.5
-CAMBIOS:         R124: ENLACE DE POST CAMUFLADO (orden del dueño:
+VERSIÓN:         2.6
+CAMBIOS:         R126: GEMELA POR TOKEN + LISTA COMPARIDA VUELVE A
+                 FILTRAR. (1) armarEnlacePost arma ahora
+                 urlPages + '/' + token + '.html' (page con OG real
+                 del post; 04 Generador 2.0) y armarEnlace añade el
+                 cache-bust ?v= (timestamp base36): el nombre del
+                 archivo ya NO lleva idPost, así que el ?v= es
+                 seguro otra vez y WhatsApp rescrapea cada enlace
+                 nuevo (corregir la imagen de un post ya compartido
+                 renueva la tarjeta). (2) RECEPTOR LISTA: el
+                 repintado de fondo del aterrizaje (ciudad/chips,
+                 R63) le ganaba la carrera al filtro de la palabra
+                 y el receptor veía el campo con la palabra pero la
+                 lista COMPLETA. aplicarFiltro re-afirma el filtro
+                 en el ciclo siguiente (la palabra es el estado
+                 FINAL del enlace compartido) y Core_Script 1.38
+                 respeta el campo en sus repintados de fondo. Nada
+                 más del receptor cambia.
+                 R124: ENLACE DE POST CAMUFLADO (orden del dueño:
                  el idPost NO va en la URL — diseño original).
                  armarEnlacePost arma el token corto
                  empaquetar('p',[idPost]) y apunta a la PAGE BASE
@@ -280,28 +304,35 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return urlApp() || urlPages();
     }
 
-    /* Enlace del POST (R124 · orden del dueño: CAMUFLAJE TOTAL —
-       el idPost NUNCA viaja plano en la URL). MISMO patrón
-       convalidado del enlace de LISTA: token corto ?s= apuntando
-       a la PAGE BASE de la carpeta e/ (urlPages), donde WhatsApp
-       previsualiza el OG POR DEFECTO y la page reenvía el ?s= a
-       la app — el receptor aterriza y el receptor de siempre
-       (desempaquetar → tipo 'p' → recibirPost) abre el post
-       directo. El ?v= de la gemela MUERE (era cache-buster del
-       OG por post: sin enlace a la gemela no tiene sentido).
-       Sin urlPages en el ROOT, directo a la app con el token.
-       Sin token (fallo de empaquetado), enlace pelado a la base. */
+    /* Enlace del POST (R126 · orden del dueño: OG REAL sin
+       exponer el idPost). GEMELA POR TOKEN: la page
+       e/<TOKEN>.html lleva la OG REAL del post (04 Generador
+       2.0) y salta a la app con el mismo token. WhatsApp lee la
+       OG del archivo ANTES de que salte: tarjeta con la imagen
+       del post, URL con SOLO el token. Sin urlPages en el ROOT,
+       directo a la app con el token. Sin token (fallo de
+       empaquetado), enlace pelado a la base. */
     function armarEnlacePost(idPost) {
       var token = empaquetar('p', [String(idPost)]);
       if (!token) return urlBase();
 
       var pages = urlPages();
-      return pages ? pages + '/?s=' + token : armarEnlace(token);
+      if (!pages) return armarEnlace(token);
+      return pages + '/' + token + '.html' + cacheBust();
     }
 
     function armarEnlace(token) {
       if (!token) return urlBase();
-      return urlBase() + '?s=' + token;
+      return urlBase() + '?s=' + token + cacheBust();
+    }
+
+    /* R126 · cache-bust corto (base36): cada enlace emitido es
+       una URL distinta → WhatsApp re-scrapea y la tarjeta sale
+       fresca (el nombre de la page ya no lleva idPost, el ?v=
+       es seguro; el receptor lo ignora: solo lee ?s=). */
+    function cacheBust() {
+      try { return '?v=' + Date.now().toString(36); }
+      catch (_) { return ''; }
     }
 
     /* Líneas de confianza · RETIRADAS (R109): los textos de
@@ -396,12 +427,14 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       try {
         /* R108 · el enlace de lista apunta a la PAGE BASE de la
            carpeta e/ (urlPages): ahí WhatsApp previsualiza el OG
-           POR DEFECTO (fijo del ROOT). La page reenvía el ?s= a
-           la app, así el receptor aterriza con su lista. Sin
-           urlPages, el enlace va directo a la app como siempre. */
+           POR DEFECTO (fijo del ROOT) — una lista no tiene
+           imagen propia. La page reenvía el ?s= a la app, así el
+           receptor aterriza con su lista. R126: con cache-bust
+           ?v=. Sin urlPages, el enlace va directo a la app como
+           siempre. */
         var pages = urlPages();
         var url = pages
-          ? pages + '/?s=' + token
+          ? pages + '/?s=' + token + cacheBust()
           : armarEnlace(token);
 
         var root = (window.SISTEMA && window.SISTEMA.root) || {};
@@ -662,6 +695,21 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
           document.dispatchEvent(new CustomEvent('buscar:change', {
             detail: { termino: termino, enLimite: false }
           }));
+
+          /* R126 · SEGUNDA PASADA en el ciclo siguiente: el
+             aterrizaje dispara ciudad:change / chips:change
+             (repintados R63) que pueden llegar DESPUÉS de este
+             filtro; la palabra re-afirma aquí su repintado y
+             queda como estado FINAL del enlace compartido.
+             Core_Script 1.38 hace lo propio en sus repintados
+             de fondo (catálogo L2 distinto). */
+          setTimeout(function () {
+            if (modoCompartido === 'lista') {
+              document.dispatchEvent(new CustomEvent('buscar:change', {
+                detail: { termino: termino, enLimite: false }
+              }));
+            }
+          }, 0);
         } else if (chip) {
           /* Lista compartida POR CHIP: se selecciona el chip del
              enlace (Lista repinta con su filtro). El campo queda

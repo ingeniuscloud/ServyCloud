@@ -12,7 +12,19 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.37.0
+VERSIÓN:         1.38.0
+CAMBIOS:         R126: EL REPINTADO DE FONDO RESPETA LA BÚSQUEDA.
+                 _revalidarCatalogo (caché L2: el catálogo llegó
+                 distinto al guardado) repintaba con
+                 Lista.pintar(chip, null) y BORRABA el filtro de la
+                 palabra: en un enlace de LISTA COMPARTIDA ese
+                 repintado asíncrono le ganaba al aterrizaje y el
+                 receptor veía el campo buscar con la palabra pero
+                 la lista COMPLETA (bug del dueño). Ahora usa el
+                 MISMO carril que Lista en ciudad:change /
+                 orden:change: si el campo trae texto pinta la
+                 búsqueda (pintarBusqueda), si no pinta el chip
+                 activo. Nada más cambia.
 CAMBIOS:         R119: chequeo VIVO de meta.expira al armar
                  TABLAS.posts (helper propio _postExpiraVivo_,
                  reloj del teléfono, misma gramática de
@@ -812,10 +824,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
               window.Promo.construir();
             }
             if (typeof window.Lista.pintar === 'function') {
-              var chip = (window.Chips &&
-                          typeof window.Chips.getChipActivo === 'function')
-                ? window.Chips.getChipActivo() : null;
-              window.Lista.pintar(chip, null);
+              /* R126 · mismo carril que Lista en ciudad:change /
+                 orden:change: el campo buscar manda. Sin esto, un
+                 repintado de fondo (catálogo L2 distinto) borraba
+                 el filtro de la palabra — el receptor de un enlace
+                 de lista compartida veía el campo con la palabra y
+                 la lista COMPLETA. */
+              var inputBuscar = document.getElementById('buscarInput');
+              var terminoVivo = inputBuscar
+                ? String(inputBuscar.value || '').trim()
+                : '';
+
+              if (terminoVivo &&
+                  typeof window.Lista.pintarBusqueda === 'function') {
+                window.Lista.pintarBusqueda(terminoVivo, false);
+              } else {
+                var chip = (window.Chips &&
+                            typeof window.Chips.getChipActivo === 'function')
+                  ? window.Chips.getChipActivo() : null;
+                window.Lista.pintar(chip, null);
+              }
             }
           }
         })
