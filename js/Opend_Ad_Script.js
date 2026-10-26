@@ -9,9 +9,17 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  (bloque { activo, items[] }) y si HOY toca, monta
                  la capa sobre la app mientras termina de cargar:
                  creativo 9:16 protagonista con fondo tenue detrás.
-                 R121 · CADA ITEM ES UNA CAMPAÑA de un anunciante
-                 (contrato propio): idOpenAd, ciudad[], imagen,
-                 textoBoton, idPost, telefonoWhatsapp,
+                 R122 · LA PINTURA VIVE DENTRO DEL TELÉFONO: la capa
+                 se monta DENTRO del vidrio del simulador (.glass,
+                 posición absoluta): en la PC se recorta por el marco
+                 y se ve EXACTO a lo que verá el teléfono real (el
+                 teléfono de la PC es el filtro visual del dueño);
+                 en un teléfono real el vidrio es pantalla completa
+                 y nada cambia. Sin vidrio imprevisto, respaldo:
+                 capa fija en el body (.openad-fijo).
+                 CADA ITEM ES UNA CAMPAÑA de un anunciante (contrato
+                 propio): idOpenAd, ciudad[], imagen, esperaX,
+                 cierreAutomatico, idPost, telefonoWhatsapp,
                  mensajeWhatsapp y ventanas[{inicia, termina}] con
                  fecha+hora. Filtros del teléfono (red de seguridad:
                  el backend ya decidió AL SERVIR): bloque inactivo
@@ -23,58 +31,69 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  anuncio no se carga; catálogo aún no cargado = se
                  confía en el backend, el ad no frena el boot) · el
                  eventual SIN idPost se rige solo por sus ventanas y
-                 abre WhatsApp con SU teléfono y SU mensaje (el
-                 WhatsApp del admin murió con la R120) · varios
+                 abre WhatsApp con SU teléfono y SU mensaje · varios
                  vigentes a la vez → rotación POR CARGA por turno
                  (el teléfono recuerda el último mostrado en
                  localStorage y pasa al siguiente; si solo hay uno,
-                 ese). CADA CLIC del CTA (a post o a WhatsApp)
+                 ese). R122 · EL CTA ES LA MISMA IMAGEN: el botón
+                 naranja MURIÓ — tocar la imagen abre el destino
+                 (idPost lleno → post directo; vacío → WhatsApp con
+                 los datos DEL anuncio) y el anuncio se cierra con
+                 fade-out. Sin destino la imagen no es clic. CADA CLIC
                  dispara el aviso avisoOpenAd al backend → Telegram
                  del admin ("nueva entrada al Open Ad" + idOpenAd +
                  fecha y hora), FIRE-AND-FORGET: nunca bloquea ni
-                 tumba la acción del usuario. CTA = botón PRIMARIO
-                 naranja con flecha (mismo estilo del CTA del post)
-                 colgando del borde inferior derecho con ~95% de su
-                 alto FUERA del creativo; X = botón SECUNDARIO
-                 (círculo con borde claro y X gris) colgando del
-                 borde superior derecho con ~95% fuera. La imagen
-                 viaja de Drive a lh3 directo y si tarda más de 6s
-                 no molesta: la app carga normal. En GitHub Pages
+                 tumba la acción del usuario. R122 · LOS TIEMPOS MANDA
+                 EL ANUNCIO (milisegundos, cada campaña es individual):
+                 esperaX → la X de cerrar aparece con FADE-IN tras esa
+                 espera · cierreAutomatico → el anuncio se cierra SOLO
+                 tras ese tiempo VISIBLE, con FADE-out fijo del
+                 sistema. Ley de la X (reglas cerradas del dueño): la
+                 X SIEMPRE aparece — (R-a) esperaX ausente/inválido →
+                 X al instante · (R-c) cierreAutomatico ≤ esperaX → se
+                 anula la espera · y (R-b) cierreAutomatico
+                 ausente/inválido/≤0 → 10000 ms por defecto · (R-d) los
+                 DOS relojes son INDEPENDIENTES: el cierre automático
+                 NUNCA depende de la X; si la X fallara por cualquier
+                 motivo, el anuncio se cierra igual en su tiempo. La
+                 imagen viaja de Drive a lh3 directo y si tarda más de
+                 6s no molesta: la app carga normal. En GitHub Pages
                  SISTEMA llega POR DATOS: espera la sesión y
                  re-intenta UNA sola vez.
-VERSIÓN:         1.5.0
-CAMBIOS:         R121: (1) Módulo window.OpenAd con clases
-                 .openad-* y eventos GA4 openad_view/openad_click:
-                 cada cosa por su nombre. (2) Lee el PROMOJSON NUEVO: openAd.{activo,
-                 items[]} con campaña por anunciante, campo ciudad
-                 (vacío = todas) y ventanas fecha+hora. (3) CTA con
-                 doble destino: idPost lleno → cierra la capa y
-                 navega al post (misma vía que titulares: Chips +
-                 bus 'post:solicitar', autocontenida); idPost vacío
-                 → WhatsApp con telefonoWhatsapp y mensajeWhatsapp
-                 DEL ANUNCIO. (4) FUERA el WhatsApp del admin
-                 (admin.whatsapp / admin.mensajeWhatsapp): el botón
-                 nunca abre el número del ROOTJSON. (5) Rotación por
-                 carga cuando dos o más anuncios cocham de horario.
-                 (6) Aviso avisoOpenAd al backend en cada clic del
-                 CTA (efectividad de contratos), con el idOpenAd.
-                 (7) Formato nuevo únicamente: corte limpio.
-                 (8) Sin catálogo cargado aún, el chequeo de
-                 post-en-catálogo confía en el backend (el ad nunca
-                 frena el boot); con TABLAS presente se repite como
-                 red de seguridad (los expirados ya salen filtrados
-                 al cargar, Core_Script).
+VERSIÓN:         1.6.0
+CAMBIOS:         R122: (1) La capa se monta DENTRO del vidrio del
+                 simulador (.glass) con posición absoluta: en la PC el
+                 marco recorta el openAd y el dueño ve en su filtro
+                 visual EXACTO lo que verá el teléfono; en móvil real
+                 el vidrio es pantalla completa (mismo camino de
+                 código). (2) EL CTA ES LA IMAGEN: muere el botón
+                 naranja y su texto — tocar la imagen abre el
+                 destino (post directo o WhatsApp del anuncio) y el
+                 anuncio se cierra con fade-out; sin destino, la
+                 imagen no es clic. (3) esperaX (ms): la X aparece con
+                 fade-in tras esa espera, cada anuncio es individual;
+                 esperaX ausente/inválido → X al instante (la X
+                 SIEMPRE existe). (4) cierreAutomatico (ms): el
+                 anuncio se cierra solo tras ese tiempo visible con
+                 fade-out fijo del sistema; ausente/inválido/≤0 →
+                 10000 ms; cierreAutomatico ≤ esperaX → la espera de
+                 la X se anula. (5) Relojes INDEPENDIENTES: el cierre
+                 automático nunca depende de la X. (6) El aviso
+                 avisoOpenAd y el throttle siguen intactos en cada
+                 clic. (7) Formato nuevo únicamente.
 
 DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  (ventanaVigente, abrirWhatsapp, postBackend,
                  asegurarSesion), Seccion_Imagen_Script.js
                  (urlImagenDirecta), Chips_Script.js (getChipActivo,
                  seleccionar), Ciudad_Script.js (getActual),
-                 Opend_Ad_CSS.css
+                 Telefono.css (.glass anfitrión), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
   window.OpenAd = (function () {
 
     var MAX_ESPERA_IMG = 6000;            /* ms: imagen lenta → no molesta */
+    var CIERRE_DEFECTO = 10000;           /* ms: cierre automático por defecto (R-b) */
+    var FADE_CIERRE_MS = 320;             /* ms: retiro del nodo tras el fade-out */
     var CLAVE_TURNO    = 'openad_ultimo'; /* rotación por carga (localStorage) */
 
     /* ============================================================
@@ -206,12 +225,12 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
 
     /* ============================================================
        AVISO TELEGRAM · R121
-       Cada clic del CTA (a post o a WhatsApp) dispara la acción
-       avisoOpenAd: el backend valida el idOpenAd y avisa al bot
-       del admin ("nueva entrada al Open Ad" + idOpenAd + destino
-       + fecha y hora). FIRE-AND-FORGET: si algo falla, la acción
-       del usuario ya corrió y nada se rompe. Sin postBackend
-       disponible se omite en silencio.
+       Cada clic (a post o a WhatsApp) dispara la acción avisoOpenAd:
+       el backend valida el idOpenAd y avisa al bot del admin ("nueva
+       entrada al Open Ad" + idOpenAd + destino + fecha y hora).
+       FIRE-AND-FORGET: si algo falla, la acción del usuario ya corrió
+       y nada se rompe. Sin postBackend disponible se omite en
+       silencio.
        ============================================================ */
     function _avisarTelegram(idOpenAd) {
       try {
@@ -222,13 +241,46 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
     }
 
     /* ============================================================
+       TIEMPOS DEL ANUNCIO · R122 (milisegundos, cada campaña es
+       individual). REGLAS CERRADAS del dueño — Ley de la X:
+       (R-a) esperaX ausente/inválido → X AL INSTANTE (la X SIEMPRE
+             existe; nunca hay anuncio sin su X).
+       (R-b) cierreAutomatico ausente/inválido/≤0 → CIERRE_DEFECTO
+             (10000 ms): el anuncio NUNCA queda abierto eterno.
+       (R-c) cierreAutomatico ≤ esperaX (JSON imposible) → la espera
+             de la X se ANULA (X al instante) y el cierre dispara en
+             su tiempo programado igual.
+       (R-d) los DOS relojes son INDEPENDIENTES: el cierre
+             automático NUNCA depende de la X; si la X fallara por
+             cualquier motivo, el anuncio se cierra igual en su
+             tiempo.
+       ============================================================ */
+    function _msEntero(v) {
+      var n = Math.round(Number(v));
+      return isFinite(n) ? n : NaN;
+    }
+
+    function _tiemposDe(it) {
+      var espera = _msEntero(it.esperaX);
+      if (!isFinite(espera) || espera < 0) espera = 0;                 /* R-a */
+      var cierre = _msEntero(it.cierreAutomatico);
+      if (!isFinite(cierre) || cierre <= 0) cierre = CIERRE_DEFECTO;   /* R-b */
+      if (cierre <= espera) espera = 0;                                /* R-c */
+      return { esperaX: espera, cierre: cierre };
+    }
+
+    /* ============================================================
        CONSTRUCCIÓN · la capa se monta ya (no espera catálogo)
-       CTA = PRIMARIO (naranja, flecha blanca, mismo estilo del
-       CTA del post) colgando del borde inferior derecho con ~95%
-       de su alto FUERA del creativo. X = SECUNDARIO (círculo con
-       borde claro, X gris) colgando del borde superior derecho
-       con ~95% fuera. Sin destino (sin idPost y sin teléfono) el
-       CTA no se pinta: queda la pieza con su X.
+       R122 · LA CAPA VIVE DENTRO DEL VIDRIO del teléfono (.glass):
+       en la PC el simulador la recorta por el marco y se ve EXACTO
+       a lo que verá el teléfono; en un teléfono real el vidrio es
+       pantalla completa (mismo camino de código). Sin vidrio,
+       respaldo en el body con .openad-fijo (capa fija).
+       EL CTA ES LA IMAGEN (R122): el botón naranja murió. Tocar la
+       imagen abre el destino y cierra el anuncio con fade-out. Sin
+       destino (sin idPost y sin teléfono) la imagen no es clic: la
+       pieza queda con su X. La X nace OCULTA y aparece con fade-in
+       tras esperaX (Ley de la X: siempre termina apareciendo).
        ============================================================ */
     function montar(it, urlImagen) {
       var capa = document.createElement('div');
@@ -239,11 +291,12 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
       capa.setAttribute('aria-label', 'Promoción');
       capa.hidden = true;
 
-      var textoBoton = String(it.textoBoton || '').trim();
-      var idp        = String(it.idPost || '').trim();
-      var telefono   = String(it.telefonoWhatsapp || '').trim();
-      var mensaje    = String(it.mensajeWhatsapp || '').trim();
-      var idOpenAd   = String(it.idOpenAd || '').trim();
+      var idp      = String(it.idPost || '').trim();
+      var telefono = String(it.telefonoWhatsapp || '').trim();
+      var mensaje  = String(it.mensajeWhatsapp || '').trim();
+      var idOpenAd = String(it.idOpenAd || '').trim();
+      var tiempos  = _tiemposDe(it);
+      var tieneDestino = !!(idp || telefono);
 
       capa.innerHTML =
         '<figure class="openad-creativo">' +
@@ -254,62 +307,81 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
               '<line x1="18" y1="6" x2="6" y2="18"/>' +
             '</svg>' +
           '</button>' +
-          ((textoBoton && (idp || telefono))
-            ? '<button type="button" class="openad-boton">' +
-                '<span class="openad-boton-texto"></span>' +
-                '<svg class="cta-flecha" viewBox="0 0 24 24" fill="none"' +
-                     ' stroke="#ffffff" stroke-width="2.5"' +
-                     ' stroke-linecap="round" stroke-linejoin="round"' +
-                     ' aria-hidden="true">' +
-                  '<path d="M4 12h15"/>' +
-                  '<path d="m13 6 6 6-6 6"/>' +
-                '</svg>' +
-              '</button>'
-            : '') +
         '</figure>';
 
-      capa.querySelector('.openad-img').src = urlImagen;
+      var img = capa.querySelector('.openad-img');
+      img.src = urlImagen;
 
-      var btn = capa.querySelector('.openad-boton');
-      if (btn) {
-        capa.querySelector('.openad-boton-texto').textContent = textoBoton;
-      }
+      var unoX = null;       /* reloj de la X (esperaX) */
+      var unoCierre = null;  /* reloj del cierre automático */
 
       function cerrar() {
+        if (unoX) { clearTimeout(unoX); unoX = null; }
+        if (unoCierre) { clearTimeout(unoCierre); unoCierre = null; }
         capa.classList.remove('openad-visible');
         document.body.classList.remove('openad-abierto');
         document.removeEventListener('keydown', alTeclear);
         setTimeout(function () {
           if (capa.parentNode) capa.parentNode.removeChild(capa);
-        }, 220);
+        }, FADE_CIERRE_MS);
       }
 
       function alTeclear(e) {
         if (e && e.key === 'Escape') cerrar();
       }
 
+      /* R-d · DOS RELOJES INDEPENDIENTES, arrancan cuando el anuncio
+         SE MUESTRA (no antes): la X no participa en el cierre. */
+      function programar() {
+        unoX = setTimeout(function () {
+          capa.querySelector('.openad-cerrar').classList.add('openad-x-visible');
+        }, tiempos.esperaX);
+        unoCierre = setTimeout(cerrar, tiempos.cierre);
+      }
+
       capa.querySelector('.openad-cerrar')
           .addEventListener('click', cerrar);
       document.addEventListener('keydown', alTeclear);
 
-      if (btn) {
-        btn.addEventListener('click', function () {
-          try {
-            if (window.Analitica) {
-              window.Analitica.enviar('openad_click', { idOpenAd: idOpenAd });
-            }
-          } catch (_) {}
-          _avisarTelegram(idOpenAd);
-          if (idp) {
-            cerrar();
-            setTimeout(function () { _irAPost(idp); }, 80);
-          } else if (typeof window.abrirWhatsapp === 'function') {
-            window.abrirWhatsapp(telefono, mensaje);
+      /* CTA = LA MISMA IMAGEN (R122): post directo o WhatsApp del
+         anuncio. En ambos casos el anuncio se cierra con fade-out
+         (convalidado: "mientras abre el destino"). */
+      function alTocar() {
+        try {
+          if (window.Analitica) {
+            window.Analitica.enviar('openad_click', { idOpenAd: idOpenAd });
           }
-        });
+        } catch (_) {}
+        _avisarTelegram(idOpenAd);
+        if (idp) {
+          cerrar();
+          setTimeout(function () { _irAPost(idp); }, 80);
+        } else if (typeof window.abrirWhatsapp === 'function') {
+          window.abrirWhatsapp(telefono, mensaje);
+          cerrar();
+        }
       }
 
-      document.body.appendChild(capa);
+      if (tieneDestino) {
+        img.addEventListener('click', alTocar);
+        img.addEventListener('keydown', function (e) {
+          if (e && (e.key === 'Enter' || e.key === ' ')) {
+            if (e.preventDefault) e.preventDefault();
+            alTocar();
+          }
+        });
+        img.setAttribute('role', 'button');
+        img.setAttribute('tabindex', '0');
+        img.setAttribute('aria-label', 'Abrir promoción');
+      }
+
+      /* ANFITRIÓN · dentro del vidrio del simulador (.glass); sin
+         vidrio imprevisto → body con .openad-fijo (capa fija). */
+      var vidrio = null;
+      try { vidrio = document.querySelector('.glass'); } catch (_) {}
+      var anfitrion = vidrio || document.body;
+      if (!vidrio) capa.classList.add('openad-fijo');
+      anfitrion.appendChild(capa);
       document.body.classList.add('openad-abierto');
 
       /* El fade necesita un frame para que la transición corra */
@@ -317,6 +389,7 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
         requestAnimationFrame(function () {
           capa.hidden = false;
           capa.classList.add('openad-visible');
+          programar();
           try {
             if (window.Analitica) {
               window.Analitica.enviar('openad_view', { idOpenAd: idOpenAd });
@@ -392,6 +465,6 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
       iniciar();
     }
 
-    return { iniciar: iniciar, datos: datos };
+    return { iniciar: iniciar, datos: datos, tiemposDe: _tiemposDe };
 
   })();

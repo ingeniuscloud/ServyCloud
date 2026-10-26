@@ -3,61 +3,79 @@
 ARCHIVO:         Opend_Ad_CSS.html
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del Open Ad de apertura (estilo App Open
-                 Ad). Capa fija sobre TODA la app mientras carga.
-                 El creativo 9:16 es EL PROTAGONISTA: fondo de la
-                 capa TENUE (velo oscuro suave que deja ver la app
-                 atenuada), sin sombra en la imagen.
-                 R121 · LOS DOS BOTONES VIVEN FUERA DEL CREATIVO,
-                 colgando de sus bordes con ~95% de su alto por
-                 fuera (solo rozan la pieza):
-                 · CTA (clase .openad-boton) = botón PRIMARIO,
-                   MISMO estilo del CTA del post: píldora naranja
-                   rgba(249,115,22,.87) con texto y flecha blancos,
-                   borde naranja suave y su sombra del post —
-                   colgando del borde INFERIOR DERECHO (right 4%,
-                   translateY(95%)).
-                 · X de cierre (clase .openad-cerrar) = botón
-                   SECUNDARIO de la app: círculo con borde claro
-                   #e2e8f0, fondo blanco y X gris #475569 (misma
-                   familia del botón secundario; sobre el velo
-                   oscuro lleva fondo blanco para leerse igual que
-                   sobre las hojas blancas donde vive el
-                   secundario) — colgando del borde SUPERIOR
-                   DERECHO (right 12px, translateY(-95%)).
-                 · El creativo reserva 120px de aire vertical
-                   (antes 56px) SOLO en el término de alto de la
-                   fórmula: en teléfonos normales manda el ancho
-                   (87.2vw, intacto) y nada cambia visualmente; en
-                   pantallas cortas deja sitio a los dos botones
-                   colgantes sin recortarlos.
-                 El texto del botón y la imagen salen de
-                 PROMOJSON.openAd.items (cero textos fijos).
-VERSIÓN:         1.4.0
-CAMBIOS:         R121: (1) Clases .openad-* (cada cosa por su
-                 nombre). (2) CTA
-                 deja el fondo blanco y pasa a PRIMARIO naranja con
-                 flecha blanca (mismo estilo del CTA del post) y
-                 sale de la imagen: cuelga del borde inferior
-                 derecho con ~95% de su alto fuera. (3) La X deja de
-                 ser la X desnuda dentro de la imagen: es el botón
-                 SECUNDARIO en círculo (borde #e2e8f0, fondo blanco,
-                 X gris #475569) colgando del borde superior derecho
-                 con ~95% fuera. (4) Aire vertical del creativo
-                 56px → 120px en el término de alto para no recortar
-                 los colgantes en pantallas cortas. (5) Área táctil
-                 44px intacta, safe areas intactas, fade/escala
-                 intactos.
+                 Ad). Capa sobre la app mientras carga. El creativo
+                 9:16 es EL PROTAGONISTA: fondo de la capa TENUE
+                 (velo oscuro suave que deja ver la app atenuada),
+                 sin sombra en la imagen.
+                 R122 · LA CAPA VIVE DENTRO DEL TELÉFONO: posición
+                 ABSOLUTA dentro del vidrio del simulador (.glass) —
+                 en la PC el marco la recorta y el dueño ve en su
+                 filtro visual EXACTO lo que verá el teléfono real;
+                 en un teléfono real el vidrio es pantalla completa
+                 y nada cambia. Respaldo sin vidrio: .openad-fijo
+                 (capa fija al viewport). TODAS las medidas del
+                 creativo son RELATIVAS AL VIDRIO (la pantalla):
+                 por construcción, la PC y el teléfono se ven IGUAL.
+                 R122 · EL CTA ES LA MISMA IMAGEN: el botón naranja
+                 MURIÓ (su clase quedó eliminada). La imagen
+                 clicable lleva role="button" (cursor pointer y
+                 feedback táctil :active); sin destino, la imagen no
+                 es clic. La X de cierre (clase .openad-cerrar) vive
+                 FUERA de la imagen, colgando del borde SUPERIOR
+                 DERECHO con ~95% de su alto por fuera
+                 (translateY(-95%)): círculo con FONDO TRANSPARENTE,
+                 X BLANCA y BORDE BLANCO (orden del dueño). Nace
+                 OCULTA y aparece con FADE-IN (clase .openad-
+                 x-visible que el script pone al vencer esperaX);
+                 cada anuncio es individual. EL CIERRE ES FADE-OUT
+                 fijo del sistema (~0.3s, transición de la capa).
+                 Mientras el anuncio vive, la app NO scrollea (ni el
+                 body ni el lienzo del marco).
+                 La imagen sale de PROMOJSON.openAd.items (cero
+                 textos fijos).
+VERSIÓN:         1.5.0
+CAMBIOS:         R122: (1) La capa pasa de fija al viewport a
+                 ABSOLUTA dentro del vidrio del simulador (.glass):
+                 en la PC el openAd se recorta por el marco del
+                 teléfono y se ve EXACTO a lo que verá el teléfono
+                 real; en móvil real el vidrio es pantalla completa
+                 (mismo camino). Respaldo sin vidrio: .openad-fijo
+                 (fija). (2) Medidas del creativo RELATIVAS AL
+                 VIDRIO (%, no vw/vh): el ancho manda (87.2% del
+                 vidrio, mismo espíritu R119) y el término de alto
+                 reserva 120px de aire para los colgantes — así la
+                 PC y el teléfono se ven IGUAL por construcción.
+                 (3) EL CTA ES LA IMAGEN: la clase del botón naranja
+                 quedó eliminada (botón muerto); la imagen
+                 clicable lleva cursor pointer y feedback :active.
+                 (4) La X: fondo TRANSPARENTE, X blanca y borde
+                 blanco (antes círculo blanco estilo secundario),
+                 nace OCULTA (opacity 0 + visibility hidden +
+                 pointer-events none) y entra con FADE-IN al vencer
+                 esperaX (clase .openad-x-visible). (5) Fade-out de
+                 cierre fijo del sistema 0.3s (la capa transiciona
+                 su opacidad en ambos sentidos). (6) Candado de
+                 scroll extendido al lienzo del marco
+                 (body.openad-abierto .lienzo). (7) Área táctil 44px
+                 intacta, safe areas intactas, «95% fuera» intacto.
 
-DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
+DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
+                 (.glass anfitrión), Index.html
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
-     CAPA · fondo TENUE: un velo oscuro suave deja VER el fondo
-     atenuado — la app se intuye detrás, sin taparla — y la
-     pieza de la publicidad resalta sola.
+     CAPA · DENTRO del vidrio del teléfono (R122): posición
+     absoluta en el anfitrión (.glass del simulador). En la PC el
+     marco la recorta — el dueño ve EXACTO lo que verá el teléfono
+     (su filtro visual) — y en un teléfono real el vidrio es
+     pantalla completa: mismo camino de código, cero divergencia.
+     Fondo TENUE: un velo oscuro suave deja VER el fondo atenuado —
+     la app se intuye detrás, sin taparla — y la pieza resalta sola.
+     El fade-out del cierre es la MISMA transición (0.3s fija del
+     sistema, R122): quitar .openad-visible desvanece la capa.
      ============================================================ */
   .openad {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 9999;
     display: flex;
@@ -68,25 +86,33 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
     background: rgba(26, 22, 16, 0.55);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
   }
+  /* Respaldo sin vidrio imprevisto: capa fija al viewport */
+  .openad.openad-fijo { position: fixed; }
   .openad.openad-visible { opacity: 1; }
   .openad[hidden] { display: none !important; }
 
-  /* Mientras la capa vive, la app de atrás no scrollea */
+  /* Mientras la capa vive, la app de atrás no scrollea: ni el
+     documento (PC) ni el lienzo del marco (el scroll de la app
+     ocurre ahí dentro). R122. */
   body.openad-abierto { overflow: hidden; }
+  body.openad-abierto .lienzo { overflow: hidden; }
 
   /* ============================================================
-     CREATIVO · imagen 9:16 protagonista. El ancho manda en
-     teléfonos (87.2vw, R119 intacto); el término de alto reserva
-     120px (antes 56px) para que los dos botones colgantes no se
-     recorten en pantallas cortas. La X y el CTA cuelgan de esta
-     figura por fuera (sin overflow hidden: nada se recorta).
+     CREATIVO · imagen 9:16 protagonista. Medidas RELATIVAS AL
+     VIDRIO (la pantalla del teléfono, R122): el ancho manda (87.2%
+     del vidrio, mismo espíritu R119) y el término de alto reserva
+     120px de aire SOLO en la fórmula para que los colgantes no se
+     recorten en pantallas cortas. Así la PC y el teléfono se ven
+     IGUAL por construcción (nada de vw/vh del monitor). La X cuelga
+     de esta figura por fuera (sin overflow hidden: nada se
+     recorta).
      ============================================================ */
   .openad-creativo {
     position: relative;
     margin: 0;
-    width: min(87.2vw, calc((100vh - 120px) * 9 / 16));
+    width: min(87.2%, calc((100% - 120px) * 9 / 16));
     animation: openad-entra 0.24s ease-out both;
   }
 
@@ -103,15 +129,25 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
     background: rgba(255, 255, 255, 0.06);
   }
 
+  /* CTA = LA MISMA IMAGEN (R122): el botón naranja murió. La
+     imagen clicable lleva role="button" (lo pone el script solo
+     cuando hay destino): cursor pointer y feedback táctil. Sin
+     destino, la imagen no es clic y queda como pieza pura. */
+  .openad-img[role="button"] {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .openad-img[role="button"]:active { transform: scale(0.985); }
+
   /* ============================================================
-     X DE CIERRE · SECUNDARIA, EN CÍRCULO, FUERA de la imagen
+     X DE CIERRE · FUERA de la imagen, arriba a la derecha (R122)
      Cuelga del borde SUPERIOR DERECHO con ~95% de su alto por
      fuera (translateY(-95%)): solo el 5% inferior roza la pieza.
-     Características del botón secundario de la app: borde claro
-     #e2e8f0 de 1.5px y X gris #475569; sobre el velo oscuro lleva
-     fondo blanco (como las hojas blancas donde vive el
-     secundario) y una sombra suave de flotación.
-     Área táctil 44px (norma de la app).
+     Orden del dueño: FONDO TRANSPARENTE, X BLANCA y BORDE BLANCO.
+     Nace OCULTA (la Ley de la X: siempre termina apareciendo) y
+     entra con FADE-IN cuando el script pone .openad-x-visible al
+     vencer esperaX (cada anuncio es individual). Área táctil 44px
+     (norma de la app).
      ============================================================ */
   .openad-cerrar {
     position: absolute;
@@ -121,83 +157,41 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Index.html
     width: 44px;
     height: 44px;
     padding: 0;
-    border: 1.5px solid #e2e8f0;
+    border: 2px solid #ffffff;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
     -webkit-tap-highlight-color: transparent;
     z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
   }
-  .openad-cerrar:active { transform: translateY(-95%) scale(0.92); }
+  .openad-cerrar.openad-x-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .openad-cerrar.openad-x-visible:active {
+    transform: translateY(-95%) scale(0.92);
+  }
   .openad-cerrar svg {
     width: 20px;
     height: 20px;
-    stroke: #475569;
+    stroke: #ffffff;
     stroke-width: 2.6;
     stroke-linecap: round;
     fill: none;
   }
 
-  /* ============================================================
-     CTA · PRIMARIO, FUERA de la imagen, abajo a la derecha
-     Cuelga del borde INFERIOR DERECHO con ~95% de su alto por
-     fuera (translateY(95%)): solo el 5% superior roza la pieza.
-     MISMO estilo del CTA del post: píldora naranja
-     rgba(249,115,22,.87), texto blanco, borde naranja suave y la
-     MISMA sombra del CTA (.cta-reservar), con la flechita blanca
-     anclada a la derecha (misma geometría del post).
-     ============================================================ */
-  .openad-boton {
-    position: absolute;
-    right: 4%;
-    bottom: 0;
-    transform: translateY(95%);
-    min-width: 58%;
-    max-width: 88%;
-    min-height: 47px;
-    padding: 12px 42px;
-    border: 1px solid rgba(234, 88, 12, 0.4);
-    border-radius: 999px;
-    background: rgba(249, 115, 22, 0.87);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24), 0 3px 8px rgba(15, 23, 42, 0.10);
-    -webkit-tap-highlight-color: transparent;
-    z-index: 2;
-  }
-  .openad-boton:active {
-    transform: translateY(95%) scale(0.97);
-    background: rgba(234, 88, 12, 0.92);
-  }
-  .openad-boton[hidden] { display: none !important; }
-
-  /* Flechita del CTA · anclada a la derecha, centrada en alto:
-     MISMA geometría que el CTA del post (flecha blanca →) */
-  .openad-boton .cta-flecha {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    display: block;
-    pointer-events: none;
-  }
-
-  /* Menos movimiento: sin animación de entrada */
+  /* Menos movimiento: sin animaciones, la X aparece al instante y
+     el cierre es directo (los relojes mandan igual). */
   @media (prefers-reduced-motion: reduce) {
     .openad { transition: none; }
     .openad-creativo { animation: none; }
+    .openad-cerrar { transition: none; }
   }
