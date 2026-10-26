@@ -5,27 +5,27 @@ ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  (volver, título del header, categoría y menú
-                 global), buscador con X de limpiar, botón
-                 ordenar, chips de categorías, botón ciudad,
-                 fila de promos y envoltorios de filtros.
-VERSIÓN:         2.8
-CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
-                 regla R108 del MENÚ GLOBAL siempre visible en
-                 lista compartida (body.compartido-lista ...
-                 .menu-global → display:flex). Nada más cambia.
-                 R77B: El texto de los chips pasa a la voz del
-                 textoPrimario (variables del Core) para acompañar
-                 la centralización tipográfica del dueño.
-                 R77: El placeholder del Buscar usa las variables
-                 de textoSecundario (la voz la manda también la
-                 regla maestra ::placeholder del Core). Encabezado
-                 saneado: solo queda lo vigente.
-DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
-                 Index.html (estructura de filtros),
-                 Lista_CSS.html (lista y buscar-vacio),
-                 Ciudad_Sheet_CSS.html (botón ciudad)
+                 global), FILA 1 con ciudad + buscador con X de
+                 limpiar + botón ordenar, FILA 2 SOLO con los
+                 chips (reparten TODO el ancho según cuántos
+                 estén activos en la BD), fila de promos y
+                 envoltorios de filtros.
+VERSIÓN:         2.9
+CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la FILA 1
+                 abre con la CIUDAD (a la izquierda del campo) y
+                 la FILA 2 es SOLO CHIPS: el contenedor .filtros
+                 toma TODO el ancho (flex 1 1 auto; mueren los
+                 tercios R65) y cada chip reparte igual; .chip-
+                 texto con elipsis (la fila nunca se rompe); en
+                 modo compartido la ciudad se OCULTA igual que el
+                 ordenar.
+                 R108: el MENÚ GLOBAL sigue siempre visible en
+                 lista compartida (body.compartido-lista ...).
+DEPENDENCIAS:    Core_CSS.css (variables y clases maestras),
+                 index.html (estructura de filtros),
+                 Lista_CSS.css (lista y buscar-vacio),
+                 Ciudad_Sheet_CSS.css (botón ciudad)
 ════════════════════════════════════════════════════════════════════*/
-
   /* ============================================================
      WRAP · FILA DE CABECERA (R63)
      Título del header a la izquierda + menú global a la derecha,
@@ -82,10 +82,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     SECCIÓN FILTROS · FILA 1 (R64) · campo buscar + ordenar
-     El campo vive EXPANDIDO de una vez (sin estados de
-     apertura) y el botón ordenar lo escolta a la derecha.
-     Aire arriba (bajo las promos) y abajo (antes de la fila 2).
+     SECCIÓN FILTROS · FILA 1 (R127) · CIUDAD + buscar + ordenar
+     La ciudad ABRE la fila (izquierda del campo, orden del
+     dueño) y el botón ordenar la cierra por la derecha; el
+     campo vive EXPANDIDO de una vez (sin estados de apertura)
+     y domina el reparto (flex 1). Aire arriba (bajo las promos)
+     y abajo (antes de la fila 2).
      ============================================================ */
   .filtros-fila {
     flex-shrink: 0;
@@ -98,12 +100,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     FILA 2 (R64) · CHIPS + CIUDAD
-     R65 · los TRES botones (2 chips + ciudad) quedan del MISMO
-     TAMAÑO: .filtros toma el doble de fila (flex 2) que la
-     ciudad (flex 1 en Ciudad_Sheet_CSS) y cada chip reparte
-     su mitad — tres tercios equitativos, sin aglomeración.
-     El respiro ABAJO (12px) es el espacio que Compartir lista
+     FILA 2 (R127) · SOLO CHIPS
+     La ciudad vive en la FILA 1 (Index.html la muda); esta fila
+     es de LOS CHIPS: los que estén activos en la BD (2, 3, 4 o
+     los que el dueño encienda temporalmente) conviven en UNA
+     sola fila y se reparten TODO el ancho en partes iguales.
+     El respiro ABAJO (16px) es el espacio que Compartir lista
      liberó al mudarse al bloque de items: la sección filtro
      respira arriba y abajo sin quedar pegada.
      ============================================================ */
@@ -119,20 +121,20 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* ============================================================
      FILTROS · contenedor de los chips (fila 2)
-     R65 · reparto en TERCIOS EXACTOS con la ciudad: base
-     explícita calc() (2 tercios + el gap) porque el navegador
-     planta el item en su min-contenido aunque le pongas
-     min-width 0 — con base fija el reparto es matemático: los
-     DOS chips miden LO MISMO que la ciudad.
+     R127 · LA FILA COMPLETA: la ciudad salió de aquí, así que
+     el contenedor ya no reparte tercios con nadie — toma TODO
+     el ancho (flex 1 1 auto) y cada chip crece por igual
+     (flex 1 1 0). overflow-x sigue de seguro: si el dueño
+     encendiera más chips de los que caben, la fila no se rompe.
      ============================================================ */
   .filtros {
-    flex: 0 0 calc((100% - 16px) / 3 * 2 + 8px);
+    flex: 1 1 auto;
     min-width: 0;
     margin: 0;
 
     display: flex;
     align-items: stretch;
-    gap: 8px;
+    gap: 6px;
     overflow-x: auto;
     padding: 0;
     background: transparent;
@@ -155,15 +157,20 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
     flex: 1 1 0;
     min-width: 0;
-    padding: 9px 10px 10px;
+    /* R127 · con 4 chips en la fila, el aire lateral y el
+       hueco icono-texto se afinan para que TODOS los títulos
+       quepan sin recorte en un teléfono de 360-390px. */
+    padding: 9px 6px 10px;
 
     border: 1px solid #cbd5e1;
     border-radius: 999px;
     background: transparent;
 
     font-family: inherit;
-    /* Voz del textoPrimario (maestras del Core) */
-    font-size: var(--size-textoPrimario);
+    /* Voz del textoPrimario: peso de las maestras del Core y
+       tamaño 12.5 (el que la fila R360 ya usaba) — con 4
+       chips es el tamaño que deja ver el título completo. */
+    font-size: 12.5px;
     font-weight: var(--weight-textoPrimario);
     line-height: 1.1;
     white-space: nowrap;
@@ -174,7 +181,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -185,12 +192,20 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   .chip:active { opacity: 0.7; }
 
+  /* R127 · el texto del chip se recorta (…) si sobra: con más
+     chips activos la fila queda SIEMPRE en una línea. */
+  .chip .chip-texto {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   /* Icono del chip (glifo de Iconos): hereda el color del
      texto; el tamaño acompaña a la letra. */
   .chip .chip-icono {
     flex-shrink: 0;
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
     display: inline-flex;
   }
   .chip .chip-icono svg {
@@ -425,6 +440,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   .filtros-fila.compartida .btn-ordenar { display: none; }
 
+  /* R127 · la ciudad vive en la FILA 1: en modo compartido esa
+     fila es el header del campo bloqueado → ciudad FUERA, igual
+     que el ordenar. */
+  .filtros-fila.compartida .city-bar { display: none; }
+
   .filtros-fila.compartida .buscar-capsula {
     border-color: #cbd5e1;
     background: #ffffff;
@@ -482,9 +502,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   @media (max-width: 360px) {
     .filtros-fila     { gap: 6px; margin: 10px 12px 0; }
     .filtros-fila-dos { gap: 6px; margin: 7px 12px 13px; }
-    .filtros { gap: 6px; flex-basis: calc((100% - 12px) / 3 * 2 + 6px); }
-    .chip    { font-size: 12.5px; padding: 8px 8px 9px; }
-    .chip .chip-icono { width: 14px; height: 14px; }
+    .filtros { gap: 6px; flex: 1 1 auto; }
+    .chip    { font-size: 12.5px; padding: 8px 4px 9px; gap: 3px; }
+    .chip .chip-icono { width: 12px; height: 12px; }
     .menu-global { width: 32px; height: 32px; margin-right: 8px; }
     .menu-global svg { width: 18px; height: 18px; }
     .btn-ordenar { width: 38px; height: 38px; }

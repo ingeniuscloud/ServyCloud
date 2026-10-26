@@ -5,8 +5,12 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Misma estructura que el Index de GAS, pero estática:
                  SISTEMA y TOKEN llegan POR DATOS (abrirSesion vía
                  POST al /exec) y los fragments viven en css/ y js/.
-VERSIÓN:         1.35.0
-CAMBIOS:         R109: (1) El include del ad de apertura es
+VERSIÓN:         1.36.0
+CAMBIOS:         R127: el botón CIUDAD vive en la FILA 1 del
+                 lienzo, a la IZQUIERDA del campo buscar (misma
+                 fila que él, orden del dueño) y la FILA 2 queda
+                 SOLO con los chips (reparten todo el ancho).
+                 R109: (1) El include del ad de apertura es
                  js/Opend_Ad_Script.js. (2)
                  Entra el OG POR DEFECTO en la raíz (título,
                  descripción e imagenDefault de app.compartir):
@@ -352,8 +356,15 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
         </div>
         <div id="promoSlot" hidden></div>
 
-        <!-- FILA 1: BUSCADOR Y BOTÓN ORDENAR -->
+        <!-- FILA 1 (R127): CIUDAD · BUSCADOR · ORDENAR
+             La ciudad acompaña al campo en SU fila (a su
+             izquierda, orden del dueño); el botón ordenar
+             sigue escoltando por la derecha. -->
         <div class="filtros-fila" id="filtrosFila">
+          <button type="button" class="city-bar" id="btnCiudad" disabled aria-label="Cambiar ciudad">
+            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
+            <span class="city-txt" id="ciudadTxt">—</span>
+          </button>
           <div class="buscar-capsula" id="buscarFila">
             <div class="buscar-input-wrap">
               <span class="buscar-lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
@@ -364,13 +375,10 @@ DEPENDENCIAS:    css/*.css + js/*.js (misma carpeta), manifest.json,
           <button type="button" class="btn-ordenar" id="btnOrdenar" aria-label="Ordenar"><span data-glifo="ordenar" aria-hidden="true"></span></button>
         </div>
 
-        <!-- FILA 2: CHIPS Y CIUDAD -->
+        <!-- FILA 2 (R127): SOLO CHIPS · los que estén activos en
+             la BD reparten TODO el ancho de la fila -->
         <div class="filtros-fila-dos" id="filtrosFilaDos">
           <div id="filtros" class="filtros" role="tablist" aria-label="Filtros"></div>
-          <button type="button" class="city-bar" id="btnCiudad" disabled aria-label="Cambiar ciudad">
-            <span class="city-pin" data-glifo="ubicacion" aria-hidden="true"></span>
-            <span class="city-txt" id="ciudadTxt">—</span>
-          </button>
         </div>
 
         <!-- CONTENEDOR DE LISTA Y DETALLE -->

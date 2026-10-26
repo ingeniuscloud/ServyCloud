@@ -3,12 +3,13 @@
 ARCHIVO:         Ciudad_Sheet_CSS.html
 ESPEJO GITHUB:   github/css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
-                 en la FILA 2 de la sección de filtros como un
-                 botón independiente más — pin + nombre de la
-                 ciudad, SIN fondo, borde suave y delgado, y
-                 reparte la fila con los chips en partes
-                 iguales) y del bottom sheet de selección (R65:
+RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R127: vive
+                 en la FILA 1 de la sección de filtros, a la
+                 IZQUIERDA del campo buscar — pin + nombre de la
+                 ciudad, SIN fondo, borde suave y delgado; NO
+                 compite con el campo: mide lo suyo (flex 0 1
+                 auto, tope 45%) y su nombre se recorta si es
+                 largo) y del bottom sheet de selección (R65:
                  STACK VERTICAL de tarjetas nativas — diseño que
                  trajo el dueño de una app popular —: nombre en
                  negrita con el badge "Activo" a la derecha y,
@@ -23,32 +24,32 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R64: vive
                  guardada. Aviso de cookies de esa primera
                  carga: icono a la izquierda del texto y botón
                  Aceptar debajo.
-VERSIÓN:         1.10
-CAMBIOS:         R77B: El nombre de la ciudad en el botón de la
-                 fila de filtros pasa a la voz del textoPrimario
-                 (variables del Core). Las tarjetas del sheet
-                 conservan su modelo.
-                 R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+VERSIÓN:         1.11
+CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
+                 mide LO SUYO en la FILA 1 (flex 0 1 auto + tope
+                 45%); en modo compartido se oculta (regla en
+                 Chips_CSS). El sheet de selección intacto.
+                 R77B: El nombre de la ciudad en el botón pasa a
+                 la voz del textoPrimario (variables del Core).
 ════════════════════════════════════════════════════════════════════*/
-
   /* ============================================================
-     BOTÓN CIUDAD (R64) · FILA 2 de la sección de filtros
-     Un botón independiente más (como los chips): cápsula con
-     borde suave y delgado (1px #e2e8f0), fondo transparente,
-     pin + nombre de la ciudad — sin fondo, sin chevron y sin
-     más texto que la ciudad. Reparte la fila con los chips en
-     partes iguales (flex 1, texto centrado). En modo detalle
-     lo esconde la fila completa.
+     BOTÓN CIUDAD (R127) · FILA 1 de la sección de filtros
+     Cápsula con borde suave y delgado (1px), fondo transparente,
+     pin + nombre de la ciudad — sin chevron y sin más texto que
+     la ciudad. ABRE la fila 1 (a la izquierda del campo buscar),
+     mide LO SUYO (flex 0 1 auto, tope 45%) y el nombre se
+     recorta si es largo. En modo compartido lo oculta Chips_CSS
+     (la fila 1 queda como header del campo).
      ============================================================ */
   .city-bar {
-    flex: 1 1 0;
+    /* R127 · fila 1, izquierda del campo: mide LO SUYO (no
+       compite con el campo) y NO se encoge hasta recortar el
+       nombre — solo cede si el nombre pasa del tope 45% (el
+       campo busca queda siempre con la mayoría). Estira a la
+       altura de la fila para medir LO MISMO que el campo. */
+    flex: 0 0 auto;
+    align-self: stretch;
+    max-width: 45%;
     min-width: 0;
 
     display: inline-flex;
