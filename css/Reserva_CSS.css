@@ -11,8 +11,13 @@ RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
                  BLOQUE REVELABLE (zona-otp / post-validación).
                  La vista de éxito, su skeleton y su error viven en
                  Reserva_Exito_CSS.html.
-VERSIÓN:         1.3
-CAMBIOS:         R76: Centralización tipográfica (parte 2).
+VERSIÓN:         1.4
+CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub →
+                 .subtitulo (muere el font-size/weight/color local).
+                 Labels, inputs, botones y turnos son controles del
+                 formulario: NO se tocan. El strong del post conserva
+                 su color.
+                 R76: Centralización tipográfica (parte 2).
                  Los tamaños RECURRENTES de la familia UI
                  (sheets y controles) ahora viven en :root de
                  Core_CSS (--size-ui-1 a --size-ui-5) y los px
@@ -21,6 +26,9 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
                  --size-subtitulo). Cero cambio visual: mismos
                  valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
+
+
 
   /* ============================================================
      ROOT · capa superior al sheet de Global (400/600)
@@ -65,19 +73,14 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
      FORM · contenedor
      ============================================================ */
   .sheet-form .form-titulo {
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    color: #0f172a;
+    /* R129 · tipografía = .titulo del Core (solo queda margen;
+       la alineación izquierda ya es la del sheet). */
     margin: 4px 0 4px;
     text-align: left;
   }
   .sheet-form .form-sub {
-    font-size: var(--size-ui-3);
-    color: #64748b;
-    font-weight: 500;
+    /* R129 · tipografía = .subtitulo del Core. */
     margin: 0 0 20px;
-    line-height: 1.45;
     text-align: left;
   }
   .sheet-form .form-sub strong {
@@ -556,3 +559,4 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     opacity: 1;
     transform: translateY(0);
   }
+

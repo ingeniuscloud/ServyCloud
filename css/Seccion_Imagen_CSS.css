@@ -7,12 +7,19 @@ RESPONSABILIDAD: Estilos del LIGHTBOX: visor fullscreen de capturas
                  sobre <dialog> nativo, controles de cierre y estado
                  body.lightbox-abierto. Lo consume
                  Seccion_Imagen_Script.html.
-VERSIÓN:         1.1
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
+VERSIÓN:         1.2
+CAMBIOS:         R129: fuera el estado hover del cierre del lightbox
+                 (escritorio; en teléfono no existe hover, orden del
+                 dueño) — el toque vive en :active.
+                 R37: encabezado simplificado — solo queda lo
                  vigente en el código (política del dueño: lo
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Seccion_CSS.html (sistema de texto/base)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
 
   /* ============================================================
      LIGHTBOX · visor fullscreen sobre <dialog> nativo
@@ -88,7 +95,6 @@ DEPENDENCIAS:    Seccion_CSS.html (sistema de texto/base)
     -webkit-backdrop-filter: blur(6px);
     transition: background 0.18s ease;
   }
-  .lightbox-close:hover,
   .lightbox-close:active {
     background: rgba(255, 255, 255, 0.24);
   }

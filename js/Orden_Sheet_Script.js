@@ -25,8 +25,12 @@ RESPONSABILIDAD: Módulo Ordenar (R66): el bottom sheet que abre el
                  velocidad, cierre, haptic) replica a
                  Ciudad_Sheet_Script — módulos hermanos. El orden
                  es de SESIÓN: al recargar vuelve a recomendado.
-VERSIÓN:         1.2
-CAMBIOS:         R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ordenar-close svg sigue mandando.
+VERSIÓN:         1.3
+CAMBIOS:         R129: los títulos del sheet llevan las clases maestras del
+                 Core: h2 → .titulo, opción → .subtitulo, descripción
+                 → .textoPrimario (un solo archivo controla la
+                 tipografía).
+                 R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ordenar-close svg sigue mandando.
 CAMBIOS:         R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
                  pasa a Orden_Sheet_* (el sheet es de ordenamiento,
                  no de filtro — corrección de nombre del dueño).
@@ -43,6 +47,11 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
                  (consumidor del evento: Lista_Script),
                  Chips_CSS.html (.btn-ordenar .con-orden)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
 
   window.Ordenar = (function () {
@@ -203,7 +212,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
     function pintarContenido() {
       if (!content) return;
 
-      var html = '<h2 class="ordenar-titulo">Ordenar por</h2>';
+      var html = '<h2 class="ordenar-titulo titulo">Ordenar por</h2>';
       html += '<div class="ordenar-opciones">';
 
       OPCIONES.forEach(function (op, i) {
@@ -216,8 +225,8 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
             ' aria-pressed="' + (esActual ? 'true' : 'false') + '">' +
             '<span class="ordenar-icono" data-glifo="' + op.glifo + '" aria-hidden="true"></span>' +
             '<span class="ordenar-texto">' +
-              '<span class="ordenar-opt-titulo">' + op.titulo + '</span>' +
-              '<span class="ordenar-opt-desc">' + op.desc + '</span>' +
+              '<span class="ordenar-opt-titulo subtitulo">' + op.titulo + '</span>' +
+              '<span class="ordenar-opt-desc textoPrimario">' + op.desc + '</span>' +
             '</span>' +
             '<span class="ordenar-check" data-glifo="verificado" aria-hidden="true"></span>' +
           '</button>';

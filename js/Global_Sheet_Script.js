@@ -15,8 +15,13 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  está instalada, el aviso vive DENTRO de la
                  pantalla como banner; Android no instalada lleva
                  botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.13.0
-CAMBIOS:         R128: el esqueleto ya no dibuja su SVG: close, volver y volver-arriba salen del registro (data-glifo) y el esqueleto se pinta en construirDOM (pintarGlifos(raiz)); el content se sigue pintando igual.
+VERSIÓN:         1.14.0
+CAMBIOS:         R129: clases maestras del Core en el DOM — «Menú» y títulos
+                 con icono → .titulo, filas del menú → .subtitulo,
+                 subtítulo del asesor y detalles PWA → .textoPrimario,
+                 contenido legal envuelto en .textoPrimario. «Acerca
+                 de» subvista: INTACTA (exenta por el dueño).
+                 R128: el esqueleto ya no dibuja su SVG: close, volver y volver-arriba salen del registro (data-glifo) y el esqueleto se pinta en construirDOM (pintarGlifos(raiz)); el content se sigue pintando igual.
 CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
                  los lienzos: círculo con chevron a la izquierda
                  (el estilo lo pinta Global_CSS); (2) fuera el
@@ -34,6 +39,11 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
 
   /* ============================================================
@@ -122,15 +132,15 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       var pwaTitulo = (window.SISTEMA && window.SISTEMA.pwa && window.SISTEMA.pwa.titulo) || 'Instalar la app';
 
       return '' +
-        '<h2 class="sheet-titulo">Menú</h2>' +
+        '<h2 class="sheet-titulo titulo">Menú</h2>' +
         '<div class="sheet-menu-lista">' +
 
           '<a class="sheet-menu-item" data-accion="asesor" ' +
              'href="' + _whatsappHrefAsesor() + '" target="_top" rel="noopener">' +
             '<span class="sheet-menu-icon"><span data-glifo="userPlus"></span></span>' +
             '<span class="sheet-menu-texto">' +
-              '<span class="sheet-menu-titulo">Ofrece tus servicios aquí</span>' +
-              '<span class="sheet-menu-sub">Cursos, oficios, asesorías y más</span>' +
+              '<span class="sheet-menu-titulo subtitulo">Ofrece tus servicios aquí</span>' +
+              '<span class="sheet-menu-sub textoPrimario">Cursos, oficios, asesorías y más</span>' +
             '</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</a>' +
@@ -139,31 +149,31 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
 
           '<button class="sheet-menu-item" data-accion="terminos">' +
             '<span class="sheet-menu-icon"><span data-glifo="book"></span></span>' +
-            '<span class="sheet-menu-texto">Términos y condiciones</span>' +
+            '<span class="sheet-menu-texto subtitulo">Términos y condiciones</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</button>' +
 
           '<button class="sheet-menu-item" data-accion="privacidad">' +
             '<span class="sheet-menu-icon"><span data-glifo="candado"></span></span>' +
-            '<span class="sheet-menu-texto">Política de privacidad</span>' +
+            '<span class="sheet-menu-texto subtitulo">Política de privacidad</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</button>' +
 
           '<button class="sheet-menu-item" data-accion="cookies">' +
             '<span class="sheet-menu-icon"><span data-glifo="cookie"></span></span>' +
-            '<span class="sheet-menu-texto">Política de cookies</span>' +
+            '<span class="sheet-menu-texto subtitulo">Política de cookies</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</button>' +
 
           '<button class="sheet-menu-item" data-accion="pwa">' +
             '<span class="sheet-menu-icon"><span data-glifo="download"></span></span>' +
-            '<span class="sheet-menu-texto">' + pwaTitulo + '</span>' +
+            '<span class="sheet-menu-texto subtitulo">' + pwaTitulo + '</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</button>' +
 
           '<button class="sheet-menu-item" data-accion="acerca">' +
             '<span class="sheet-menu-icon"><span data-glifo="info"></span></span>' +
-            '<span class="sheet-menu-texto">Acerca de</span>' +
+            '<span class="sheet-menu-texto subtitulo">Acerca de</span>' +
             '<span class="sheet-menu-chevron">›</span>' +
           '</button>' +
 
@@ -226,7 +236,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                       window.SISTEMA.contenidoLegal[clave];
 
       if (!contenido) {
-        return '<h2 class="sheet-titulo">Próximamente</h2>';
+        return '<h2 class="sheet-titulo titulo">Próximamente</h2>';
       }
 
       var root  = (window.SISTEMA && window.SISTEMA.root) || {};
@@ -250,13 +260,13 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
           .replace(/\{whatsapp\}/g,     datos.whatsapp);
       }
 
-      var html = '<div class="sheet-privacidad">';
+      var html = '<div class="sheet-privacidad textoPrimario">';
 
       html += '<div class="sheet-titulo-con-icono">';
       if (contenido.icono) {
         html += '<span class="icono"><span data-glifo="' + contenido.icono + '"></span></span>';
       }
-      html += '<span>' + interpolar(contenido.titulo) + '</span>';
+      html += '<span class="titulo">' + interpolar(contenido.titulo) + '</span>';
       html += '</div>';
 
       if (contenido.ultimaActualizacion) {
@@ -460,9 +470,9 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
           '<li class="pwa-paso" style="--i:' + i + '">' +
             '<span class="pwa-paso-punto" aria-hidden="true">' + (i + 1) + '</span>' +
             '<span class="pwa-paso-contenido">' +
-              '<span class="pwa-paso-titulo">' + (p.titulo || '') + '</span>' +
+              '<span class="pwa-paso-titulo subtitulo">' + (p.titulo || '') + '</span>' +
               (p.detalle
-                ? '<span class="pwa-paso-detalle">' + p.detalle + '</span>'
+                ? '<span class="pwa-paso-detalle textoPrimario">' + p.detalle + '</span>'
                 : '') +
             '</span>' +
           '</li>';
@@ -491,7 +501,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
 
     function getPWAHTML() {
       var cfg = window.SISTEMA && window.SISTEMA.pwa;
-      if (!cfg) return '<h2 class="sheet-titulo">Próximamente</h2>';
+      if (!cfg) return '<h2 class="sheet-titulo titulo">Próximamente</h2>';
 
       /* Pestañas: las plataformas que la BD traiga. Si ninguna,
          fallback cfg.otro con una sola guía (compatibilidad). */
@@ -500,7 +510,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
         plataformas = ['android'];
       }
       if (!plataformas.length) {
-        return '<h2 class="sheet-titulo">Próximamente</h2>';
+        return '<h2 class="sheet-titulo titulo">Próximamente</h2>';
       }
 
       /* Pestaña inicial: la del dispositivo si está; si no, la
@@ -515,7 +525,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       if (cfg.icono) {
         html += '<span class="icono"><span data-glifo="' + cfg.icono + '"></span></span>';
       }
-      html += '<span>' + (cfg.titulo || 'Instalar la app') + '</span>';
+      html += '<span class="titulo">' + (cfg.titulo || 'Instalar la app') + '</span>';
       html += '</div>';
 
       /* R64 · ya instalada: el aviso vive DENTRO de la pantalla
@@ -529,7 +539,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       }
 
       if (cfg.subtitulo) {
-        html += '<p class="pwa-sub">' + cfg.subtitulo + '</p>';
+        html += '<p class="pwa-sub subtitulo">' + cfg.subtitulo + '</p>';
       }
 
       if (plataformas.length > 1) {

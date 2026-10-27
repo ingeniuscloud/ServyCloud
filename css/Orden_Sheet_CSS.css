@@ -9,7 +9,8 @@ RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  sheet de ciudad (R65, modelo nativo que trajo el
                  dueño): sheet BLANCO al 90% máximo con esquinas
                  superiores 22px, HANDLE 36×5 #dee2e6, título
-                 centrado 20px y STACK VERTICAL de tarjetas
+                 centrado (tipografía .titulo del Core, R129) y
+                 STACK VERTICAL de tarjetas
                  (borde #eef0f2, radio 18px) — cada opción con su
                  ICONO en pastilla suave, título, descripción y el
                  check verificado SOLO en la activa. Activa:
@@ -25,8 +26,14 @@ RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  si hiciera falta (.ordenar-content).
                  La estructura raíz/backdrop/handle/close replica
                  a Ciudad_Sheet_CSS (módulos hermanos).
-VERSIÓN:         1.3
-CAMBIOS:         R76: Centralización tipográfica (parte 2).
+VERSIÓN:         1.4
+CAMBIOS:         R129: unificación tipográfica del sheet — la letra la mandan
+                 .titulo / .subtitulo / .textoPrimario del Core
+                 (colocadas por Orden_Sheet_Script); aquí muere el
+                 font-size/weight/color local (código muerto) y solo
+                 queda layout (centrado, recortes, márgenes). El
+                 naranja del estado activo gana con !important.
+                 R76: Centralización tipográfica (parte 2).
                  Los tamaños RECURRENTES de la familia UI
                  (sheets y controles) ahora viven en :root de
                  Core_CSS (--size-ui-1 a --size-ui-5) y los px
@@ -35,6 +42,9 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
                  --size-subtitulo). Cero cambio visual: mismos
                  valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
+
+
 
   /* ============================================================
      ROOT DEL SHEET
@@ -166,12 +176,13 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
   .ordenar-content::-webkit-scrollbar { display: none; }
 
   .ordenar-titulo {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    color: #121214;
+    /* R129 · la tipografía la manda .titulo del Core (GAS Core_CSS
+       / css/Core_CSS.css): tamaño, peso, color, línea, tracking y
+       familia viven CENTRALIZADOS. Aquí solo queda layout: el
+       centrado propio del sheet (la alineación es diseño, no
+       tipografía) y los márgenes. */
+    text-align: center !important;
     margin: 2px 0 22px;
-    text-align: center;
   }
 
   /* ============================================================
@@ -272,13 +283,9 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
   }
 
   .ordenar-opt-titulo {
+    /* R129 · tipografía = .subtitulo del Core. Queda solo el
+       recorte de la fila y la transición del estado activo. */
     display: block;
-
-    font-size: 15.5px;
-    font-weight: 650;
-    line-height: 1.25;
-    letter-spacing: -0.2px;
-    color: #121214;
 
     overflow: hidden;
     text-overflow: ellipsis;
@@ -286,16 +293,12 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
 
     transition: color 0.2s ease;
   }
-  .ordenar-card.activa .ordenar-opt-titulo { color: #f97316; }
+  .ordenar-card.activa .ordenar-opt-titulo { color: #f97316 !important; }
 
   .ordenar-opt-desc {
+    /* R129 · tipografía = .textoPrimario del Core (antes 12.5px
+       gris local: código muerto eliminado). */
     display: block;
-
-    font-size: 12.5px;
-    font-weight: 400;
-    line-height: 1.35;
-    letter-spacing: -0.1px;
-    color: #64748b;
   }
 
   /* Check de la activa · SOLO visible en la tarjeta activa
@@ -338,8 +341,5 @@ CAMBIOS:         R76: Centralización tipográfica (parte 2).
     .ordenar-card { padding: 12px; gap: 10px; }
     .ordenar-icono { width: 34px; height: 34px; border-radius: 10px; }
     .ordenar-icono svg { width: 17px; height: 17px; }
-    .ordenar-opt-titulo { font-size: 14.5px; }
-    .ordenar-opt-desc { font-size: 12px; }
     .ordenar-check { width: 20px; height: 20px; }
-    .ordenar-titulo { font-size: var(--size-subtitulo); }
   }

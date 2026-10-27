@@ -24,14 +24,37 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R127: vive
                  guardada. Aviso de cookies de esa primera
                  carga: icono a la izquierda del texto y botón
                  Aceptar debajo.
-VERSIÓN:         1.11
-CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
-                 mide LO SUYO en la FILA 1 (flex 0 1 auto + tope
-                 45%); en modo compartido se oculta (regla en
+VERSIÓN:         1.12
+CAMBIOS:         R129: unificación tipográfica del sheet — .titulo /
+                 .subtitulo / .textoPrimario del Core mandan la
+                 letra; muere el font-size/weight/color local
+                 (código muerto). Los pills de métricas y el badge
+                 son controles: NO se tocan. El naranja activo gana
+                 con !important.
+                 R127: la ciudad pasa de la fila de chips a la
+                 FILA 1 del lienzo (a la izquierda del campo
+                 buscar, orden del dueño): su ancho deja de ser
+                 un tercio — mide LO SUYO (flex 0 1 auto) con
+                 tope 45% para que el campo nunca quede apretado;
+                 en modo compartido se oculta (regla en
                  Chips_CSS). El sheet de selección intacto.
-                 R77B: El nombre de la ciudad en el botón pasa a
-                 la voz del textoPrimario (variables del Core).
+                 R77B: El nombre de la ciudad en el botón de la
+                 fila de filtros pasa a la voz del textoPrimario
+                 (variables del Core). Las tarjetas del sheet
+                 conservan su modelo.
+                 R76: Centralización tipográfica (parte 2).
+                 Los tamaños RECURRENTES de la familia UI
+                 (sheets y controles) ahora viven en :root de
+                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
+                 iguales al canon de contenido usan sus variables
+                 (--size-enlaces, --size-textoPrimario, --size-cita,
+                 --size-subtitulo). Cero cambio visual: mismos
+                 valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
   /* ============================================================
      BOTÓN CIUDAD (R127) · FILA 1 de la sección de filtros
      Cápsula con borde suave y delgado (1px), fondo transparente,
@@ -258,12 +281,10 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
   .ciudad-content::-webkit-scrollbar { display: none; }
 
   .ciudad-titulo {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    color: #121214;
+    /* R129 · la tipografía la manda .titulo del Core. Solo queda
+       layout: centrado del sheet y márgenes. */
+    text-align: center !important;
     margin: 2px 0 22px;
-    text-align: center;
   }
 
   /* ============================================================
@@ -302,11 +323,9 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
   }
 
   .cookies-texto {
+    /* R129 · tipografía = .textoPrimario del Core (el color y el
+       tamaño vivían repetidos aquí: código muerto eliminado). */
     margin: 0;
-    font-size: var(--size-textoPrimario);
-    line-height: 1.55;
-    color: #475569;
-    text-align: left;
   }
 
   .cookies-aceptar {
@@ -334,7 +353,7 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
      TARJETAS DE CIUDADES (R65) · STACK NATIVO (modelo del dueño)
      Tarjetas apiladas verticalmente (flex column, gap 12):
      blanca, borde fino #eef0f2, esquinas 18px, padding 16.
-     Arriba: nombre en NEGRITA (17px) + badge "Activo" naranja
+     Arriba: nombre (.subtitulo del Core, R129) + badge "Activo" naranja
      (SOLO la activa lo muestra). Debajo: pills horizontales
      "N Servicios · N Cursos · N Promos" — cifra en negrita
      dentro del pill, la de PROMOS es la destacada. ACTIVA:
@@ -391,7 +410,7 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
     margin-bottom: 12px;
   }
 
-  /* Nombre EN NEGRITA (17px, como el modelo) */
+  /* Nombre · la tipografía la manda .subtitulo del Core (R129) */
   .ciudad-card-nombre {
     flex: 1;
     min-width: 0;
@@ -400,14 +419,8 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
     white-space: nowrap;
 
     margin: 0;
-
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.3px;
-    color: #121214;
   }
-  .ciudad-card.activa .ciudad-card-nombre { color: #f97316; }
+  .ciudad-card.activa .ciudad-card-nombre { color: #f97316 !important; }
 
   /* Badge "Activo" · SOLO visible en la tarjeta activa
      (naranja oficial, píldora blanca rellena). */
@@ -482,10 +495,7 @@ CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS — la ciudad
     .ciudad-content { padding: 4px 18px 22px; }
     .ciudad-tarjetas { gap: 10px; }
     .ciudad-card { padding: 14px; }
-    .ciudad-card-nombre { font-size: 16px; }
     .ciudad-card-metrica { font-size: 12px; padding: 5px 10px; }
-    .ciudad-titulo { font-size: 18px; }
     .ciudad-cookies { max-width: 280px; }
     .cookies-icono { width: 26px; height: 26px; }
-    .cookies-texto { font-size: 13px; }
   }

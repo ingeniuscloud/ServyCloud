@@ -25,8 +25,11 @@ RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
                  Promos destacada); al tocar, aplicar + cerrar
                  como siempre. Las métricas se calculan con
                  TABLAS.posts y SISTEMA.promo.titulares (R121).
-VERSIÓN:         1.10
-CAMBIOS:         R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ciudad-close svg sigue mandando.
+VERSIÓN:         1.11
+CAMBIOS:         R129: clases maestras del Core en el DOM: h2 → .titulo,
+                 nombre de ciudad → .subtitulo, texto de cookies →
+                 .textoPrimario.
+                 R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ciudad-close svg sigue mandando.
 CAMBIOS:         R121: (1) Las métricas por ciudad leen la
                  estructura nueva SISTEMA.promo.titulares — cada
                  item trae SU ciudad (vacío [] = cuenta en todas)
@@ -38,6 +41,11 @@ CAMBIOS:         R121: (1) Las métricas por ciudad leen la
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
   window.Ciudad = (function () {
 
@@ -323,7 +331,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
         '<div class="ciudad-cookies">' +
           '<div class="cookies-fila">' +
             '<span class="cookies-icono" data-glifo="cookie" aria-hidden="true"></span>' +
-            (texto ? '<p class="cookies-texto">' + texto + '</p>' : '') +
+            (texto ? '<p class="cookies-texto textoPrimario">' + texto + '</p>' : '') +
           '</div>' +
           '<button class="cookies-aceptar" type="button">Aceptar</button>' +
         '</div>';
@@ -433,7 +441,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
     function pintarContenido() {
       if (!content) return;
 
-      var html = '<h2 class="ciudad-titulo">Selecciona tu ciudad</h2>';
+      var html = '<h2 class="ciudad-titulo titulo">Selecciona tu ciudad</h2>';
       html += '<div class="ciudad-tarjetas">';
 
       lista.forEach(function (c) {
@@ -446,7 +454,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
             escapeHtml(c.idCiudad) + '" aria-pressed="' +
             (esActual ? 'true' : 'false') + '">' +
             '<span class="ciudad-card-top">' +
-              '<span class="ciudad-card-nombre">' + escapeHtml(c.titulo) + '</span>' +
+              '<span class="ciudad-card-nombre subtitulo">' + escapeHtml(c.titulo) + '</span>' +
               '<span class="ciudad-card-badge" aria-hidden="true">Activo</span>' +
             '</span>' +
             '<span class="ciudad-card-metricas">' +

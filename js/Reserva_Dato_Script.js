@@ -10,8 +10,11 @@ RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
                  Validaciones delegadas a window.ReservaValida.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.3.0
-CAMBIOS:         R128: el check y los 2 lápices dejan de ser SVG a mano: .field-check y .form-check-box llevan data-glifo de check y el lápiz sale del registro (data-glifo de lapiz, 16px). El pintado lo hacen los flujos de Reserva (ya pintan tras cada setContent).
+VERSIÓN:         1.4.0
+CAMBIOS:         R129: clases maestras del Core en el DOM del formulario:
+                 «Reservar cupo» → .titulo y «Estás reservando…» →
+                 .subtitulo.
+                 R128: el check y los 2 lápices dejan de ser SVG a mano: .field-check y .form-check-box llevan data-glifo de check y el lápiz sale del registro (data-glifo de lapiz, 16px). El pintado lo hacen los flujos de Reserva (ya pintan tras cada setContent).
 CAMBIOS:         R95: (1) datosPlan lee el PLANJSON nuevo
                  [{dias, horario, cupo}] — la pintada de opciones
                  y el texto de cupos por item quedan intactos.
@@ -25,6 +28,11 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  (state + callbacks), Index.html (SISTEMA.origenes
                  vía state)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
 
   window.ReservaDatos = (function () {
@@ -64,8 +72,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
     function getHeaderHTML(nombrePost) {
       return '' +
         '<div class="reserva-banner" id="reservaBanner" hidden></div>' +
-        '<h3 class="form-titulo">Reservar cupo</h3>' +
-        '<p class="form-sub">Estás reservando <strong>' + escapeHtml(nombrePost) +
+        '<h3 class="form-titulo titulo">Reservar cupo</h3>' +
+        '<p class="form-sub subtitulo">Estás reservando <strong>' + escapeHtml(nombrePost) +
         '</strong>. Completa tus datos y un asesor te contactará.</p>';
     }
 

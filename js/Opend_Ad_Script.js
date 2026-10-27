@@ -60,8 +60,13 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  6s no molesta: la app carga normal. En GitHub Pages
                  SISTEMA llega POR DATOS: espera la sesión y
                  re-intenta UNA sola vez.
-VERSIÓN:         1.7.0
-CAMBIOS:         R128: la X del openAd sale del registro (data-glifo close) y la capa se pinta al armarse. El CSS .openad-cerrar svg sigue mandando (blanca, 2.6).
+VERSIÓN:         1.8.0
+CAMBIOS:         R129: fuera el teclado de escritorio — Escape del documento y
+                 Enter/espacio del img (con su role/tabindex) no
+                 existen en teléfonos (orden del dueño). Cierra la X
+                 y los relojes; aria-label se queda (VoiceOver lo
+                 lee al tocar).
+                 R128: la X del openAd sale del registro (data-glifo close) y la capa se pinta al armarse. El CSS .openad-cerrar svg sigue mandando (blanca, 2.6).
 CAMBIOS:         R122: (1) La capa se monta DENTRO del vidrio del
                  simulador (.glass) con posición absoluta: en la PC el
                  marco recorta el openAd y el dueño ve en su filtro
@@ -90,6 +95,11 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  seleccionar), Ciudad_Script.js (getActual),
                  Telefono.css (.glass anfitrión), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
   window.OpenAd = (function () {
 
@@ -322,14 +332,9 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
         if (unoCierre) { clearTimeout(unoCierre); unoCierre = null; }
         capa.classList.remove('openad-visible');
         document.body.classList.remove('openad-abierto');
-        document.removeEventListener('keydown', alTeclear);
         setTimeout(function () {
           if (capa.parentNode) capa.parentNode.removeChild(capa);
         }, FADE_CIERRE_MS);
-      }
-
-      function alTeclear(e) {
-        if (e && e.key === 'Escape') cerrar();
       }
 
       /* R-d · DOS RELOJES INDEPENDIENTES, arrancan cuando el anuncio
@@ -343,7 +348,6 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
 
       capa.querySelector('.openad-cerrar')
           .addEventListener('click', cerrar);
-      document.addEventListener('keydown', alTeclear);
 
       /* CTA = LA MISMA IMAGEN (R122): post directo o WhatsApp del
          anuncio. En ambos casos el anuncio se cierra con fade-out
@@ -366,14 +370,6 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
 
       if (tieneDestino) {
         img.addEventListener('click', alTocar);
-        img.addEventListener('keydown', function (e) {
-          if (e && (e.key === 'Enter' || e.key === ' ')) {
-            if (e.preventDefault) e.preventDefault();
-            alTocar();
-          }
-        });
-        img.setAttribute('role', 'button');
-        img.setAttribute('tabindex', '0');
         img.setAttribute('aria-label', 'Abrir promoción');
       }
 

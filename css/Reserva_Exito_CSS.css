@@ -8,13 +8,20 @@ RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
                  resumen, WhatsApp), skeleton mientras procesa la
                  reserva y pantalla de error. Los consume
                  Reserva_Exito_Script.html.
-VERSIÓN:         1.4
-CAMBIOS:         R114: comentarios al día — el bloque PLAN DE
+VERSIÓN:         1.5
+CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
+                 .reserva-exito-sub → .subtitulo; queda el centrado
+                 de la pantalla de éxito (text-align:center
+                 !important local) y la entrada suave.
+                 R114: comentarios al día — el bloque PLAN DE
                  ESTUDIOS (.exito-plan) muestra del markdown los
                  datos clave: inicio, duración, inscripción y
                  pagos. Mismo lenguaje visual de .exito-lista y
                  entrada escalonada.
 ════════════════════════════════════════════════════════════════════*/
+
+
+
 
   /* ============================================================
      VISTA DE ÉXITO · confirmación tras enviar
@@ -35,19 +42,17 @@ CAMBIOS:         R114: comentarios al día — el bloque PLAN DE
   }
 
   .reserva-exito-titulo {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.4px;
+    /* R129 · tipografía = .titulo del Core. Queda el centrado
+       propio de la pantalla de éxito y la entrada suave. */
+    text-align: center !important;
     margin: 0 0 6px;
     animation: revelarEntrada 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .reserva-exito-sub {
-    font-size: 0.86rem;
-    color: #64748b;
-    font-weight: 500;
-    line-height: 1.45;
+    /* R129 · tipografía = .subtitulo del Core. Queda el centrado
+       y la entrada suave. */
+    text-align: center !important;
     margin: 0 0 22px;
     max-width: 300px;
     animation: revelarEntrada 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;

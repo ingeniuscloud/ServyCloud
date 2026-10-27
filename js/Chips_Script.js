@@ -17,17 +17,44 @@ RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
                  resetearVista() — cada cambio de ciudad cae al
                  chip de SERVICIOS por defecto (orden del dueño:
                  Irapa sin cursos no puede dejar la lista vacía).
-VERSIÓN:         1.5
-CAMBIOS:         R127: GEMELO SINCRONIZADO con el GAS —
-                 glifoDeChip() resuelve también EVENTOS y VENTAS
-                 ('evento' → glifo eventos, 'venta' → glifo
-                 ventas): los 4 chips de la BD llevan su icono
-                 desde Iconos (cero svg hardcodeado).
+VERSIÓN:         1.6
+CAMBIOS:         R129: muere chip.title (tooltip de escritorio — el código solo
+                 vive en teléfonos, orden del dueño): el texto
+                 completo ya viaja dentro del chip (.chip-texto).
+                 R127: glifoDeChip() resuelve también EVENTOS y
+                 VENTAS ('evento' → glifo eventos, 'venta' →
+                 glifo ventas): la BD trae 4 chips (Servicios,
+                 Cursos, Eventos, Ventas) y todos llevan su icono
+                 desde Iconos (regla del dueño: cero svg
+                 hardcodeado). Sin coincidencia → el chip sale
+                 solo con su texto (igual que antes).
                  R64: FUERA los números de items (orden del
-                 dueño): los chips quedan solo con su icono y su
-                 texto.
-DEPENDENCIAS:    index.html (inyección window.SISTEMA vía /exec)
+                 dueño): mueren contarItems(),
+                 actualizarContadores() y su listener de
+                 'ciudad:change' — los chips quedan solo con su
+                 icono y su texto.
+                 R63: entra resetearVista() (y chipServicio(),
+                 que resuelve el id del chip servicio por su
+                 texto/idChip, sin hardcodear ids): escribe la
+                 vista guardada con el chip servicio para que la
+                 restauración no reviva el chip anterior; si los
+                 botones ya están pintados, activa y emite
+                 chips:change. Core_Script lo llama en
+                 'ciudad:change'.
+                 R62: cada chip lleva ICONO — glifoDeChip()
+                 resuelve el glifo (servicio / cursos) por el
+                 titulo y el idChip (sin svg hardcodeado: los
+                 glifos viven en Iconos).
+                 R37: encabezado simplificado — solo queda lo
+                 vigente en el código (política del dueño: lo
+                 eliminado ya no se menciona).
+DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía 00 DoGet.gs)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
   window.Chips = (function () {
 
     var KEY_VISTA  = 'app_vista';
@@ -126,7 +153,9 @@ DEPENDENCIAS:    index.html (inyección window.SISTEMA vía /exec)
         chip.type = 'button';
         chip.className = 'chip';
         chip.setAttribute(ATTR_CLAVE, op.idChip);
-        chip.title = op.titulo;   /* texto completo si la fila aprieta */
+        /* R129: sin chip.title (tooltip de escritorio; el código
+           solo vive en teléfonos — orden del dueño). El texto
+           completo ya viaja dentro del chip (.chip-texto). */
 
         /* R62 · icono + texto (R64: sin números de items) */
         var glifo = glifoDeChip(op);

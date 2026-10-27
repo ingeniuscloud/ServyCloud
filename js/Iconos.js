@@ -10,8 +10,15 @@ RESPONSABILIDAD: Repositorio único de glifos SVG (data URI) y del
                  ACTIVOS (en uso hoy) y los SIN USO EN EL CÓDIGO
                  HOY (reserva: el dueño decide si se borran o se
                  guardan para el futuro).
-VERSIÓN:         2.6.0
-CAMBIOS:         R128: MIGRACIÓN TOTAL (orden del dueño: «ningún
+VERSIÓN:         2.7.0
+CAMBIOS:         R129: birrete de CURSOS reescalado ×1.1 (orden del
+                 dueño: «un poco más grande, tamaño equivalente a
+                 los otros chips») — solo cambia el d de la clave
+                 cursos (la geometría pasa a ocupar x 1..23, el
+                 mismo ancho que el carrito de Ventas); la config
+                 del registro NO se mueve (viewBox 24, fill none,
+                 stroke currentColor, width 2, puntas round).
+                 R128: MIGRACIÓN TOTAL (orden del dueño: «ningún
                  SVG hardcodeado»): entran 9 claves que vivían
                  dibujadas a mano en el sistema — volver (chevron
                  atrás de lienzos/sheets/Safari), menu (3 puntos
@@ -40,6 +47,11 @@ DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
                  pintan con data-glifo)
 ════════════════════════════════════════════════════════════════════*/
 
+
+
+
+
+
   const IMAGENES = {
 
   /* ╔══════════════════════════════════════════════════════════╗
@@ -56,7 +68,7 @@ DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
     flecha:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     flechaVer:      "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2012h15%22%2F%3E%3Cpath%20d%3D%22m13%206%206%206-6%206%22%2F%3E%3C%2Fsvg%3E",
     servicio:       "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.7%206.3a1%201%200%200%200%200%201.4l1.6%201.6a1%201%200%200%200%201.4%200l3.77-3.77a6%206%200%200%201-7.94%207.94l-6.91%206.91a2.12%202.12%200%200%201-3-3l6.91-6.91a6%206%200%200%201%207.94-7.94l-3.76%203.76z%22%2F%3E%3C%2Fsvg%3E",   /* chip Servicios (Chips.glifoDeChip, runtime) */
-    cursos:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M22%2010L12%205%202%2010l10%205%2010-5z%22%2F%3E%3Cpath%20d%3D%22M6%2012v5c3%203%209%203%2012%200v-5%22%2F%3E%3C%2Fsvg%3E",   /* chip Cursos (Chips.glifoDeChip, runtime) · R127: birrete del dueño */
+    cursos:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M23%209.8L12%204.3%201%209.8l11%205.5%2011-5.5z%22%2F%3E%3Cpath%20d%3D%22M5.4%2012v5.5c3.3%203.3%209.9%203.3%2013.2%200v-5.5%22%2F%3E%3C%2Fsvg%3E",   /* chip Cursos (Chips.glifoDeChip, runtime) · R127: birrete del dueño · R129: reescalado ×1.1 (tamaño equivalente a los otros chips) */
     eventos:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%229%22%20y%3D%222%22%20width%3D%226%22%20height%3D%2212%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M5%2010v1a7%207%200%200%200%2014%200v-1%22%2F%3E%3Cline%20x1%3D%2212%22%20y1%3D%2218%22%20x2%3D%2212%22%20y2%3D%2222%22%2F%3E%3Cline%20x1%3D%228%22%20y1%3D%2222%22%20x2%3D%2216%22%20y2%3D%2222%22%2F%3E%3C%2Fsvg%3E",   /* chip Eventos (Chips.glifoDeChip, runtime) · R127: NUEVO */
     ventas:         "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%229%22%20cy%3D%2221%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2221%22%20r%3D%221%22%2F%3E%3Cpath%20d%3D%22M1%201h4l2.68%2013.39a2%202%200%200%200%202%201.61h9.72a2%202%200%200%200%202-1.61L23%206H6%22%2F%3E%3C%2Fsvg%3E",   /* chip Ventas (Chips.glifoDeChip, runtime) · R127: NUEVO */
     ordenar:        "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%223%22%20y1%3D%226%22%20x2%3D%2221%22%20y2%3D%226%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%2212%22%20x2%3D%2218%22%20y2%3D%2212%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2218%22%20x2%3D%2214%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E",

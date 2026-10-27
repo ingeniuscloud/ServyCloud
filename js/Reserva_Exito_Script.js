@@ -8,8 +8,10 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.5.0
-CAMBIOS:         R128: el check del éxito sale del registro (data-glifo de check); muere el svg armado a mano. El CSS .exito-check svg sigue vistiendo (grosor 3).
+VERSIÓN:         1.6.0
+CAMBIOS:         R129: clases maestras del Core en el DOM del éxito: títulos →
+                 .titulo y subtítulos → .subtitulo (3 estados).
+                 R128: el check del éxito sale del registro (data-glifo de check); muere el svg armado a mano. El CSS .exito-check svg sigue vistiendo (grosor 3).
 CAMBIOS:         R114: el Plan de Estudios se simplifica — del
                  markdown solo se muestran los datos clave:
                  Inicio, Duración, Inscripción y Pago único /
@@ -31,6 +33,11 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  (clases reserva-exito/exito-*),
                  Reserva_Script.html (state + callbacks)
 ════════════════════════════════════════════════════════════════════*/
+
+
+
+
+
 
 
   window.ReservaExito = (function () {
@@ -115,8 +122,8 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     function _htmlCargando(state) {
       var html = '<div class="reserva-exito reserva-exito-cargando">';
       html +=   '<div class="reserva-exito-icono"><span class="spinner-exito"></span></div>';
-      html +=   '<h3 class="reserva-exito-titulo">Procesando tu reserva</h3>';
-      html +=   '<p class="reserva-exito-sub">Estamos confirmando tu cupo. Esto toma unos segundos.</p>';
+      html +=   '<h3 class="reserva-exito-titulo titulo">Procesando tu reserva</h3>';
+      html +=   '<p class="reserva-exito-sub subtitulo">Estamos confirmando tu cupo. Esto toma unos segundos.</p>';
       html +=   '<ul class="exito-lista">';
 
       var anchos = ['78%', '62%', '70%', '55%', '66%'];
@@ -140,8 +147,8 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       var html = '<div class="reserva-exito reserva-exito-error">';
       html +=   '<div class="reserva-exito-icono">⚠️</div>';
-      html +=   '<h3 class="reserva-exito-titulo">No pudimos confirmar tu reserva</h3>';
-      html +=   '<p class="reserva-exito-sub">' + escapeHtml(mensaje) + '</p>';
+      html +=   '<h3 class="reserva-exito-titulo titulo">No pudimos confirmar tu reserva</h3>';
+      html +=   '<p class="reserva-exito-sub subtitulo">' + escapeHtml(mensaje) + '</p>';
       html +=   '<div class="exito-acciones">';
       html +=     '<button type="button" class="exito-btn-primario" id="btnReintentarReserva">Intentar de nuevo</button>';
       html +=     '<button type="button" class="exito-btn-secundario" id="btnVolverFormulario">Volver al formulario</button>';
@@ -206,8 +213,8 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       var html = '<div class="reserva-exito">';
       html += '<div class="reserva-exito-icono">🎉</div>';
-      html += '<h3 class="reserva-exito-titulo">¡Felicitaciones!</h3>';
-      html += '<p class="reserva-exito-sub">Hemos recibido tus datos correctamente.</p>';
+      html += '<h3 class="reserva-exito-titulo titulo">¡Felicitaciones!</h3>';
+      html += '<p class="reserva-exito-sub subtitulo">Hemos recibido tus datos correctamente.</p>';
 
       html += '<ul class="exito-lista">';
       html += fila('Publicación:', nombrePost);

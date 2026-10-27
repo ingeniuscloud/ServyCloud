@@ -14,8 +14,16 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.13.0
-CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
+VERSIÓN:         1.14.0
+CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
+                 .subtitulo / .textoPrimario del Core mandan la letra
+                 del menú y de las subvistas (legal y PWA); muere el
+                 font-size/weight/color local repetido. El h3 legal
+                 mide con las VARIABLES maestras (nace de la BD, la
+                 clase va por CSS). Exento por orden: «Acerca de».
+                 La familia naranja del ítem asesor y los callouts se
+                 conservan con !important.
+                 R96: (1) el botón Volver del sheet es el MISMO de
                  los lienzos: círculo de 34px con borde fino
                  #475569 y chevron a la izquierda (mismas
                  características de .btn-volver); (2) fuera el
@@ -30,6 +38,9 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
                  reemplaza a Volver en la esquina izquierda; al
                  llegar arriba, Volver vuelve.
 ════════════════════════════════════════════════════════════════════*/
+
+
+
 
   /* ============================================================
      CONTENEDOR RAÍZ
@@ -246,23 +257,19 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
      TÍTULOS
      ============================================================ */
   .sheet-titulo {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    color: #0f172a;
+    /* R129 · tipografía = .titulo del Core. Solo queda layout:
+       centrado del sheet y márgenes. */
+    text-align: center !important;
     margin: 4px 0 14px;
-    text-align: center;
   }
 
   .sheet-titulo-con-icono {
+    /* R129 · tipografía = .titulo del Core (vive en el span del
+       texto, en el script). Aquí solo queda el layout flex. */
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 1.15rem;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    color: #0f172a;
     margin: 4px 0 22px;
     text-align: center;
   }
@@ -289,8 +296,9 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
      SUBVISTA LEGAL (privacidad, cookies)
      ============================================================ */
   .sheet-privacidad {
+    /* R129 · el contenido legal lleva el wrapper .textoPrimario
+       (DOM): párrafos y listas miden con el Core. */
     padding: 0 0 12px;
-    color: #334155;
   }
   .sheet-privacidad .fecha {
     text-align: center;
@@ -301,18 +309,19 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
     margin: 0 0 24px;
   }
   .sheet-privacidad h3 {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #0f172a;
-    letter-spacing: -0.2px;
-    margin: 20px 0 8px;
+    /* R129 · los encabezados del contenido son SUBTÍTULOS: miden
+       con las variables maestras del Core (un solo archivo manda).
+       El h3 nace del contenido de la BD, por eso la clase va por
+       CSS y no por DOM. */
+    font-size: var(--size-subtitulo) !important;
+    font-weight: var(--weight-subtitulo) !important;
+    color: var(--color-subtitulo) !important;
     line-height: 1.3;
+    letter-spacing: 0px;
+    margin: 20px 0 8px;
   }
   .sheet-privacidad h3:first-of-type { margin-top: 0; }
   .sheet-privacidad p {
-    font-size: var(--size-ui-3);
-    line-height: 1.55;
-    color: #475569;
     margin: 0 0 8px;
   }
   .sheet-privacidad ul {
@@ -321,9 +330,6 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
     list-style: none;
   }
   .sheet-privacidad ul li {
-    font-size: var(--size-ui-3);
-    line-height: 1.55;
-    color: #475569;
     margin: 0 0 5px;
     position: relative;
     padding-left: 14px;
@@ -356,14 +362,12 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
     background: transparent;
     border-radius: 12px;
     font-family: inherit;
-    font-size: var(--size-ui-5);
-    font-weight: 600;
-    color: #5b6472;
     cursor: pointer;
     text-align: left;
     width: 100%;
-    letter-spacing: -0.1px;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.15s ease;
+    /* R129 · la letra la llevan las clases del Core (.subtitulo /
+       .textoPrimario) puestas en el DOM por Global_Sheet_Script. */
     -webkit-tap-highlight-color: transparent;
     text-decoration: none;
     -webkit-box-sizing: border-box;
@@ -372,7 +376,6 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
 
   .sheet-menu-item:active {
     background-color: #f1f5f9;
-    color: #1e293b;
   }
   .sheet-menu-icon {
     width: 24px;
@@ -396,24 +399,13 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
   .sheet-menu-texto { flex: 1; min-width: 0; }
 
   .sheet-menu-titulo {
+    /* R129 · tipografía = .subtitulo del Core. */
     display: block;
-    font-size: var(--size-ui-5);
-    font-weight: 600;
-    color: inherit;
-    line-height: 1.2;
-    letter-spacing: -0.1px;
   }
   .sheet-menu-sub {
+    /* R129 · tipografía = .textoPrimario del Core. */
     display: block;
-    font-size: 0.74rem;
-    font-weight: 500;
-    color: #94a3b8;
-    line-height: 1.3;
-    letter-spacing: -0.1px;
     margin-top: 3px;
-  }
-  .sheet-menu-item:active .sheet-menu-sub {
-    color: #64748b;
   }
 
   .sheet-menu-chevron {
@@ -442,11 +434,13 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
     color: #F97316;
   }
   .sheet-menu-item[data-accion="asesor"] .sheet-menu-titulo {
-    color: #9A3412;
-    font-weight: 700;
+    /* R129 · identidad naranja del ítem destacado: gana a la
+       clase del Core (misma familia de los callouts). */
+    color: #9A3412 !important;
+    font-weight: 700 !important;
   }
   .sheet-menu-item[data-accion="asesor"] .sheet-menu-sub {
-    color: #C2410C;
+    color: #C2410C !important;
     opacity: 0.85;
   }
   .sheet-menu-item[data-accion="asesor"] .sheet-menu-chevron {
@@ -589,13 +583,9 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
      ============================================================ */
   .sheet-pwa {
     padding: 0 0 12px;
-    color: #334155;
   }
   .sheet-pwa .pwa-sub {
-    text-align: left;
-    font-size: 0.84rem;
-    line-height: 1.5;
-    color: #64748b;
+    /* R129 · tipografía = .subtitulo del Core. */
     margin: 12px 0 18px;
   }
 
@@ -733,18 +723,13 @@ CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
     padding-top: 3px;
   }
   .sheet-pwa .pwa-paso-titulo {
+    /* R129 · tipografía = .subtitulo del Core. */
     display: block;
-    font-size: var(--size-ui-4);
-    font-weight: 700;
-    color: #1f2937;
     margin: 0 0 3px;
-    line-height: 1.3;
   }
   .sheet-pwa .pwa-paso-detalle {
+    /* R129 · tipografía = .textoPrimario del Core. */
     display: block;
-    font-size: var(--size-ui-2);
-    color: #64748b;
-    line-height: 1.45;
   }
 
   /* ---------- Banner "app ya instalada" (R64) ----------
