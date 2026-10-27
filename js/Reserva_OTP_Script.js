@@ -3,19 +3,15 @@
 ARCHIVO:         Reserva_OTP_Script.html
 ESPEJO GITHUB:   github/js/Reserva_OTP_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Lógica de solicitud, reenvío y verificación del
-                 código OTP enviado por el backend (OTP.gs).
-                 El aviso de reserva activa muestra nombre y post
-                 de la reserva que causó el conflicto.
-VERSIÓN:         1.2
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+RESPONSABILIDAD: Módulo window.ReservaOTP: solicitar/reenviar código por correo, cooldown, verificación del código y sus mensajes bajo el campo correspondiente.
+VERSIÓN:         1.3
+CAMBIOS:         R131: los 8 mensajes de OTP viven bajo su campo: fallos de solicitar/reenviar bajo su botón, fallos de verificación bajo el campo de código; se limpian al escribir o reintentar.
 DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
                  Reserva_Valida_Script.html (window.ReservaValida),
                  Index.html (TABLAS), Iconos.html (pintarGlifos),
                  Reserva_CSS.html (clases zona-otp/link-reenviar)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.ReservaOTP = (function () {
 
@@ -55,6 +51,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
         var limpio = window.ReservaValida.limpiarOtp(this.value);
         if (limpio !== this.value) this.value = limpio;
         fieldOtp.classList.remove('invalido');
+        cb.errorCampo(fieldOtp, '');
         fieldOtp.classList.toggle('activo', this.value.length > 0 || document.activeElement === this);
         if (window.ReservaValida.otp(this.value)) verificarOtp();
       });
@@ -176,6 +173,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
         var correo = correoActual();
         if (!window.ReservaValida.correo(correo)) return;
 
+        cb.errorCampo(el.errorSolicitar, '');
         btnSolicitar.disabled = true;
         btnSolicitar.textContent = 'Enviando código…';
 
@@ -221,12 +219,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
             btnSolicitar.disabled = false;
             btnSolicitar.textContent = TEXTO_BTN_SOLICITAR;
             var msg = err.message || '';
+            /* R131 · el mensaje vive DEBAJO del botón que se pulsó */
             if (msg.indexOf('RATE_LIMIT') === 0) {
-              cb.banner('Demasiadas solicitudes. Intenta en unos minutos.', 'error');
+              cb.errorCampo(el.errorSolicitar, 'Demasiadas solicitudes. Intenta en unos minutos.');
             } else if (msg === 'CORREO_NO_ENVIADO') {
-              cb.banner('No se pudo enviar el correo. Verifica la dirección.', 'error');
+              cb.errorCampo(el.errorSolicitar, 'No se pudo enviar el correo. Verifica la dirección.');
             } else {
-              cb.banner('No se pudo enviar el código. Intenta de nuevo.', 'error');
+              cb.errorCampo(el.errorSolicitar, 'No se pudo enviar el código. Intenta de nuevo.');
             }
             cb.haptic([30, 20, 30]);
           });
@@ -237,6 +236,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
         var correo = correoActual();
         if (!window.ReservaValida.correo(correo)) return;
 
+        cb.errorCampo(el.errorReenviar, '');
         btnReenviar.disabled = true;
         btnReenviar.textContent = 'Enviando…';
 
@@ -273,10 +273,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
           })
           .catch(function (err) {
             var msg = err.message || '';
+            /* R131 · el mensaje vive DEBAJO del botón Reenviar */
             if (msg.indexOf('RATE_LIMIT') === 0) {
-              cb.banner('Demasiadas solicitudes. Intenta en unos minutos.', 'error');
+              cb.errorCampo(el.errorReenviar, 'Demasiadas solicitudes. Intenta en unos minutos.');
             } else {
-              cb.banner('No se pudo reenviar el código. Intenta de nuevo.', 'error');
+              cb.errorCampo(el.errorReenviar, 'No se pudo reenviar el código. Intenta de nuevo.');
             }
             btnReenviar.disabled = false;
             btnReenviar.textContent = 'Reenviar código';
@@ -321,14 +322,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
             fieldOtp.classList.add('invalido');
             var msg = err.message || '';
 
+            /* R131 · el mensaje vive DEBAJO del campo de código */
             if (msg === 'OTP_EXPIRADO') {
-              cb.banner('El código expiró. Solicita uno nuevo.', 'error');
+              cb.errorCampo(fieldOtp, 'El código expiró. Solicita uno nuevo.');
               reset(state, el);
             } else if (msg === 'OTP_INTENTOS_AGOTADOS') {
-              cb.banner('Demasiados intentos. Solicita un código nuevo.', 'error');
+              cb.errorCampo(fieldOtp, 'Demasiados intentos. Solicita un código nuevo.');
               reset(state, el);
             } else {
-              cb.banner('Código incorrecto', 'error');
+              cb.errorCampo(fieldOtp, 'Código incorrecto');
               inputOtp.value = '';
               inputOtp.focus();
             }

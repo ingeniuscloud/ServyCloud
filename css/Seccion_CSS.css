@@ -10,21 +10,7 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
 VERSIÓN:         2.5.0
-CAMBIOS:         R119: el punto ACTIVO del carrusel viste EXACTAMENTE
-                 lo mismo que los inactivos (núcleo gris
-                 translúcido + aro blanco + sombrita, todo
-                 heredado del estilo base) y solo conserva su
-                 tamaño: píldora de 14px (radius 3px). Inactivos
-                 intactos. Decisión del dueño (C·3): la única
-                 diferencia entre puntos es el tamaño.
-                 R95: (1) El fade del sheet de descripción es OVERLAY
-                 absoluto del .mk-sheet (hermano del content que
-                 scrollea): el degradado vive SIEMPRE pegado al
-                 borde inferior visible del sheet y el texto nunca
-                 se ve pasar por debajo; Seccion_Script lo retira
-                 (.fin) al llegar al final. (2) El sheet lleva el
-                 botón VOLVER ARRIBA (.mk-sheet-top del Core).
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/

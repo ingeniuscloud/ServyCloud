@@ -3,48 +3,12 @@
 ARCHIVO:         Ciudad_Sheet_Script.html
 ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Módulo Ciudad. Resuelve la ciudad activa desde
-                 localStorage (app_ciudad). Si no existe, abre
-                 el sheet en modo BLOQUEADO: el usuario debe
-                 seleccionar una ciudad antes de ver cualquier
-                 lista. En esa primera carga el sheet muestra
-                 PRIMERO el aviso de cookies (key
-                 localStorage: app_cookies; el TEXTO llega servido
-                 en SISTEMA.avisos.cookies — 03 Constantes.gs —, no
-                 vive aquí): hasta pulsar
-                 Aceptar no se ve la lista de ciudades, y tras
-                 aceptar el aviso desaparece y la selección
-                 obligatoria sigue. Pinta el botón .city-bar (en
-                 la fila de filtros desde R62) y emite
-                 'ciudad:change' cuando cambia.
-                 Ordena las ciudades alfabéticamente por título.
-                 El sheet pinta el STACK NATIVO: tarjetas apiladas
-                 (una por fila): nombre en negrita + badge "Activo"
-                 (solo la activa lo muestra) y pills horizontales
-                 "N Servicios · N Cursos · N Promos" (la de
-                 Promos destacada); al tocar, aplicar + cerrar
-                 como siempre. Las métricas se calculan con
-                 TABLAS.posts y SISTEMA.promo.titulares (R121).
-VERSIÓN:         1.11
-CAMBIOS:         R129: clases maestras del Core en el DOM: h2 → .titulo,
-                 nombre de ciudad → .subtitulo, texto de cookies →
-                 .textoPrimario.
-                 R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ciudad-close svg sigue mandando.
-CAMBIOS:         R121: (1) Las métricas por ciudad leen la
-                 estructura nueva SISTEMA.promo.titulares — cada
-                 item trae SU ciudad (vacío [] = cuenta en todas)
-                 y fechas con o sin hora (ventanaVigente, misma
-                 gramática del sistema). (2) Nada más cambia:
-                 bloqueo de primera carga, cookies, stack nativo y
-                 eventos intactos.
-
+RESPONSABILIDAD: Módulo window.CiudadSheet: lista de ciudades desde SISTEMA, tarjeta de la ciudad activa con badge «Activo» y métricas; selecciona ciudad y cierra.
+VERSIÓN:         1.12
+CAMBIOS:         R131: el badge «Activo» viste la clase maestra .badgeActivo (antes .ciudad-card-badge).
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
 
   window.Ciudad = (function () {
@@ -455,7 +419,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
             (esActual ? 'true' : 'false') + '">' +
             '<span class="ciudad-card-top">' +
               '<span class="ciudad-card-nombre subtitulo">' + escapeHtml(c.titulo) + '</span>' +
-              '<span class="ciudad-card-badge" aria-hidden="true">Activo</span>' +
+              '<span class="badgeActivo" aria-hidden="true">Activo</span>' +
             '</span>' +
             '<span class="ciudad-card-metricas">' +
               '<span class="ciudad-card-metrica">' +

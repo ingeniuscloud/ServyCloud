@@ -3,47 +3,10 @@
 ARCHIVO:         Reserva_Exito_CSS.html
 ESPEJO GITHUB:   github/css/Reserva_Exito_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
-                 vista de confirmación (wrap, tarjeta, icono,
-                 resumen, WhatsApp), skeleton mientras procesa la
-                 reserva y pantalla de error. Los consume
-                 Reserva_Exito_Script.html.
-VERSIÓN:         1.6
-CAMBIOS:         R130 · la letra del ÉXITO sale de las clases del Core
-                 (solo letra/tamaño/grosor; animaciones, fondos y
-                 estados intactos): «¡Felicitaciones!» → .titulo a la
-                 IZQUIERDA (muere su centrado local — orden del
-                 dueño: solo los sheets del menú global van
-                 centrados); sub → .textoPrimario (DOM) conservando
-                 su centro; TODO el resto de textos → .cita (11px ·
-                 400): filas clave/valor, Plan de Estudios y su
-                 lista, aviso ⚠️, nota 📧 y «Para dudas o
-                 comentarios» — los grises claros NO cambian
-                 (#64748b/#475569) y lo demás toma el gris original
-                 de .cita (#1f2937; antes #0f172a y los tonos de
-                 aviso). Las negritas de énfasis (valores y <b> del
-                 plan) conservan su 700. Los 3 botones («Chatea con
-                 atención al cliente», «Intentar de nuevo», «Volver
-                 al formulario») → .botonSecundario EN SU TOTALIDAD
-                 + look de los posts: sin fondo (muere el degradado
-                 naranja/verde y su sombra), píldora transparente
-                 con borde rgba(15,23,42,.16), 16px · 400 · #7A828A;
-                 el glifo de WhatsApp en verde #25d366 como el botón
-                 de los posts.
-                 R129: .reserva-exito-titulo → .titulo del Core y
-                 .reserva-exito-sub → .subtitulo; queda el centrado
-                 de la pantalla de éxito (text-align:center
-                 !important local) y la entrada suave.
-                 R114: comentarios al día — el bloque PLAN DE
-                 ESTUDIOS (.exito-plan) muestra del markdown los
-                 datos clave: inicio, duración, inscripción y
-                 pagos. Mismo lenguaje visual de .exito-lista y
-                 entrada escalonada.
+RESPONSABILIDAD: Estilos de la pantalla de éxito de la reserva: título, resumen clave/valor, Plan de Estudios, avisos y botones secundarios estilo posts.
+VERSIÓN:         1.7
+CAMBIOS:         R131: «Plan de Estudios» viste la letra .textoPrimario del Core (14px · 300, antes .cita); color y espaciado intactos.
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
   /* ============================================================
      VISTA DE ÉXITO · confirmación tras enviar
@@ -165,9 +128,10 @@ CAMBIOS:         R130 · la letra del ÉXITO sale de las clases del Core
     animation: revelarEntrada 0.5s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .exito-plan-titulo {
-    /* R130 · letra = .cita del Core (variables): 11px · 400. */
-    font-size: var(--size-cita);
-    font-weight: var(--weight-cita);
+    /* R131 · letra = .textoPrimario del Core (variables, orden del
+       dueño): 14px · 300 · #1f2937. Quedan SOLO espaciado propio. */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
     color: #1f2937;
     letter-spacing: -0.1px;
     margin: 0 0 6px;

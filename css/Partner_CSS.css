@@ -4,24 +4,9 @@ ARCHIVO:         Partner_CSS.html
 ESPEJO GITHUB:   github/css/Partner_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del LIENZO del partner (#partnerTrack),
-                 hermano del post dentro de .secciones-wrap (R87:
-                 el perfil del vendedor dejó de ser bottom sheet).
-                 Identidad (avatar con check + nombre + eslogan,
-                 mismas clases del post), stats del sheet,
-                 dirección, botón WhatsApp .botonSecundario sin
-                 fondo, tabs Servicios/Cursos estilo Yummy y
-                 tarjetas .mk-cross-* del post.
+                 hermano del post dentro de .secciones-wrap
 VERSIÓN:         1.1
-CAMBIOS:         R88: (1) Las tarjetas de publicaciones pasan a
-                 CUADRÍCULA 3 columnas (.pf-grid, como en el sheet
-                 viejo) — fuera el carrusel horizontal.
-                 (2) Las divisoras de identidad y stats adoptan el
-                 MISMO gris visible de las divisoras del post
-                 (rgba(15,23,42,.12), la .mk-hairline).
-                 (3) FUERA los fades post↔partner: el intercambio
-                 es inmediato (el parpadeo con la imagen se fue).
-                 R87: NACE — reemplaza al bottom sheet del
-                 partner (Partner_Sheet_CSS retirado).
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
                  .mk-rel-section, .mk-cross-*), Core_CSS.html
                  (variables y .botonSecundario/.enlacesOpciones)

@@ -3,27 +3,9 @@
 ARCHIVO:         Social_CSS.html
 ESPEJO GITHUB:   github/css/Social_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
+RESPONSABILIDAD: Estilos de los botones sociales (corazón/like, compartir) del hero y de la sección social de los posts.
 VERSIÓN:         1.7.0
-CAMBIOS:         R128: SOLO un comentario reescrito (mencionaba el
-                 svg a mano que ya no existe en el sistema: cero
-                 SVG hardcodeado, orden del dueño). Reglas y
-                 valores: INTACTOS byte a byte.
-CAMBIOS:         R96: (1) el corazón SÍ se rellena al dar like —
-                 el glifo like trae fill="none" como atributo del
-                 <path>, y la regla vieja (.activo svg { fill })
-                 nunca lo vencía porque el path lleva su propio
-                 fill: ahora la regla apunta al path y el corazón
-                 queda PINTADO en rojo (y se despinta al segundo
-                 toque, leyendo el estado local al reentrar);
-                 (2) borde de like y compartir en GRIS MEDIO
-                 (#94a3b8, el mismo para los dos) para que no
-                 compitan con el CTA.
-                 R95: LIKE LIMPIO — sin efectos de tamaño en ningún
-                 lado: el corazón solo se desplaza (vuelo -800%
-                 ≈ 210px, 1.05s, con fade de entrada/salida) y el
-                 botón ya no escala al tocar (:active scale fuera).
-                 El origen sigue siendo el centro EXACTO del
-                 corazón (fix R90 intacto).
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================

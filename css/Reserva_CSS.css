@@ -3,55 +3,10 @@
 ARCHIVO:         Reserva_CSS.html
 ESPEJO GITHUB:   github/css/Reserva_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
-                 de Global, banner de mensajes, form contenedor,
-                 fieldsets, campos flotantes, teléfono, OTP, botón
-                 solicitar código, turnos, chips de origen, checkbox
-                 de privacidad, botón submit y animaciones.
-                 BLOQUE REVELABLE (zona-otp / post-validación).
-                 La vista de éxito, su skeleton y su error viven en
-                 Reserva_Exito_CSS.html.
-VERSIÓN:         1.5
-CAMBIOS:         R130 · LA LETRA DE LA RESERVA SALE DE LAS CLASES
-                 MAESTRAS DEL CORE (orden del dueño — SOLO cambia
-                 letra/tamaño/grosor: efectos, estados, transiciones,
-                 alineaciones y colores que permanecen quedan
-                 IDÉNTICOS). Banner → .cita (11px · 400, colores de
-                 estado intactos) · inputs y teléfono → .textoPrimario
-                 (14px · 300, #0f172a intacto; placeholders ya son
-                 .textoSecundario por la regla global R77) · labels →
-                 .cita FIJOS 11px (dejan de encoger al flotar; colores
-                 de estado intactos) · prefijo → .textoPrimario ·
-                 OTP → .subtitulo (18px · 300) · reenviar → letra
-                 .enlacesOpciones (13px · 400 · naranja + punteado) ·
-                 solicitar código → .botonSecundario completo (16px ·
-                 400 · #7A828A) · submit → .botonPrimario completo
-                 (16px · 400, su degradado naranja intacto) · chips →
-                 .chipsFormulario (12px · 600) · check privacidad →
-                 .cita · leyendas de sección → .cita IGUAL QUE LABELS
-                 (en el código ahora son label: ids *Label) · turnos →
-                 .cita con los DÍAS conservando su 700 · reglas muertas
-                 .turno-dia/.turno-hora eliminadas (el DOM nunca las
-                 tuvo). El strong del post y los verdes de confirmación
-                 intactos.
-                 R129: .form-titulo → tipografía .titulo del Core y .form-sub →
-                 .subtitulo (muere el font-size/weight/color local).
-                 Labels, inputs, botones y turnos son controles del
-                 formulario: NO se tocan. El strong del post conserva
-                 su color.
-                 R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+RESPONSABILIDAD: Estilos del flujo de reserva: formularios flotantes, teléfono, OTP, turnos, errores por campo (.form-error), botones y zona revelable post-validación.
+VERSIÓN:         1.6
+CAMBIOS:         R131: MUERE el banner superior (.reserva-banner) — nace .form-error: cada mensaje vive DEBAJO de su campo con la misma paleta de error (#fef2f2 / #991b1b) y letra .cita; slot de flujo #errorFlujo bajo la cabecera · el campo OTP viste letra .titulo (22px · 300; centro y tracking intactos) · el botón solicitar código queda con LOOK SECUNDARIO COMPLETO (transparente + borde fino) y la letra de .botonSecundario en el DOM.
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
   /* ============================================================
      ROOT · capa superior al sheet de Global (400/600)
@@ -76,23 +31,25 @@ CAMBIOS:         R130 · LA LETRA DE LA RESERVA SALE DE LAS CLASES
   .reserva-root .sheet.solo-volver .sheet-handle { opacity: 0.4; }
 
   /* ============================================================
-     BANNER · mensajes inline (sustituye toasts)
+     ERRORES POR CAMPO (R131) · MUERE el banner superior (nadie lo
+     veía: vivía arriba y se escondía solo). Cada mensaje vive
+     DEBAJO de su campo, con la MISMA paleta de error que tenía el
+     banner (#fef2f2 / #991b1b) y la letra .cita del Core. El slot
+     de flujo (#errorFlujo, mensajes sin campo) comparte estilo.
      ============================================================ */
-  .reserva-banner {
-    padding: 10px 14px;
-    border-radius: 10px;
-    /* R130 · letra = .cita del Core (variables): 11px · 400.
-       Los COLORES de estado (info/éxito/error) quedan intactos. */
+  .form-error {
+    display: block;
+    margin-top: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
     font-size: var(--size-cita);
     font-weight: var(--weight-cita);
     line-height: 1.4;
-    margin: 0 0 14px;
     text-align: left;
   }
-  .reserva-banner[hidden] { display: none; }
-  .reserva-banner.info  { background: #eff6ff; color: #1e40af; }
-  .reserva-banner.exito { background: #f0fdf4; color: #166534; }
-  .reserva-banner.error { background: #fef2f2; color: #991b1b; }
+  .form-error[hidden] { display: none; }
 
   /* ============================================================
      FORM · contenedor
@@ -315,10 +272,10 @@ CAMBIOS:         R130 · LA LETRA DE LA RESERVA SALE DE LAS CLASES
   .form-input-otp {
     text-align: center;
     letter-spacing: 4px;
-    /* R130 · letra = .subtitulo del Core (variables): 18px · 300
-       (gana al 16px · 600 compartido de .form-input). */
-    font-size: var(--size-subtitulo);
-    font-weight: var(--weight-subtitulo);
+    /* R131 · letra = .titulo del Core (variables): 22px · 300
+       (orden del dueño). Centro y tracking intactos (efectos). */
+    font-size: var(--size-titulo);
+    font-weight: var(--weight-titulo);
     padding: 0 14px;
   }
 
@@ -355,13 +312,12 @@ CAMBIOS:         R130 · LA LETRA DE LA RESERVA SALE DE LAS CLASES
     margin: 0 0 6px;
     padding: 13px 16px;
     border-radius: 12px;
-    border: 1.5px solid color-mix(in srgb, var(--post-color, #1d4ed8) 40%, #e2e8f0);
-    background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 6%, #f8fafc);
-    /* R130 · letra = .botonSecundario del Core COMPLETA (variables):
-       16px · 400 · #7A828A. Su fondo/borde tintados quedan intactos. */
-    color: var(--color-botonSecundario);
-    font-size: var(--size-botonSecundario);
-    font-weight: var(--weight-botonSecundario);
+    /* R131 · LOOK SECUNDARIO COMPLETO, igual que los botones de
+       los posts (orden del dueño): sin fondo tintado, borde fino
+       neutro. La letra la viste la clase maestra .botonSecundario
+       del Core (en el DOM) — aquí queda solo layout. */
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
+    background: transparent;
     font-family: inherit;
     display: flex;
     align-items: center;

@@ -18,33 +18,7 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
 VERSIÓN:         2.16
-CAMBIOS:         R113: comentario del avatar al día con el
-                 nuevo tamaño (52×52); sin cambio de código.
-                 R112: el avatar del item es un CÍRCULO
-                 PERFECTO centrado verticalmente — no
-                 se estira con el alto de la fila. La inicial
-                 lleva la tipografía .tituloPost con el COLOR
-                 OFICIAL del post; fondo suave de siempre.
-                 R111: el avatar del item pasa a la COLUMNA
-                 IZQUIERDA: SOLO la INICIAL DEL TÍTULO — sin
-                 imagen, el avatar nunca lleva foto. El pie
-                 pierde el avatar chico; el texto de la marca
-                 se queda.
-                 R87: NACE EL MODO 'partner' — el perfil del
-                 vendedor es un LIENZO propio (#partnerTrack, lo
-                 pinta window.Partner), hijo del detalle: el
-                 título del header pasa a "Perfil del vendedor",
-                 el botón volver REGRESA AL POST (no a la lista)
-                 y el historial apila su estado propio. Cambios de
-                 chip/ciudad/orden cierran partner + detalle.
-                 R86: el SKELETON del detalle se actualiza a la
-                 anatomía real del post de hoy: marco 1:1 con
-                 vidrio, título, promo, descripción, CTA píldora
-                 y fila del partner.
-                 R84: el detalle sube con las ÚLTIMAS 2 preguntas
-                 del post (post.preguntas, ya vienen dentro de
-                 postDetalle): el Q&A del lienzo se pinta con la
-                 misma llamada, sin pedido extra.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -54,6 +28,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  (window.Compartir), Orden_Sheet_Script.html,
                  Core_CSS.html, Lista_CSS.html, Promo_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Lista = (function () {
 

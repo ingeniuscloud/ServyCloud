@@ -11,105 +11,8 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-                 R126 · ENLACE DE POST = GEMELA POR TOKEN (orden del
-                 dueño: cada post comparte SU OG real): urlPages +
-                 '/' + token + '.html' — la page e/<TOKEN>.html que
-                 el 04 Generador 2.0 escribe con la OG REAL del post
-                 y el salto ?s= instantáneo. WhatsApp previsualiza
-                 LA IMAGEN DEL POST (muere el OG POR DEFECTO para
-                 los posts) y el nombre del archivo muestra SOLO el
-                 token (cero idPost). El enlace de LISTA sigue en la
-                 page base (urlPages + '/?s=' + token, OG de marca:
-                 una lista no tiene imagen propia). Ambos llevan
-                 cache-bust ?v=. Sin urlPages, el enlace va directo
-                 a la app (root.app.urlApp) con el mismo payload ?s=.
-                 R124 · ambos enlaces siguen CAMUFLADOS: token corto
-                 ?s=, la idPost NUNCA en la URL (diseño original
-                 del dueño): el token la lleva OFUSCADO y el
-                 receptor de siempre lo abre (desempaquetar →
-                 tipo 'p' → recibirPost). La page reenvía el ?s= a
-                 la app (location.replace, NUNCA al /exec de GAS).
-                 MENSAJES (R108 · nueva estructura):
-                 · POST → compartir.mensajeWhatsapp del POSTJSON
-                   (texto completo del dueño) + el enlace.
-                 · LISTA → root.app.compartir.mensajeListaWhatsapp
-                   con [ciudad] (UPPERCASE de la ciudad activa) y
-                   [textoBuscado] (texto del buscador; sin filtro =
-                   "lista general") + el enlace. Ahora se puede
-                   compartir TAMBIÉN la lista sin filtros.
-                 El payload viaja OFUSCADO (XOR con clave embebida +
-                 base64url): el ID del post o el término NUNCA van
-                 planos en la URL. Los enlaces antiguos ?d=
-                 (AES-256-GCM) siguen abriendo.
-                 Receptor: Core llama Compartir.recibir() cuando
-                 TABLAS cargó y el lienzo está inyectado; se aplica
-                 ciudad + contenido y la app entra en MODO
-                 COMPARTIDO: ciudad VISTA pero BLOQUEADA, campo de
-                 búsqueda fijado SIN foco y la X del campo libera la
-                 vista. R108: el MENÚ GLOBAL queda VISIBLE en modo
-                 lista compartida (decisión del dueño — CSS en
-                 Chips_CSS). El header del detalle lo decide el TIPO
-                 de enlace: con UN post la fila sustituye al par
-                 volver/título del modo detalle y la salida es la X;
-                 con una LISTA cada post abre con volver/título
-                 normales para recorrer los demás posts del filtro,
-                 y la X queda en la lista. Al limpiar vuelve todo el
-                 catálogo (la ciudad del enlace queda como la del
-                 receptor). Aviso amable si el contenido compartido
-                 ya no existe. La instalación de la PWA NO cambia:
-                 se hace desde la app con el enlace principal (menú /
-                 píldora), nunca desde el enlace compartido.
 VERSIÓN:         2.6
-CAMBIOS:         R126: GEMELA POR TOKEN + LISTA COMPARIDA VUELVE A
-                 FILTRAR. (1) armarEnlacePost arma ahora
-                 urlPages + '/' + token + '.html' (page con OG real
-                 del post; 04 Generador 2.0) y armarEnlace añade el
-                 cache-bust ?v= (timestamp base36): el nombre del
-                 archivo ya NO lleva idPost, así que el ?v= es
-                 seguro otra vez y WhatsApp rescrapea cada enlace
-                 nuevo (corregir la imagen de un post ya compartido
-                 renueva la tarjeta). (2) RECEPTOR LISTA: el
-                 repintado de fondo del aterrizaje (ciudad/chips,
-                 R63) le ganaba la carrera al filtro de la palabra
-                 y el receptor veía el campo con la palabra pero la
-                 lista COMPLETA. aplicarFiltro re-afirma el filtro
-                 en el ciclo siguiente (la palabra es el estado
-                 FINAL del enlace compartido) y Core_Script 1.38
-                 respeta el campo en sus repintados de fondo. Nada
-                 más del receptor cambia.
-                 R124: ENLACE DE POST CAMUFLADO (orden del dueño:
-                 el idPost NO va en la URL — diseño original).
-                 armarEnlacePost arma el token corto
-                 empaquetar('p',[idPost]) y apunta a la PAGE BASE
-                 (urlPages + '/?s=' + token): el MISMO patrón
-                 convalidado del enlace de LISTA. Muere el enlace a
-                 la página gemela con ?v= (timestamp): el idPost
-                 viajaba PLANO en la URL. El receptor tipo 'p' ya
-                 existía (recibirPost → irAPost) — cero cambios en
-                 recepción. Las gemelas /e/ID.html siguen existiendo
-                 para OG/QR (Generador), solo dejan de ser destino
-                 del botón compartir.
-                 R109: FUERA el mensaje hardcodeado de lista (orden
-                 del dueño: los textos de WhatsApp viven en la BD).
-                 Sin plantilla en app.compartir.mensajeListaWhatsapp
-                 el mensaje es SOLO el enlace — el código no inventa
-                  texto. tituloChip sigue (lo usa la plantilla
-                  con [textoBuscado]) y buscarPost sigue (receptor).
-                 R108: (1) urlPages() lee root.app.compartir.urlPages
-                 (nueva ubicación del ROOT) con respaldo en
-                 app.urlPages. (2) El enlace de LISTA apunta a la
-                 page base (urlPages + '/?s=' + token) para que
-                 WhatsApp previsualice el OG POR DEFECTO; la page
-                 reenvía el ?s= y el receptor cae con su lista.
-                 (3) El mensaje de lista sale de
-                 app.compartir.mensajeListaWhatsapp con los
-                 placeholders [ciudad] (UPPERCASE) y [textoBuscado]
-                 (texto del buscador, título del chip si comparte
-                 por chip, o "lista general" si comparte todo); se
-                 puede compartir la lista SIN filtros. (4) El
-                 formato armado previo queda como respaldo si el
-                 ROOT aún no trae la plantilla — respaldo retirado
-                 en R109.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Lista_Script.html (TABLAS.posts,
                  visibilidad de #btnCompartir),
@@ -121,6 +24,8 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  Social_Script.html (urlDePost), Chips_CSS.html
                  (.btn-compartir / .compartida)
 ════════════════════════════════════════════════════════════════════*/
+
+
   window.Compartir = (function () {
 
     /* ============================================================

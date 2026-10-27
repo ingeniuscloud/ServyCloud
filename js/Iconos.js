@@ -11,45 +11,10 @@ RESPONSABILIDAD: Repositorio único de glifos SVG (data URI) y del
                  HOY (reserva: el dueño decide si se borran o se
                  guardan para el futuro).
 VERSIÓN:         2.7.0
-CAMBIOS:         R129: birrete de CURSOS reescalado ×1.1 (orden del
-                 dueño: «un poco más grande, tamaño equivalente a
-                 los otros chips») — solo cambia el d de la clave
-                 cursos (la geometría pasa a ocupar x 1..23, el
-                 mismo ancho que el carrito de Ventas); la config
-                 del registro NO se mueve (viewBox 24, fill none,
-                 stroke currentColor, width 2, puntas round).
-                 R128: MIGRACIÓN TOTAL (orden del dueño: «ningún
-                 SVG hardcodeado»): entran 9 claves que vivían
-                 dibujadas a mano en el sistema — volver (chevron
-                 atrás de lienzos/sheets/Safari), menu (3 puntos
-                 del header), lupa (campo buscar), wifi y
-                 candadoUrl y tresPuntos (chrome del teléfono),
-                 instalar (píldora PWA del cromo), check
-                 (validación de formularios y éxito de reserva) y
-                 lapiz (editar datos de reserva). Reutilizadas SIN
-                 duplicar: close (las 7 X del sistema),
-                 flechaArriba (volver arriba) y like (corazón
-                 volador de Social). Registro: 38 ACTIVAS + 7 en
-                 reserva. Cero SVG dibujado a mano fuera de este
-                 archivo.
-                 R127: (1) Los 4 chips llevan su glifo: servicio y
-                 cursos SUSTITUIDOS por los SVG del dueño adaptados
-                 a la config del registro (viewBox 24, fill none,
-                 stroke currentColor, width 2, puntas redondas; el
-                 de servicio quedó BYTE-IDÉNTICO: era el mismo
-                 trazo) y ENTRAN eventos (micrófono) y ventas
-                 (carrito). (2) glifoDeChip (Chips_Script) resuelve
-                 evento→eventos y venta→ventas. (3) AUDITORÍA de
-                 SVG en todo el sistema → el registro dividido en
-                 2 secciones informativas.
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Ninguna (consumido por Index.html y los módulos que
                  pintan con data-glifo)
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
 
   const IMAGENES = {

@@ -15,17 +15,14 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  respuestas del post en UNA llamada (acción
                  `preguntas`). Sin borrado y sin nombre.
 VERSIÓN:         1.3.0
-CAMBIOS:         R95: en el sheet "Ver todas las preguntas" el fade
-                 pasa a overlay del .mk-sheet y entra el botón
-                 VOLVER ARRIBA (izquierda): el mismo scroll del
-                 content maneja ambos. 0 llamadas a la BD.
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Iconos.html (pintarGlifos), Seccion_Script.html
                  (monta buildHTML/enganchar/cargar), Seccion_CSS.html
                  (infra .mk-sheet-*), Pregunta_CSS.html,
                  Core_CSS.html (clases maestras)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Pregunta = (function () {
 

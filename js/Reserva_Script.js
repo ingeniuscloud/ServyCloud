@@ -3,19 +3,9 @@
 ARCHIVO:         Reserva_Script.html
 ESPEJO GITHUB:   github/js/Reserva_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Orquestador. Abre directo al formulario de horario
-                 + datos. Envía la reserva y maneja errores.
-VERSIÓN:         1.3.0
-CAMBIOS:         R95: (1) PLANJSON NUEVO — el plan llega como array
-                 directo [{dias, horario, cupo}] (getPlanes).
-                 (2) El POST compuesto que viaja al backend es
-                 código_dias_horario con '_' (ej:
-                 EXCEL-001_Lunes a Jueves_5:30 pm a 6:25 pm).
-                 (3) SIN_CUPOS del backend se muestra como
-                 "Cupos agotados. Elige otro horario."
-                 (4) El color del sheet es el colorOficial del
-                  índice (meta.color[0]).
-
+RESPONSABILIDAD: Orquestador de la reserva: abre el sheet, envía la reserva, pinta cada mensaje DEBAJO de su campo (errorCampo/errorFlujo/limpiarErrores) y maneja el reintento.
+VERSIÓN:         1.4.0
+CAMBIOS:         R131: muere banner() — nacen errorCampo/errorFlujo/limpiarErrores: cada mensaje se pinta DEBAJO de su campo (horario → fieldset, privacidad → su check, flujo → cabecera). Sin temporizador: el mensaje vive hasta que el campo cambie o se reintente.
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -25,6 +15,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  (window.Lista), Index.html (SISTEMA.origenes),
                  Iconos.html (pintarGlifos), Reserva_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Reserva = (function () {
 
@@ -50,7 +41,6 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     };
 
     var el = {};
-    var bannerTimeout = null;
 
     function haptic(v) {
       if (navigator.vibrate) { try { navigator.vibrate(v); } catch (e) {} }
@@ -86,23 +76,47 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       return (getPlanes())[i] || null;
     }
 
-    function banner(texto, tipo) {
+    /* ============================================================
+       ERRORES POR CAMPO (R131) · MUERE el banner superior: cada
+       mensaje se pinta DEBAJO de su campo (orden del dueño). Sin
+       temporizador: el mensaje vive hasta que el campo cambie o
+       se reintente. errorFlujo = mensajes sin campo (bajo la
+       cabecera del sheet).
+       ============================================================ */
+    function errorCampo(fieldEl, texto) {
+      if (!fieldEl) return;
+      var slot = (fieldEl.classList && fieldEl.classList.contains('form-error'))
+        ? fieldEl
+        : fieldEl.querySelector('.form-error');
+      if (!slot) return;
+      slot.textContent = texto || '';
+      slot.hidden = !texto;
+    }
+
+    function errorFlujo(texto) {
       var content = Sheet.getContent();
       if (!content) return;
-      var b = content.querySelector('#reservaBanner');
-      if (!b) return;
-      b.textContent = texto;
-      b.className = 'reserva-banner ' + (tipo || 'info');
-      b.hidden = false;
-      clearTimeout(bannerTimeout);
-      bannerTimeout = setTimeout(function () { if (b) b.hidden = true; }, 3200);
+      var f = content.querySelector('#errorFlujo');
+      if (!f) return;
+      f.textContent = texto || '';
+      f.hidden = !texto;
+    }
+
+    function limpiarErrores() {
+      var content = Sheet.getContent();
+      if (!content) return;
+      content.querySelectorAll('.form-error').forEach(function (s) {
+        s.hidden = true;
+        s.textContent = '';
+      });
     }
 
     function recogerEl() {
       var c = Sheet.getContent();
       if (!c) return;
       el = {
-        banner:               c.querySelector('#reservaBanner'),
+        errorFlujo:           c.querySelector('#errorFlujo'),
+        horarioFieldset:      c.querySelector('#horarioFieldset'),
         bloqueDatos:          c.querySelector('#bloqueDatos'),
         inputNombre:          c.querySelector('#inputNombre'),
         fieldNombre:          c.querySelector('#fieldNombre'),
@@ -115,7 +129,9 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
         inputOtp:             c.querySelector('#inputOtp'),
         fieldOtp:             c.querySelector('#fieldOtp'),
         btnSolicitar:         c.querySelector('#btnSolicitarCodigo'),
+        errorSolicitar:       c.querySelector('#errorSolicitar'),
         btnReenviar:          c.querySelector('#btnReenviar'),
+        errorReenviar:        c.querySelector('#errorReenviar'),
         zonaOtp:              c.querySelector('#zonaOtp'),
         bloquePost:           c.querySelector('#bloquePostValidacion'),
         chipsConocio:         c.querySelector('#chipsConocio'),
@@ -135,7 +151,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
 
       window.ReservaDatos.bind(state, el, {
         haptic:              haptic,
-        banner:              banner,
+        errorCampo:          errorCampo,
         onEnviar:            onEnviar,
         mostrarPrivacidad:   mostrarPrivacidad,
         getOrigenPorId:      getOrigenPorId
@@ -219,7 +235,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     function mostrarPrivacidad() {
       var getLegal = (window.Global && typeof window.Global.getLegalHTML === 'function')
         ? window.Global.getLegalHTML : null;
-      if (!getLegal) { banner('No se pudo cargar la política de privacidad', 'error'); return; }
+      if (!getLegal) { errorCampo(el.checkPrivacidadWrap, 'No se pudo cargar la política de privacidad'); return; }
 
       var content = Sheet.getContent();
       var formWrap = content.querySelector('.sheet-form');
@@ -256,9 +272,11 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
        ENVÍO
        ============================================================ */
     function onEnviar() {
+      limpiarErrores();
+
       if (state.reservaError) {
         if (!state.payloadUltimo) {
-          banner('No hay datos para reintentar. Vuelve al formulario.', 'error');
+          errorFlujo('No hay datos para reintentar. Vuelve al formulario.');
           return;
         }
         ejecutarEnvio(state.payloadUltimo);
@@ -266,10 +284,10 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       }
 
       var post = getPostActivo();
-      if (!post) { banner('No hay publicación activa', 'error'); return; }
+      if (!post) { errorFlujo('No hay publicación activa'); return; }
 
       var plan = getTurnoPorIndice(state.turnoSeleccionado);
-      if (!plan || !plan.dias || !plan.horario) { banner('Selecciona un horario válido', 'error'); return; }
+      if (!plan || !plan.dias || !plan.horario) { errorCampo(el.horarioFieldset, 'Selecciona un horario válido'); return; }
 
       state.formSnapshot = {
         nombre:            (el.inputNombre.value || '').trim(),

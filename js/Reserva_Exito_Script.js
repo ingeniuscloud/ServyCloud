@@ -9,27 +9,7 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
 VERSIÓN:         1.7.0
-CAMBIOS:         R130: la línea bajo «¡Felicitaciones!» (y las de los
-                 otros estados) viste .textoPrimario del Core (antes
-                 .subtitulo — orden del dueño). Su centrado propio se
-                 queda (Reserva_Exito_CSS).
-CAMBIOS:         R129: clases maestras del Core en el DOM del éxito: títulos →
-                 .titulo y subtítulos → .subtitulo (3 estados).
-                 R128: el check del éxito sale del registro (data-glifo de check); muere el svg armado a mano. El CSS .exito-check svg sigue vistiendo (grosor 3).
-CAMBIOS:         R114: el Plan de Estudios se simplifica — del
-                 markdown solo se muestran los datos clave:
-                 Inicio, Duración, Inscripción y Pago único /
-                 cada Cuota (arriba la pantalla ya informa el
-                 horario elegido y los datos de la reserva).
-                 Sin sección: la pantalla queda como siempre.
-                 Mismo bloque que viaja al correo del alumno.
-                 R96: la pantalla de éxito muestra el PLAN DE
-                 ESTUDIOS extraído del markdown del post activo
-                 (sección "### Plan de Estudios" hasta el final).
-                 R95: la pantalla de éxito lee el horario del item
-                 del PLANJSON ({dias, horario, cupo}) y el título
-                 directo del índice.
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
                  Index.html (TABLAS), Reserva_CSS.html (clases
@@ -37,12 +17,6 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  (clases reserva-exito/exito-*),
                  Reserva_Script.html (state + callbacks)
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
-
-
 
 
   window.ReservaExito = (function () {

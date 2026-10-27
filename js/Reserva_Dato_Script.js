@@ -3,35 +3,9 @@
 ARCHIVO:         Reserva_Dato_Script.html
 ESPEJO GITHUB:   github/js/Reserva_Dato_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
-                 Bloque 2 = nombre, teléfono, correo, OTP y
-                 post-validación (conocio + privacidad).
-                 OTP delegado a window.ReservaOTP.
-                 Validaciones delegadas a window.ReservaValida.
-                 Título del post leído de seccionPresentacion.titulo
-                 (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.5.0
-CAMBIOS:         R130 · la letra del formulario sale de las clases del
-                 Core (solo letra/tamaño/grosor; efectos y colores
-                 intactos): «Estás reservando…» → .textoPrimario
-                 (antes .subtitulo) · chips del formulario visten su
-                 clase maestra .chipsFormulario (12px · 600) · los
-                 rótulos de sección son LABEL igual que los labels de
-                 los campos (ids horarioLabel/conocioLabel — antes
-                 *Legend; el elemento <legend> se queda por su
-                 posición nativa sobre el borde) · turnos y resúmenes
-                 verdes miden 11px (.cita) con los DÍAS conservando
-                 su 700; verdes intactos.
-                 R129: clases maestras del Core en el DOM del formulario:
-                 «Reservar cupo» → .titulo y «Estás reservando…» →
-                 .subtitulo.
-                 R128: el check y los 2 lápices dejan de ser SVG a mano: .field-check y .form-check-box llevan data-glifo de check y el lápiz sale del registro (data-glifo de lapiz, 16px). El pintado lo hacen los flujos de Reserva (ya pintan tras cada setContent).
-CAMBIOS:         R95: (1) datosPlan lee el PLANJSON nuevo
-                 [{dias, horario, cupo}] — la pintada de opciones
-                 y el texto de cupos por item quedan intactos.
-                 (2) El CTA de confirmar se apaga si el horario
-                 elegido tiene cupo en cero (el backend revalida).
-
+RESPONSABILIDAD: Vista del formulario de reserva: bloque 1 = horario; bloque 2 = nombre, teléfono, correo, OTP y post-validación (¿cómo te enteraste? + privacidad), con slots de error bajo cada campo. OTP delegado a window.ReservaOTP; validaciones a window.ReservaValida.
+VERSIÓN:         1.6.0
+CAMBIOS:         R131: slots .form-error bajo cada campo (nombre, teléfono, correo, OTP, ¿cuál medio?, horario, privacidad) + #errorFlujo bajo la cabecera (fuera el banner superior) · el botón solicitar código viste .botonSecundario · los mensajes se limpian al escribir.
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),
                  Reserva_Sheet_Script.html (window.Sheet),
@@ -39,12 +13,6 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  (state + callbacks), Index.html (SISTEMA.origenes
                  vía state)
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
-
-
 
 
   window.ReservaDatos = (function () {
@@ -83,10 +51,13 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
 
     function getHeaderHTML(nombrePost) {
       return '' +
-        '<div class="reserva-banner" id="reservaBanner" hidden></div>' +
         '<h3 class="form-titulo titulo">Reservar cupo</h3>' +
         '<p class="form-sub textoPrimario">Estás reservando <strong>' + escapeHtml(nombrePost) +
-        '</strong>. Completa tus datos y un asesor te contactará.</p>';
+        '</strong>. Completa tus datos y un asesor te contactará.</p>' +
+        /* R131 · slot de mensajes de FLUJO (sin campo: p.ej. «No hay
+           publicación activa»). Los errores de campo viven debajo
+           de cada campo (.form-error); este vive bajo la cabecera. */
+        '<div class="form-error" id="errorFlujo" hidden></div>';
     }
 
     var PENCIL_BTN =
@@ -180,6 +151,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                 'data-confirmado="' + (confirmado ? '1' : '0') + '" style="' + verde + '">' +
                 '<legend id="horarioLabel"' + label + '>Horario disponible</legend>' +
                 opciones + resumen +
+                '<div class="form-error" hidden></div>' +
               '</fieldset>';
     }
 
@@ -210,6 +182,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                     '<input type="text" id="inputNombre" placeholder=" " class="form-input" autocomplete="name">' +
                     '<label for="inputNombre" class="form-label">Nombre completo</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
+                    '<div class="form-error" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldTelefono">' +
@@ -219,6 +192,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                     '</div>' +
                     '<label for="inputTelefono" class="form-label">Teléfono</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
+                    '<div class="form-error" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldCorreo">' +
@@ -227,6 +201,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                            'autocapitalize="off" autocorrect="off" spellcheck="false">' +
                     '<label for="inputCorreo" class="form-label">Correo electrónico</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
+                    '<div class="form-error" hidden></div>' +
                     '<button type="button" id="btnEditarCorreo" aria-label="Editar correo" data-glifo="lapiz" ' +
                       'style="display:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); ' +
                              'align-items:center; justify-content:center; ' +
@@ -241,17 +216,20 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                     'style="display:none; padding:14px 16px; margin-top:10px; ' +
                            'background:transparent; border:1.5px dashed #cbd5e1; border-radius:12px;"></div>';
 
-      html +=     '<button type="button" class="btn-solicitar-codigo" id="btnSolicitarCodigo" hidden>' +
+      html +=     '<button type="button" class="btn-solicitar-codigo botonSecundario" id="btnSolicitarCodigo" hidden>' +
                     '📧 Solicitar código de validación' +
-                  '</button>';
+                  '</button>' +
+                  '<div class="form-error" id="errorSolicitar" hidden></div>';
 
       html +=     '<div class="zona-otp" id="zonaOtp" hidden>' +
                     '<div class="form-field" id="fieldOtp">' +
                       '<input type="text" id="inputOtp" placeholder=" " class="form-input form-input-otp" ' +
                              'inputmode="numeric" maxlength="6" autocomplete="one-time-code">' +
                       '<label for="inputOtp" class="form-label">Código de validación</label>' +
+                      '<div class="form-error" hidden></div>' +
                     '</div>' +
                     '<button type="button" class="link-reenviar" id="btnReenviar">Reenviar código</button>' +
+                    '<div class="form-error" id="errorReenviar" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="bloque-post-validacion" id="bloquePostValidacion" hidden>';
@@ -304,6 +282,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                         '<input type="text" id="inputConocioOtro" placeholder=" " class="form-input">' +
                         '<label for="inputConocioOtro" class="form-label">¿Cuál medio?</label>' +
                         '<span class="field-check" data-glifo="check"></span>' +
+                        '<div class="form-error" hidden></div>' +
                       '</div>' +
                     '</fieldset>';
 
@@ -318,6 +297,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                           '<button type="button" class="link-privacidad" id="linkPrivacidad">política de privacidad</button>' +
                           ' de Centro Ceicca.' +
                         '</span>' +
+                        '<div class="form-error" hidden></div>' +
                       '</div>' +
                     '</div>';
 
@@ -422,6 +402,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         var ok = validarNombre(v);
         el.fieldNombre.classList.toggle('validado', ok);
         el.fieldNombre.classList.remove('invalido');
+        cb.errorCampo(el.fieldNombre, '');
         actualizarEstadoFormulario();
       });
       el.inputNombre.addEventListener('focus', function () { el.fieldNombre.classList.add('activo'); });
@@ -435,6 +416,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         var ok = validarTelefono(v);
         el.fieldTelefono.classList.toggle('validado', ok);
         el.fieldTelefono.classList.remove('invalido');
+        cb.errorCampo(el.fieldTelefono, '');
         actualizarEstadoFormulario();
       });
       el.inputTelefono.addEventListener('focus', function () { el.fieldTelefono.classList.add('activo'); });
@@ -457,6 +439,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         el.fieldCorreo.classList.toggle('activo', v.length > 0 || document.activeElement === this);
         var ok = validarCorreo(v);
         el.fieldCorreo.classList.remove('validado', 'invalido');
+        cb.errorCampo(el.fieldCorreo, '');
+        cb.errorCampo(el.errorSolicitar, '');
         el.btnSolicitar.hidden = !ok;
         if (v.length > 0) el.fieldCorreo.classList.add('activo');
 
@@ -493,7 +477,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
 
       window.ReservaOTP.init(state, el, {
         haptic:           cb.haptic,
-        banner:           cb.banner,
+        errorCampo:       cb.errorCampo,
         onEstadoCambiado: actualizarEstadoFormulario
       });
 
@@ -584,6 +568,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         var v = this.value;
         el.fieldConocioOtro.classList.toggle('activo', v.length > 0 || document.activeElement === this);
         el.fieldConocioOtro.classList.toggle('validado', v.trim().length > 0);
+        cb.errorCampo(el.fieldConocioOtro, '');
         actualizarEstadoFormulario();
       });
       el.inputConocioOtro.addEventListener('focus', function () { el.fieldConocioOtro.classList.add('activo'); });
@@ -591,7 +576,10 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
 
       el.inputPrivacidad.addEventListener('change', function () {
         cb.haptic(6);
-        if (this.checked) el.checkPrivacidadWrap.classList.remove('error');
+        if (this.checked) {
+          el.checkPrivacidadWrap.classList.remove('error');
+          cb.errorCampo(el.checkPrivacidadWrap, '');
+        }
         actualizarEstadoFormulario();
       });
 

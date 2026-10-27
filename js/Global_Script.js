@@ -17,32 +17,12 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Guardia anti-loop de token: corta a los 3 intentos.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
-                 Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp)
-                 y ventanaVigente (R108: ESTRICTA — exige ambos
-                 extremos válidos; fecha sola o fecha + hora;
-                 "24:00" = medianoche — usada por promo y openAd).
-                 Global_Sheet_Script.html.
+                 aplicarPlaceholders y ventanaVigente
 VERSIÓN:         1.17.0
-CAMBIOS:         R109: GEMELO SINCRONIZADO con el GAS: entra la
-                 ventanaVigente ESTRICTA de R108 que este js/ nunca
-                 recibió (el GAS la corrigió y aquí quedó la R98
-                 tolerante: un extremo roto dejaba la ventana
-                 "abierta" y el openAd se mostraba fuera de
-                 horario). Ahora exige inicia+termina válidos;
-                 termina con fecha sola = día completo y "24:00" =
-                 medianoche.
-                 R98: ventanaVigente(inicia, termina) — compara con
-                 el RELOJ DEL TELÉFONO; "inicia" acepta fecha o
-                 fecha+hora (sin hora = desde 00:00), "termina"
-                 acepta fecha (vigente todo el día) o fecha+hora.
-                 Fechas inválidas no bloquean: fallan abiertas.
-                 R95: (1) La pantalla de error de token ya no lleva
-                 botón ni pie de WhatsApp — queda la invitación a
-                 cerrar y reabrir la app. (2) Fuera 'cupos' de
-                 ACCIONES_IDEMPOTENTES (acción retirada).
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
 ════════════════════════════════════════════════════════════════════*/
+
 
   /* ============================================================
      HELPERS GLOBALES · Backend

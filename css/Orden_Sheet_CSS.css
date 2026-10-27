@@ -3,55 +3,10 @@
 ARCHIVO:         Orden_Sheet_CSS.html
 ESPEJO GITHUB:   github/css/Orden_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
-                 botón ordenar (#btnOrdenar, fila 1 de la sección
-                 filtros — Chips_CSS). Misma familia visual del
-                 sheet de ciudad (R65, modelo nativo que trajo el
-                 dueño): sheet BLANCO al 90% máximo con esquinas
-                 superiores 22px, HANDLE 36×5 #dee2e6, título
-                 centrado (tipografía .titulo del Core, R129) y
-                 STACK VERTICAL de tarjetas
-                 (borde #eef0f2, radio 18px) — cada opción con su
-                 ICONO en pastilla suave, título, descripción y el
-                 check verificado SOLO en la activa. Activa:
-                 degradado tinte naranja→blanco + borde NARANJA
-                 oficial (#f97316, jamás azul). Táctil: la tarjeta
-                 se encoge 3% al presionar (rebote nativo, sin el
-                 recuadro gris de Android/Safari) y las opciones
-                 entran escalonadas (puntos con vida, R63).
-                 Altura FIJA al 90% (R68): abre a la MISMA altura
-                 que el sheet de reserva (.sheet, Global_CSS) y el
-                 de ciudad — la fila de opciones queda arriba y el
-                 resto del sheet es blanco; el contenido scrollea
-                 si hiciera falta (.ordenar-content).
-                 La estructura raíz/backdrop/handle/close replica
-                 a Ciudad_Sheet_CSS (módulos hermanos).
-VERSIÓN:         1.5
-CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
-                 (orden del dueño): muere el centrado local del R129
-                 — solo los sheets del MENÚ GLOBAL van centrados
-                 (tienen botón volver). La letra sigue saliendo de
-                 .titulo del Core (22px · 300, que ya trae la
-                 alineación izquierda). Nada más cambia.
-                 R129: unificación tipográfica del sheet — la letra la mandan
-                 .titulo / .subtitulo / .textoPrimario del Core
-                 (colocadas por Orden_Sheet_Script); aquí muere el
-                 font-size/weight/color local (código muerto) y solo
-                 queda layout (centrado, recortes, márgenes). El
-                 naranja del estado activo gana con !important.
-                 R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+RESPONSABILIDAD: Estilos del bottom sheet de orden: stack vertical de opciones (icono, título, descripción, píldora .badgeActivo), estado activo y responsive.
+VERSIÓN:         1.6
+CAMBIOS:         R131: MUERE el check naranja (.ordenar-check + @keyframes ordenarCheckIn + su regla responsive) y entra la píldora .badgeActivo del Core con su aparición suave (ordenarBadgeIn); aquí queda SOLO el estado. Código muerto eliminado.
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
   /* ============================================================
      ROOT DEL SHEET
@@ -193,8 +148,8 @@ CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
      OPCIONES · STACK NATIVO (hermana de .ciudad-tarjetas)
      Tarjetas apiladas verticalmente (flex column, gap 12):
      blanca, borde fino #eef0f2, esquinas 18px. Fila: icono en
-     pastilla suave + título con descripción + check verificado
-     (SOLO la activa lo muestra). ACTIVA: degradado tinte
+     pastilla suave + título con descripción + píldora .badgeActivo
+     (SOLO la activa la muestra). ACTIVA: degradado tinte
      naranja→blanco + borde #f97316 + icono y título naranjas
      (NARANJA OFICIAL, jamás azul). Táctil: la tarjeta se
      encoge 3% al presionar (rebote nativo) y cada opción
@@ -305,25 +260,19 @@ CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
     display: block;
   }
 
-  /* Check de la activa · SOLO visible en la tarjeta activa
-     (verificado de Iconos: círculo relleno naranja con paloma
-     blanca). Con animación de aparición para que la elección
-     se SIENTA. */
-  .ordenar-check {
-    flex-shrink: 0;
-
-    display: none;
-    width: 22px;
-    height: 22px;
-    color: #f97316;
-
-    animation: ordenarCheckIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Píldora «Activo» de la tarjeta activa · R131: MUERE el check
+     naranja (verificado + su animación) y entra la MISMA píldora
+     del sheet Ciudad. La PÍLDORA COMPLETA vive en la clase
+     maestra .badgeActivo del Core; aquí queda SOLO el estado:
+     oculta en reposo, visible en la activa, con una aparición
+     suave para que la elección se SIENTA. */
+  .ordenar-card .badgeActivo { display: none; }
+  .ordenar-card.activa .badgeActivo {
+    display: inline-block;
+    animation: ordenarBadgeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .ordenar-check svg { width: 100%; height: 100%; display: block; }
 
-  .ordenar-card.activa .ordenar-check { display: block; }
-
-  @keyframes ordenarCheckIn {
+  @keyframes ordenarBadgeIn {
     from { opacity: 0; transform: scale(0.5); }
     to   { opacity: 1; transform: scale(1); }
   }
@@ -333,7 +282,7 @@ CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
       animation: none;
       opacity: 1;
     }
-    .ordenar-check { animation: none; }
+    .ordenar-card .badgeActivo { animation: none; }
   }
 
   /* ============================================================
@@ -345,5 +294,4 @@ CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
     .ordenar-card { padding: 12px; gap: 10px; }
     .ordenar-icono { width: 34px; height: 34px; border-radius: 10px; }
     .ordenar-icono svg { width: 17px; height: 17px; }
-    .ordenar-check { width: 20px; height: 20px; }
   }

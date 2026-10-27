@@ -10,31 +10,7 @@ RESPONSABILIDAD: Cromo de la página estática: preloader orbital,
                  service worker. Nació con el envoltorio (R26); el
                  dueño no necesita tocarlo.
 VERSIÓN:         1.3
-CAMBIOS:         R101 (falla del dueño en el teléfono): mientras el
-                 preloader vive se pone la clase
-                 html.preloader-activo y al retirarse se quita — el
-                 CSS pinta con ella el fondo del documento con el
-                 mismo degradado naranja y la franja del estado del
-                 teléfono deja de verse blanca (detalle en
-                 GitHub_Cromo.css). Nada más cambia.
-                 R86: MODO MANUAL de instalación: en Androids Go/
-                 básicos (Redmi A3x y compañía) Chrome NO dispara
-                 beforeinstallprompt (no crea WebAPK) y el menú
-                 ni siquiera muestra "Instalar aplicación": la
-                 píldora aparece TAMBIÉN sin el boleto, en modo
-                 "¿Cómo instalar?", y enseña el camino a mano
-                 (⋮ → Añadir a pantalla de inicio) en un panel de
-                 3 pasos. Si el boleto llega tarde, la píldora
-                 vuelve sola al modo nativo. El index no cambia:
-                 el panel lo crea este archivo y lo viste
-                 GitHub_Cromo.css.
-                 R33: el boleto de instalación se comparte en
-                 window.__servyBoleto para que el ítem "Instalar la
-                 app" del menú (Global_Menu_Script) pueda abrir el
-                 diálogo nativo sin capturarlo de nuevo; la píldora
-                 consume con try/catch porque el menú puede canjear
-                 el boleto primero.
-                 R29: extraído del monolito v4.1 byte a byte.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.js (asegurarSesion) · Ciudad_Sheet_
                  Script.js (reinicializar) · css/GitHub_Cromo.css ·
                  sw.js · manifest.json. Debe cargarse ÚLTIMO.

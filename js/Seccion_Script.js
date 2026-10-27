@@ -11,12 +11,7 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
 VERSIÓN:         2.11.0
-CAMBIOS:         R121: la promo del post lee la estructura nueva
-                 SISTEMA.promo.titulares (items con SU ciudad,
-                 vacío [] = todas, y fechas con o sin hora via
-                 ventanaVigente, con el activo del bloque). El
-                 formato WhatsApp del texto y todo lo demás quedan
-                 intactos.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -25,6 +20,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  Chips_Script (window.Chips), Seccion_CSS.html,
                  Pregunta_CSS.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
+
   window.Secciones = (function () {
 
     var postActivo = null;

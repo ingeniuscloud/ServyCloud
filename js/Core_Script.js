@@ -13,55 +13,7 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
 VERSIÓN:         1.38.0
-CAMBIOS:         R126: EL REPINTADO DE FONDO RESPETA LA BÚSQUEDA.
-                 _revalidarCatalogo (caché L2: el catálogo llegó
-                 distinto al guardado) repintaba con
-                 Lista.pintar(chip, null) y BORRABA el filtro de la
-                 palabra: en un enlace de LISTA COMPARTIDA ese
-                 repintado asíncrono le ganaba al aterrizaje y el
-                 receptor veía el campo buscar con la palabra pero
-                 la lista COMPLETA (bug del dueño). Ahora usa el
-                 MISMO carril que Lista en ciudad:change /
-                 orden:change: si el campo trae texto pinta la
-                 búsqueda (pintarBusqueda), si no pinta el chip
-                 activo. Nada más cambia.
-CAMBIOS:         R119: chequeo VIVO de meta.expira al armar
-                 TABLAS.posts (helper propio _postExpiraVivo_,
-                 reloj del teléfono, misma gramática de
-                 _parseVentana R108): un post cuya ventana
-                 expiró DESPUÉS de que el catálogo llegó al
-                 dispositivo deja de existir en todas las
-                 superficies sin esperar la próxima descarga
-                 (cubre el hueco TTL). Sin expira o ilegible =
-                 siempre visible (compatibilidad). Los chequeos
-                 de estado viejos quedan intactos como red.
-                 R111: (1) El catálogo NO trae la imagen del
-                 item (el avatar del lienzo es solo la inicial
-                 del título, sin foto): CacheL2 ENV_VERSION
-                 regresa a 3 y el dispositivo que bajó el
-                 catálogo con imagen lo renueva UNA vez.
-                 (2) El skeleton de lista espeja la anatomía del
-                 item (avatar a la izquierda).
-                 R110: Capa 1 GA4 resucitada — desde R105 (app
-                 única, sin envoltorio/iframe) window.Puente ya no
-                 existe y el guard viejo mataba TODOS los eventos
-                 client-side (app_ready, post_open, whatsapp_click,
-                 like, promo_click, intersticial_view…): a GA4 solo
-                 entraban los page_view. Sin puente, los eventos
-                 van DIRECTOS a gtag de index.html; con puente
-                 (legado) se retransmiten como antes.
-                 R100: CacheL2 ENV_VERSION pasa a 3 — el
-                 dispositivo se trae catálogo y detalles UNA vez
-                 tras desplegar (arranque limpio garantizado:
-                 el snapshot viejo pudo nacer de un SISTEMA a
-                 medias mientras la BD se editaba).
-                 R98: (1) La lista blanca de GA4 suma
-                 intersticial_view e intersticial_click (el ad de
-                 apertura los emite). (2) CacheL2 ENV_VERSION pasa
-                 a 2: el catálogo ahora trae el bloque promo del
-                 POSTJSON en cada post — el envoltorio viejo se
-                 descarta solo una vez y se re-descarga fresco.
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -69,6 +21,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Reserva_Script.html y hojas de reserva,
                  Iconos.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
+
+
 
   /* ============================================================
      CACHEL2 · capa del dispositivo

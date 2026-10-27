@@ -9,85 +9,8 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  (bloque { activo, items[] }) y si HOY toca, monta
                  la capa sobre la app mientras termina de cargar:
                  creativo 9:16 protagonista con fondo tenue detrás.
-                 R122 · LA PINTURA VIVE DENTRO DEL TELÉFONO: la capa
-                 se monta DENTRO del vidrio del simulador (.glass,
-                 posición absoluta): en la PC se recorta por el marco
-                 y se ve EXACTO a lo que verá el teléfono real (el
-                 teléfono de la PC es el filtro visual del dueño);
-                 en un teléfono real el vidrio es pantalla completa
-                 y nada cambia. Sin vidrio imprevisto, respaldo:
-                 capa fija en el body (.openad-fijo).
-                 CADA ITEM ES UNA CAMPAÑA de un anunciante (contrato
-                 propio): idOpenAd, ciudad[], imagen, esperaX,
-                 cierreAutomatico, idPost, telefonoWhatsapp,
-                 mensajeWhatsapp y ventanas[{inicia, termina}] con
-                 fecha+hora. Filtros del teléfono (red de seguridad:
-                 el backend ya decidió AL SERVIR): bloque inactivo
-                 nada · ventana estricta (ventanaVigente, reloj del
-                 teléfono) · ciudad del item (vacío = todas; el
-                 backend no conoce la ciudad activa) · item CON
-                 idPost exige el post en el catálogo y activo/pronto
-                 (MISMO tratamiento que titulares: post muerto =
-                 anuncio no se carga; catálogo aún no cargado = se
-                 confía en el backend, el ad no frena el boot) · el
-                 eventual SIN idPost se rige solo por sus ventanas y
-                 abre WhatsApp con SU teléfono y SU mensaje · varios
-                 vigentes a la vez → rotación POR CARGA por turno
-                 (el teléfono recuerda el último mostrado en
-                 localStorage y pasa al siguiente; si solo hay uno,
-                 ese). R122 · EL CTA ES LA MISMA IMAGEN: el botón
-                 naranja MURIÓ — tocar la imagen abre el destino
-                 (idPost lleno → post directo; vacío → WhatsApp con
-                 los datos DEL anuncio) y el anuncio se cierra con
-                 fade-out. Sin destino la imagen no es clic. CADA CLIC
-                 dispara el aviso avisoOpenAd al backend → Telegram
-                 del admin ("nueva entrada al Open Ad" + idOpenAd +
-                 fecha y hora), FIRE-AND-FORGET: nunca bloquea ni
-                 tumba la acción del usuario. R122 · LOS TIEMPOS MANDA
-                 EL ANUNCIO (milisegundos, cada campaña es individual):
-                 esperaX → la X de cerrar aparece con FADE-IN tras esa
-                 espera · cierreAutomatico → el anuncio se cierra SOLO
-                 tras ese tiempo VISIBLE, con FADE-out fijo del
-                 sistema. Ley de la X (reglas cerradas del dueño): la
-                 X SIEMPRE aparece — (R-a) esperaX ausente/inválido →
-                 X al instante · (R-c) cierreAutomatico ≤ esperaX → se
-                 anula la espera · y (R-b) cierreAutomatico
-                 ausente/inválido/≤0 → 10000 ms por defecto · (R-d) los
-                 DOS relojes son INDEPENDIENTES: el cierre automático
-                 NUNCA depende de la X; si la X fallara por cualquier
-                 motivo, el anuncio se cierra igual en su tiempo. La
-                 imagen viaja de Drive a lh3 directo y si tarda más de
-                 6s no molesta: la app carga normal. En GitHub Pages
-                 SISTEMA llega POR DATOS: espera la sesión y
-                 re-intenta UNA sola vez.
 VERSIÓN:         1.8.0
-CAMBIOS:         R129: fuera el teclado de escritorio — Escape del documento y
-                 Enter/espacio del img (con su role/tabindex) no
-                 existen en teléfonos (orden del dueño). Cierra la X
-                 y los relojes; aria-label se queda (VoiceOver lo
-                 lee al tocar).
-                 R128: la X del openAd sale del registro (data-glifo close) y la capa se pinta al armarse. El CSS .openad-cerrar svg sigue mandando (blanca, 2.6).
-CAMBIOS:         R122: (1) La capa se monta DENTRO del vidrio del
-                 simulador (.glass) con posición absoluta: en la PC el
-                 marco recorta el openAd y el dueño ve en su filtro
-                 visual EXACTO lo que verá el teléfono; en móvil real
-                 el vidrio es pantalla completa (mismo camino de
-                 código). (2) EL CTA ES LA IMAGEN: muere el botón
-                 naranja y su texto — tocar la imagen abre el
-                 destino (post directo o WhatsApp del anuncio) y el
-                 anuncio se cierra con fade-out; sin destino, la
-                 imagen no es clic. (3) esperaX (ms): la X aparece con
-                 fade-in tras esa espera, cada anuncio es individual;
-                 esperaX ausente/inválido → X al instante (la X
-                 SIEMPRE existe). (4) cierreAutomatico (ms): el
-                 anuncio se cierra solo tras ese tiempo visible con
-                 fade-out fijo del sistema; ausente/inválido/≤0 →
-                 10000 ms; cierreAutomatico ≤ esperaX → la espera de
-                 la X se anula. (5) Relojes INDEPENDIENTES: el cierre
-                 automático nunca depende de la X. (6) El aviso
-                 avisoOpenAd y el throttle siguen intactos en cada
-                 clic. (7) Formato nuevo únicamente.
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  (ventanaVigente, abrirWhatsapp, postBackend,
                  asegurarSesion), Seccion_Imagen_Script.js
@@ -95,10 +18,6 @@ DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  seleccionar), Ciudad_Script.js (getActual),
                  Telefono.css (.glass anfitrión), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
 
 
   window.OpenAd = (function () {

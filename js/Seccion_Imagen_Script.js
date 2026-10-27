@@ -7,41 +7,15 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                  · Helpers de URL (Drive → lh3, normalización).
                  · Normalización del array de capturas.
                  · Carrusel compacto centrado con dots (patrón
-                   Instagram).
+                 Instagram).
                  · Lightbox fullscreen sobre <dialog> nativo:
-                   pinch zoom anclado al midpoint, doble tap,
-                   pan de un dedo, swipe-down para cerrar y
-                   cierre al tocar el fondo.
+                 pinch zoom anclado al midpoint, doble tap,
+                 pan de un dedo, swipe-down para cerrar y
+                 cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
 VERSIÓN:         1.4.0
-CAMBIOS:         R128: la X del lightbox sale del registro (data-glifo close) y se pinta al construir el diálogo. El CSS .lightbox-close svg sigue mandando.
-CAMBIOS:         R94: L2 PROPIA DE LAS IMÁGENES — el cache HTTP del
-                 navegador no siempre conserva las fotos (en el
-                 teléfono cada visita al mismo post volvía a
-                 bajarlas: parecía que no se guardaba nada).
-                 poblarConL2 alimenta cada imagen del hero:
-                 la 1ª vez la descarga y la guarda en Cache API
-                 (servy-img-v1, tope 40, recorte de la más vieja);
-                 a partir de ahí pinta desde DISCO sin tocar la
-                 red (blob), aunque el navegador tire su cache
-                 HTTP. La clave usa el ID de la foto de Drive (no
-                 la URL completa) para sobrevivir a URLs que
-                 cambian. Sin Cache API o ante cualquier fallo
-                 (CORS, cuota): la imagen carga por su URL de
-                 siempre. El lightbox pasa por la misma L2.
-                 R92: PESO DE LA IMAGEN — urlImagenDirecta pide
-                 ahora las fotos de Drive a lh3 con =w1600 (las
-                 /d/ crudas sirven el archivo a tamaño completo,
-                 fotos de varios MB: por eso la imagen tardaba en
-                 aparecer la primera vez). 1600px cubre el hero
-                 del teléfono con 2-4x de densidad y el lightbox;
-                 la descarga baja de megas a cientos de KB. Si la
-                 URL ya trae su propio =tamaño se respeta; las
-                 que no son de Drive pasan intactas.
-                 R77.1: El método enganchar() ahora también
-                 detecta la clase .post-hero-img para que el
-                 Lightbox funcione en el nuevo lienzo del post.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
                  Seccion_Imagen_CSS.html (clases lightbox-*)
 ════════════════════════════════════════════════════════════════════*/

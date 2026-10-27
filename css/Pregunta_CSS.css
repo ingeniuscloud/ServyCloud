@@ -12,13 +12,7 @@ RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
                  fecha y firma del partner) y el sheet al 90%
                  para ver todas con SKELETON de carga.
 VERSIÓN:         1.2.0
-CAMBIOS:         R95: el fade del sheet "Ver todas" pasa a overlay
-                 absoluto del .mk-sheet (era hijo del content y se
-                 desplazaba con el scroll): el degradado vive
-                 SIEMPRE pegado al borde inferior visible del
-                 sheet. El content pierde su position:relative
-                 (ya no ancla nada).
-
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
                  Seccion_CSS.html (infra .mk-sheet-* del sheet),
                  Social_CSS.html (colores del post vía --post-color)

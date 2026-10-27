@@ -3,52 +3,13 @@
 ARCHIVO:         Global_Sheet_Script.html
 ESPEJO GITHUB:   github/js/Global_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
-                 jerarquía (marca de la app protagonista arriba,
-                 crédito de INGeniusCloud abajo) y subvistas
-                 "Acerca de", "Términos y condiciones", "Privacidad"
-                 y "Cookies" interpolando datos de ROOTJSON, más la
-                 ayuda de instalación (R63: guía con pestañas
-                 ANDROID / IPHONE y TIMELINE animado de pasos — las
-                 2 versiones juntas, vistiendo el color oficial;
-                 R64: SIEMPRE muestra su contenido — si la app ya
-                 está instalada, el aviso vive DENTRO de la
-                 pantalla como banner; Android no instalada lleva
-                 botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.15.0
-CAMBIOS:         R130: las pestañas Android/iPhone de la guía PWA
-                 visten su clase maestra .chipsFormulario (Core 2.13,
-                 la misma letra de los chips del formulario: 12px ·
-                 600; sus colores gris/naranja quedan intactos).
-                 R129: clases maestras del Core en el DOM — «Menú» y títulos
-                 con icono → .titulo, filas del menú → .subtitulo,
-                 subtítulo del asesor y detalles PWA → .textoPrimario,
-                 contenido legal envuelto en .textoPrimario. «Acerca
-                 de» subvista: INTACTA (exenta por el dueño).
-                 R128: el esqueleto ya no dibuja su SVG: close, volver y volver-arriba salen del registro (data-glifo) y el esqueleto se pinta en construirDOM (pintarGlifos(raiz)); el content se sigue pintando igual.
-CAMBIOS:         R96: (1) el botón Volver del sheet es el MISMO de
-                 los lienzos: círculo con chevron a la izquierda
-                 (el estilo lo pinta Global_CSS); (2) fuera el
-                 texto "Volver" de la cabecera (el botón se
-                  explica solo); (3) el volver-arriba vive abajo a
-                  la derecha (Core_CSS). Volver siempre visible en
-                  subvista.
-                 R95: VOLVER ARRIBA en el menú global — botón circular
-                 (.mk-sheet-top del Core) que
-                 aparece pasados ~120px de scroll y sube suave al
-                 tocar. En subvista comparte esquina con Volver
-                 (sheet.profundo lo alterna). 0 llamadas a la BD.
-
+RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con jerarquía (marca arriba, crédito abajo), subvistas «Acerca de», «Términos y condiciones», «Privacidad» y «Cookies» interpolando ROOTJSON, guía de instalación PWA (pestañas Android/iPhone, pasos, botón instalar) y drag de cierre.
+VERSIÓN:         1.16.0
+CAMBIOS:         R131: el texto bajo el título de instalar app viste .textoPrimario (antes .subtitulo).
 DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
 ════════════════════════════════════════════════════════════════════*/
-
-
-
-
-
-
 
 
   /* ============================================================
@@ -544,7 +505,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
       }
 
       if (cfg.subtitulo) {
-        html += '<p class="pwa-sub subtitulo">' + cfg.subtitulo + '</p>';
+        html += '<p class="pwa-sub textoPrimario">' + cfg.subtitulo + '</p>';
       }
 
       if (plataformas.length > 1) {

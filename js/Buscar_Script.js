@@ -2,10 +2,11 @@
 
 ARCHIVO:         Buscar_Script.html
 ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   js/Buscar_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  vez en la FILA 1 de la sección de filtros (sin
-                  estados de apertura).
+                 estados de apertura).
                  Al escribir emite 'buscar:change' con el término
                  y el flag de límite alcanzado, y enciende la X
                  circular naranja (.con-texto en la cápsula) que
@@ -16,35 +17,13 @@ RESPONSABILIDAD: Campo de búsqueda (R64): vive EXPANDIDO de una
                  (el trabajo que hacía CANCELAR — libera la
                  vista). Límite: 40 chars.
 VERSIÓN:         2.2
-CAMBIOS:         R70-B: EL FRAGMENTO VUELVE A LLEVAR SU ENVOLTORIO. La entrega
-                 R70 pegaba este JS sin las etiquetas <script> propias
-                 que TODO fragmento GAS trae desde siempre: el
-                 include() lo vertía como TEXTO en la página. El cuerpo
-                 NO cambia una línea: sigue el fix R70 completo (la X
-                 limpia y suelta el foco para cerrar el teclado). En
-                 GAS: pega el archivo COMPLETO en el archivo
-                 Buscar_Script (lleva sus <script>...</script>).
-                 R70: la X QUITA EL FOCO del campo (input.blur())
-                 al limpiar — orden del dueño: el teclado virtual
-                 del teléfono se CIERRA al tocar la X (antes el
-                 blur lo re-enfocaba con input.focus() y el
-                 teclado seguía abierto). El blur corre SIEMPRE,
-                 también en modo compartido. Resto intacto.
-                 R64: el campo NO se abre ni se cierra (siempre
-                 visible) — fuera abrir()/cerrar()/abrir capsula,
-                 la lupa-botón (#btnBuscar) y el texto CANCELAR
-                 (#btnCancelarBusqueda) con el evento
-                 'buscar:estado' (nadie lo consume ya); entra la
-                 X (#btnLimpiarCampo): aparece al escribir y
-                 limpia el campo — en modo compartido libera la
-                 vista (mismo trabajo de siempre).
-                 R61: el placeholder lo pinta Core_Script desde
-                 app.placeholderBuscar.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (estructura .filtros-fila),
                  Chips_Script.html (window.Chips), Lista_Script.html
                  (window.Lista.getPostActivo),
                  Compartir_Script.html (estaCompartido/limpiar)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Buscar = (function () {
 

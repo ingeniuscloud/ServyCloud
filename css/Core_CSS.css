@@ -3,42 +3,9 @@
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía
-                 maestra y de la voz única de los placeholders.
-VERSIÓN:         2.13
-CAMBIOS:         R130: NACEN 2 CLASES MAESTRAS NUEVAS (orden del dueño):
-                 .chipsFiltros (14px/300, color dinámico — la letra de
-                 los chips del lienzo principal) y .chipsFormulario
-                 (12px/600, color dinámico — la letra de los chips del
-                 formulario y de las pestañas Android/iPhone de la
-                 guía PWA). Como .badge: SOLO letra (tamaño+peso);
-                 el color lo conserva cada elemento. Variables propias
-                 en :root (--size/weight-chipsFiltros /
-                 --size/weight-chipsFormulario): un solo archivo manda.
-                 R111: .mk-sheet-top (VOLVER ARRIBA de los bottom
-                 sheets) en TONO TENUE: borde #cbd5e1, flecha
-                 #94a3b8 y sombra más suave — el color fuerte
-                 friccionaba con el texto del sheet. Tamaño,
-                 ubicación y comportamiento intactos.
-                 R98.1: RESTAURACIÓN (orden del dueño) del
-                 degradado del documento en body.is-mobile — el
-                 bloque R70 exacto: color sólido #fdf3ec para la
-                 franja + degradado R69 (clarito arriba, blanco
-                 desde 30%). Una ronda intermedia lo dejó en
-                 blanco plano y el arranque/preloader perdía su
-                 degradado original. El LIENZO (.area-contenido)
-                 no cambia. R96: .mk-sheet-top (VOLVER ARRIBA de los bottom
-                 sheets) pasa a la ESQUINA INFERIOR DERECHA — la
-                 ubicación estándar de apps y web que el dueño
-                 pidió restituir — con fondo blanco y sombra para
-                 leerse sobre el fade y sobre cualquier contenido.
-                 R95: Clase compartida .mk-sheet-top — el botón
-                 VOLVER ARRIBA de los bottom sheets (el mismo
-                 círculo del volver de la app: 34px, borde fino,
-                 flecha hacia arriba). Aparece solo cuando hay scroll abajo
-                 (.visible la pone cada sheet) y desaparece al
-                 llegar arriba. 0 llamadas a la BD, 0 temporizadores.
-
+RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
+VERSIÓN:         2.14
+CAMBIOS:         R131: NACE la clase maestra .badgeActivo (Core 2.14) — la PÍLDORA COMPLETA (letra 11px · 600 + fondo #f97316 + blanco + padding 5px 12px + radio 20px) que marca la opción activa en los sheets Ciudad y Ordenar; variables --size/weight-badgeActivo en :root. Un solo sitio manda.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -68,6 +35,11 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        formulario). La clase solo manda tamaño y peso. */
     --size-chipsFiltros: 14px;    --weight-chipsFiltros: 300;
     --size-chipsFormulario: 12px; --weight-chipsFormulario: 600;
+
+    /* R131 · BADGE ACTIVO · la píldora completa (letra + forma +
+       color) que marca la opción activa: badge «Activo» del sheet
+       Ciudad y del sheet Ordenar. Un solo sitio manda. */
+    --size-badgeActivo: 11px;     --weight-badgeActivo: 600;
 
     /* ============================================================
        FAMILIA UI · tamaños recurrentes de sheets y controles
@@ -207,6 +179,26 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .chipsFormulario {
     font-size: var(--size-chipsFormulario) !important;
     font-weight: var(--weight-chipsFormulario) !important;
+  }
+
+  /* ============================================================
+     R131 · BADGE ACTIVO · píldora «Activo» (la del sheet Ciudad,
+     ahora también en Ordenar). La clase lleva la PÍLDORA COMPLETA:
+     letra (11px · 600), fondo naranja, blanco, padding y radio.
+     El visible/invisible NO va aquí: es estado de cada sheet
+     (.ciudad-card.activa / .ordenar-card.activa encienden la suya).
+     ============================================================ */
+  .badgeActivo {
+    font-size: var(--size-badgeActivo) !important;
+    font-weight: var(--weight-badgeActivo) !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    background: #f97316 !important;
+    color: #ffffff !important;
+    padding: 5px 12px !important;
+    border-radius: 20px !important;
+    flex-shrink: 0 !important;
   }
 
   /* ============================================================

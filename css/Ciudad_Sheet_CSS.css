@@ -3,63 +3,10 @@
 ARCHIVO:         Ciudad_Sheet_CSS.html
 ESPEJO GITHUB:   github/css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R127: vive
-                 en la FILA 1 de la sección de filtros, a la
-                 IZQUIERDA del campo buscar — pin + nombre de la
-                 ciudad, SIN fondo, borde suave y delgado; NO
-                 compite con el campo: mide lo suyo (flex 0 1
-                 auto, tope 45%) y su nombre se recorta si es
-                 largo) y del bottom sheet de selección (R65:
-                 STACK VERTICAL de tarjetas nativas — diseño que
-                 trajo el dueño de una app popular —: nombre en
-                 negrita con el badge "Activo" a la derecha y,
-                 debajo, las tres etiquetas de métricas en pills
-                 horizontales (8 Servicios · 7 Cursos · 5
-                 Promos, la de Promos destacada); la tarjeta
-                 activa viste degradado tinte→blanco + borde
-                 NARANJA oficial + badge visible + pills
-                 naranjas; feedback táctil de rebote
-                 (scale 0.97). Jamás azul). Sheet al 90%. Modo
-                 bloqueado para primera selección sin ciudad
-                 guardada. Aviso de cookies de esa primera
-                 carga: icono a la izquierda del texto y botón
-                 Aceptar debajo.
-VERSIÓN:         1.13
-CAMBIOS:         R130: el título del sheet pasa a la IZQUIERDA
-                 (orden del dueño): muere el centrado local del R129
-                 — solo los sheets del MENÚ GLOBAL van centrados
-                 (tienen botón volver). La letra sigue saliendo de
-                 .titulo del Core. El botón city-bar ya medía con
-                 .textoPrimario (R127): intacto. Nada más cambia.
-                 R129: unificación tipográfica del sheet — .titulo /
-                 .subtitulo / .textoPrimario del Core mandan la
-                 letra; muere el font-size/weight/color local
-                 (código muerto). Los pills de métricas y el badge
-                 son controles: NO se tocan. El naranja activo gana
-                 con !important.
-                 R127: la ciudad pasa de la fila de chips a la
-                 FILA 1 del lienzo (a la izquierda del campo
-                 buscar, orden del dueño): su ancho deja de ser
-                 un tercio — mide LO SUYO (flex 0 1 auto) con
-                 tope 45% para que el campo nunca quede apretado;
-                 en modo compartido se oculta (regla en
-                 Chips_CSS). El sheet de selección intacto.
-                 R77B: El nombre de la ciudad en el botón de la
-                 fila de filtros pasa a la voz del textoPrimario
-                 (variables del Core). Las tarjetas del sheet
-                 conservan su modelo.
-                 R76: Centralización tipográfica (parte 2).
-                 Los tamaños RECURRENTES de la familia UI
-                 (sheets y controles) ahora viven en :root de
-                 Core_CSS (--size-ui-1 a --size-ui-5) y los px
-                 iguales al canon de contenido usan sus variables
-                 (--size-enlaces, --size-textoPrimario, --size-cita,
-                 --size-subtitulo). Cero cambio visual: mismos
-                 valores computados, verificados antes/después.
+RESPONSABILIDAD: Estilos del bottom sheet de ciudad: tarjetas apiladas (nombre, badge «Activo», métricas), estado activo naranja, responsive.
+VERSIÓN:         1.14
+CAMBIOS:         R131: muere .ciudad-card-badge (bloque entero) — la píldora «Activo» viste la clase maestra .badgeActivo del Core; aquí queda SOLO el estado (oculta en reposo, visible en la tarjeta activa). Código muerto eliminado.
 ════════════════════════════════════════════════════════════════════*/
-
-
-
 
 
   /* ============================================================
@@ -429,24 +376,12 @@ CAMBIOS:         R130: el título del sheet pasa a la IZQUIERDA
   }
   .ciudad-card.activa .ciudad-card-nombre { color: #f97316 !important; }
 
-  /* Badge "Activo" · SOLO visible en la tarjeta activa
-     (naranja oficial, píldora blanca rellena). */
-  .ciudad-card-badge {
-    flex-shrink: 0;
-
-    display: none;
-
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.01em;
-
-    background: #f97316;
-    color: #ffffff;
-    padding: 5px 12px;
-    border-radius: 20px;
-  }
-  .ciudad-card.activa .ciudad-card-badge { display: inline-block; }
+  /* Píldora «Activo» de la tarjeta activa · R131: la PÍLDORA
+     COMPLETA vive en la clase maestra .badgeActivo del Core
+     (letra, fondo, padding, radio). Aquí queda SOLO el estado:
+     oculta en reposo, visible en la activa. */
+  .ciudad-card .badgeActivo { display: none; }
+  .ciudad-card.activa .badgeActivo { display: inline-block; }
 
   /* Pills de métricas · fila horizontal con wrap por si la
      pantalla es muy pequeña. Fondo gris suave, cifra en

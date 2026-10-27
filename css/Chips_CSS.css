@@ -12,43 +12,13 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  estén activos en la BD), fila de promos y
                  envoltorios de filtros.
 VERSIÓN:         2.10
-CAMBIOS:         R130: los chips del lienzo visten su CLASE MAESTRA
-                 propia .chipsFiltros (Core 2.13): letra 14px · 300
-                 (la de .textoPrimario que traían prestada desde el
-                 R129) con variables propias del Core. Sus COLORES y
-                 estados quedan IDÉNTICOS (gris #475569 reposo,
-                 blanco sobre naranja el activo — el color es
-                 dinámico, como .badge). El DOM lleva la clase
-                 (Chips_Script 1.7): chip.className = 'chip
-                 chipsFiltros'.
-                 R127: (1) La ciudad SALIÓ de la fila de chips
-                 (vive en la FILA 1, a la izquierda del campo —
-                 el DOM lo muda Index.html; aquí su ancho deja de
-                 ser un tercio y el CONTENEDOR de chips toma la
-                 fila completa: los chips activos se reparten el
-                 ancho en partes iguales, 2, 3, 4 o los que sean). 
-                 (2) .chip-texto con elipsis: si el dueño activa
-                 temporalmente más chips de los que caben, la fila
-                 NUNCA se rompe (una sola fila, texto recortado).
-                 (3) En modo compartido la ciudad se OCULTA igual
-                 que el botón ordenar (la fila 1 es el header del
-                 campo bloqueado).
-                 R109: sin cambios de código en el GAS — solo sube
-                 la versión para registrar que el gemelo
-                 css/Chips_CSS.css recibió la regla R108 del MENÚ
-                 GLOBAL en lista compartida.
-                 R77B: El texto de los chips pasa a la voz del
-                 textoPrimario (variables del Core) para acompañar
-                 la centralización tipográfica del dueño.
-                 R77: El placeholder del Buscar usa las variables
-                 de textoSecundario (la voz la manda también la
-                 regla maestra ::placeholder del Core). Encabezado
-                 saneado: solo queda lo vigente.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura de filtros),
                  Lista_CSS.html (lista y buscar-vacio),
                  Ciudad_Sheet_CSS.html (botón ciudad)
 ════════════════════════════════════════════════════════════════════*/
+
 
   /* ============================================================
      WRAP · FILA DE CABECERA (R63)

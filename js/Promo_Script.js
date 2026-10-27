@@ -55,15 +55,7 @@ RESPONSABILIDAD: Marquesina de titulares destacados. Vive fuera
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
 VERSIÓN:         2.4.0
-CAMBIOS:         R121: (1) El carrusel se llama TITULARES y lee la
-                 estructura nueva: promo.titulares.{activo,
-                 autoAvanceSeg, items[]}. (2) Cada item trae SU
-                 ciudad (campo `ciudad`;
-                 vacío [] = se muestra en todas). (3) Fechas con o
-                 sin horario (misma gramática ventanaVigente).
-                 El formato WhatsApp del texto (waFormato/waInline
-                 autocontenidos) y todo el proceso del riel quedan
-                 intactos.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  #promoEncabezado), Global_Script.html
                  (ventanaVigente), Ciudad_Sheet_Script.html
@@ -72,6 +64,8 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  Promo_CSS.html, Lista_CSS.html (clase .lista-item
                  compartida)
 ════════════════════════════════════════════════════════════════════*/
+
+
   window.Promo = (function () {
 
     var track = null;

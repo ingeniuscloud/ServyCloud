@@ -8,55 +8,7 @@ RESPONSABILIDAD: Estilos del cromo de la página estática: preloader
                  envoltorio (R26) y desde R29 vive como archivo
                  propio. El dueño no necesita tocarlo.
 VERSIÓN:         1.6
-CAMBIOS:         R128: el icono de la píldora se pinta desde
-                 js/Iconos.js 2.6.0 (data-glifo="instalar"): entra
-                 .btn-instalar-glifo con display contents para que
-                 el svg pintado siga siendo el hijo directo del
-                 botón flex y el layout no se mueva 1px.
-                 R101 (falla del dueño, capturas PC vs teléfono): el
-                 preloader se veía PERFECTO en la PC pero en el
-                 TELÉFONO dejaba una franja BLANCA/crema arriba (en
-                 la zona del reloj/señal). Causa: en la app
-                 instalada (standalone) iOS no siempre deja que un
-                 elemento fixed pinte DENTRO de la franja del
-                 estado — y esa franja la pinta el fondo del
-                 DOCUMENTO, que es el crema #fdf3ec de la app.
-                 Arreglo en DOS cinturones: (1) mientras el
-                 preloader vive, la clase html.preloader-activo
-                 pinta el fondo del DOCUMENTO con el MISMO
-                 degradado naranja del preloader — la franja queda
-                 naranja y se funde con la capa; (2) la capa
-                 estira su caja hacia arriba/abajo
-                 (−env(safe-area-inset-*)) para cubrir la franja
-                 aunque el navegador la subjecte. Al retirarse el
-                 preloader la clase se quita y el degradado crema
-                 R70 de la app vuelve solo. La PC no cambia (env
-                 vale 0 y la clase va y viene sin efecto visible).
-                 R86: panel del MODO MANUAL de instalación
-                 (#zona-instalar-pasos): tarjeta blanca encima de la
-                 píldora con los 3 pasos para Androids donde Chrome
-                 no ofrece el diálogo nativo (Android Go/básicos):
-                 ⋮ → Añadir a pantalla de inicio → Añadir/Instalar.
-                 La píldora y el preloader quedan intactos.
-                 R59: interior del preloader corregido DE UNA VEZ
-                 (orden del dueño): el anillo base de los
-                 orbitales se funde con el fondo (transparente —
-                 el mismo efecto del blanco-sobre-blanco de
-                 antes, ahora sobre naranja); lo que era azul
-                 pasa a BLANCO: arcos del orbital-1 plenos y del
-                 orbital-2 en blanco suave (la profundidad de los
-                 2 giros se conserva); la marca INGeniusCloud se
-                 limpia TODA en blanco (pesos 900/700/300
-                 intactos — ya no se ve sucia); "Servy",
-                 "Cargando catálogo" y los puntos en blanco.
-                 R58: el naranja oficial #f97316 de fondo le
-                 pareció OSCURO al dueño — el preloader viste un
-                 naranja CLARO y atractivo (degradado #fb923c →
-                 #fdba74, misma familia del oficial).
-                 R57: el fondo del preloader (.preloader-overlay)
-                 pasa al NARANJA OFICIAL de la app (#f97316) —
-                 antes #f8fafc.
-                 R29: extraído del monolito v4.1 byte a byte.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    index.html (clases .preloader-overlay, .carga-*,
                  #zona-instalar) · js/GitHub_Cromo.js
 ════════════════════════════════════════════════════════════════════

@@ -8,10 +8,7 @@ RESPONSABILIDAD: Infraestructura del bottom sheet. Apertura,
                  NO conoce el flujo de reserva: recibe HTML y
                  callbacks. Reutilizable para cualquier sheet.
 VERSIÓN:         1.2
-CAMBIOS:         R128: la X y el volver del esqueleto salen del registro (data-glifo close/volver) y el esqueleto se pinta en construir. El content lo pintan los flujos de reserva igual que hoy.
-CAMBIOS:         R37: encabezado simplificado — solo queda lo
-                 vigente en el código (política del dueño: lo
-                 eliminado ya no se menciona).
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (.area-contenido), Global_CSS.html y
                  Reserva_CSS.html (clases .sheet-*, .reserva-root)
 ════════════════════════════════════════════════════════════════════*/

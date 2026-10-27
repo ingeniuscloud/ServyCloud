@@ -28,30 +28,8 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  vive SOLO aquí y en el post. Vive fuera del
                  scroll en modo lista. Se oculta en modo detalle.
 VERSIÓN:         3.0
-CAMBIOS:         R130: el ENCABEZADO de promos toma las clases
-                 maestras del Core (orden del dueño): «Promos cerca
-                 de ti» = letra .subtitulo (18px · 300, variables)
-                 CONSERVANDO su gris #64748B (para no friccionar con
-                 el título del post); «Toca para conocer más» = letra
-                 .cita (11px · 400) con el MISMO gris #64748B (antes
-                 #94a3b8). Posiciones intactas: una a la izquierda y
-                 otra a la derecha (space-between). Muere el override
-                 responsive del título a 16px (la letra sale del
-                 Core, una sola voz).
-                 R117: efectos del formato estilo WhatsApp en los
-                 textos de promo de las DOS superficies (caja
-                 tenue para `codigo` que sirve sobre el degradado
-                 de la marquesina y sobre la tarjeta clara del
-                 post; cita en bloque con barra currentColor). Los
-                 aplica waFormato, definida DENTRO de
-                 Promo_Script.html y de Seccion_Script.html
-                 (autocontenida, sin Global — lección R115/R116).
-                 Nada más cambia.
-                 R98: solo encabezado — los textos de la tarjeta
-                 ahora salen del POSTJSON (meta.promo del post).
-                 El CSS no cambia.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 ════════════════════════════════════════════════════════════════════*/
-
 
   /* ============================================================
      SLOT · contenedor de la marquesina

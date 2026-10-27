@@ -3,45 +3,9 @@
 ARCHIVO:         Orden_Sheet_Script.html
 ESPEJO GITHUB:   github/js/Orden_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Módulo Ordenar (R66): el bottom sheet que abre el
-                 botón ordenar (#btnOrdenar, fila 1 de la sección
-                 filtros). Ofrece el ORDEN de la vidriera en 6
-                 opciones y emite 'orden:change' (lo consume
-                 Lista_Script, que repinta con el orden aplicado):
-
-                 · recomendado  — el orden original de la hoja
-                 · nombre-asc   — título A → Z
-                 · nombre-desc  — título Z → A
-                 · categoria    — agrupados por su grupo (A → Z)
-                 · compartido   — mayor nº de compartidos, ceros al final
-                 · valoracion   — mayor nº de likes, ceros al final
-
-                 Al elegir: haptic + la tarjeta marca .activa al
-                 instante (check naranja) y el sheet baja a los
-                 ~220 ms — la elección se VE antes de cerrar.
-                 El botón queda con el PUNTO naranja (.con-orden)
-                 mientras el orden activo NO sea el recomendado.
-                 La mecánica del sheet (backdrop, drag con
-                 velocidad, cierre, haptic) replica a
-                 Ciudad_Sheet_Script — módulos hermanos. El orden
-                 es de SESIÓN: al recargar vuelve a recomendado.
-VERSIÓN:         1.3
-CAMBIOS:         R129: los títulos del sheet llevan las clases maestras del
-                 Core: h2 → .titulo, opción → .subtitulo, descripción
-                 → .textoPrimario (un solo archivo controla la
-                 tipografía).
-                 R128: la X del sheet sale del registro (data-glifo close) y el esqueleto se pinta en construirDOM. El CSS .ordenar-close svg sigue mandando.
-CAMBIOS:         R67: RENOMBRADO por orden del dueño: Filtros_Sheet_*
-                 pasa a Orden_Sheet_* (el sheet es de ordenamiento,
-                 no de filtro — corrección de nombre del dueño).
-                 Ni una línea de lógica tocada.
-                 R66: NACE el módulo — fuera la inercia de "sin
-                 acción todavía": el botón ordena de verdad. 6
-                 opciones como tarjetas del lenguaje de la ciudad
-                 (R65), entrada escalonada (--i), cierre con
-                 rebote, punto indicador en el botón. Sin
-                 persistencia (sesión) y sin modo bloqueado
-                 (nunca es obligatorio).
+RESPONSABILIDAD: Módulo window.Ordenar: opciones de orden (recomendado, nombre, categoría, precio), marca la activa con la píldora .badgeActivo y reordena la vidriera.
+VERSIÓN:         1.4
+CAMBIOS:         R131: fuera el check (data-glifo verificado) — la opción activa muestra la píldora .badgeActivo «Activo».
 DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
                  Iconos.html (window.pintarGlifos), Lista_CSS.html
                  (consumidor del evento: Lista_Script),
@@ -49,17 +13,12 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
 ════════════════════════════════════════════════════════════════════*/
 
 
-
-
-
-
-
   window.Ordenar = (function () {
 
     /* ============================================================
        OPCIONES DEL SHEET (orden del dueño, R66)
        glifo → Iconos 2.0 (lista/grupos/alfabeto) y reutilizados
-       (share/estrella); el check activo reutiliza verificado.
+       (share/estrella); la activa muestra la píldora .badgeActivo.
        ============================================================ */
     var OPCIONES = [
       { id: 'recomendado',  glifo: 'lista',    titulo: 'Recomendado',
@@ -228,7 +187,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
               '<span class="ordenar-opt-titulo subtitulo">' + op.titulo + '</span>' +
               '<span class="ordenar-opt-desc textoPrimario">' + op.desc + '</span>' +
             '</span>' +
-            '<span class="ordenar-check" data-glifo="verificado" aria-hidden="true"></span>' +
+            '<span class="badgeActivo" aria-hidden="true">Activo</span>' +
           '</button>';
       });
 

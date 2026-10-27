@@ -3,59 +3,10 @@
 ARCHIVO:         Global_CSS.html
 ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
-                 "Acerca de" con jerarquía: marca de la app arriba
-                 (protagonista) y crédito INGeniusCloud abajo.
-                 Ítem "asesor" destacado con borde dashed naranja.
-                 Ayuda de instalación (R63/R64): pestañas
-                 ANDROID / IPHONE y TIMELINE de pasos — puntos
-                 numerados sobre línea vertical, entrada escalonada
-                 y NARANJA OFICIAL en toda la guía; banner interno
-                 "app ya instalada" (R64: el aviso vive DENTRO de
-                 la pantalla) y botón manual de instalación con
-                 glifo.
-VERSIÓN:         1.15.0
-CAMBIOS:         R130 · INSTALAR APP (5 órdenes del dueño, efectos y
-                 colores permanentes intactos): (1) banner verde
-                 «ya instalada» = letra .cita (11px · 400), verde
-                 #065f46 intacto; (2) pestañas Android/iPhone =
-                 clase maestra .chipsFormulario (12px · 600, Core
-                 2.13), colores gris/naranja intactos; (3) números
-                 de los pasos = letra .subtitulo (18px · 300),
-                 naranja del círculo se queda; (4) botón «Instalar
-                 la app» = SECUNDARIO IGUAL QUE LOS POSTS: muere el
-                 fondo y la sombra naranjas, píldora transparente
-                 con borde rgba(15,23,42,.16) y letra .botonSecundario
-                 (16px · 400 · #7A828A), glifo download en gris
-                 (currentColor); (5) nota final = letra .cita,
-                 #9A3412 sobre crema intacto. El MENÚ GLOBAL queda
-                 CENTRADO (orden del dueño: sus títulos no se tocan).
-                 R129: unificación tipográfica del sheet global — .titulo /
-                 .subtitulo / .textoPrimario del Core mandan la letra
-                 del menú y de las subvistas (legal y PWA); muere el
-                 font-size/weight/color local repetido. El h3 legal
-                 mide con las VARIABLES maestras (nace de la BD, la
-                 clase va por CSS). Exento por orden: «Acerca de».
-                 La familia naranja del ítem asesor y los callouts se
-                 conservan con !important.
-                 R96: (1) el botón Volver del sheet es el MISMO de
-                 los lienzos: círculo de 34px con borde fino
-                 #475569 y chevron a la izquierda (mismas
-                 características de .btn-volver); (2) fuera el
-                 texto "Volver" de la cabecera y su CSS; (3) el
-                 volver-arriba vivió en su esquina y pasó abajo a
-                 la derecha (Core_CSS): el relevo sheet.profundo
-                 quedó sin uso y salió — Volver siempre visible
-                 en subvista.
-                 R95: en las subvistas del menú global, mientras
-                 hay scroll abajo (sheet.profundo) el botón
-                 circular VOLVER ARRIBA (.mk-sheet-top del Core)
-                 reemplaza a Volver en la esquina izquierda; al
-                 llegar arriba, Volver vuelve.
+RESPONSABILIDAD: Estilos del menú global y sus subvistas (Acerca de, Legales, instalar app: pestañas, pasos, botón instalar), más el marco de los bottom sheets.
+VERSIÓN:         1.16.0
+CAMBIOS:         R131: el texto bajo el título de instalar app (.pwa-sub) viste .textoPrimario del Core (antes .subtitulo); la regla conserva solo su espaciado.
 ════════════════════════════════════════════════════════════════════*/
-
-
-
 
 
   /* ============================================================
@@ -601,7 +552,8 @@ CAMBIOS:         R130 · INSTALAR APP (5 órdenes del dueño, efectos y
     padding: 0 0 12px;
   }
   .sheet-pwa .pwa-sub {
-    /* R129 · tipografía = .subtitulo del Core. */
+    /* R131 · tipografía = .textoPrimario del Core (orden del
+       dueño). La regla conserva SOLO el espaciado propio. */
     margin: 12px 0 18px;
   }
 

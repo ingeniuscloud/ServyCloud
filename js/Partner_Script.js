@@ -4,27 +4,8 @@ ARCHIVO:         Partner_Script.html
 ESPEJO GITHUB:   github/js/Partner_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Partner. LIENZO propio del partner
-                 (R87: dejó de ser bottom sheet). Pinta
-                 #partnerTrack dentro de .secciones-wrap: identidad
-                 (avatar con check + nombre + eslogan del post),
-                 stats del sheet, dirección, botón WhatsApp,
-                 tabs Servicios/Cursos con tarjetas .mk-cross-* del
-                 post y "Ver todas las publicaciones".
-                 El modo (título "Perfil del vendedor", botón
-                 volver e historial) lo lleva window.Lista vía
-                 abrirPartner/cerrarPartner; este módulo solo pinta,
-                 hace el intercambio inmediato y navega a posts.
 VERSIÓN:         1.1
-CAMBIOS:         R88: (1) El nombre del partner pasa a .subtitulo
-                 con el color del post (mismo tratamiento que la
-                 fila del post). (2) Las tarjetas de publicaciones
-                 van en CUADRÍCULA .pf-grid (3 columnas, como el
-                 sheet viejo) — fuera el carrusel .mk-cross-row.
-                 (3) INTERCAMBIO INMEDIATO post↔partner: sin fades
-                 ni temporizadores — el parpadeo con la imagen
-                 desaparece (abrir/ocultar/irAPost).
-                 R87: NACE — reemplaza al bottom sheet del
-                 partner (Partner_Sheet_Script retirado).
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                  Lista_Script.html (abrirPartner/cerrarPartner/
                  getModo), Iconos.html (pintarGlifos),
@@ -33,6 +14,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                  Partner_CSS.html, Seccion_CSS.html (clases
                  .mk-partner-*, .mk-location-*, .mk-cross-*)
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Partner = (function () {
 

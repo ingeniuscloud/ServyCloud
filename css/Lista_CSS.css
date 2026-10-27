@@ -2,6 +2,7 @@
 
 ARCHIVO:         Lista_CSS.html
 ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
+ESPEJO GITHUB:   github/css/Lista_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  categoría, alternancia lista ↔ detalle con fade,
@@ -12,35 +13,12 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
 VERSIÓN:         2.16
-CAMBIOS:         R113: el avatar pasa a 52×52 px y se
-                 reajusta lo derivado: skeleton de lista y
-                 corte móvil (44×44 en ≤360px) espejan el
-                 nuevo tamaño.
-                 R112: el avatar del item es un CÍRCULO
-                 PERFECTO (border-radius 50%) centrado
-                 verticalmente — nunca se estira con el alto de
-                 la fila. La inicial lleva la tipografía de la
-                 maestra .tituloPost (mismas variables del Core)
-                 y el COLOR OFICIAL del post (--post-color);
-                 fondo suave de siempre (--post-claro).
-                 R111: el item muestra SOLO la INICIAL DEL
-                 TÍTULO en el avatar — sin imagen ni capa img.
-                 R87: (1) "Compartir lista" con la tipografía
-                 .enlacesOpciones (13px/400/#f97316 vía variables
-                 del Core; sigue a la derecha). (2) Cinturón de
-                 seguridad: body.modo-partner apaga el compartir.
-                 R86: el SKELETON del detalle imita la anatomía real
-                 del post (marco 1:1 con vidrio, título, promo,
-                 descripción, CTA píldora y fila del partner) —
-                 fuera la identidad centrada del post viejo.
-                 R77: El título del item pasa a la clase maestra
-                 .subtitulo (Lista_Script): aquí solo queda el
-                 recorte a 2 líneas; el tamaño/peso/color lo pone
-                 el Core.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
 ════════════════════════════════════════════════════════════════════*/
+
 
   /* ============================================================
      BOTÓN VOLVER

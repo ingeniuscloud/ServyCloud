@@ -14,21 +14,7 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  corto ?s= codificado, R124). Key localStorage:
                  post_likes.
 VERSIÓN:         2.5
-CAMBIOS:         R128: el corazón volador sale del registro (data-glifo like, el MISMO glifo del botón) y se pinta al crear el wrap. El CSS .heart-pop-svg sigue mandando (rojo #ef4444).
-CAMBIOS:         R124: SOLO COMENTARIO HONESTO (regla del dueño):
-                 el enlace que arma Compartir ya no apunta a la
-                 página gemela del post — es el enlace corto ?s=
-                 codificado (ver Compartir_Script 2.5). Lógica
-                 INTACTA (like + share + contador).
-                 R109: FUERA el mensaje hardcodeado (orden del
-                 dueño: los textos de WhatsApp viven en la BD, no
-                 en el código). El texto es SOLO
-                 compartir.mensajeWhatsapp + el enlace; si el post
-                  no trae mensaje, sale el enlace pelado.
-                 R108: el mensaje de compartir del POST salió del
-                 campo compartir.mensajeWhatsapp del POSTJSON
-                 (nueva estructura) con respaldo del formato
-                 armado — respaldo retirado en R109.
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Lista_Script.html (window.Lista:
@@ -36,6 +22,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  (window.Compartir: urlDePost), Social_CSS.html,
                  Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
+
 
   window.Social = (function () {
 

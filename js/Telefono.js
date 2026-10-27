@@ -8,21 +8,14 @@ RESPONSABILIDAD: Shell visual del iPhone 11 con reloj dinámico en la
                  segundo). Barras superior e inferior en blanco
                  #ffffff (igual que el menú tabs). NO define colores
                  del área de trabajo.
-VERSIÓN:         1.2
-CAMBIOS:         R53: entra la shell del dueño TAL CUAL (Regla de
-                 Oro): cuerpo a 242.39 mm para más aire vertical del
-                 lienzo, carcasa sin sombra, barra de estado con la
-                 pila tipográfica del sistema, barra de Safari en
-                 blanco con bordes finos #e5e5ea (botones y cápsula),
-                 iconos grises #8e8e93 de trazo fino, icono de tres
-                 puntos a la derecha, URL real del proyecto en la
-                 cápsula y reloj dinámico 12h (#reloj-estado).
-                 Encabezado actualizado (solo info vigente).
+VERSIÓN:         1.3
+CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Ninguna (shell visual; #lienzo es consumido por
                  Core_Script.html y estilizado en modo móvil por
                  Core_CSS.html). El reloj solo escribe en
                  #reloj-estado.
 ════════════════════════════════════════════════════════════════════*/
+
 
   (function() {
     function actualizarHora() {
