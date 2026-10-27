@@ -4,8 +4,8 @@ ARCHIVO:         Reserva_OTP_Script.html
 ESPEJO GITHUB:   github/js/Reserva_OTP_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.ReservaOTP: solicitar/reenviar código por correo, cooldown, verificación del código y sus mensajes bajo el campo correspondiente.
-VERSIÓN:         1.3
-CAMBIOS:         R131: los 8 mensajes de OTP viven bajo su campo: fallos de solicitar/reenviar bajo su botón, fallos de verificación bajo el campo de código; se limpian al escribir o reintentar.
+VERSIÓN:         1.4
+CAMBIOS:         R132: «Código incorrecto» se auto-oculta a los 3.2s (el MISMO tiempo que vivía el banner que este slot reemplazó); se limpia igual al escribir o reintentar; expirado/agotados mueren con el reset.
 DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
                  Reserva_Valida_Script.html (window.ReservaValida),
                  Index.html (TABLAS), Iconos.html (pintarGlifos),
@@ -16,8 +16,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
   window.ReservaOTP = (function () {
 
     var OTP_COOLDOWN_MS      = 60 * 1000;
+    var OTP_MSG_MS           = 3200;   /* R132 · vida del «Código incorrecto» (la del banner que lo precedió) */
     var TEXTO_BTN_SOLICITAR  = '📧 Solicitar código de validación';
     var cooldownTimer        = null;
+    var otpMsgTimer          = null;   /* R132 · temporizador del mensaje bajo el campo de código */
 
     function escapeHtml(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
@@ -27,6 +29,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
 
     function init(state, el, cb) {
       if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      if (otpMsgTimer)   { clearTimeout(otpMsgTimer);     otpMsgTimer   = null; }
 
       var inputCorreo  = el.inputCorreo;
       var fieldCorreo  = el.fieldCorreo;
@@ -51,12 +54,30 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
         var limpio = window.ReservaValida.limpiarOtp(this.value);
         if (limpio !== this.value) this.value = limpio;
         fieldOtp.classList.remove('invalido');
-        cb.errorCampo(fieldOtp, '');
+        ocultarMensajeOtp();
         fieldOtp.classList.toggle('activo', this.value.length > 0 || document.activeElement === this);
         if (window.ReservaValida.otp(this.value)) verificarOtp();
       });
       inputOtp.addEventListener('focus', function () { fieldOtp.classList.add('activo'); });
       inputOtp.addEventListener('blur', function () { if (!this.value) fieldOtp.classList.remove('activo'); });
+
+      /* R132 · el mensaje «Código incorrecto» se auto-oculta a
+         los 3.2s (el MISMO tiempo que vivía el banner que este
+         slot reemplazó). Expirado/agotados no llevan temporizador:
+         mueren con el reset de la zona OTP. */
+      function ocultarMensajeOtp() {
+        if (otpMsgTimer) { clearTimeout(otpMsgTimer); otpMsgTimer = null; }
+        cb.errorCampo(fieldOtp, '');
+      }
+
+      function mensajeOtpTemporal(texto) {
+        if (otpMsgTimer) { clearTimeout(otpMsgTimer); otpMsgTimer = null; }
+        cb.errorCampo(fieldOtp, texto);
+        otpMsgTimer = setTimeout(function () {
+          otpMsgTimer = null;
+          cb.errorCampo(fieldOtp, '');
+        }, OTP_MSG_MS);
+      }
 
       function correoActual() {
         return (inputCorreo.value || '').trim().toLowerCase();
@@ -294,6 +315,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
 
         inputOtp.readOnly = true;
         fieldOtp.classList.remove('invalido');
+        ocultarMensajeOtp();
 
         postBackend('otpVerificar', { correo: correo, codigo: codigo })
           .then(function () {
@@ -330,7 +352,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
               cb.errorCampo(fieldOtp, 'Demasiados intentos. Solicita un código nuevo.');
               reset(state, el);
             } else {
-              cb.errorCampo(fieldOtp, 'Código incorrecto');
+              mensajeOtpTemporal('Código incorrecto');
               inputOtp.value = '';
               inputOtp.focus();
             }
@@ -341,6 +363,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
 
     function reset(state, el) {
       if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      if (otpMsgTimer)   { clearTimeout(otpMsgTimer);     otpMsgTimer   = null; }
 
       state.otpEnviado       = false;
       state.otpCooldownHasta = 0;

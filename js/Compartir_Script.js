@@ -11,8 +11,8 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-VERSIÓN:         2.6
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.7
+CAMBIOS:         R132: el cache-bust de los enlaces ?s= va con separador «&» (un segundo «?» empalmaba el token y el receptor no filtraba ni veía la palabra en Buscar) + sin token no se emite ?s=null (enlace pelado a la app).
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Lista_Script.html (TABLAS.posts,
                  visibilidad de #btnCompartir),
@@ -223,7 +223,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
       var pages = urlPages();
       if (!pages) return armarEnlace(token);
-      return pages + '/' + token + '.html' + cacheBust();
+      return pages + '/' + token + '.html' + cacheBust('?');
     }
 
     function armarEnlace(token) {
@@ -234,10 +234,15 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     /* R126 · cache-bust corto (base36): cada enlace emitido es
        una URL distinta → WhatsApp re-scrapea y la tarjeta sale
        fresca (el nombre de la page ya no lleva idPost, el ?v=
-       es seguro; el receptor lo ignora: solo lee ?s=). */
-    function cacheBust() {
-      try { return '?v=' + Date.now().toString(36); }
-      catch (_) { return ''; }
+       es seguro; el receptor lo ignora: solo lee ?s=).
+       R132 · SEPARADOR: la gemela del post (e/TOKEN.html) abre
+       su query propia → «?v=»; los enlaces ?s= ya llevan query
+       → «&v=» (un segundo «?» empalmaba el token — ?s=TOKEN?v=
+       — y el receptor no filtraba nada ni mostraba la palabra). */
+    function cacheBust(separador) {
+      try {
+        return (separador === '?' ? '?' : '&') + 'v=' + Date.now().toString(36);
+      } catch (_) { return ''; }
     }
 
     /* Líneas de confianza · RETIRADAS (R109): los textos de
@@ -338,7 +343,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
            ?v=. Sin urlPages, el enlace va directo a la app como
            siempre. */
         var pages = urlPages();
-        var url = pages
+        var url = (token && pages)
           ? pages + '/?s=' + token + cacheBust()
           : armarEnlace(token);
 
