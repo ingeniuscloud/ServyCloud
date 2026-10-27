@@ -24,8 +24,14 @@ RESPONSABILIDAD: Estilos del botón de ciudad (city-bar, R127: vive
                  guardada. Aviso de cookies de esa primera
                  carga: icono a la izquierda del texto y botón
                  Aceptar debajo.
-VERSIÓN:         1.12
-CAMBIOS:         R129: unificación tipográfica del sheet — .titulo /
+VERSIÓN:         1.13
+CAMBIOS:         R130: el título del sheet pasa a la IZQUIERDA
+                 (orden del dueño): muere el centrado local del R129
+                 — solo los sheets del MENÚ GLOBAL van centrados
+                 (tienen botón volver). La letra sigue saliendo de
+                 .titulo del Core. El botón city-bar ya medía con
+                 .textoPrimario (R127): intacto. Nada más cambia.
+                 R129: unificación tipográfica del sheet — .titulo /
                  .subtitulo / .textoPrimario del Core mandan la
                  letra; muere el font-size/weight/color local
                  (código muerto). Los pills de métricas y el badge
@@ -51,6 +57,7 @@ CAMBIOS:         R129: unificación tipográfica del sheet — .titulo /
                  --size-subtitulo). Cero cambio visual: mismos
                  valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -281,9 +288,9 @@ CAMBIOS:         R129: unificación tipográfica del sheet — .titulo /
   .ciudad-content::-webkit-scrollbar { display: none; }
 
   .ciudad-titulo {
-    /* R129 · la tipografía la manda .titulo del Core. Solo queda
-       layout: centrado del sheet y márgenes. */
-    text-align: center !important;
+    /* R130 · IZQUIERDA (orden del dueño): muere el centrado local
+       del R129 — la alineación la trae .titulo del Core. Aquí solo
+       quedan los márgenes. */
     margin: 2px 0 22px;
   }
 

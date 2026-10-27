@@ -8,8 +8,29 @@ RESPONSABILIDAD: Estilos de la pantalla de ÉXITO de la reserva:
                  resumen, WhatsApp), skeleton mientras procesa la
                  reserva y pantalla de error. Los consume
                  Reserva_Exito_Script.html.
-VERSIÓN:         1.5
-CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
+VERSIÓN:         1.6
+CAMBIOS:         R130 · la letra del ÉXITO sale de las clases del Core
+                 (solo letra/tamaño/grosor; animaciones, fondos y
+                 estados intactos): «¡Felicitaciones!» → .titulo a la
+                 IZQUIERDA (muere su centrado local — orden del
+                 dueño: solo los sheets del menú global van
+                 centrados); sub → .textoPrimario (DOM) conservando
+                 su centro; TODO el resto de textos → .cita (11px ·
+                 400): filas clave/valor, Plan de Estudios y su
+                 lista, aviso ⚠️, nota 📧 y «Para dudas o
+                 comentarios» — los grises claros NO cambian
+                 (#64748b/#475569) y lo demás toma el gris original
+                 de .cita (#1f2937; antes #0f172a y los tonos de
+                 aviso). Las negritas de énfasis (valores y <b> del
+                 plan) conservan su 700. Los 3 botones («Chatea con
+                 atención al cliente», «Intentar de nuevo», «Volver
+                 al formulario») → .botonSecundario EN SU TOTALIDAD
+                 + look de los posts: sin fondo (muere el degradado
+                 naranja/verde y su sombra), píldora transparente
+                 con borde rgba(15,23,42,.16), 16px · 400 · #7A828A;
+                 el glifo de WhatsApp en verde #25d366 como el botón
+                 de los posts.
+                 R129: .reserva-exito-titulo → .titulo del Core y
                  .reserva-exito-sub → .subtitulo; queda el centrado
                  de la pantalla de éxito (text-align:center
                  !important local) y la entrada suave.
@@ -19,6 +40,7 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
                  pagos. Mismo lenguaje visual de .exito-lista y
                  entrada escalonada.
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -42,16 +64,17 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
   }
 
   .reserva-exito-titulo {
-    /* R129 · tipografía = .titulo del Core. Queda el centrado
-       propio de la pantalla de éxito y la entrada suave. */
-    text-align: center !important;
+    /* R130 · IZQUIERDA (orden del dueño): muere el centrado local
+       del R129 — la alineación la trae .titulo del Core. La letra
+       y la entrada suave quedan intactas. */
     margin: 0 0 6px;
     animation: revelarEntrada 0.5s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .reserva-exito-sub {
-    /* R129 · tipografía = .subtitulo del Core. Queda el centrado
-       y la entrada suave. */
+    /* R130 · letra la trae el DOM (.textoPrimario del Core); el
+       CENTRADO propio de la pantalla de éxito se queda y la
+       entrada suave intacta. */
     text-align: center !important;
     margin: 0 0 22px;
     max-width: 300px;
@@ -75,7 +98,9 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     align-items: flex-start;
     gap: 8px;
     padding: 3px 0;
-    font-size: 0.8rem;
+    /* R130 · letra = .cita del Core (variables): 11px · 400. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.35;
   }
 
@@ -103,16 +128,21 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     flex: 1;
     min-width: 0;
     color: #64748b;
-    font-weight: 500;
+    /* R130 · gris claro intacto; peso = .cita. */
+    font-weight: var(--weight-cita);
   }
 
   .exito-k {
     color: #64748b;
-    font-weight: 500;
+    /* R130 · gris claro intacto; peso = .cita. */
+    font-weight: var(--weight-cita);
   }
 
   .exito-v {
-    color: #0f172a;
+    /* R130 · valor: gris original de .cita (#1f2937; antes
+       #0f172a). Su énfasis 700 se queda, como los días de los
+       turnos. */
+    color: #1f2937;
     font-weight: 700;
     word-break: break-word;
   }
@@ -135,8 +165,9 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     animation: revelarEntrada 0.5s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .exito-plan-titulo {
-    font-size: var(--size-ui-3, 15px);
-    font-weight: 700;
+    /* R130 · letra = .cita del Core (variables): 11px · 400. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     color: #1f2937;
     letter-spacing: -0.1px;
     margin: 0 0 6px;
@@ -147,14 +178,19 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     padding: 0;
   }
   .exito-plan-lista li {
-    font-size: 0.8rem;
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       Gris claro #475569 intacto. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.45;
     color: #475569;
     padding: 2px 0;
     word-break: break-word;
   }
   .exito-plan-lista li b {
-    color: #0f172a;
+    /* R130 · énfasis: gris original de .cita (#1f2937; antes
+       #0f172a); su 700 se queda. */
+    color: #1f2937;
     font-weight: 700;
   }
 
@@ -162,7 +198,9 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     width: 100%;
     padding: 12px 14px;
     border-radius: 12px;
-    font-size: 0.8rem;
+    /* R130 · letra = .cita del Core (variables): 11px · 400. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.45;
     text-align: left;
     margin: 0 0 10px;
@@ -180,12 +218,16 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
   .exito-aviso.warning {
     background: #fffbeb;
     border: 1px solid #fde68a;
-    color: #92400e;
+    /* R130 · texto en el gris original de .cita (#1f2937); fondo
+       y borde ámbar intactos. */
+    color: #1f2937;
   }
   .exito-aviso.info {
     background: #eff6ff;
     border: 1px solid #bfdbfe;
-    color: #1e40af;
+    /* R130 · texto en el gris original de .cita (#1f2937); fondo
+       y borde azules intactos. */
+    color: #1f2937;
   }
 
   .exito-nota {
@@ -194,7 +236,10 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     border-radius: 12px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    font-size: var(--size-ui-2);
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       Gris claro #475569 intacto. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.5;
     color: #475569;
     text-align: left;
@@ -213,15 +258,23 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
 
   .exito-contacto {
     width: 100%;
-    font-size: var(--size-ui-3);
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       Gris claro #64748b y su centro intactos. */
+    font-size: var(--size-cita);
     color: #64748b;
-    font-weight: 500;
+    font-weight: var(--weight-cita);
     text-align: center;
     line-height: 1.5;
     margin: 0 0 4px;
     animation: revelarEntrada 0.5s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
+  /* R130 · SECUNDARIO IGUAL QUE LOS POSTS (orden del dueño, en su
+     totalidad): muere el degradado verde y su sombra — píldora
+     transparente con borde fino, letra .botonSecundario del Core
+     (16px · 400 · #7A828A). El glifo de WhatsApp en VERDE
+     #25d366, como el botón de los posts. Animación de entrada
+     intacta; activo al estilo .pf-wa (velo tenue). */
   .exito-whatsapp {
     display: flex;
     align-items: center;
@@ -230,22 +283,19 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     width: 100%;
     padding: 14px 20px;
     margin-top: 10px;
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
     border-radius: 999px;
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-    color: #ffffff;
+    background: transparent;
+    color: var(--color-botonSecundario);
     text-decoration: none;
-    font-size: var(--size-ui-5);
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.28),
-                0 3px 8px rgba(15, 23, 42, 0.10);
-    transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+    font-size: var(--size-botonSecundario);
+    font-weight: var(--weight-botonSecundario);
+    letter-spacing: -0.1px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
     animation: revelarEntrada 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .exito-whatsapp:active {
-    transform: scale(0.98);
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35),
-                0 2px 4px rgba(15, 23, 42, 0.10);
+    background: rgba(15, 23, 42, 0.04);
   }
 
   .exito-whatsapp-icono {
@@ -261,6 +311,7 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     height: 100%;
     display: block;
   }
+  .exito-whatsapp-icono svg path { fill: #25d366; }
 
   .exito-whatsapp-texto {
     flex: 0 1 auto;
@@ -313,31 +364,38 @@ CAMBIOS:         R129: .reserva-exito-titulo → .titulo del Core y
     gap: 10px;
     margin-top: 12px;
   }
+  /* R130 · SECUNDARIO EN SU TOTALIDAD (orden del dueño): muere el
+     degradado naranja — píldora transparente con borde fino y
+     letra .botonSecundario del Core (16px · 400 · #7A828A).
+     Activo al estilo .pf-wa. */
   .exito-btn-primario {
     width: 100%;
     padding: 14px 20px;
-    border: none;
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
     border-radius: 999px;
     font-family: inherit;
-    font-size: var(--size-ui-5);
-    font-weight: 800;
-    color: #ffffff;
+    font-size: var(--size-botonSecundario);
+    font-weight: var(--weight-botonSecundario);
+    letter-spacing: -0.1px;
+    color: var(--color-botonSecundario);
     cursor: pointer;
-    background: linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
-    transition: transform 0.15s;
+    background: transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
-  .exito-btn-primario:active { transform: scale(0.98); }
+  .exito-btn-primario:active { background: rgba(15, 23, 42, 0.04); }
   .exito-btn-secundario {
     width: 100%;
     padding: 13px 20px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
     border-radius: 999px;
     background: transparent;
-    color: #475569;
+    /* R130 · letra = .botonSecundario del Core COMPLETA. */
+    color: var(--color-botonSecundario);
     font-family: inherit;
-    font-size: var(--size-ui-4);
-    font-weight: 700;
+    font-size: var(--size-botonSecundario);
+    font-weight: var(--weight-botonSecundario);
+    letter-spacing: -0.1px;
     cursor: pointer;
-    transition: background-color 0.15s;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
-  .exito-btn-secundario:active { background-color: #f1f5f9; }
+  .exito-btn-secundario:active { background: rgba(15, 23, 42, 0.04); }

@@ -5,8 +5,17 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía
                  maestra y de la voz única de los placeholders.
-VERSIÓN:         2.12
-CAMBIOS:         R111: .mk-sheet-top (VOLVER ARRIBA de los bottom
+VERSIÓN:         2.13
+CAMBIOS:         R130: NACEN 2 CLASES MAESTRAS NUEVAS (orden del dueño):
+                 .chipsFiltros (14px/300, color dinámico — la letra de
+                 los chips del lienzo principal) y .chipsFormulario
+                 (12px/600, color dinámico — la letra de los chips del
+                 formulario y de las pestañas Android/iPhone de la
+                 guía PWA). Como .badge: SOLO letra (tamaño+peso);
+                 el color lo conserva cada elemento. Variables propias
+                 en :root (--size/weight-chipsFiltros /
+                 --size/weight-chipsFormulario): un solo archivo manda.
+                 R111: .mk-sheet-top (VOLVER ARRIBA de los bottom
                  sheets) en TONO TENUE: borde #cbd5e1, flecha
                  #94a3b8 y sombra más suave — el color fuerte
                  friccionaba con el texto del sheet. Tamaño,
@@ -33,6 +42,7 @@ CAMBIOS:         R111: .mk-sheet-top (VOLVER ARRIBA de los bottom
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
+
   *{ box-sizing: border-box; }
 
   /* ============================================================
@@ -51,6 +61,13 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     --size-botonPrimario: 16px;   --weight-botonPrimario: 400;   --color-botonPrimario: #FFFFFF;
     --size-botonSecundario: 16px; --weight-botonSecundario: 400; --color-botonSecundario: #7A828A;
     --size-badge: 9px;            --weight-badge: 700;
+
+    /* R130 · CHIPS · letras propias de los dos carriles de chips.
+       Color dinámico: cada chip conserva el suyo (gris reposo /
+       blanco sobre naranja el activo del lienzo; gris/naranja del
+       formulario). La clase solo manda tamaño y peso. */
+    --size-chipsFiltros: 14px;    --weight-chipsFiltros: 300;
+    --size-chipsFormulario: 12px; --weight-chipsFormulario: 600;
 
     /* ============================================================
        FAMILIA UI · tamaños recurrentes de sheets y controles
@@ -173,6 +190,23 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     font-weight: var(--weight-badge) !important;
     line-height: 1.2 !important;
     letter-spacing: 0.5px !important;
+  }
+
+  /* ============================================================
+     R130 · CHIPS MAESTROS · dos letras propias (como .badge:
+     SOLO tamaño y peso — el color lo viste cada elemento y sus
+     estados, que quedan intactos).
+     .chipsFiltros    → chips del LIENZO principal (14px · 300).
+     .chipsFormulario → chips del formulario y pestañas Android/
+                        iPhone de la guía PWA (12px · 600).
+     ============================================================ */
+  .chipsFiltros {
+    font-size: var(--size-chipsFiltros) !important;
+    font-weight: var(--weight-chipsFiltros) !important;
+  }
+  .chipsFormulario {
+    font-size: var(--size-chipsFormulario) !important;
+    font-weight: var(--weight-chipsFormulario) !important;
   }
 
   /* ============================================================

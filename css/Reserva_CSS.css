@@ -11,8 +11,30 @@ RESPONSABILIDAD: Estilos del sheet de reserva: raíz sobre el sheet
                  BLOQUE REVELABLE (zona-otp / post-validación).
                  La vista de éxito, su skeleton y su error viven en
                  Reserva_Exito_CSS.html.
-VERSIÓN:         1.4
-CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub →
+VERSIÓN:         1.5
+CAMBIOS:         R130 · LA LETRA DE LA RESERVA SALE DE LAS CLASES
+                 MAESTRAS DEL CORE (orden del dueño — SOLO cambia
+                 letra/tamaño/grosor: efectos, estados, transiciones,
+                 alineaciones y colores que permanecen quedan
+                 IDÉNTICOS). Banner → .cita (11px · 400, colores de
+                 estado intactos) · inputs y teléfono → .textoPrimario
+                 (14px · 300, #0f172a intacto; placeholders ya son
+                 .textoSecundario por la regla global R77) · labels →
+                 .cita FIJOS 11px (dejan de encoger al flotar; colores
+                 de estado intactos) · prefijo → .textoPrimario ·
+                 OTP → .subtitulo (18px · 300) · reenviar → letra
+                 .enlacesOpciones (13px · 400 · naranja + punteado) ·
+                 solicitar código → .botonSecundario completo (16px ·
+                 400 · #7A828A) · submit → .botonPrimario completo
+                 (16px · 400, su degradado naranja intacto) · chips →
+                 .chipsFormulario (12px · 600) · check privacidad →
+                 .cita · leyendas de sección → .cita IGUAL QUE LABELS
+                 (en el código ahora son label: ids *Label) · turnos →
+                 .cita con los DÍAS conservando su 700 · reglas muertas
+                 .turno-dia/.turno-hora eliminadas (el DOM nunca las
+                 tuvo). El strong del post y los verdes de confirmación
+                 intactos.
+                 R129: .form-titulo → tipografía .titulo del Core y .form-sub →
                  .subtitulo (muere el font-size/weight/color local).
                  Labels, inputs, botones y turnos son controles del
                  formulario: NO se tocan. El strong del post conserva
@@ -26,6 +48,7 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
                  --size-subtitulo). Cero cambio visual: mismos
                  valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -58,8 +81,10 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
   .reserva-banner {
     padding: 10px 14px;
     border-radius: 10px;
-    font-size: var(--size-ui-3);
-    font-weight: 600;
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       Los COLORES de estado (info/éxito/error) quedan intactos. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.4;
     margin: 0 0 14px;
     text-align: left;
@@ -79,7 +104,8 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     text-align: left;
   }
   .sheet-form .form-sub {
-    /* R129 · tipografía = .subtitulo del Core. */
+    /* R130 · la letra la trae el DOM: .textoPrimario del Core
+       (Reserva_Dato_Script — antes .subtitulo, orden del dueño). */
     margin: 0 0 20px;
     text-align: left;
   }
@@ -103,8 +129,12 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
   .form-fieldset legend {
     padding: 0 6px;
     margin-left: 4px;
-    font-size: var(--size-ui-1);
-    font-weight: 700;
+    /* R130 · letra = .cita del Core, IGUAL QUE LOS LABELS (orden
+       del dueño: en el código son label — ids *Label en
+       Reserva_Dato_Script). Colores intactos: gris reposo, verde
+       al confirmar (inline). */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     color: #475569;
     letter-spacing: 0.1px;
     background-color: #ffffff;
@@ -127,8 +157,11 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border-radius: 12px;
     border: 1.5px solid #e2e8f0;
     background-color: #f8fafc;
-    font-size: 16px;
-    font-weight: 600;
+    /* R130 · letra = .textoPrimario del Core (14px · 300).
+       El color #0f172a queda intacto. Sus placeholders ya hablan
+       .textoSecundario (regla global R77 del Core). */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
     color: #0f172a;
     outline: none;
     font-family: inherit;
@@ -149,23 +182,28 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: var(--size-ui-4);
-    font-weight: 500;
+    /* R130 · letra = .cita del Core (variables): 11px · 400 FIJOS
+       — el label deja de encoger al flotar (orden del dueño). Sus
+       colores por estado (reposo/activo/validado/inválido) y su
+       animación de flotar quedan intactos. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     color: #94a3b8;
     pointer-events: none;
     padding: 0 4px;
     border-radius: 3px;
     background-color: transparent;
     line-height: 1;
-    transition: top 0.22s, transform 0.22s, font-size 0.22s,
+    transition: top 0.22s, transform 0.22s,
                 color 0.22s, background-color 0.22s;
   }
 
   .form-field.activo .form-label {
     top: 0;
     transform: translateY(-50%);
-    font-size: 0.7rem;
-    font-weight: 700;
+    /* R130 · mueren font-size/weight locales: la letra la manda
+       .cita arriba (11px · 400 fijos). El color y el fondo blancos
+       del flotante quedan intactos. */
     color: var(--post-color, #1d4ed8);
     background-color: #ffffff;
   }
@@ -240,8 +278,9 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border: none;
     background: transparent;
     padding: 0 0 0 14px;
-    font-size: 16px;
-    font-weight: 600;
+    /* R130 · letra = .textoPrimario del Core (14px · 300). */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
     color: #0f172a;
     outline: none;
     font-family: inherit;
@@ -258,8 +297,9 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
 
   .form-prefijo {
     padding: 0 2px 0 14px;
-    font-size: 16px;
-    font-weight: 600;
+    /* R130 · letra = .textoPrimario del Core (14px · 300). */
+    font-size: var(--size-textoPrimario);
+    font-weight: var(--weight-textoPrimario);
     color: #64748b;
     user-select: none;
     opacity: 0;
@@ -275,7 +315,10 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
   .form-input-otp {
     text-align: center;
     letter-spacing: 4px;
-    font-weight: 800;
+    /* R130 · letra = .subtitulo del Core (variables): 18px · 300
+       (gana al 16px · 600 compartido de .form-input). */
+    font-size: var(--size-subtitulo);
+    font-weight: var(--weight-subtitulo);
     padding: 0 14px;
   }
 
@@ -285,10 +328,14 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     background: none;
     border: none;
     font-family: inherit;
-    font-size: var(--size-ui-2);
-    font-weight: 700;
-    color: var(--post-color, #1d4ed8);
+    /* R130 · letra = .enlacesOpciones del Core (variables), con
+       TODO: 13px · 400 · naranja #f97316 + subrayado punteado.
+       La alineación y su zona de toque quedan intactas. */
+    font-size: var(--size-enlaces);
+    font-weight: var(--weight-enlaces);
+    color: var(--color-enlaces);
     text-decoration: underline;
+    text-decoration-style: dotted;
     text-underline-offset: 3px;
     cursor: pointer;
     padding: 6px 4px;
@@ -310,9 +357,11 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border-radius: 12px;
     border: 1.5px solid color-mix(in srgb, var(--post-color, #1d4ed8) 40%, #e2e8f0);
     background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 6%, #f8fafc);
-    color: var(--post-color, #1d4ed8);
-    font-size: 0.86rem;
-    font-weight: 700;
+    /* R130 · letra = .botonSecundario del Core COMPLETA (variables):
+       16px · 400 · #7A828A. Su fondo/borde tintados quedan intactos. */
+    color: var(--color-botonSecundario);
+    font-size: var(--size-botonSecundario);
+    font-weight: var(--weight-botonSecundario);
     font-family: inherit;
     display: flex;
     align-items: center;
@@ -339,8 +388,11 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border: 1.5px solid #e2e8f0;
     background-color: #f8fafc;
     font-family: inherit;
-    font-size: 0.76rem;
-    font-weight: 700;
+    /* R130 · letra base = .cita del Core (variables): 11px · 400.
+       Los DÍAS conservan su peso grueso (700, inline en
+       Reserva_Dato_Script) y los colores quedan intactos. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     color: #475569;
     text-align: center;
     line-height: 1.3;
@@ -352,8 +404,9 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 8%, white);
     color: var(--post-color, #1d4ed8);
   }
-  .form-turno .turno-dia  { display: block; font-weight: 800; }
-  .form-turno .turno-hora { display: block; font-size: 0.66rem; font-weight: 600; opacity: 0.75; margin-top: 2px; }
+  /* R130 · mueren .turno-dia/.turno-hora: reglas muertas — el DOM
+     nunca tuvo esas clases (los turnos se pintan con estilos
+     inline en Reserva_Dato_Script). */
 
   /* ============================================================
      CHIPS "¿CÓMO TE ENTERASTE?"
@@ -366,8 +419,11 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     background-color: #f8fafc;
     border-radius: 999px;
     font-family: inherit;
-    font-size: 0.75rem;
-    font-weight: 600;
+    /* R130 · letra = clase maestra .chipsFormulario del Core
+       (12px · 600 — la que ya traían; el DOM lleva la clase).
+       Colores intactos: gris reposo, naranja del post el activo. */
+    font-size: var(--size-chipsFormulario);
+    font-weight: var(--weight-chipsFormulario);
     color: #475569;
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s, color 0.2s;
@@ -376,7 +432,7 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border-color: var(--post-color, #1d4ed8);
     background-color: color-mix(in srgb, var(--post-color, #1d4ed8) 10%, white);
     color: var(--post-color, #1d4ed8);
-    font-weight: 700;
+    font-weight: 700 !important;
   }
 
   /* ============================================================
@@ -439,10 +495,12 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
   }
 
   .form-check-texto {
-    font-size: 0.8rem;
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       El gris #475569 y su link naranja interior quedan intactos. */
+    font-size: var(--size-cita);
     line-height: 1.45;
     color: #475569;
-    font-weight: 500;
+    font-weight: var(--weight-cita);
     flex: 1;
     text-align: left;
   }
@@ -470,10 +528,12 @@ CAMBIOS:         R129: .form-titulo → tipografía .titulo del Core y .form-sub
     border: none;
     border-radius: 999px;
     font-family: inherit;
-    font-size: var(--size-ui-5);
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    color: #ffffff;
+    /* R130 · letra = .botonPrimario del Core COMPLETA (variables):
+       16px · 400 · blanco. Su degradado naranja y estados intactos. */
+    font-size: var(--size-botonPrimario);
+    font-weight: var(--weight-botonPrimario);
+    letter-spacing: -0.1px;
+    color: var(--color-botonPrimario);
     cursor: pointer;
     background: linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
     transition: transform 0.15s, opacity 0.2s, filter 0.2s;

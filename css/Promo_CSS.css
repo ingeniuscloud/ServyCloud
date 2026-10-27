@@ -27,8 +27,18 @@ RESPONSABILIDAD: Estilos de la marquesina de promoción destacada.
                  Promo_Script (rAF sobre scrollLeft). El badge
                  vive SOLO aquí y en el post. Vive fuera del
                  scroll en modo lista. Se oculta en modo detalle.
-VERSIÓN:         2.9
-CAMBIOS:         R117: efectos del formato estilo WhatsApp en los
+VERSIÓN:         3.0
+CAMBIOS:         R130: el ENCABEZADO de promos toma las clases
+                 maestras del Core (orden del dueño): «Promos cerca
+                 de ti» = letra .subtitulo (18px · 300, variables)
+                 CONSERVANDO su gris #64748B (para no friccionar con
+                 el título del post); «Toca para conocer más» = letra
+                 .cita (11px · 400) con el MISMO gris #64748B (antes
+                 #94a3b8). Posiciones intactas: una a la izquierda y
+                 otra a la derecha (space-between). Muere el override
+                 responsive del título a 16px (la letra sale del
+                 Core, una sola voz).
+                 R117: efectos del formato estilo WhatsApp en los
                  textos de promo de las DOS superficies (caja
                  tenue para `codigo` que sirve sobre el degradado
                  de la marquesina y sobre la tarjeta clara del
@@ -41,6 +51,7 @@ CAMBIOS:         R117: efectos del formato estilo WhatsApp en los
                  ahora salen del POSTJSON (meta.promo del post).
                  El CSS no cambia.
 ════════════════════════════════════════════════════════════════════*/
+
 
   /* ============================================================
      SLOT · contenedor de la marquesina
@@ -101,8 +112,11 @@ CAMBIOS:         R117: efectos del formato estilo WhatsApp en los
   body.modo-detalle .promo-encabezado { display: none !important; }
 
   .promo-encabezado-titulo {
-    font-size: 17px;
-    font-weight: 400;
+    /* R130 · letra = .subtitulo del Core (variables): 18px · 300.
+       El GRIS #64748B se queda (orden del dueño: sin fricción con
+       el título del post). Alineación intacta (izquierda). */
+    font-size: var(--size-subtitulo);
+    font-weight: var(--weight-subtitulo);
     line-height: 1.2;
     letter-spacing: -0.01em;
     /* R65 · COLOR DE TEXTO NORMAL (#64748B, el .t-body del
@@ -113,10 +127,12 @@ CAMBIOS:         R117: efectos del formato estilo WhatsApp en los
   }
 
   .promo-encabezado-sub {
-    font-size: 12px;
-    font-weight: 400;
+    /* R130 · letra = .cita del Core (variables): 11px · 400, con
+       el MISMO gris #64748B del título (orden del dueño). */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     line-height: 1.2;
-    color: #94a3b8;
+    color: #64748B;
     white-space: nowrap;
   }
 
@@ -306,7 +322,9 @@ CAMBIOS:         R117: efectos del formato estilo WhatsApp en los
      ============================================================ */
   @media (max-width: 360px) {
     .promo-encabezado { padding: 8px 14px 0; }
-    .promo-encabezado-titulo { font-size: 16px; }
+    /* R130 · muere el font-size 16px del título: la letra sale de
+       .subtitulo del Core (una sola voz). El resto del responsive
+       de la tarjeta de promo queda intacto. */
     .lista-item.promo-item .promo-titulo { font-size: 17px; }
     .lista-item.promo-item .promo-sub { font-size: 13px; }
     .lista-item.promo-item .promo-flecha { width: 30px; height: 30px; right: 10px; bottom: 8px; }

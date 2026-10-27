@@ -14,8 +14,23 @@ RESPONSABILIDAD: CSS del menú global (bottom sheet). Subvista
                  "app ya instalada" (R64: el aviso vive DENTRO de
                  la pantalla) y botón manual de instalación con
                  glifo.
-VERSIÓN:         1.14.0
-CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
+VERSIÓN:         1.15.0
+CAMBIOS:         R130 · INSTALAR APP (5 órdenes del dueño, efectos y
+                 colores permanentes intactos): (1) banner verde
+                 «ya instalada» = letra .cita (11px · 400), verde
+                 #065f46 intacto; (2) pestañas Android/iPhone =
+                 clase maestra .chipsFormulario (12px · 600, Core
+                 2.13), colores gris/naranja intactos; (3) números
+                 de los pasos = letra .subtitulo (18px · 300),
+                 naranja del círculo se queda; (4) botón «Instalar
+                 la app» = SECUNDARIO IGUAL QUE LOS POSTS: muere el
+                 fondo y la sombra naranjas, píldora transparente
+                 con borde rgba(15,23,42,.16) y letra .botonSecundario
+                 (16px · 400 · #7A828A), glifo download en gris
+                 (currentColor); (5) nota final = letra .cita,
+                 #9A3412 sobre crema intacto. El MENÚ GLOBAL queda
+                 CENTRADO (orden del dueño: sus títulos no se tocan).
+                 R129: unificación tipográfica del sheet global — .titulo /
                  .subtitulo / .textoPrimario del Core mandan la letra
                  del menú y de las subvistas (legal y PWA); muere el
                  font-size/weight/color local repetido. El h3 legal
@@ -38,6 +53,7 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
                  reemplaza a Volver en la esquina izquierda; al
                  llegar arriba, Volver vuelve.
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -610,8 +626,12 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
     background: transparent;
 
     font-family: inherit;
-    font-size: 0.84rem;
-    font-weight: 600;
+    /* R130 · letra = clase maestra .chipsFormulario del Core
+       (12px · 600 — la misma de los chips del formulario). Los
+       COLORES quedan intactos: gris #64748b la inactiva, naranja
+       #EA580C la activa. */
+    font-size: var(--size-chipsFormulario);
+    font-weight: var(--weight-chipsFormulario);
     letter-spacing: -0.1px;
     color: #64748b;
 
@@ -709,8 +729,10 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
     background: #ffffff;
     border: 2px solid #f97316;
     color: #f97316;
-    font-size: 0.8rem;
-    font-weight: 800;
+    /* R130 · letra = .subtitulo del Core (variables): 18px · 300.
+       El NARANJA del número se queda (orden del dueño). */
+    font-size: var(--size-subtitulo);
+    font-weight: var(--weight-subtitulo);
     line-height: 1;
 
     display: flex;
@@ -762,15 +784,20 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
   }
 
   .sheet-pwa .pwa-instalada-texto {
-    font-size: var(--size-ui-3);
-    font-weight: 600;
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       El VERDE #065f46 y la alineación quedan intactos. */
+    font-size: var(--size-cita);
+    font-weight: var(--weight-cita);
     color: #065f46;
     line-height: 1.35;
   }
 
-  /* ---------- Botón manual de instalación (R64) ----------
-     SIEMPRE visible en Android: glifo download + texto, con
-     boleto abre el diálogo nativo y sin boleto avisa el camino. */
+  /* ---------- Botón manual de instalación (R64/R130) ----------
+     R130 · SECUNDARIO IGUAL QUE LOS POSTS (orden del dueño):
+     muere el fondo y la sombra naranjas — píldora transparente
+     con borde fino, letra .botonSecundario del Core (16px · 400
+     · #7A828A) y glifo download en gris (currentColor). States
+     al estilo de .pf-wa (Partner): activo = velo tenue. */
   .sheet-pwa .pwa-instalar {
     display: flex;
     align-items: center;
@@ -781,26 +808,24 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
     margin: 16px 0 4px;
     padding: 13px 18px;
 
-    border: none;
+    border: 1.5px solid rgba(15, 23, 42, 0.16);
     border-radius: 999px;
-    background: #f97316;
-    color: #ffffff;
+    background: transparent;
+    color: var(--color-botonSecundario);
 
     font-family: inherit;
-    font-size: 0.92rem;
-    font-weight: 700;
+    font-size: var(--size-botonSecundario);
+    font-weight: var(--weight-botonSecundario);
     letter-spacing: -0.1px;
     text-align: center;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.28);
-    transition: transform 0.15s ease, background-color 0.2s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
   .sheet-pwa .pwa-instalar:active {
-    transform: scale(0.98);
-    background: #EA580C;
+    background: rgba(15, 23, 42, 0.04);
   }
   .sheet-pwa .pwa-instalar-icono {
     flex-shrink: 0;
@@ -816,7 +841,9 @@ CAMBIOS:         R129: unificación tipográfica del sheet global — .titulo /
 
   /* ---------- Nota por versión (familia naranja) ---------- */
   .sheet-pwa .pwa-nota {
-    font-size: var(--size-ui-2);
+    /* R130 · letra = .cita del Core (variables): 11px · 400.
+       El color #9A3412 sobre crema y la alineación intactos. */
+    font-size: var(--size-cita);
     color: #9A3412;
     line-height: 1.5;
     padding: 12px 14px;

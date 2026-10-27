@@ -15,8 +15,12 @@ RESPONSABILIDAD: Módulo window.Global: menú bottom sheet con
                  está instalada, el aviso vive DENTRO de la
                  pantalla como banner; Android no instalada lleva
                  botón manual de instalación) y el drag de cierre.
-VERSIÓN:         1.14.0
-CAMBIOS:         R129: clases maestras del Core en el DOM — «Menú» y títulos
+VERSIÓN:         1.15.0
+CAMBIOS:         R130: las pestañas Android/iPhone de la guía PWA
+                 visten su clase maestra .chipsFormulario (Core 2.13,
+                 la misma letra de los chips del formulario: 12px ·
+                 600; sus colores gris/naranja quedan intactos).
+                 R129: clases maestras del Core en el DOM — «Menú» y títulos
                  con icono → .titulo, filas del menú → .subtitulo,
                  subtítulo del asesor y detalles PWA → .textoPrimario,
                  contenido legal envuelto en .textoPrimario. «Acerca
@@ -39,6 +43,7 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
                  (SISTEMA), Iconos.html (window.pintarGlifos),
                  Global_CSS.html (base del sheet)
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -549,7 +554,8 @@ DEPENDENCIAS:    Global_Script.html (limpiarTelefono), Index.html
           var esIOS = (p === 'ios');
           html +=
             '<button type="button" role="tab" ' +
-              'class="pwa-tab' + (p === pwaTab ? ' activa' : '') + '" ' +
+              /* R130 · letra maestra .chipsFormulario (Core 2.13). */
+              'class="pwa-tab chipsFormulario' + (p === pwaTab ? ' activa' : '') + '" ' +
               'data-tab="' + p + '" ' +
               'aria-selected="' + (p === pwaTab ? 'true' : 'false') + '">' +
               '<span class="pwa-tab-icono" data-glifo="' +

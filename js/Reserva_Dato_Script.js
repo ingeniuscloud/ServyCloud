@@ -10,8 +10,19 @@ RESPONSABILIDAD: Vista del formulario. Bloque 1 = horario.
                  Validaciones delegadas a window.ReservaValida.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.4.0
-CAMBIOS:         R129: clases maestras del Core en el DOM del formulario:
+VERSIÓN:         1.5.0
+CAMBIOS:         R130 · la letra del formulario sale de las clases del
+                 Core (solo letra/tamaño/grosor; efectos y colores
+                 intactos): «Estás reservando…» → .textoPrimario
+                 (antes .subtitulo) · chips del formulario visten su
+                 clase maestra .chipsFormulario (12px · 600) · los
+                 rótulos de sección son LABEL igual que los labels de
+                 los campos (ids horarioLabel/conocioLabel — antes
+                 *Legend; el elemento <legend> se queda por su
+                 posición nativa sobre el borde) · turnos y resúmenes
+                 verdes miden 11px (.cita) con los DÍAS conservando
+                 su 700; verdes intactos.
+                 R129: clases maestras del Core en el DOM del formulario:
                  «Reservar cupo» → .titulo y «Estás reservando…» →
                  .subtitulo.
                  R128: el check y los 2 lápices dejan de ser SVG a mano: .field-check y .form-check-box llevan data-glifo de check y el lápiz sale del registro (data-glifo de lapiz, 16px). El pintado lo hacen los flujos de Reserva (ya pintan tras cada setContent).
@@ -28,6 +39,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  (state + callbacks), Index.html (SISTEMA.origenes
                  vía state)
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -73,7 +85,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       return '' +
         '<div class="reserva-banner" id="reservaBanner" hidden></div>' +
         '<h3 class="form-titulo titulo">Reservar cupo</h3>' +
-        '<p class="form-sub subtitulo">Estás reservando <strong>' + escapeHtml(nombrePost) +
+        '<p class="form-sub textoPrimario">Estás reservando <strong>' + escapeHtml(nombrePost) +
         '</strong>. Completa tus datos y un asesor te contactará.</p>';
     }
 
@@ -124,11 +136,11 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                      'background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; ' +
                      'font-family:inherit; text-align:left; cursor:pointer; ' +
                      '-webkit-tap-highlight-color:transparent;">' +
-              '<span style="font-size:0.82rem; font-weight:700; line-height:1.2; color:#334155;">' +
+              '<span style="font-size:var(--size-cita); font-weight:700; line-height:1.2; color:#334155;">' +
                 escapeHtml(d.dias) +
               '</span>' +
               '<span style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; ' +
-                           'font-size:0.78rem; line-height:1.2; color:#64748b;">' +
+                           'font-size:var(--size-cita); font-weight:var(--weight-cita); line-height:1.2; color:#64748b;">' +
                 '<span>' + escapeHtml(d.hora)  + '</span>' +
                 '<span>' + escapeHtml(d.cupos) + '</span>' +
               '</span>' +
@@ -145,11 +157,11 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  'font-family:inherit; cursor:' + (auto ? 'default' : 'pointer') + '; text-align:left; ' +
                  '-webkit-tap-highlight-color:transparent;">' +
           '<div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; color:#16a34a;">' +
-            '<span id="resumenHorarioDia" style="font-size:0.82rem; font-weight:700; line-height:1.2;">' +
+            '<span id="resumenHorarioDia" style="font-size:var(--size-cita); font-weight:700; line-height:1.2;">' +
               escapeHtml(d0.dias) +
             '</span>' +
             '<span style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; ' +
-                         'font-size:0.78rem; line-height:1.2;">' +
+                         'font-size:var(--size-cita); font-weight:var(--weight-cita); line-height:1.2;">' +
               '<span id="resumenHorarioHora">'  + escapeHtml(d0.hora)  + '</span>' +
               '<span id="resumenHorarioCupos">' + escapeHtml(d0.cupos) + '</span>' +
             '</span>' +
@@ -158,12 +170,15 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         '</button>';
 
       var verde  = confirmado ? 'border-color:#16a34a; background-color:#f0fdf4;' : '';
-      var legend = confirmado ? ' style="color:#16a34a; background-color:#f0fdf4;"' : '';
+      /* R130 · rótulo de sección = LABEL igual que los labels de los
+         campos (orden del dueño). El elemento <legend> se queda
+         (posición nativa sobre el borde del recuadro); id en label. */
+      var label = confirmado ? ' style="color:#16a34a; background-color:#f0fdf4;"' : '';
 
       return '<fieldset class="form-fieldset" id="horarioFieldset" ' +
                 'data-auto="' + (auto ? '1' : '0') + '" ' +
                 'data-confirmado="' + (confirmado ? '1' : '0') + '" style="' + verde + '">' +
-                '<legend id="horarioLegend"' + legend + '>Horario disponible</legend>' +
+                '<legend id="horarioLabel"' + label + '>Horario disponible</legend>' +
                 opciones + resumen +
               '</fieldset>';
     }
@@ -252,17 +267,17 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       }
 
       var verdeC  = conocioConfirmado ? 'border-color:#16a34a; background-color:#f0fdf4;' : '';
-      var legendC = conocioConfirmado ? ' style="color:#16a34a; background-color:#f0fdf4;"' : '';
+      var labelC = conocioConfirmado ? ' style="color:#16a34a; background-color:#f0fdf4;"' : '';
 
       html +=       '<fieldset class="form-fieldset revelar-item" id="conocioFieldset" ' +
                       'data-confirmado="' + (conocioConfirmado ? '1' : '0') + '" ' +
                       'style="animation-delay:0ms; ' + verdeC + '">' +
-                      '<legend id="conocioLegend"' + legendC + '>¿Cómo te enteraste?</legend>' +
+                      '<legend id="conocioLabel"' + labelC + '>¿Cómo te enteraste?</legend>' +
 
                       '<div id="conocioOpciones" style="display:' + (conocioConfirmado ? 'none' : '') + ';">' +
                         '<div class="form-chips" id="chipsConocio">';
       origenes.forEach(function (o) {
-        html += '<button type="button" class="chip-form' + (conocioConfirmado && o.idOrigen === state.conocioSeleccionado ? ' activo' : '') + '" ' +
+        html += '<button type="button" class="chip-form chipsFormulario' + (conocioConfirmado && o.idOrigen === state.conocioSeleccionado ? ' activo' : '') + '" ' +
                       'data-valor="' + escapeHtml(o.idOrigen) + '" ' +
                       'data-titulo="' + escapeHtml(o.titulo) + '">' +
                   escapeHtml(o.titulo) +
@@ -276,8 +291,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                                'align-items:center; justify-content:space-between; ' +
                                'padding:0; background:transparent; border:none; font-family:inherit; ' +
                                'cursor:pointer; text-align:left; -webkit-tap-highlight-color:transparent;">' +
-                        '<span id="resumenConocioTexto" style="flex:1; font-weight:700; line-height:1.4; ' +
-                          'font-size:0.82rem; color:#16a34a;">' +
+                        '<span id="resumenConocioTexto" style="flex:1; font-weight:var(--weight-cita); line-height:1.4; ' +
+                          'font-size:var(--size-cita); color:#16a34a;">' +
                           (conocioConfirmado ? '✓ ' + escapeHtml(conocioSeleccionadoTitulo) : '—') +
                         '</span>' +
                         PENCIL_BTN +
@@ -356,7 +371,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
 
         var optH    = fsH.querySelector('#horarioOpciones');
         var btnResH = fsH.querySelector('#btnResumenHorario');
-        var legendH = fsH.querySelector('#horarioLegend');
+        var labelH  = fsH.querySelector('#horarioLabel');
         var rDia    = fsH.querySelector('#resumenHorarioDia');
         var rHora   = fsH.querySelector('#resumenHorarioHora');
         var rCupos  = fsH.querySelector('#resumenHorarioCupos');
@@ -365,8 +380,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
           fsH.setAttribute('data-confirmado', si ? '1' : '0');
           fsH.style.borderColor     = si ? '#16a34a' : '';
           fsH.style.backgroundColor = si ? '#f0fdf4' : '';
-          legendH.style.color           = si ? '#16a34a' : '';
-          legendH.style.backgroundColor = si ? '#f0fdf4' : '';
+          labelH.style.color            = si ? '#16a34a' : '';
+          labelH.style.backgroundColor  = si ? '#f0fdf4' : '';
         }
 
         fsH.querySelectorAll('.form-turno').forEach(function (btn) {
@@ -489,7 +504,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
 
         var optC      = fsC.querySelector('#conocioOpciones');
         var btnResC   = fsC.querySelector('#btnResumenConocio');
-        var legendC   = fsC.querySelector('#conocioLegend');
+        var labelC    = fsC.querySelector('#conocioLabel');
         var resumenC  = fsC.querySelector('#resumenConocioTexto');
         var chips     = fsC.querySelectorAll('.chip-form');
 
@@ -497,8 +512,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
           fsC.setAttribute('data-confirmado', si ? '1' : '0');
           fsC.style.borderColor     = si ? '#16a34a' : '';
           fsC.style.backgroundColor = si ? '#f0fdf4' : '';
-          legendC.style.color           = si ? '#16a34a' : '';
-          legendC.style.backgroundColor = si ? '#f0fdf4' : '';
+          labelC.style.color            = si ? '#16a34a' : '';
+          labelC.style.backgroundColor  = si ? '#f0fdf4' : '';
         }
 
         function confirmar(valor, titulo) {

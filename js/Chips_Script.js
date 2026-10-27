@@ -17,8 +17,12 @@ RESPONSABILIDAD: Lógica del menú de chips. Genera los chips desde
                  resetearVista() — cada cambio de ciudad cae al
                  chip de SERVICIOS por defecto (orden del dueño:
                  Irapa sin cursos no puede dejar la lista vacía).
-VERSIÓN:         1.6
-CAMBIOS:         R129: muere chip.title (tooltip de escritorio — el código solo
+VERSIÓN:         1.7
+CAMBIOS:         R130: cada chip viste su CLASE MAESTRA propia
+                 .chipsFiltros (Core 2.13): chip.className = 'chip
+                 chipsFiltros' — letra 14px · 300 con variables del
+                 Core, colores/estados intactos.
+                 R129: muere chip.title (tooltip de escritorio — el código solo
                  vive en teléfonos, orden del dueño): el texto
                  completo ya viaja dentro del chip (.chip-texto).
                  R127: glifoDeChip() resuelve también EVENTOS y
@@ -50,6 +54,7 @@ CAMBIOS:         R129: muere chip.title (tooltip de escritorio — el código so
                  eliminado ya no se menciona).
 DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía 00 DoGet.gs)
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -151,7 +156,9 @@ DEPENDENCIAS:    Index.html (inyección window.SISTEMA vía 00 DoGet.gs)
       chips.forEach(function (op) {
         var chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'chip';
+        /* R130 · letra maestra propia: .chipsFiltros (Core 2.13).
+           El color lo viste el chip (gris / blanco-naranja activo). */
+        chip.className = 'chip chipsFiltros';
         chip.setAttribute(ATTR_CLAVE, op.idChip);
         /* R129: sin chip.title (tooltip de escritorio; el código
            solo vive en teléfonos — orden del dueño). El texto

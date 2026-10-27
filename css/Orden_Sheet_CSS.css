@@ -26,8 +26,14 @@ RESPONSABILIDAD: Bottom sheet de ORDENAMIENTO (R66): lo abre el
                  si hiciera falta (.ordenar-content).
                  La estructura raíz/backdrop/handle/close replica
                  a Ciudad_Sheet_CSS (módulos hermanos).
-VERSIÓN:         1.4
-CAMBIOS:         R129: unificación tipográfica del sheet — la letra la mandan
+VERSIÓN:         1.5
+CAMBIOS:         R130: el título «Ordenar» pasa a la IZQUIERDA
+                 (orden del dueño): muere el centrado local del R129
+                 — solo los sheets del MENÚ GLOBAL van centrados
+                 (tienen botón volver). La letra sigue saliendo de
+                 .titulo del Core (22px · 300, que ya trae la
+                 alineación izquierda). Nada más cambia.
+                 R129: unificación tipográfica del sheet — la letra la mandan
                  .titulo / .subtitulo / .textoPrimario del Core
                  (colocadas por Orden_Sheet_Script); aquí muere el
                  font-size/weight/color local (código muerto) y solo
@@ -42,6 +48,7 @@ CAMBIOS:         R129: unificación tipográfica del sheet — la letra la manda
                  --size-subtitulo). Cero cambio visual: mismos
                  valores computados, verificados antes/después.
 ════════════════════════════════════════════════════════════════════*/
+
 
 
 
@@ -176,12 +183,9 @@ CAMBIOS:         R129: unificación tipográfica del sheet — la letra la manda
   .ordenar-content::-webkit-scrollbar { display: none; }
 
   .ordenar-titulo {
-    /* R129 · la tipografía la manda .titulo del Core (GAS Core_CSS
-       / css/Core_CSS.css): tamaño, peso, color, línea, tracking y
-       familia viven CENTRALIZADOS. Aquí solo queda layout: el
-       centrado propio del sheet (la alineación es diseño, no
-       tipografía) y los márgenes. */
-    text-align: center !important;
+    /* R130 · IZQUIERDA (orden del dueño): muere el centrado local
+       del R129 — la alineación la trae .titulo del Core. Aquí solo
+       quedan los márgenes. */
     margin: 2px 0 22px;
   }
 
