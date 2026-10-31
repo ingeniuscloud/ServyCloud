@@ -9,8 +9,8 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.5.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.6.0
+CAMBIOS:         R134: post — la duda pasa a CHIP del formulario (.chip-form) DEBAJO del CTA (antes: enlace encima); el excerpt de la descripción muere (sin texto, sin fade) y queda el disparador «Ver descripción completa» 18px·300 con chevron ›. Gemelo GAS sincronizado.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -104,10 +104,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* INFO */
   .mk-info { padding: 0 5% 20px; }
   .mk-desc-wrap { position: relative; margin-top: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-  .mk-desc-clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%); }
-  .mk-desc-clamp p { margin: 0 0 8px; } .mk-desc-clamp p:last-child { margin-bottom: 0; }
-  .mk-desc-clamp ul, .mk-desc-clamp ol { margin: 0 0 8px; padding-left: 18px; }
-  .mk-desc-clamp li { margin: 0 0 2px; }
+  /* R134 · .mk-desc-clamp MURIÓ: el post ya no muestra excerpt
+     (ni su fade de máscara) — solo el disparador «Ver descripción
+     completa». El sheet (#postDescSheetContent) conserva TODAS
+     sus reglas; los selectores combinados de más abajo que aún
+     citan .mk-desc-clamp quedan muertos pero inofensivos. */
 
   /* ============================================================
      R92 · TABLA MARKDOWN (plan de inversión) — líneas sutiles,
@@ -270,7 +271,23 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* CTA */
   .mk-cta-section { padding: 4px 5% 20px !important; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-  .secciones-track .cta-duda.enlacesOpciones { text-align: center !important; align-self: center !important; margin: 0 0 16px 0 !important; }
+  /* R134 · la duda es CHIP del formulario DEBAJO del CTA (antes:
+     enlace encima). Caja = .chip-form de Reserva_CSS (8px 12px ·
+     borde 1.5px #e2e8f0 · fondo #f8fafc · radio 999); letra =
+     clase maestra .chipsFormulario del Core (12px · 600). La
+     ACCIÓN no cambió: el click lo sigue delegando Core_Script
+     por la clase .cta-duda. */
+  .secciones-track .cta-duda.chipsFormulario {
+    text-align: center !important; align-self: center !important;
+    margin: 12px 0 0 0 !important;
+    padding: 8px 12px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 999px !important;
+    background-color: #f8fafc !important;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .secciones-track .cta-duda.chipsFormulario:active { opacity: 0.7; }
   .secciones-track .cta-duda[hidden] { display: none !important; }
   .secciones-track .cta-reservar.mk-cta-button {
     width: 100% !important; margin: 0 !important; box-sizing: border-box !important;

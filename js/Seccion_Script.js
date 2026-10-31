@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.11.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.12.0
+CAMBIOS:         R134: post — «Cómo llegar» → «Ver cómo llegar» (sheet Academia); la duda es chip .chipsFormulario DEBAJO del CTA (acción intacta, delegación .cta-duda); descripción sin excerpt ni fade: disparador «Ver descripción completa» 18px·300 con chevron › al final del texto. Gemelo GAS sincronizado.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -559,16 +559,20 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
          incentivo → detalle). */
       html += buildPromoHTML();
       if (markdown) {
-        var renderExcerpt = _renderMarkdown(markdown);
         /* R92: los colores del post viajan en el wrap para que la
            tabla markdown y la fila BCV usen el pastel/color. */
         var colorArr = meta.color || [];
         var oficial  = colorArr[0] || post.colorOficial || '#475569';
         var pastel   = colorArr[1] || post.colorPastel || '#f1f5f9';
         var claro    = colorArr[2] || post.colorClaro   || '#f1f5f9';
+        /* R134 · el excerpt MURIÓ (sin texto, sin fade): queda
+           SOLO el disparador — tamaño .subtitulo (18px) · peso
+           300 (orden del dueño) · color .enlacesOpciones — con
+           chevron › pegado al final del texto (inline, NO
+           alineado a la derecha). Su acción abre el sheet de la
+           descripción completa, que queda intacto. */
         html += '<div class="mk-desc-wrap" style="--post-color:' + escapeHtml(oficial) + '; --post-pastel:' + escapeHtml(pastel) + '; --post-claro:' + escapeHtml(claro) + ';">' +
-                  '<div class="mk-desc-clamp textoPrimario" id="postDescExcerpt">' + renderExcerpt + '</div>' +
-                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:10px !important; margin-bottom:12px !important;">Ver descripción completa</button>' +
+                  '<button type="button" class="enlacesOpciones" id="postVerMas" style="margin-top:10px !important; margin-bottom:12px !important; font-size:18px !important; font-weight:300 !important;">Ver descripción completa<span aria-hidden="true" style="margin-left:6px;">›</span></button>' +
                 '</div>';
       }
       html += '</div>';
@@ -618,15 +622,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var hayDuda = dudaTexto.length > 0;
 
       var html = '<div class="mk-cta-section">';
-      
-      if (hayDuda) {
-        html += '<button type="button" class="cta-duda enlacesOpciones">' + escapeHtml(dudaTexto) + '</button>';
-      }
-      
+
       html += '<button type="button" class="cta-reservar mk-cta-button" aria-label="Reservar cupo">';
       html +=   '<span class="cta-reservar-texto botonPrimario">' + escapeHtml(ctaTexto) + '</span>';
       html +=   '<span class="mk-cta-arrow-icon" data-glifo="flecha"></span>';
       html += '</button>';
+
+      /* R134 · la duda vive DEBAJO del CTA, pintada como chip del
+         formulario (caja .chip-form de Reserva_CSS + letra
+         .chipsFormulario del Core). La ACCIÓN quedó intacta: el
+         click lo sigue delegando Core_Script por .cta-duda. */
+      if (hayDuda) {
+        html += '<button type="button" class="cta-duda chipsFormulario">' + escapeHtml(dudaTexto) + '</button>';
+      }
       
       html += '</div>';
       /* R82: divisora debajo del CTA — aquí termina la info del
@@ -653,7 +661,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                   '<span class="mk-location-icon" data-glifo="ubicacion"></span>' +
                   '<div class="mk-location-content">' +
                     '<p class="textoPrimario" style="margin:0 !important;">' + escapeHtml(direccion) + '</p>' +
-                    '<a href="' + urlMaps + '" target="_blank" rel="noopener" class="enlacesOpciones" style="text-decoration: none;">Cómo llegar</a>' +
+                    '<a href="' + urlMaps + '" target="_blank" rel="noopener" class="enlacesOpciones" style="text-decoration: none;">Ver cómo llegar</a>' +
                   '</div>' +
                 '</div>' +
               '</div>';

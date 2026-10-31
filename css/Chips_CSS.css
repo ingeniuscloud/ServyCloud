@@ -11,8 +11,8 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  chips (reparten TODO el ancho según cuántos
                  estén activos en la BD), fila de promos y
                  envoltorios de filtros.
-VERSIÓN:         2.10
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.11
+CAMBIOS:         R134: la FILA 1 baja al ALTO DE LOS CHIPS — .btn-ordenar 42×42 → 36.4×36.4 (círculo proporcional) y .buscar-capsula height 42 → 36.4; la ciudad se estira sola (align-self: stretch). Cuenta: 9+10 aire + 15.4 letra + 2 borde. Gemelo GAS sincronizado.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura de filtros),
                  Lista_CSS.html (lista y buscar-vacio),
@@ -232,8 +232,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
     position: relative;
 
-    width: 42px;
-    height: 42px;
+    /* R134 · al ALTO DEL CHIP: 36.4px = 9 + 10 (aire del chip)
+       + 15.4 (letra 14px × línea 1.1) + 2 (borde). El círculo
+       baja proporcional — diámetro = alto del chip, jamás ovala. */
+    width: 36.4px;
+    height: 36.4px;
     padding: 0;
 
     border: 1px solid #cbd5e1;
@@ -296,7 +299,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     flex: 1 1 auto;
     min-width: 0;
 
-    height: 42px;
+    /* R134 · mismo alto que los chips (36.4px — la cuenta vive
+       en .btn-ordenar). El campo respira igual que la fila 2. */
+    height: 36.4px;
 
     background: transparent;
     border: 1px solid #cbd5e1;

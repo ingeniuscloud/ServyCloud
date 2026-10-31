@@ -4,8 +4,8 @@ ARCHIVO:         Partner_Script.html
 ESPEJO GITHUB:   github/js/Partner_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Partner. LIENZO propio del partner
-VERSIÓN:         1.1
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.2
+CAMBIOS:         R134: «Cómo llegar» → «Ver cómo llegar» (orden del dueño: el cambio es en los DOS sitios — aquí y en el sheet Academia de Seccion_Script). Gemelo GAS sincronizado.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                  Lista_Script.html (abrirPartner/cerrarPartner/
                  getModo), Iconos.html (pintarGlifos),
@@ -219,8 +219,9 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
 
     /* Dirección · la misma anatomía del lienzo del post
        (.mk-location-*): icono + dirección .textoPrimario +
-       "Cómo llegar" .enlacesOpciones. Sin dirección el bloque
-       completo se omite sin reservar espacio. */
+       "Ver cómo llegar" .enlacesOpciones (R134: antes decía
+       solo "Cómo llegar"). Sin dirección el bloque completo
+       se omite sin reservar espacio. */
     function buildUbicacion() {
       var pj = partnerActivo && partnerActivo.partnerJson ? partnerActivo.partnerJson : {};
       var direccion = String(pj.direccion || '').trim();
@@ -237,7 +238,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                   '<span class="mk-location-icon" data-glifo="ubicacion"></span>' +
                   '<div class="mk-location-content">' +
                     '<p class="textoPrimario" style="margin:0 !important;">' + escapeHtml(direccion) + '</p>' +
-                    '<a href="' + urlMaps + '" target="_blank" rel="noopener" class="enlacesOpciones" style="text-decoration: none;">Cómo llegar</a>' +
+                    '<a href="' + urlMaps + '" target="_blank" rel="noopener" class="enlacesOpciones" style="text-decoration: none;">Ver cómo llegar</a>' +
                   '</div>' +
                 '</div>' +
               '</div>';
