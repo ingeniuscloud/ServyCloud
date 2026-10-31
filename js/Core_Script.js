@@ -12,8 +12,8 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.38.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.39.0
+CAMBIOS:         R136: cada click válido del botón CTA de un post dispara avisoCTA al backend (fire-and-forget, asíncrono — mismo camino que el aviso del Open Ad); el backend deduplica 60s por dispositivo+post y encola el Telegram al admin. Cubre el CTA en ambos modos (reserva y whatsapp).
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -635,6 +635,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       }
     }, true);
 
+    /* ============================================================
+       R136 · AVISO TELEGRAM · CTA DEL POST
+       Igual que el aviso del Open Ad (Opend_Ad_Script): cada click
+       VÁLIDO del botón CTA dispara postBackend('avisoCTA') —
+       FIRE-AND-FORGET: si algo falla, la acción del usuario ya
+       corrió y nada se rompe; sin postBackend disponible se omite
+       en silencio. El backend valida el idPost, deduplica por
+       dispositivo+post (60s) y encola el aviso al bot del admin.
+       Vive AQUÍ —antes del corte de WhatsApp por captura— para
+       cubrir el CTA en AMBOS modos (reserva y whatsapp).
+       ============================================================ */
+    function avisarCTATelegram() {
+      try {
+        if (!postActivoGlobal || !postActivoGlobal.id) return;
+        if (typeof window.postBackend !== 'function') return;
+        var r = window.postBackend('avisoCTA', { idPost: postActivoGlobal.id });
+        if (r && typeof r.catch === 'function') r.catch(function () {});
+      } catch (_) {}
+    }
+
     document.addEventListener('click', function (e) {
       var objetivo = e.target;
       if (!objetivo || !objetivo.closest) return;
@@ -642,6 +662,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       var btn = objetivo.closest('.cta-reservar');
       if (!btn) return;
       if (btn.disabled) return;
+
+      /* R136 · el aviso viaja SIEMPRE que el click es válido
+         (botón habilitado y post activo), sin importar el modo. */
+      avisarCTATelegram();
 
       if (intentarWhatsapp()) {
         if (window.Analitica && postActivoGlobal) {

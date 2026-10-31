@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.12.0
-CAMBIOS:         R134: post — «Cómo llegar» → «Ver cómo llegar» (sheet Academia); la duda es chip .chipsFormulario DEBAJO del CTA (acción intacta, delegación .cta-duda); descripción sin excerpt ni fade: disparador «Ver descripción completa» 18px·300 con chevron › al final del texto. Gemelo GAS sincronizado.
+VERSIÓN:         2.13.0
+CAMBIOS:         R136: el sheet de la descripción completa gana DRAG DE CIERRE — gesto desde la franja superior (handle) o desde el contenido cuando está arriba del todo; el sheet obedece al dedo frame a frame y al soltar decide la inercia o el umbral (30%), igual que los sheets del menú global y de reserva. Gemelo GAS sincronizado.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -749,6 +749,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
 
     var descSheetRoot = null;
     var descFadeEnganchado = false;
+
+    /* R136 · DRAG DE CIERRE del sheet de descripción — misma
+       mecánica EXACTA de los sheets del menú global
+       (Global_Sheet_Script) y de reserva (Reserva_Sheet_Script):
+       el gesto nace en la franja superior (handle) o en el
+       contenido cuando está arriba del todo; mientras arrastra,
+       el sheet OBEDECE al dedo frame a frame (sin transición,
+       transform inline) y al soltar decide la inercia o la
+       posición (umbral del 30%). */
+    var descSheet        = null;
+    var descContent      = null;
+    var descHandleArea   = null;
+    var descDragActivo   = false;
+    var descDragMoved    = false;
+    var descDragPointerId = null;
+    var descDragStartY   = 0;
+    var descDragUltimoY  = 0;
+    var descDragUltimoT  = 0;
+    var descDragVelocidad = 0;
+    var descDragDesdeHandle = false;
+    var DESC_UMBRAL_VELOCIDAD = 0.5;
+    var DESC_UMBRAL_DRAG      = 6;
+
     function _construirDescSheet() {
       if (descSheetRoot) return descSheetRoot;
       var area = document.querySelector('.area-contenido') || document.body;
@@ -770,6 +793,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (typeof window.pintarGlifos === 'function') window.pintarGlifos(descSheetRoot);
       descSheetRoot.querySelector('#postDescSheetBackdrop').addEventListener('click', cerrarSheetDesc);
       descSheetRoot.querySelector('#postDescSheetClose').addEventListener('click', cerrarSheetDesc);
+
+      /* R136 · ganchos del drag de cierre: franja superior y
+         contenido (el content decide según su scroll, igual que
+         en el sheet del menú global). */
+      descSheet      = descSheetRoot.querySelector('.mk-sheet');
+      descContent    = descSheetRoot.querySelector('#postDescSheetContent');
+      descHandleArea = descSheetRoot.querySelector('.mk-sheet-handle-area');
+      descHandleArea.addEventListener('pointerdown', descOnHandleDown);
+      descContent.addEventListener('pointerdown', descOnContentDown);
       return descSheetRoot;
     }
 
@@ -822,7 +854,146 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       root.classList.add('abierto');
     }
 
-    function cerrarSheetDesc() { if (descSheetRoot) descSheetRoot.classList.remove('abierto'); }
+    function cerrarSheetDesc() {
+      if (!descSheetRoot) return;
+      descSheetRoot.classList.remove('abierto');
+      /* R136 · limpieza del drag: soltar el transform inline deja
+         que la clase .abierto ausente anime el cierre desde el
+         punto exacto donde quedó el sheet (0.38s del .mk-sheet).
+         Si el cierre llega por el botón o el backdrop, el inline
+         ya está vacío y esto es inocuo. */
+      if (descSheet) {
+        descSheet.classList.remove('sin-transicion');
+        descSheet.style.transform = '';
+      }
+      descLimpiarListenersDrag();
+    }
+
+    /* ============================================================
+       R136 · DRAG DE CIERRE — misma gramática de Global_Sheet
+       (umbral 6px de arranque, inercia 0.5 px/ms, umbral 30%).
+       ============================================================ */
+    function descOnHandleDown(e) { descIniciarDrag(e, true); }
+    function descOnContentDown(e) {
+      if (descContent && descContent.scrollTop > 0) return;
+      descIniciarDrag(e, false);
+    }
+
+    function descIniciarDrag(e, desdeHandle) {
+      if (!descSheetRoot || !descSheetRoot.classList.contains('abierto')) return;
+      if (e.button !== undefined && e.button !== 0) return;
+
+      descDragActivo = true;
+      descDragMoved = false;
+      descDragDesdeHandle = desdeHandle;
+      descDragPointerId = e.pointerId;
+      descDragStartY = e.clientY;
+      descDragUltimoY = e.clientY;
+      descDragUltimoT = performance.now();
+      descDragVelocidad = 0;
+
+      if (desdeHandle) {
+        descHandleArea.addEventListener('pointermove', descOnDragMove);
+        descHandleArea.addEventListener('pointerup', descOnDragEnd);
+        descHandleArea.addEventListener('pointercancel', descOnDragEnd);
+      } else {
+        descContent.addEventListener('pointermove', descOnDragMove);
+        descContent.addEventListener('pointerup', descOnDragEnd);
+        descContent.addEventListener('pointercancel', descOnDragEnd);
+      }
+    }
+
+    function descOnDragMove(e) {
+      if (!descDragActivo) return;
+      if (e.pointerId !== descDragPointerId) return;
+      if (!descSheetRoot || !descSheetRoot.classList.contains('abierto')) { descCancelarDrag(); return; }
+
+      var dy = e.clientY - descDragStartY;
+
+      if (!descDragMoved) {
+        if (Math.abs(dy) < DESC_UMBRAL_DRAG) return;
+        descDragMoved = true;
+        descSheet.classList.add('sin-transicion');
+        if (descDragDesdeHandle) {
+          try { descHandleArea.setPointerCapture(e.pointerId); } catch (err) {}
+        } else {
+          if (dy < 0) { descCancelarDrag(); return; }
+          try { descContent.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+      }
+
+      var alturaSheet = descSheet.offsetHeight;
+      var pct = (dy / alturaSheet) * 100;
+      if (pct < 0) pct = 0;
+      if (pct > 100) pct = 100;
+
+      e.preventDefault();
+      descSheet.style.transform = 'translateY(' + pct + '%)';
+
+      var ahora = performance.now();
+      var dt = ahora - descDragUltimoT;
+      if (dt > 0) {
+        var v = (e.clientY - descDragUltimoY) / dt;
+        descDragVelocidad = descDragVelocidad * 0.7 + v * 0.3;
+        descDragUltimoY = e.clientY;
+        descDragUltimoT = ahora;
+      }
+    }
+
+    function descOnDragEnd(e) {
+      if (!descDragActivo) return;
+      if (e.pointerId !== descDragPointerId) return;
+
+      descDragActivo = false;
+      descDragPointerId = null;
+
+      if (!descDragMoved) { descLimpiarListenersDrag(); return; }
+
+      descDragMoved = false;
+      descSheet.classList.remove('sin-transicion');
+
+      var transform = descSheet.style.transform || '';
+      var match = transform.match(/translateY\(([\d.]+)%\)/);
+      var pct = match ? parseFloat(match[1]) : 0;
+
+      /* El settle lo gobiernan las CLASES (misma gramática del
+         .mk-sheet): soltar el transform inline deja que
+         .abierto —o su ausencia— anime el regreso o el cierre
+         desde el punto exacto donde quedó el dedo. */
+      descSheet.style.transform = '';
+
+      if (descDecidirDestino(pct) === 'cerrado') cerrarSheetDesc();
+
+      descLimpiarListenersDrag();
+    }
+
+    function descCancelarDrag() {
+      descDragActivo = false;
+      descDragMoved = false;
+      descDragPointerId = null;
+      if (descSheet) {
+        descSheet.classList.remove('sin-transicion');
+        descSheet.style.transform = '';
+      }
+      descLimpiarListenersDrag();
+    }
+
+    function descLimpiarListenersDrag() {
+      if (!descHandleArea || !descContent) return;
+      descHandleArea.removeEventListener('pointermove', descOnDragMove);
+      descHandleArea.removeEventListener('pointerup', descOnDragEnd);
+      descHandleArea.removeEventListener('pointercancel', descOnDragEnd);
+      descContent.removeEventListener('pointermove', descOnDragMove);
+      descContent.removeEventListener('pointerup', descOnDragEnd);
+      descContent.removeEventListener('pointercancel', descOnDragEnd);
+    }
+
+    function descDecidirDestino(pct) {
+      if (descDragVelocidad > DESC_UMBRAL_VELOCIDAD) return 'cerrado';
+      if (descDragVelocidad < -DESC_UMBRAL_VELOCIDAD) return 'abierto';
+      if (pct > 30) return 'cerrado';
+      return 'abierto';
+    }
 
     function pintarVistas() {
       var track = document.getElementById('seccionesTrack');

@@ -9,8 +9,8 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.7.0
-CAMBIOS:         R135: limpieza de código muerto — los selectores combinados de las reglas de tabla y citas del markdown ya NO citan .mk-desc-clamp (clase muerta desde R134; solo queda #postDescSheetContent, vivo). Cero efecto visual. Historial: bitácora/versiones.
+VERSIÓN:         2.8.0
+CAMBIOS:         R136: el sheet de descripción gana drag de cierre (handle touch-action none + .mk-sheet.sin-transicion + content pan-y — la mecánica de los sheets global y de reserva) y la duda bajo el CTA queda formal: texto azul #1d4ed8 SOLO en ese botón (antes lo pintaba el UA). Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -272,9 +272,15 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* R134 · la duda es CHIP del formulario DEBAJO del CTA (antes:
      enlace encima). Caja = .chip-form de Reserva_CSS (8px 12px ·
      borde 1.5px #e2e8f0 · fondo #f8fafc · radio 999); letra =
-     clase maestra .chipsFormulario del Core (12px · 600). La
-     ACCIÓN no cambió: el click lo sigue delegando Core_Script
-     por la clase .cta-duda. */
+     clase maestra .chipsFormulario del Core (12px · 300).
+     R136 · AZUL FORMAL del TEXTO, SOLO este botón (#1d4ed8, el
+     azul que el sistema ya usa de respaldo en Reserva_CSS):
+     antes lo pintaba el UA del navegador sin que nadie lo
+     declarara; ahora es determinista en todas las plataformas.
+     La clase maestra .chipsFormulario NO se toca — los demás
+     chips del formulario siguen en su gris. La ACCIÓN no cambió:
+     el click lo sigue delegando Core_Script por la clase
+     .cta-duda. */
   .secciones-track .cta-duda.chipsFormulario {
     text-align: center !important; align-self: center !important;
     margin: 12px 0 0 0 !important;
@@ -282,6 +288,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     border: 1.5px solid #e2e8f0 !important;
     border-radius: 999px !important;
     background-color: #f8fafc !important;
+    color: #1d4ed8 !important;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
@@ -399,11 +406,22 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* La sombra solo vive con el sheet abierto: guardada no se asoma
      en el borde inferior del post (R77) */
   .mk-sheet-root.abierto .mk-sheet { transform: translateY(0); box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.12); }
-  .mk-sheet-handle-area { flex-shrink: 0; padding: 10px 0 6px; display: flex; align-items: center; justify-content: center; min-height: 40px; background: #fff; }
+  /* R136 · drag de cierre: con sin-transicion el sheet OBEDECE
+     al dedo (el transform va inline frame a frame); al soltar la
+     clase devuelve la animación de 0.38s y las clases gobiernan
+     el settle (regreso o cierre) igual que en los sheets global
+     y de reserva. */
+  .mk-sheet.sin-transicion { transition: none; }
+  /* R136 · la franja superior es ZONA DE ARRASTRE (misma
+     gramática del .sheet-handle-area del menú global): cursor de
+     agarre y touch-action none para que el gesto sea SIEMPRE del
+     drag y el navegador no se lo robe para hacer scroll. */
+  .mk-sheet-handle-area { flex-shrink: 0; padding: 10px 0 6px; display: flex; align-items: center; justify-content: center; min-height: 40px; background: #fff; cursor: grab; touch-action: none; position: relative; z-index: 6; }
+  .mk-sheet-handle-area:active { cursor: grabbing; }
   .mk-sheet-handle { width: 36px; height: 5px; background: #dee2e6; border-radius: 3px; }
   .mk-sheet-close { position: absolute; top: 6px; right: 12px; width: 36px; height: 36px; border: none; background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 7; }
   .mk-sheet-close svg { width: 18px; height: 18px; display: block; }
-  .mk-sheet-content { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 5% calc(26px + env(safe-area-inset-bottom, 0px)); scrollbar-width: none; }
+  .mk-sheet-content { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 5% calc(26px + env(safe-area-inset-bottom, 0px)); scrollbar-width: none; touch-action: pan-y; }
   .mk-sheet-content::-webkit-scrollbar { display: none; }
 
   /* ============================================================
