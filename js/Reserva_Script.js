@@ -4,8 +4,8 @@ ARCHIVO:         Reserva_Script.html
 ESPEJO GITHUB:   github/js/Reserva_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Orquestador de la reserva: abre el sheet, envía la reserva, pinta cada mensaje DEBAJO de su campo (errorCampo/errorFlujo/limpiarErrores) y maneja el reintento.
-VERSIÓN:         1.4.0
-CAMBIOS:         R131: muere banner() — nacen errorCampo/errorFlujo/limpiarErrores: cada mensaje se pinta DEBAJO de su campo (horario → fieldset, privacidad → su check, flujo → cabecera). Sin temporizador: el mensaje vive hasta que el campo cambie o se reintente.
+VERSIÓN:         1.5.0
+CAMBIOS:         R135: los selectores de error siguen la clase renombrada .errorForm (antes .form-error; mismos valores, cero efecto visual). Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -85,9 +85,9 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
        ============================================================ */
     function errorCampo(fieldEl, texto) {
       if (!fieldEl) return;
-      var slot = (fieldEl.classList && fieldEl.classList.contains('form-error'))
+      var slot = (fieldEl.classList && fieldEl.classList.contains('errorForm'))
         ? fieldEl
-        : fieldEl.querySelector('.form-error');
+        : fieldEl.querySelector('.errorForm');
       if (!slot) return;
       slot.textContent = texto || '';
       slot.hidden = !texto;
@@ -105,7 +105,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     function limpiarErrores() {
       var content = Sheet.getContent();
       if (!content) return;
-      content.querySelectorAll('.form-error').forEach(function (s) {
+      content.querySelectorAll('.errorForm').forEach(function (s) {
         s.hidden = true;
         s.textContent = '';
       });

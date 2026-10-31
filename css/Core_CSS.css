@@ -4,8 +4,8 @@ ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
-VERSIÓN:         2.14
-CAMBIOS:         R131: NACE la clase maestra .badgeActivo (Core 2.14) — la PÍLDORA COMPLETA (letra 11px · 600 + fondo #f97316 + blanco + padding 5px 12px + radio 20px) que marca la opción activa en los sheets Ciudad y Ordenar; variables --size/weight-badgeActivo en :root. Un solo sitio manda.
+VERSIÓN:         2.15
+CAMBIOS:         R135: .chipsFormulario baja de peso 600 → 300 (centralizado: el cambio se aplica solo en todos lados) + limpieza del registro: --size-ui-4 y --size-ui-5 eliminados (0 usos en toda la app). Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -34,7 +34,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        blanco sobre naranja el activo del lienzo; gris/naranja del
        formulario). La clase solo manda tamaño y peso. */
     --size-chipsFiltros: 14px;    --weight-chipsFiltros: 300;
-    --size-chipsFormulario: 12px; --weight-chipsFormulario: 600;
+    --size-chipsFormulario: 12px; --weight-chipsFormulario: 300;
 
     /* R131 · BADGE ACTIVO · la píldora completa (letra + forma +
        color) que marca la opción activa: badge «Activo» del sheet
@@ -48,8 +48,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     --size-ui-1: 0.72rem;
     --size-ui-2: 0.78rem;
     --size-ui-3: 0.82rem;
-    --size-ui-4: 0.88rem;
-    --size-ui-5: 0.94rem;
   }
 
   html, body {
@@ -170,7 +168,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      estados, que quedan intactos).
      .chipsFiltros    → chips del LIENZO principal (14px · 300).
      .chipsFormulario → chips del formulario y pestañas Android/
-                        iPhone de la guía PWA (12px · 600).
+                        iPhone de la guía PWA (12px · 300).
      ============================================================ */
   .chipsFiltros {
     font-size: var(--size-chipsFiltros) !important;

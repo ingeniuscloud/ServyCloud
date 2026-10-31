@@ -2,7 +2,6 @@
 
 ARCHIVO:         Chips_CSS.html
 ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
-ESPEJO GITHUB:   github/css/Chips_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  (volver, título del header, categoría y menú
@@ -11,8 +10,8 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  chips (reparten TODO el ancho según cuántos
                  estén activos en la BD), fila de promos y
                  envoltorios de filtros.
-VERSIÓN:         2.11
-CAMBIOS:         R134: la FILA 1 baja al ALTO DE LOS CHIPS — .btn-ordenar 42×42 → 36.4×36.4 (círculo proporcional) y .buscar-capsula height 42 → 36.4; la ciudad se estira sola (align-self: stretch). Cuenta: 9+10 aire + 15.4 letra + 2 borde. Gemelo GAS sincronizado.
+VERSIÓN:         2.12
+CAMBIOS:         R135: limpieza — línea ESPEJO GITHUB duplicada en la cabecera del gemelo Pages eliminada (comentario, cero efecto). R134: la FILA 1 baja al ALTO DE LOS CHIPS (ordenar y buscar a 36.4px). Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura de filtros),
                  Lista_CSS.html (lista y buscar-vacio),

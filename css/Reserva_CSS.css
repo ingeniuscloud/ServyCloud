@@ -3,9 +3,9 @@
 ARCHIVO:         Reserva_CSS.html
 ESPEJO GITHUB:   github/css/Reserva_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del flujo de reserva: formularios flotantes, teléfono, OTP, turnos, errores por campo (.form-error), botones y zona revelable post-validación.
-VERSIÓN:         1.6
-CAMBIOS:         R131: MUERE el banner superior (.reserva-banner) — nace .form-error: cada mensaje vive DEBAJO de su campo con la misma paleta de error (#fef2f2 / #991b1b) y letra .cita; slot de flujo #errorFlujo bajo la cabecera · el campo OTP viste letra .titulo (22px · 300; centro y tracking intactos) · el botón solicitar código queda con LOOK SECUNDARIO COMPLETO (transparente + borde fino) y la letra de .botonSecundario en el DOM.
+RESPONSABILIDAD: Estilos del flujo de reserva: formularios flotantes, teléfono, OTP, turnos, errores por campo (.errorForm), botones y zona revelable post-validación.
+VERSIÓN:         1.7
+CAMBIOS:         R135: la clase .form-error pasa a llamarse .errorForm (orden del dueño; MISMOS valores: 11px·400, #991b1b sobre #fef2f2, padding 7px 10px, radio 8px, margen 6px, línea 1.4 — renombrada pura, cero efecto visual). Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -37,7 +37,7 @@ CAMBIOS:         R131: MUERE el banner superior (.reserva-banner) — nace .form
      banner (#fef2f2 / #991b1b) y la letra .cita del Core. El slot
      de flujo (#errorFlujo, mensajes sin campo) comparte estilo.
      ============================================================ */
-  .form-error {
+  .errorForm {
     display: block;
     margin-top: 6px;
     padding: 7px 10px;
@@ -49,7 +49,7 @@ CAMBIOS:         R131: MUERE el banner superior (.reserva-banner) — nace .form
     line-height: 1.4;
     text-align: left;
   }
-  .form-error[hidden] { display: none; }
+  .errorForm[hidden] { display: none; }
 
   /* ============================================================
      FORM · contenedor

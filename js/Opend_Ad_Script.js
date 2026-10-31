@@ -9,13 +9,13 @@ RESPONSABILIDAD: Open Ad de apertura (estilo App Open Ad de Mercado
                  (bloque { activo, items[] }) y si HOY toca, monta
                  la capa sobre la app mientras termina de cargar:
                  creativo 9:16 protagonista con fondo tenue detrás.
-VERSIÓN:         1.8.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.8.1
+CAMBIOS:         R135: dependencia legado corregida — el gemelo real es Ciudad_Sheet_Script.js (decía Ciudad_Script.js; comentario de cabecera, cero efecto). Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA), Global_Script.js
                  (ventanaVigente, abrirWhatsapp, postBackend,
                  asegurarSesion), Seccion_Imagen_Script.js
                  (urlImagenDirecta), Chips_Script.js (getChipActivo,
-                 seleccionar), Ciudad_Script.js (getActual),
+                 seleccionar), Ciudad_Sheet_Script.js (getActual),
                  Telefono.css (.glass anfitrión), Opend_Ad_CSS.css
 ════════════════════════════════════════════════════════════════════*/
 

@@ -9,8 +9,8 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.6.0
-CAMBIOS:         R134: post — la duda pasa a CHIP del formulario (.chip-form) DEBAJO del CTA (antes: enlace encima); el excerpt de la descripción muere (sin texto, sin fade) y queda el disparador «Ver descripción completa» 18px·300 con chevron ›. Gemelo GAS sincronizado.
+VERSIÓN:         2.7.0
+CAMBIOS:         R135: limpieza de código muerto — los selectores combinados de las reglas de tabla y citas del markdown ya NO citan .mk-desc-clamp (clase muerta desde R134; solo queda #postDescSheetContent, vivo). Cero efecto visual. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -104,11 +104,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   /* INFO */
   .mk-info { padding: 0 5% 20px; }
   .mk-desc-wrap { position: relative; margin-top: 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-  /* R134 · .mk-desc-clamp MURIÓ: el post ya no muestra excerpt
-     (ni su fade de máscara) — solo el disparador «Ver descripción
-     completa». El sheet (#postDescSheetContent) conserva TODAS
-     sus reglas; los selectores combinados de más abajo que aún
-     citan .mk-desc-clamp quedan muertos pero inofensivos. */
+  /* R134/R135 · .mk-desc-clamp MURIÓ en R134: el post ya no muestra
+     excerpt (ni su fade de máscara) — solo el disparador «Ver
+     descripción completa». En R135 se limpian los selectores que
+     aún lo citaban: las reglas de abajo viven SOLO para el sheet
+     de descripción (#postDescSheetContent). */
 
   /* ============================================================
      R92 · TABLA MARKDOWN (plan de inversión) — líneas sutiles,
@@ -117,21 +117,20 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      la tabla tiene 3 columnas y viste th/td con las clases del
      Core (textoPrimario / textoSecundario / subtitulo).
      ============================================================ */
-  .mk-desc-clamp table, #postDescSheetContent table {
+  #postDescSheetContent table {
     width: 100%; border-collapse: separate; border-spacing: 0;
     margin: 10px 0 12px; border: 1px solid rgba(15, 23, 42, 0.10);
     border-radius: 12px; overflow: hidden; font-variant-numeric: tabular-nums;
   }
-  .mk-desc-clamp thead th, #postDescSheetContent thead th {
+  #postDescSheetContent thead th {
     background: var(--post-pastel, #f1f5f9);
     text-align: left; padding: 9px 12px;
     border-bottom: 1px solid rgba(15, 23, 42, 0.10);
   }
-  .mk-desc-clamp tbody td, #postDescSheetContent tbody td {
+  #postDescSheetContent tbody td {
     padding: 9px 12px; background: #ffffff;
     border-bottom: 1px solid rgba(15, 23, 42, 0.07);
   }
-  .mk-desc-clamp tbody tr:last-child td,
   #postDescSheetContent tbody tr:last-child td { border-bottom: none; }
   /* !important: .subtitulo del Core trae text-align:left
      !important y pisaría la alineación de los precios. */
@@ -160,11 +159,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      La variante ^ (cita con llamado, marcada .mk-cita-llamado
      por el decorador) NO lleva línea ni padding: solo tipografía.
      ============================================================ */
-  .mk-desc-clamp blockquote.cita, #postDescSheetContent blockquote.cita {
+  #postDescSheetContent blockquote.cita {
     margin: 10px 0 12px; padding: 2px 0 2px 12px;
     border-left: 3px solid var(--post-pastel, #e2e8f0);
   }
-  .mk-desc-clamp blockquote.cita p, #postDescSheetContent blockquote.cita p {
+  #postDescSheetContent blockquote.cita p {
     margin: 0;
     font-size: var(--size-cita, 11px) !important;
     font-weight: var(--weight-cita, 400) !important;
@@ -172,7 +171,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     line-height: 1.4 !important;
     letter-spacing: 0 !important;
   }
-  .mk-desc-clamp blockquote.cita.mk-cita-llamado,
   #postDescSheetContent blockquote.cita.mk-cita-llamado {
     border-left: none; padding-left: 0;
   }

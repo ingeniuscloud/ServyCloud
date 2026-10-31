@@ -4,8 +4,8 @@ ARCHIVO:         Reserva_Dato_Script.html
 ESPEJO GITHUB:   github/js/Reserva_Dato_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Vista del formulario de reserva: bloque 1 = horario; bloque 2 = nombre, teléfono, correo, OTP y post-validación (¿cómo te enteraste? + privacidad), con slots de error bajo cada campo. OTP delegado a window.ReservaOTP; validaciones a window.ReservaValida.
-VERSIÓN:         1.6.0
-CAMBIOS:         R131: slots .form-error bajo cada campo (nombre, teléfono, correo, OTP, ¿cuál medio?, horario, privacidad) + #errorFlujo bajo la cabecera (fuera el banner superior) · el botón solicitar código viste .botonSecundario · los mensajes se limpian al escribir.
+VERSIÓN:         1.7.0
+CAMBIOS:         R135: los slots de error pasan de .form-error a .errorForm (clase renombrada en Reserva_CSS 1.7; mismos valores, cero efecto visual). Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),
                  Reserva_Sheet_Script.html (window.Sheet),
@@ -56,8 +56,8 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
         '</strong>. Completa tus datos y un asesor te contactará.</p>' +
         /* R131 · slot de mensajes de FLUJO (sin campo: p.ej. «No hay
            publicación activa»). Los errores de campo viven debajo
-           de cada campo (.form-error); este vive bajo la cabecera. */
-        '<div class="form-error" id="errorFlujo" hidden></div>';
+           de cada campo (.errorForm); este vive bajo la cabecera. */
+        '<div class="errorForm" id="errorFlujo" hidden></div>';
     }
 
     var PENCIL_BTN =
@@ -151,7 +151,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                 'data-confirmado="' + (confirmado ? '1' : '0') + '" style="' + verde + '">' +
                 '<legend id="horarioLabel"' + label + '>Horario disponible</legend>' +
                 opciones + resumen +
-                '<div class="form-error" hidden></div>' +
+                '<div class="errorForm" hidden></div>' +
               '</fieldset>';
     }
 
@@ -182,7 +182,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                     '<input type="text" id="inputNombre" placeholder=" " class="form-input" autocomplete="name">' +
                     '<label for="inputNombre" class="form-label">Nombre completo</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
-                    '<div class="form-error" hidden></div>' +
+                    '<div class="errorForm" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldTelefono">' +
@@ -192,7 +192,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                     '</div>' +
                     '<label for="inputTelefono" class="form-label">Teléfono</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
-                    '<div class="form-error" hidden></div>' +
+                    '<div class="errorForm" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="form-field" id="fieldCorreo">' +
@@ -201,7 +201,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                            'autocapitalize="off" autocorrect="off" spellcheck="false">' +
                     '<label for="inputCorreo" class="form-label">Correo electrónico</label>' +
                     '<span class="field-check" data-glifo="check"></span>' +
-                    '<div class="form-error" hidden></div>' +
+                    '<div class="errorForm" hidden></div>' +
                     '<button type="button" id="btnEditarCorreo" aria-label="Editar correo" data-glifo="lapiz" ' +
                       'style="display:none; position:absolute; right:12px; top:50%; transform:translateY(-50%); ' +
                              'align-items:center; justify-content:center; ' +
@@ -219,17 +219,17 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       html +=     '<button type="button" class="btn-solicitar-codigo botonSecundario" id="btnSolicitarCodigo" hidden>' +
                     '📧 Solicitar código de validación' +
                   '</button>' +
-                  '<div class="form-error" id="errorSolicitar" hidden></div>';
+                  '<div class="errorForm" id="errorSolicitar" hidden></div>';
 
       html +=     '<div class="zona-otp" id="zonaOtp" hidden>' +
                     '<div class="form-field" id="fieldOtp">' +
                       '<input type="text" id="inputOtp" placeholder=" " class="form-input form-input-otp" ' +
                              'inputmode="numeric" maxlength="6" autocomplete="one-time-code">' +
                       '<label for="inputOtp" class="form-label">Código de validación</label>' +
-                      '<div class="form-error" hidden></div>' +
+                      '<div class="errorForm" hidden></div>' +
                     '</div>' +
                     '<button type="button" class="link-reenviar" id="btnReenviar">Reenviar código</button>' +
-                    '<div class="form-error" id="errorReenviar" hidden></div>' +
+                    '<div class="errorForm" id="errorReenviar" hidden></div>' +
                   '</div>';
 
       html +=     '<div class="bloque-post-validacion" id="bloquePostValidacion" hidden>';
@@ -282,7 +282,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                         '<input type="text" id="inputConocioOtro" placeholder=" " class="form-input">' +
                         '<label for="inputConocioOtro" class="form-label">¿Cuál medio?</label>' +
                         '<span class="field-check" data-glifo="check"></span>' +
-                        '<div class="form-error" hidden></div>' +
+                        '<div class="errorForm" hidden></div>' +
                       '</div>' +
                     '</fieldset>';
 
@@ -297,7 +297,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                           '<button type="button" class="link-privacidad" id="linkPrivacidad">política de privacidad</button>' +
                           ' de Centro Ceicca.' +
                         '</span>' +
-                        '<div class="form-error" hidden></div>' +
+                        '<div class="errorForm" hidden></div>' +
                       '</div>' +
                     '</div>';
 
