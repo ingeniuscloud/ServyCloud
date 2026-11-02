@@ -4,8 +4,8 @@ ARCHIVO:         Reserva_Dato_Script.html
 ESPEJO GITHUB:   github/js/Reserva_Dato_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Vista del formulario de reserva: bloque 1 = horario; bloque 2 = nombre, teléfono, correo, OTP y post-validación (¿cómo te enteraste? + privacidad), con slots de error bajo cada campo. OTP delegado a window.ReservaOTP; validaciones a window.ReservaValida.
-VERSIÓN:         1.7.0
-CAMBIOS:         R135: los slots de error pasan de .form-error a .errorForm (clase renombrada en Reserva_CSS 1.7; mismos valores, cero efecto visual). Historial: bitácora/versiones.
+VERSIÓN:         1.8.0
+CAMBIOS:         R138: el título del formulario (h3 .form-titulo) deja de ser fijo («Reservar cupo») y ahora dice LO MISMO que el CTA del post: lee meta.cta del MISMO postJson que ya trae el post del lienzo, con la MISMA miga que buildCTA (Seccion_Script). Si el dueño cambia el texto del CTA en la BD, el título del sheet cambia solo. SOLO el texto: clase, subtítulo, tipografía, OTP y procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),
                  Reserva_Sheet_Script.html (window.Sheet),
@@ -13,7 +13,6 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  (state + callbacks), Index.html (SISTEMA.origenes
                  vía state)
 ════════════════════════════════════════════════════════════════════*/
-
 
   window.ReservaDatos = (function () {
 
@@ -49,9 +48,18 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       return t || 'esta publicación';
     }
 
-    function getHeaderHTML(nombrePost) {
+    /* R138 · Texto del CTA del post · MISMA fuente y MISMA miga que
+       buildCTA (Seccion_Script): meta.cta del postJson del lienzo.
+       El título del sheet lo espeja: si el dueño cambia el texto del
+       CTA en la BD, el título cambia solo. Solo texto, sin CSS. */
+    function ctaDelPost(post) {
+      var meta = ((post && post.postJson) || {}).meta || {};
+      return String(meta.cta || 'Quiero reservar mi cupo').trim();
+    }
+
+    function getHeaderHTML(nombrePost, ctaTexto) {
       return '' +
-        '<h3 class="form-titulo titulo">Reservar cupo</h3>' +
+        '<h3 class="form-titulo titulo">' + escapeHtml(ctaTexto) + '</h3>' +
         '<p class="form-sub textoPrimario">Estás reservando <strong>' + escapeHtml(nombrePost) +
         '</strong>. Completa tus datos y un asesor te contactará.</p>' +
         /* R131 · slot de mensajes de FLUJO (sin campo: p.ej. «No hay
@@ -165,7 +173,7 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       var origenes = state.origenes || [];
 
       var html = '<div class="sheet-form">';
-      html += getHeaderHTML(nombrePost);
+      html += getHeaderHTML(nombrePost, ctaDelPost(post));
 
       html += '<div id="bloqueDatos">';
       html += getHorarioHTML(state);
