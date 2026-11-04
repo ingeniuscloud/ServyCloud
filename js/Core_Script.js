@@ -2,7 +2,6 @@
 
 ARCHIVO:         Core_Script.html
 ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
-ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  arranca los componentes con datos; inyecta el
@@ -12,8 +11,8 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.39.0
-CAMBIOS:         R136: cada click válido del botón CTA de un post dispara avisoCTA al backend (fire-and-forget, asíncrono — mismo camino que el aviso del Open Ad); el backend deduplica 60s por dispositivo+post y encola el Telegram al admin. Cubre el CTA en ambos modos (reserva y whatsapp).
+VERSIÓN:         1.40.0
+CAMBIOS:         R139: el placeholder {tituloPost} viaja en los mensajes de WhatsApp. mensajeCta (modo whatsapp del CTA) ahora sustituye {tituloPost} con el título del post; mensajeDuda pasa de {titulo} a {tituloPost} (el viejo {titulo} sigue funcionando en posts que aún lo traigan). Fuente del título: descripcion.tituloPost del postJson, con post.titulo de miga — la MISMA que ya usaba la duda. Sin título, el mensaje viaja tal cual. SOLO el texto que viaja: click, sheet, Telegram, GA4 y procesos intactos.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -21,8 +20,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Reserva_Script.html y hojas de reserva,
                  Iconos.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
-
-
 
 
   /* ============================================================
@@ -453,6 +450,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       return String(meta.mensajeCta || '').trim().length > 0;
     }
 
+    /* R139 · Título del post para los placeholders · la MISMA
+       fuente que la duda ya usaba (R76): descripcion.tituloPost
+       del postJson, con post.titulo de miga. */
+    function tituloDelPost(post) {
+      var pj = (post && post.postJson) || {};
+      var desc = pj.descripcion || {};
+      return String(desc.tituloPost || (post && post.titulo) || '').trim();
+    }
+
     function intentarWhatsapp() {
       if (!postActivoGlobal) return false;
       if (!esModoWhatsapp(postActivoGlobal)) return false;
@@ -460,6 +466,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       var pj = postActivoGlobal.postJson || {};
       var meta = pj.meta || {};
       var mensaje = String(meta.mensajeCta || '').trim();
+
+      /* R139: {tituloPost} → el título del post. Sin título,
+         el mensaje viaja tal cual (nunca tumba el envío). */
+      var titulo = tituloDelPost(postActivoGlobal);
+      if (titulo) mensaje = mensaje.split('{tituloPost}').join(titulo);
 
       var partner = buscarPartner(postActivoGlobal.idPartner);
       var numero = partner && partner.partnerJson
@@ -608,13 +619,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
       var pj = post.postJson || {};
       var meta = pj.meta || {};
-      var desc = pj.descripcion || {};
 
       var mensaje = String(meta.mensajeDuda || '').trim();
       if (!mensaje) return;
 
-      var titulo = String(desc.tituloPost || post.titulo || '').trim();
-      if (titulo) mensaje = mensaje.split('{titulo}').join(titulo);
+      var titulo = tituloDelPost(post);
+      if (titulo) {
+        /* R139: placeholder explícito {tituloPost}; el viejo
+           {titulo} sigue funcionando para posts que aún lo
+           traigan en la BD. */
+        mensaje = mensaje.split('{tituloPost}').join(titulo);
+        mensaje = mensaje.split('{titulo}').join(titulo);
+      }
 
       var partner = buscarPartner(post.idPartner);
       var numero = partner && partner.partnerJson
