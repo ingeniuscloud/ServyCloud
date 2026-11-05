@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.13.0
-CAMBIOS:         R136: el sheet de la descripción completa gana DRAG DE CIERRE — gesto desde la franja superior (handle) o desde el contenido cuando está arriba del todo; el sheet obedece al dedo frame a frame y al soltar decide la inercia o el umbral (30%), igual que los sheets del menú global y de reserva. Gemelo GAS sincronizado.
+VERSIÓN:         2.14.0
+CAMBIOS:         R141: la opción «Publícalo con nosotros» (bloque asesor) pasa a TODOS los posts — ya no es exclusiva de Servicios; en Cursos queda DEBAJO de In Company (el orden que ya pintaba). Texto 100% ágil desde la BD, cero hardcodeo: pregunta = CHIPSJSON.crossSell del chip del post (viaja en SISTEMA.chips) y CTA = ROOTJSON.app.crossSellCta (viaja en SISTEMA.root.app); sin datos de BD no hay bloque ni texto de respaldo. Gemelo GAS sincronizado. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -714,14 +714,42 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
           '</button></div>';
     }
 
-    function buildBloqueAsesor() {
+    /* R141 · TEXTOS ÁGILES DEL BLOQUE ASESOR — cero texto en el
+       código: la pregunta vive en CHIPSJSON.crossSell del chip del
+       post (viaja en SISTEMA.chips) y el CTA en ROOTJSON.app.
+       crossSellCta (viaja en SISTEMA.root.app, la misma ruta del
+       color primario R140). Sin dato de BD no hay bloque y NO hay
+       texto de respaldo: todo el texto lo manda el dueño. */
+    function preguntaCrossSell(post) {
+      var chipsPost = (post && post.idChips) || [];
+      var catalogo  = (window.SISTEMA && window.SISTEMA.chips) || [];
+      for (var i = 0; i < chipsPost.length; i++) {
+        for (var j = 0; j < catalogo.length; j++) {
+          var c = catalogo[j];
+          if (c && c.idChip === chipsPost[i] && c.crossSell) return String(c.crossSell);
+        }
+      }
+      return '';
+    }
+
+    function ctaCrossSell() {
+      var app = (window.SISTEMA && window.SISTEMA.root && window.SISTEMA.root.app) || null;
+      return (app && app.crossSellCta) ? String(app.crossSellCta) : '';
+    }
+
+    function buildBloqueAsesor(post) {
       /* R83: el Servy publicidad lleva el MISMO botón blanco
          redondo del In Company (.ci-boton) en vez de la flecha
-         suelta. */
+         suelta. R141: los dos textos llegan de la BD (pregunta del
+         chip + CTA del app) y la opción se pinta en TODOS los
+         posts, no solo en Servicios. */
+      var pregunta = preguntaCrossSell(post);
+      var cta      = ctaCrossSell();
+      if (!pregunta || !cta) return '';
       return '<div class="mk-section" style="padding-top:10px;">' +
           '<button type="button" class="bloque-asesor" id="bloqueAsesor">' +
             '<span class="bloque-asesor-icono" data-glifo="userPlus"></span>' +
-            '<span class="bloque-asesor-info"><span class="bloque-asesor-titulo textoPrimario">¿Ofreces algún servicio?</span><span class="bloque-asesor-sub textoSecundario">Publícalo con nosotros y llega a más personas</span></span>' +
+            '<span class="bloque-asesor-info"><span class="bloque-asesor-titulo textoPrimario">' + escapeHtml(pregunta) + '</span><span class="bloque-asesor-sub textoSecundario">' + escapeHtml(cta) + '</span></span>' +
             '<span class="ci-boton"><span data-glifo="flechaVer" style="width:18px; height:18px; display:block;"></span></span>' +
           '</button></div>';
     }
@@ -732,10 +760,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var pj = post.postJson || {};
       var ids       = Array.isArray(pj.crosssell) ? pj.crosssell : [];
       var inCompany = pj.inCompany === true;
-      var esServicio = (post.idChips || []).indexOf('se') !== -1;
+      /* R141: la opción ya NO es exclusiva de Servicios — se pinta
+         en TODOS los posts al final de la sección; en Cursos queda
+         DEBAJO de In Company (el orden que ya pintaba: tarjetas →
+         In Company → opción del chip). Sin textos en la BD, sin
+         bloque (buildBloqueAsesor devuelve ''). */
       var tarjetas  = buildCrossSellHTML(ids);
       var inCo      = inCompany ? buildInCompanyButton() : '';
-      var asesor    = esServicio ? buildBloqueAsesor() : '';
+      var asesor    = buildBloqueAsesor(post);
       if (!tarjetas && !inCo && !asesor) return '';
       /* R83: la sección pintada abriga a las tarjetas relacionadas
          Y también a In Company y Servy publicidad. */
