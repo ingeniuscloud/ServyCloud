@@ -9,8 +9,8 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.8.0
-CAMBIOS:         R136: el sheet de descripción gana drag de cierre (handle touch-action none + .mk-sheet.sin-transicion + content pan-y — la mecánica de los sheets global y de reserva) y la duda bajo el CTA queda formal: texto azul #1d4ed8 SOLO en ese botón (antes lo pintaba el UA). Historial: bitácora/versiones.
+VERSIÓN:         2.9.0
+CAMBIOS:         R142: la venta del post en el lienzo — nace .lienzo-venta (debajo del título del post): la MISMA letra del slot de la grilla (maestra .subtitulo en el HTML) y el MISMO color oficial centralizado var(--color-primario); moneda y centavos menores (centavos en superíndice, formato ML) y el glifo calendario acompañando en el mismo color. Sin datos en la BD el bloque ni nace (el «A consultar» es de la card, no del lienzo). Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -442,3 +442,25 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     opacity: 1; transition: opacity 0.25s ease;
   }
   .mk-sheet-fade.fin { opacity: 0; }
+
+  /* ============================================================
+     R142 · VENTA EN EL LIENZO · debajo del título
+     La MISMA letra del slot de la grilla (maestra .subtitulo en
+     el HTML) y el MISMO color oficial centralizado: moneda y
+     centavos menores (centavos en superíndice, formato ML) y el
+     glifo calendario acompañando en el mismo color. Sin datos en
+     la BD el bloque ni nace (el «A consultar» es de la card).
+     ============================================================ */
+  .lienzo-venta { margin: 0 0 2px 0; }
+  .lienzo-venta .lv-precio { color: var(--color-primario, #EA580C) !important; }
+  .lienzo-venta .lv-precio .precio-moneda { font-size: 0.72em; margin-right: 2px; }
+  .lienzo-venta .lv-precio .precio-centavos { font-size: 0.6em; vertical-align: 0.45em; margin-left: 1px; }
+  .lienzo-venta .lv-fecha {
+    display: flex; align-items: center; gap: 5px;
+    color: var(--color-primario, #EA580C) !important;
+  }
+  .lienzo-venta .lv-fecha-glifo {
+    flex: 0 0 auto; width: 15px; height: 15px; display: block;
+    color: var(--color-primario, #EA580C);
+  }
+  .lienzo-venta .lv-fecha-glifo svg { width: 100%; height: 100%; display: block; }

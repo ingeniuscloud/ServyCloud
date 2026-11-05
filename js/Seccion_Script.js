@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.14.0
-CAMBIOS:         R141: la opción «Publícalo con nosotros» (bloque asesor) pasa a TODOS los posts — ya no es exclusiva de Servicios; en Cursos queda DEBAJO de In Company (el orden que ya pintaba). Texto 100% ágil desde la BD, cero hardcodeo: pregunta = CHIPSJSON.crossSell del chip del post (viaja en SISTEMA.chips) y CTA = ROOTJSON.app.crossSellCta (viaja en SISTEMA.root.app); sin datos de BD no hay bloque ni texto de respaldo. Gemelo GAS sincronizado. Historial: bitácora/versiones.
+VERSIÓN:         2.15.0
+CAMBIOS:         R142: la venta del post entra al lienzo — con precioVenta y/o fechaEvento en la BD, el dato sale DEBAJO del título con la MISMA tipografía del slot de la grilla (maestra .subtitulo + --color-primario): precio formato ML (moneda menor + centavos superíndice) y fecha es-VE 12h con su calendario. Solo con datos reales: sin precio y sin fecha el bloque NO nace (el «A consultar» es de la card, no del lienzo). Fuente: meta fresca del detalle, respaldo la fila horneada del catálogo (R140). Gemelo GAS sincronizado. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -540,6 +540,72 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       return html;
     }
 
+    /* ══════════════════════════════════════════════════════════
+       R142 · LA VENTA DEL POST EN EL LIENZO — los formateadores
+       del slot de la grilla (R140 de Lista) vivos aquí: precio
+       formato ML (moneda menor + centavos superíndice) y fecha
+       es-VE 12h. Autocontenidos: Seccion no depende de Lista.
+       ══════════════════════════════════════════════════════════ */
+    var MESES_CORTOS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    function partesPrecio(valor) {
+      var s = String(valor == null ? '' : valor).trim();
+      if (!s || !/^[0-9][0-9.,]*$/.test(s)) return null;
+      var coma = s.lastIndexOf(',');
+      if (coma === -1) return { entero: s, centavos: '' };
+      var entero = s.slice(0, coma);
+      if (!entero) return null;
+      var centavos = s.slice(coma + 1);
+      if (centavos.length > 2) centavos = centavos.slice(0, 2);
+      return { entero: entero, centavos: centavos };
+    }
+
+    function textoFechaEvento(valor) {
+      var m = String(valor == null ? '' : valor).trim()
+        .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?$/);
+      if (!m) return '';
+      var mes = MESES_CORTOS[parseInt(m[2], 10) - 1];
+      if (!mes) return '';
+      var txt = parseInt(m[3], 10) + ' ' + mes;
+      if (m[4]) {
+        var h = parseInt(m[4], 10);
+        var h12 = h % 12 || 12;
+        txt += ' · ' + h12 + ':' + ('0' + m[5]).slice(-2) + ' ' + (h >= 12 ? 'pm' : 'am');
+      }
+      return txt;
+    }
+
+    function buildVentaLienzo(post) {
+      /* La meta del detalle manda (fresca); la fila del catálogo
+         horneada (R140) es el respaldo natural — el dato sale
+         aunque el detalle llegue sin postJson. Sin precio Y sin
+         fecha legibles, el bloque no nace: el «A consultar» es
+         de la card de la grilla, nunca del lienzo. */
+      var meta   = (post && post.postJson && post.postJson.meta) || {};
+      var precio = partesPrecio(meta.precioVenta)     || partesPrecio(post && post.precioVenta);
+      var fecha  = textoFechaEvento(meta.fechaEvento) || textoFechaEvento(post && post.fechaEvento);
+      if (!precio && !fecha) return '';
+      var moneda = String(meta.monedaVenta || (post && post.monedaVenta) || '$');
+      var html = '<div class="lienzo-venta">';
+      if (precio) {
+        html += '<div class="lv-precio subtitulo">' +
+                  '<span class="precio-moneda">' + escapeHtml(moneda || '$') + '</span>' +
+                  '<span class="precio-entero">' + escapeHtml(precio.entero) + '</span>';
+        if (precio.centavos) {
+          html += '<span class="precio-centavos">' + escapeHtml(precio.centavos) + '</span>';
+        }
+        html += '</div>';
+      }
+      if (fecha) {
+        html += '<div class="lv-fecha subtitulo">' +
+                '<span class="lv-fecha-glifo" data-glifo="calendario" aria-hidden="true"></span>' +
+                escapeHtml(fecha) +
+                '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
     function buildPresentacion() {
       var post = postActivo;
       if (!post) return '';
@@ -555,6 +621,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (hero) { html += '<div class="app-hero-wrap">' + hero + '</div>'; }
       html += '<div class="mk-info">';
       if (titulo) { html += '<h1 class="tituloPost" style="margin:0 0 8px 0;">' + escapeHtml(titulo) + '</h1>'; }
+      /* R142: la venta del post (precio ML y/o fecha es-VE) viaja
+         DEBAJO del título con la MISMA tipografía del slot de la
+         grilla (maestra .subtitulo + --color-primario). Solo con
+         datos reales de la BD. */
+      html += buildVentaLienzo(post);
       /* R82: la promo vive debajo del título (jerarquía: qué es →
          incentivo → detalle). */
       html += buildPromoHTML();
