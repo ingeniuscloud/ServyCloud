@@ -18,8 +18,8 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
                  aplicarPlaceholders y ventanaVigente
-VERSIÓN:         1.17.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.18.0
+CAMBIOS:         R140: aplicarColorPrimario() — ROOTJSON.app.colorPrimario → variable CSS central --color-primario (fallback #EA580C en Core_CSS). Un solo sitio manda; se aplica al cargar (página GAS: SISTEMA ya viene inyectado) y cada vez que abrirSesion entrega SISTEMA (Pages). Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -42,6 +42,29 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     try { localStorage.setItem(KEY, nuevo); } catch (_) {}
     return nuevo;
   }
+
+  /* ============================================================
+     R140 · COLOR PRIMARIO CENTRAL
+     ROOTJSON.app.colorPrimario (lo controla el dueño en BD) →
+     variable CSS central --color-primario. El fallback vive en
+     el :root del Core_CSS (#EA580C): sin dato de BD o ante
+     cualquier fallo, la app pinta naranja de siempre. Se aplica
+     DOS veces por sesión: aquí al cargar (la página de GAS ya
+     trae SISTEMA inyectado por el Index) y cada vez que
+     abrirSesion entrega SISTEMA (páginas de GitHub Pages).
+     Nunca lanza: un color mal escrito no puede tumbar la app.
+     ============================================================ */
+  function aplicarColorPrimario() {
+    try {
+      var app = (window.SISTEMA && window.SISTEMA.root && window.SISTEMA.root.app) || null;
+      var color = app ? String(app.colorPrimario || '').trim() : '';
+      if (color && document.documentElement) {
+        document.documentElement.style.setProperty('--color-primario', color);
+      }
+    } catch (_) {}
+  }
+  window.aplicarColorPrimario = aplicarColorPrimario;
+  aplicarColorPrimario();
 
   /* ============================================================
      SESIÓN POR DATOS (R26)
@@ -81,6 +104,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
         if (data && data.token) window.TOKEN_SESION = data.token;
         if (data && data.sistema && !window.SISTEMA) {
           window.SISTEMA = data.sistema;
+          aplicarColorPrimario();   /* R140: el color oficial viaja con el sistema */
         }
         return data;
       });

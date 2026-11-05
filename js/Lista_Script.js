@@ -17,8 +17,14 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  volver y skeleton. Emite 'post:change'; escucha
                  'chips:change', 'buscar:change', 'ciudad:change'
                  y 'orden:change'.
-VERSIÓN:         2.16
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+                 R140: los chips con vista 'grilla' (CHIPSJSON) pintan
+                 tarjetas 2 por fila al estilo Mercado Libre — imagen
+                 1:1 lazy con skeleton propio, badge overlay, título a
+                 2 líneas y slot fijo precio/fecha ("A consultar" si
+                 no hay). Datos horneados en el catálogo. La búsqueda
+                 sigue SIEMPRE en lista.
+VERSIÓN:         2.17
+CAMBIOS:         R140: grilla data-driven para chips con vista 'grilla' (montarTarjetaGrilla + helpers: vistaDeChip, partesPrecio, textoFechaEvento, badgeDePost, slotPrecioFecha). Precio formato ML (centavos superíndice) en var(--color-primario); fecha es-VE 12h con glifo calendario. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -96,6 +102,181 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var grupos = post && post.idGrupo;
       if (!grupos || !grupos.length) return '';
       return nombreGrupo(grupos[0]);
+    }
+
+    /* ============================================================
+       R140 · GRILLA (vista 'grilla' del chip) · HELPERS
+       La vista la define el CHIP en CHIPSJSON (campo vista):
+       'grilla' → tarjetas 2 por fila al estilo Mercado Libre;
+       todo lo demás → la lista de siempre. La BÚSQUEDA sigue
+       SIEMPRE en lista (definición vigente del dueño). Los datos
+       del slot (precio/fecha) y la imagen viajan HORNEADOS en el
+       catálogo (02 Cache.gs R140): la grilla NUNCA llama
+       postDetalle por post.
+       ============================================================ */
+
+    /* Vista del chip: solo 'grilla' cambia la vidriera. Sin
+       campo, con otro valor o chip desconocido → 'lista'. */
+    function vistaDeChip(idChip) {
+      if (!idChip) return 'lista';
+      var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
+      for (var i = 0; i < chips.length; i++) {
+        if (chips[i] && chips[i].idChip === idChip) {
+          return String(chips[i].vista || '').trim().toLowerCase() === 'grilla'
+            ? 'grilla'
+            : 'lista';
+        }
+      }
+      return 'lista';
+    }
+
+    var MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+    /* PRECIO FORMATO ML: "250,00" → entero "250" + centavos "00"
+       (el superíndice lo pinta el CSS). El entero viaja tal cual
+       (respeta miles con punto si el dueño los escribe). Sin coma
+       → sin centavos. Solo dígitos y separadores: cualquier otra
+       cosa → null y la card cae al slot de fecha. */
+    function partesPrecio(valor) {
+      var s = String(valor == null ? '' : valor).trim();
+      if (!s || !/^[0-9][0-9.,]*$/.test(s)) return null;
+      var coma = s.lastIndexOf(',');
+      if (coma === -1) return { entero: s, centavos: '' };
+      var entero = s.slice(0, coma);
+      if (!entero) return null;
+      var centavos = s.slice(coma + 1);
+      if (centavos.length > 2) centavos = centavos.slice(0, 2);
+      return { entero: entero, centavos: centavos };
+    }
+
+    /* FECHA DEL EVENTO es-VE: "2026-12-25 20:00" →
+       "25 Dic · 8:00 pm" (12h, am/pm en minúscula). Sin hora →
+       "25 Dic". Ilegible → ''. */
+    function textoFechaEvento(valor) {
+      var m = String(valor == null ? '' : valor).trim()
+        .match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?$/);
+      if (!m) return '';
+      var mes = MESES_CORTOS[parseInt(m[2], 10) - 1];
+      if (!mes) return '';
+      var txt = parseInt(m[3], 10) + ' ' + mes;
+      if (m[4]) {
+        var h = parseInt(m[4], 10);
+        var h12 = h % 12 || 12;
+        txt += ' · ' + h12 + ':' + ('0' + m[5]).slice(-2) + ' ' + (h >= 12 ? 'pm' : 'am');
+      }
+      return txt;
+    }
+
+    /* BADGE OVERLAY: mismo contrato del banner (R98) —
+       post.promo.idBadge buscado en SISTEMA.badges. Apagado o
+       sin título → sin overlay. */
+    function badgeDePost(post) {
+      var id = post && post.promo ? String(post.promo.idBadge || '').trim() : '';
+      if (!id) return null;
+      var badges = (window.SISTEMA && window.SISTEMA.badges) || [];
+      for (var i = 0; i < badges.length; i++) {
+        if (badges[i] && badges[i].idBadge === id) {
+          if (badges[i].estado === false) return null;
+          return badges[i];
+        }
+      }
+      return null;
+    }
+
+    /* SLOT FIJO de la card: precio → fecha → "A consultar".
+       Nunca queda muda. El precio manda (Ventas); la fecha es el
+       respaldo natural de Eventos. */
+    function slotPrecioFecha(post) {
+      var precio = partesPrecio(post.precioVenta);
+      if (precio) {
+        var html = '<span class="grilla-precio titulo">' +
+          '<span class="precio-moneda">' + escapeHtml(post.monedaVenta || '$') + '</span>' +
+          '<span class="precio-entero">' + escapeHtml(precio.entero) + '</span>';
+        if (precio.centavos) {
+          html += '<span class="precio-centavos">' + escapeHtml(precio.centavos) + '</span>';
+        }
+        return html + '</span>';
+      }
+
+      var fecha = textoFechaEvento(post.fechaEvento);
+      if (fecha) {
+        return '<span class="grilla-fecha">' +
+               '<span class="grilla-fecha-glifo" data-glifo="calendario" aria-hidden="true"></span>' +
+               escapeHtml(fecha) +
+               '</span>';
+      }
+
+      return '<span class="grilla-consulta">A consultar</span>';
+    }
+
+    /* CARD DE LA GRILLA (patrón Mercado Libre): la CARD ENTERA
+       es el botón. Imagen 1:1 cover con lazy y skeleton PROPIO
+       (cada card brilla hasta que SU foto llega; si falla, cae
+       a la inicial del título), badge overlay y título a 2
+       líneas con altura fija (los slots quedan alineados entre
+       cards). Sin likes, sin marca y sin "Ver publicación": la
+       grilla invita con el precio. Tipografía del dueño: título
+       .textoPrimario · precio .titulo (clases maestras). */
+    function montarTarjetaGrilla(post) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'grilla-item';
+      btn.setAttribute('data-post', post.id);
+
+      var badge   = badgeDePost(post);
+      var titulo  = post.titulo || post.boton || post.id;
+      var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
+
+      var html = '<span class="grilla-foto" aria-hidden="true">';
+      html +=   '<span class="grilla-foto-skeleton"></span>';
+      if (post.imagen) {
+        html += '<img class="grilla-img" src="' + escapeHtml(post.imagen) + '" alt="" loading="lazy" decoding="async">';
+      } else {
+        html += '<span class="grilla-inicial">' + escapeHtml(inicial) + '</span>';
+      }
+      if (badge && badge.titulo) {
+        html += '<span class="grilla-badge">' + escapeHtml(badge.titulo) + '</span>';
+      }
+      html += '</span>';
+      html += '<span class="grilla-titulo textoPrimario">' + escapeHtml(titulo) + '</span>';
+      html += slotPrecioFecha(post);
+
+      btn.innerHTML = html;
+
+      /* El skeleton individual se retira cuando LA IMAGEN de esa
+         card llega (o falla: cae a la inicial). */
+      var img = btn.querySelector('.grilla-img');
+      if (img) {
+        var retirarSkeleton = function () {
+          var sk = btn.querySelector('.grilla-foto-skeleton');
+          if (sk && sk.parentNode) sk.parentNode.removeChild(sk);
+        };
+        if (img.complete) {
+          retirarSkeleton();
+        } else {
+          img.addEventListener('load', retirarSkeleton);
+          img.addEventListener('error', function () {
+            retirarSkeleton();
+            if (img.parentNode) {
+              var inicialFalla = document.createElement('span');
+              inicialFalla.className = 'grilla-inicial';
+              inicialFalla.textContent = inicial;
+              img.parentNode.insertBefore(inicialFalla, img);
+              img.parentNode.removeChild(img);
+            }
+          });
+        }
+      }
+
+      if (typeof window.pintarGlifos === 'function') {
+        window.pintarGlifos(btn);
+      }
+
+      btn.addEventListener('click', function () {
+        abrirDetalle(post.id);
+      });
+
+      return btn;
     }
 
     function tituloDe(post) {
@@ -430,6 +611,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       actualizarAvisoBusqueda(false, enLimite);
 
+      /* R140 · la vista la define el CHIP (CHIPSJSON.vista):
+         'grilla' pinta tarjetas 2 por fila (Ventas/Eventos);
+         todo lo demás pinta la lista de siempre. La BÚSQUEDA
+         SIEMPRE lista (definición vigente del dueño). */
+      var esGrilla = !modoBusqueda && vistaDeChip(chipActivoActual) === 'grilla';
+      cont.classList.toggle('en-grilla', esGrilla);
+
       var frag = document.createDocumentFragment();
 
       /* Construye el botón de UN post (anatomía R64 · LIMPIO:
@@ -502,7 +690,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
          .lista-grupo-header al abrir cada bloque de grupo. */
       var renderizados = [];
       var bloqueActual = null;
-      var agrupando = (ordenActual === 'categoria');
+      var agrupando = (ordenActual === 'categoria') && !esGrilla;
 
       lista.forEach(function (post) {
         if (agrupando) {
@@ -517,7 +705,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
           }
         }
 
-        frag.appendChild(montarItem(post));
+        frag.appendChild(esGrilla ? montarTarjetaGrilla(post) : montarItem(post));
         renderizados.push(post);
       });
 

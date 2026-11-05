@@ -4,8 +4,8 @@ ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
-VERSIÓN:         2.15
-CAMBIOS:         R135: .chipsFormulario baja de peso 600 → 300 (centralizado: el cambio se aplica solo en todos lados) + limpieza del registro: --size-ui-4 y --size-ui-5 eliminados (0 usos en toda la app). Historial: bitácora/versiones.
+VERSIÓN:         2.16
+CAMBIOS:         R140: variable central --color-primario (fallback #EA580C) — el color oficial naranja del sistema vive EN LAS VARIABLES como las demás; el dueño lo manda desde ROOTJSON.app.colorPrimario (Global_Script lo aplica al cargar) y los consumidores pintan con var(--color-primario). Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -28,6 +28,15 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     --size-botonPrimario: 16px;   --weight-botonPrimario: 400;   --color-botonPrimario: #FFFFFF;
     --size-botonSecundario: 16px; --weight-botonSecundario: 400; --color-botonSecundario: #7A828A;
     --size-badge: 9px;            --weight-badge: 700;
+
+    /* R140 · COLOR PRIMARIO · el naranja oficial vive CENTRALIZADO
+       aquí (mismo trato que las variables de tipografía). El
+       fallback #EA580C (el más profundo de la familia sin dejar
+       de ser naranja: 3.54:1 sobre blanco, AA texto grande); si
+       ROOTJSON.app.colorPrimario trae otro valor, Global_Script
+       lo sobrescribe AL VUELO sobre <html>. Consumidores:
+       var(--color-primario) — nada de naranjas sueltos. */
+    --color-primario: #EA580C;
 
     /* R130 · CHIPS · letras propias de los dos carriles de chips.
        Color dinámico: cada chip conserva el suyo (gris reposo /

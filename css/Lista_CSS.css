@@ -12,8 +12,8 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.16
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.17
+CAMBIOS:         R140: sección GRILLA para los chips con vista 'grilla' (CHIPSJSON): 2 tarjetas por fila, card botón con imagen 1:1 + skeleton individual, badge overlay en var(--color-primario), título .textoPrimario a 2 líneas con altura fija y slot precio (.titulo, naranja oficial centralizado) / fecha / "A consultar". .lista-wrap[hidden] pasa a !important (la grilla introduce display:grid y el ocultado del modo detalle debe ganar). Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -125,8 +125,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* ============================================================
      CONTENEDORES
+     .lista-wrap[hidden] con !important (R140): la grilla mete
+     display:grid en .lista-wrap.en-grilla y el ocultado del
+     modo detalle SIEMPRE gana — mismo trato que su hermano
+     .secciones-track[hidden] de la línea siguiente.
      ============================================================ */
-  .lista-wrap[hidden] { display: none; }
+  .lista-wrap[hidden] { display: none !important; }
   .secciones-track[hidden] { display: none !important; }
 
   /* ============================================================
@@ -659,4 +663,111 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-skeleton-item { padding: 12px 14px; }
     .lista-skeleton-avatar { width: 44px; height: 44px; }
     .lista-skeleton-estrella .punto { width: 14px; height: 14px; }
+  }
+
+  /* ============================================================
+     R140 · GRILLA (vista 'grilla' del chip) · patrón Mercado
+     Libre: 2 tarjetas por fila y la CARD ENTERA es el botón.
+     Imagen 1:1 cover con skeleton INDIVIDUAL (mismo shimmer del
+     sistema), badge overlay en var(--color-primario), título
+     .textoPrimario a 2 líneas con ALTURA FIJA (slots alineados
+     entre cards) y slot único: precio (.titulo en el COLOR
+     OFICIAL CENTRALIZADO --color-primario — el más visible de
+     la familia sin dejar de ser naranja) / fecha (glifo
+     calendario) / "A consultar". Sin likes ni marca: la grilla
+     invita con el precio.
+     ============================================================ */
+  .lista-wrap.en-grilla {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+    padding: 12px 14px 24px;
+  }
+  .grilla-item {
+    display: flex; flex-direction: column; padding: 0;
+    border: 1px solid #eef2f7; border-radius: 14px; background: #ffffff;
+    overflow: hidden; font-family: inherit; text-align: left; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease;
+  }
+  .grilla-item:active { transform: scale(0.98); }
+
+  /* FOTO · marco 1:1 con skeleton propio (mismo shimmer del
+     sistema, definido en la sección skeleton del detalle). */
+  .grilla-foto {
+    position: relative; display: block; width: 100%;
+    aspect-ratio: 1 / 1; background: #f8fafc; overflow: hidden;
+  }
+  .grilla-foto-skeleton {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.06) 0%, rgba(15, 23, 42, 0.10) 50%, rgba(15, 23, 42, 0.06) 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+  .grilla-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .grilla-inicial {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: var(--size-tituloPost, 24px); font-weight: var(--weight-tituloPost, 300);
+    color: #94a3b8; background: #f1f5f9;
+  }
+
+  /* BADGE overlay (BADGEJSON vía promo.idBadge): píldora del
+     color oficial arriba a la izquierda — el idioma ML. */
+  .grilla-badge {
+    position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 999px;
+    background: var(--color-primario, #EA580C); color: #ffffff;
+    font-size: var(--size-badge, 9px); font-weight: var(--weight-badge, 700);
+    letter-spacing: 0.5px; line-height: 1.2;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+  }
+
+  /* TÍTULO · la letra la manda la maestra .textoPrimario (en el
+     HTML); aquí solo el carril: altura fija de 2 líneas
+     (2 × 14px × 1.6). */
+  .grilla-item .grilla-titulo { height: 45px; padding: 8px 10px 0; }
+
+  /* SLOT · precio → fecha → "A consultar". Anclado al pie con
+     margin-top:auto: card alta o corta, el slot siempre abajo. */
+  .grilla-item .grilla-precio,
+  .grilla-item .grilla-fecha,
+  .grilla-item .grilla-consulta { margin-top: auto; padding: 4px 10px 10px; }
+
+  /* PRECIO · la letra la manda la maestra .titulo (en el HTML);
+     el COLOR es el oficial centralizado. Moneda y centavos
+     menores, centavos en superíndice: formato ML. */
+  .grilla-item .grilla-precio { color: var(--color-primario, #EA580C) !important; }
+  .grilla-item .grilla-precio .precio-moneda { font-size: 0.72em; margin-right: 2px; }
+  .grilla-item .grilla-precio .precio-centavos { font-size: 0.6em; vertical-align: 0.45em; margin-left: 1px; }
+
+  /* FECHA · mismo peso visual que el precio pero en tinta (el
+     naranja es del precio) + glifo calendario del sistema en el
+     color oficial. */
+  .grilla-item .grilla-fecha {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 16px; font-weight: 400; color: var(--color-textoPrimario, #1f2937);
+    line-height: 1.2; letter-spacing: -0.2px;
+    white-space: nowrap; overflow: hidden;
+  }
+  .grilla-item .grilla-fecha .grilla-fecha-glifo {
+    flex: 0 0 auto; width: 15px; height: 15px; display: block;
+    color: var(--color-primario, #EA580C);
+  }
+  .grilla-item .grilla-fecha .grilla-fecha-glifo svg { width: 100%; height: 100%; display: block; }
+
+  /* A CONSULTAR · el slot nunca queda mudo: voz gris de la
+     maestra textoSecundario. */
+  .grilla-item .grilla-consulta {
+    font-size: var(--size-textoSecundario, 14px);
+    font-weight: var(--weight-textoSecundario, 300);
+    color: var(--color-textoSecundario, #64748B); line-height: 1.2;
+  }
+
+  @media (max-width: 360px) {
+    .lista-wrap.en-grilla { gap: 10px 8px; padding: 10px 12px 20px; }
+    .grilla-item { border-radius: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grilla-foto-skeleton { animation: none; background: rgba(15, 23, 42, 0.08); }
+    .grilla-item:active { transform: none; }
   }
