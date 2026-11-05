@@ -11,8 +11,8 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  cabecera de grupo,
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.18
-CAMBIOS:         R140: sección GRILLA para los chips con vista 'grilla' (CHIPSJSON): 2 tarjetas por fila, card botón con imagen 1:1 + skeleton individual, badge overlay que viste la PÍLDORA maestra .badgeActivo del Core (aquí solo posición + sombra), título .textoPrimario a 2 líneas con altura fija y slot único precio / fecha / "A consultar" — UNA SOLA letra (maestra .subtitulo, ajuste del dueño) pintada en el oficial centralizado var(--color-primario). .lista-wrap[hidden] pasa a !important (la grilla introduce display:grid y el ocultado del modo detalle debe ganar). Historial: bitácora/versiones.
+VERSIÓN:         2.19
+CAMBIOS:         R143: ajuste del dueño — PESO del slot de la grilla: precio / fecha / "A consultar" pasan de 300 a 600 para resaltar sobre la card (font-weight 600 !important en los 3 selectores del slot; gana sobre la maestra .subtitulo, que pinta 300 vía variable — el lienzo R142 y el resto de .subtitulo de la app NO se tocan). Color oficial, formato ML, badge y procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -725,11 +725,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      (2 × 14px × 1.6). */
   .grilla-item .grilla-titulo { height: 45px; padding: 8px 10px 0; }
 
-  /* SLOT · precio → fecha → "A consultar". Anclado al pie con
+  /* SLOT · precio → fecha → "A consultar" · PESO 600 (R143: gana
+     sobre la maestra .subtitulo, que pinta 300). Anclado al pie con
      margin-top:auto: card alta o corta, el slot siempre abajo. */
   .grilla-item .grilla-precio,
   .grilla-item .grilla-fecha,
-  .grilla-item .grilla-consulta { margin-top: auto; padding: 4px 10px 10px; }
+  .grilla-item .grilla-consulta { margin-top: auto; padding: 4px 10px 10px; font-weight: 600 !important; }
 
   /* PRECIO · la letra la manda la maestra .subtitulo (en el
      HTML); el COLOR es el oficial centralizado. Moneda y centavos
