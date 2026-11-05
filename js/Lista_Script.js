@@ -19,12 +19,13 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  y 'orden:change'.
                  R140: los chips con vista 'grilla' (CHIPSJSON) pintan
                  tarjetas 2 por fila al estilo Mercado Libre — imagen
-                 1:1 lazy con skeleton propio, badge overlay, título a
-                 2 líneas y slot fijo precio/fecha ("A consultar" si
-                 no hay). Datos horneados en el catálogo. La búsqueda
+                 1:1 lazy con skeleton propio, badge píldora
+                 .badgeActivo, título a 2 líneas y slot fijo
+                 precio/fecha en .subtitulo ("A consultar" si no
+                 hay). Datos horneados en el catálogo. La búsqueda
                  sigue SIEMPRE en lista.
-VERSIÓN:         2.17
-CAMBIOS:         R140: grilla data-driven para chips con vista 'grilla' (montarTarjetaGrilla + helpers: vistaDeChip, partesPrecio, textoFechaEvento, badgeDePost, slotPrecioFecha). Precio formato ML (centavos superíndice) en var(--color-primario); fecha es-VE 12h con glifo calendario. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
+VERSIÓN:         2.18
+CAMBIOS:         R140: grilla data-driven para chips con vista 'grilla' (montarTarjetaGrilla + helpers: vistaDeChip, partesPrecio, textoFechaEvento, badgeDePost, slotPrecioFecha). Precio formato ML (centavos superíndice), fecha es-VE 12h con glifo calendario y "A consultar": el slot viaja en la maestra .subtitulo pintada con el oficial --color-primario (ajuste del dueño: UNA sola letra, sin distorsión); el badge viste la píldora maestra .badgeActivo (R131). La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -185,11 +186,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
     /* SLOT FIJO de la card: precio → fecha → "A consultar".
        Nunca queda muda. El precio manda (Ventas); la fecha es el
-       respaldo natural de Eventos. */
+       respaldo natural de Eventos. Tipografía del dueño: UNA
+       SOLA letra para el slot entero — la maestra .subtitulo —
+       para que el precio, la fecha y el "A consultar" no
+       distorsionen entre cards (el color lo pinta el CSS). */
     function slotPrecioFecha(post) {
       var precio = partesPrecio(post.precioVenta);
       if (precio) {
-        var html = '<span class="grilla-precio titulo">' +
+        var html = '<span class="grilla-precio subtitulo">' +
           '<span class="precio-moneda">' + escapeHtml(post.monedaVenta || '$') + '</span>' +
           '<span class="precio-entero">' + escapeHtml(precio.entero) + '</span>';
         if (precio.centavos) {
@@ -200,23 +204,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       var fecha = textoFechaEvento(post.fechaEvento);
       if (fecha) {
-        return '<span class="grilla-fecha">' +
+        return '<span class="grilla-fecha subtitulo">' +
                '<span class="grilla-fecha-glifo" data-glifo="calendario" aria-hidden="true"></span>' +
                escapeHtml(fecha) +
                '</span>';
       }
 
-      return '<span class="grilla-consulta">A consultar</span>';
+      return '<span class="grilla-consulta subtitulo">A consultar</span>';
     }
 
     /* CARD DE LA GRILLA (patrón Mercado Libre): la CARD ENTERA
        es el botón. Imagen 1:1 cover con lazy y skeleton PROPIO
        (cada card brilla hasta que SU foto llega; si falla, cae
-       a la inicial del título), badge overlay y título a 2
-       líneas con altura fija (los slots quedan alineados entre
-       cards). Sin likes, sin marca y sin "Ver publicación": la
-       grilla invita con el precio. Tipografía del dueño: título
-       .textoPrimario · precio .titulo (clases maestras). */
+       a la inicial del título), badge y título a 2 líneas con
+       altura fija (los slots quedan alineados entre cards).
+       Sin likes, sin marca y sin "Ver publicación": la grilla
+       invita con el precio. Tipografía del dueño: título
+       .textoPrimario · slot .subtitulo con el color oficial ·
+       badge píldora maestra .badgeActivo (clases maestras). */
     function montarTarjetaGrilla(post) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -235,7 +240,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         html += '<span class="grilla-inicial">' + escapeHtml(inicial) + '</span>';
       }
       if (badge && badge.titulo) {
-        html += '<span class="grilla-badge">' + escapeHtml(badge.titulo) + '</span>';
+        html += '<span class="grilla-badge badgeActivo">' + escapeHtml(badge.titulo) + '</span>';
       }
       html += '</span>';
       html += '<span class="grilla-titulo textoPrimario">' + escapeHtml(titulo) + '</span>';
