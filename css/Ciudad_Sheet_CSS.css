@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar e
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del bottom sheet de ciudad: tarjetas apiladas (nombre, badge «Activo», métricas), estado activo naranja, responsive.
 VERSIÓN:         1.14
-CAMBIOS:         R131: muere .ciudad-card-badge (bloque entero) — la píldora «Activo» viste la clase maestra .badgeActivo del Core; aquí queda SOLO el estado (oculta en reposo, visible en la tarjeta activa). Código muerto eliminado.
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con scale de la card de ciudad (.ciudad-card) y del aceptar cookies (.cookies-aceptar), y el :active de solo cursor del handle (.ciudad-handle-area). El drag del handle y el feedback de toque sin movimiento intactos. Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
 
@@ -163,7 +163,6 @@ CAMBIOS:         R131: muere .ciudad-card-badge (bloque entero) — la píldora 
     min-height: 40px;
     background-color: #ffffff;
   }
-  .ciudad-handle-area:active { cursor: grabbing; }
 
   .ciudad-handle {
     width: 36px;
@@ -298,10 +297,6 @@ CAMBIOS:         R131: muere .ciudad-card-badge (bloque entero) — la píldora 
     -webkit-tap-highlight-color: transparent;
     transition: background 0.15s ease, transform 0.15s ease;
   }
-  .cookies-aceptar:active {
-    background: #e05e07;
-    transform: scale(0.98);
-  }
 
   /* ============================================================
      TARJETAS DE CIUDADES (R65) · STACK NATIVO (modelo del dueño)
@@ -348,7 +343,6 @@ CAMBIOS:         R131: muere .ciudad-card-badge (bloque entero) — la píldora 
 
   /* FEEDBACK TÁCTIL NATIVO (modelo del dueño): se encoge un
      3% al poner el pulgar encima. */
-  .ciudad-card:active { transform: scale(0.97); }
 
   /* Tarjeta ACTIVA · degradado tinte→blanco + borde naranja */
   .ciudad-card.activa {

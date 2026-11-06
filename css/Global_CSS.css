@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del menú global y sus subvistas (Acerca de, Legales, instalar app: pestañas, pasos, botón instalar), más el marco de los bottom sheets.
 VERSIÓN:         1.16.0
-CAMBIOS:         R131: el texto bajo el título de instalar app (.pwa-sub) viste .textoPrimario del Core (antes .subtitulo); la regla conserva solo su espaciado.
+CAMBIOS:         R145: barrido de efectos que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active de solo cursor del handle de los sheets (.sheet-handle-area). El drag del handle y el feedback de toque sin movimiento (menú, cerrar, volver, tabs) intactos. Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
 
@@ -115,7 +115,6 @@ CAMBIOS:         R131: el texto bajo el título de instalar app (.pwa-sub) viste
     min-height: 40px;
     z-index: 6;
   }
-  .sheet-handle-area:active { cursor: grabbing; }
 
   .sheet-handle {
     width: 38px;

@@ -12,7 +12,7 @@ RESPONSABILIDAD: Estilos del Q&A del post. Campo de pregunta en el
                  fecha y firma del partner) y el sheet al 90%
                  para ver todas con SKELETON de carga.
 VERSIÓN:         1.2.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale del botón enviar (.preg-send). El feedback de toque sin movimiento (.preg-clear) y el resto intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
                  Seccion_CSS.html (infra .mk-sheet-* del sheet),
                  Social_CSS.html (colores del post vía --post-color)
@@ -75,7 +75,6 @@ DEPENDENCIAS:    Core_CSS.html (clases maestras y variables),
     transition: transform 0.15s ease, color 0.2s ease, box-shadow 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .preg-send:active { transform: scale(0.92); }
   .preg-send:disabled { color: #cbd5e1; box-shadow: none; cursor: not-allowed; }
   .preg-send svg { width: 19px; height: 19px; display: block; margin-left: 1px; }
   .preg-form > .preg-send { flex-shrink: 0; }

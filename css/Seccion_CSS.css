@@ -10,7 +10,7 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
 VERSIÓN:         2.9.0
-CAMBIOS:         R142: la venta del post en el lienzo — nace .lienzo-venta (debajo del título del post): la MISMA letra del slot de la grilla (maestra .subtitulo en el HTML) y el MISMO color oficial centralizado var(--color-primario); moneda y centavos menores (centavos en superíndice, formato ML) y el glifo calendario acompañando en el mismo color. Sin datos en la BD el bloque ni nace (el «A consultar» es de la card, no del lienzo). Historial: bitácora/versiones.
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con movimiento del CTA del lienzo (.secciones-track .cta-reservar.mk-cta-button), del cross-sell (.mk-cross-card), de In Company (.cross-incompany) y del bloque asesor (.bloque-asesor), y el :active de solo cursor del handle del sheet (.mk-sheet-handle-area). El feedback de toque sin movimiento y el layout intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -302,7 +302,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24), 0 3px 8px rgba(15, 23, 42, 0.10) !important;
     cursor: pointer; position: relative;
   }
-  .secciones-track .cta-reservar.mk-cta-button:active { transform: scale(0.97) !important; background: rgba(234, 88, 12, 0.92) !important; }
   .secciones-track .cta-reservar-texto { text-align: center !important; flex: none !important; }
   .mk-cta-arrow-icon { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
   .mk-cta-arrow-icon svg { width: 100%; height: 100%; display: block; }
@@ -337,7 +336,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     font-family: inherit; text-align: left; cursor: pointer;
     transition: transform 0.15s ease; display: flex; flex-direction: column;
   }
-  .mk-cross-card:active { transform: scale(0.97); }
   .mk-cross-top {
     background: var(--post-claro, #f1f5f9);
     background: color-mix(in srgb, var(--post-color) 15%, #ffffff);
@@ -368,7 +366,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     border: 1.5px dashed rgba(15,23,42,0.18); border-radius: 14px; background: #ffffff;
     font-family: inherit; cursor: pointer; text-align: left; transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
   }
-  .cross-incompany:active { background: #f8fafc; border-color: #94A3B8; transform: scale(0.985); }
   .cross-incompany .ci-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   /* R82: la tipografía la llevan .textoSecundario y .textoPrimario
      del Core; aquí queda solo el layout de las dos líneas. */
@@ -382,7 +379,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     font-family: inherit; cursor: pointer; text-align: left; width: 100%;
     transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
   }
-  .bloque-asesor:active { background: #FFF7ED; border-color: #EA580C; transform: scale(0.985); }
   .bloque-asesor-icono { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background-color: #FFF7ED; color: #F97316; display: flex; align-items: center; justify-content: center; }
   .bloque-asesor-icono svg { width: 20px; height: 20px; display: block; }
   .bloque-asesor-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -417,7 +413,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      agarre y touch-action none para que el gesto sea SIEMPRE del
      drag y el navegador no se lo robe para hacer scroll. */
   .mk-sheet-handle-area { flex-shrink: 0; padding: 10px 0 6px; display: flex; align-items: center; justify-content: center; min-height: 40px; background: #fff; cursor: grab; touch-action: none; position: relative; z-index: 6; }
-  .mk-sheet-handle-area:active { cursor: grabbing; }
   .mk-sheet-handle { width: 36px; height: 5px; background: #dee2e6; border-radius: 3px; }
   .mk-sheet-close { position: absolute; top: 6px; right: 12px; width: 36px; height: 36px; border: none; background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 7; }
   .mk-sheet-close svg { width: 18px; height: 18px; display: block; }

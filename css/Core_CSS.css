@@ -4,8 +4,8 @@ ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
-VERSIÓN:         2.16
-CAMBIOS:         R140: variable central --color-primario (fallback #EA580C) — el color oficial naranja del sistema vive EN LAS VARIABLES como las demás; el dueño lo manda desde ROOTJSON.app.colorPrimario (Global_Script lo aplica al cargar) y los consumidores pintan con var(--color-primario). Historial: bitácora/versiones.
+VERSIÓN:         2.17
+CAMBIOS:         R145: el post PRONTO vuelve al tenue natural del botón :disabled (R144 revertida por el dueño: el tenue ES el look pedido) — fuera la regla .cta-pronto:disabled — y fuera el efecto de click del CTA (.cta-reservar:active con scale; barrido de efectos que no aplican en teléfono, app 100% teléfono). El bloque base del activo, .botonPrimario y los tenues de agotado/sin post intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -285,7 +285,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24), 0 3px 8px rgba(15, 23, 42, 0.10);
     transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   }
-  .cta-reservar:active { transform: scale(0.97); background: rgba(234, 88, 12, 0.92); }
   .cta-reservar-texto { flex: 1; text-align: left; }
   .cta-reservar-icono { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
   .cta-reservar-icono svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }

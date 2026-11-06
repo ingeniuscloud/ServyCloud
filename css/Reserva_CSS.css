@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Reserva_CSS.css (subir a GitHub Pages; editar en GAS
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del flujo de reserva: formularios flotantes, teléfono, OTP, turnos, errores por campo (.errorForm), botones y zona revelable post-validación.
 VERSIÓN:         1.7
-CAMBIOS:         R135: la clase .form-error pasa a llamarse .errorForm (orden del dueño; MISMOS valores: 11px·400, #991b1b sobre #fef2f2, padding 7px 10px, radio 8px, margen 6px, línea 1.4 — renombrada pura, cero efecto visual). Historial: bitácora/versiones.
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale del botón de envío (.form-submit). El tenue del :disabled (estado, no efecto) y el resto del formulario intactos. Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -498,7 +498,6 @@ CAMBIOS:         R135: la clase .form-error pasa a llamarse .errorForm (orden de
     justify-content: space-between;
     gap: 10px;
   }
-  .form-submit:active:not(:disabled) { transform: scale(0.98); }
   .form-submit:disabled {
     opacity: 0.42;
     cursor: not-allowed;

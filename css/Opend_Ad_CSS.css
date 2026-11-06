@@ -9,7 +9,7 @@ RESPONSABILIDAD: Estilos del Open Ad de apertura (estilo App Open
                  (velo oscuro suave que deja ver la app atenuada),
                  sin sombra en la imagen.
 VERSIÓN:         1.7.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con movimiento de la imagen del open-ad (.openad-img) y de su X de cierre (.openad-cerrar). El resto del open-ad intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
                  (.glass anfitrión), Index.html
 ════════════════════════════════════════════════════════════════════*/
@@ -96,7 +96,6 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
     cursor: pointer;
     transition: transform 0.15s ease;
   }
-  .openad-img[role="button"]:active { transform: scale(0.985); }
 
   /* ============================================================
      X DE CIERRE · FUERA de la imagen, arriba a la derecha (R122)
@@ -137,9 +136,6 @@ DEPENDENCIAS:    Opend_Ad_Script.html (crea el nodo), Telefono.css
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-  }
-  .openad-cerrar.openad-x-visible:active {
-    transform: translateY(-95%) scale(0.92);
   }
   .openad-cerrar svg {
     width: 20px;

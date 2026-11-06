@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Orden_Sheet_CSS.css (subir a GitHub Pages; editar en
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del bottom sheet de orden: stack vertical de opciones (icono, título, descripción, píldora .badgeActivo), estado activo y responsive.
 VERSIÓN:         1.6
-CAMBIOS:         R131: MUERE el check naranja (.ordenar-check + @keyframes ordenarCheckIn + su regla responsive) y entra la píldora .badgeActivo del Core con su aparición suave (ordenarBadgeIn); aquí queda SOLO el estado. Código muerto eliminado.
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale de las cards del ordenar (.ordenar-card) y el :active de solo cursor del handle (.ordenar-handle-area). El drag del handle y el feedback de toque sin movimiento intactos. Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -79,7 +79,6 @@ CAMBIOS:         R131: MUERE el check naranja (.ordenar-check + @keyframes orden
     min-height: 40px;
     background-color: #ffffff;
   }
-  .ordenar-handle-area:active { cursor: grabbing; }
 
   .ordenar-handle {
     width: 36px;
@@ -196,7 +195,6 @@ CAMBIOS:         R131: MUERE el check naranja (.ordenar-check + @keyframes orden
 
   /* FEEDBACK TÁCTIL NATIVO (modelo del dueño): se encoge un
      3% al poner el pulgar encima. */
-  .ordenar-card:active { transform: scale(0.97); }
 
   /* Tarjeta ACTIVA · degradado tinte→blanco + borde naranja */
   .ordenar-card.activa {

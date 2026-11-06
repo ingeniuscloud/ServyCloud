@@ -6,7 +6,7 @@ PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del LIENZO del partner (#partnerTrack),
                  hermano del post dentro de .secciones-wrap
 VERSIÓN:         1.1
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale del botón WhatsApp del partner (.pf-wa). El feedback de toque sin movimiento (.pf-tab) y el resto intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
                  .mk-rel-section, .mk-cross-*), Core_CSS.html
                  (variables y .botonSecundario/.enlacesOpciones)
@@ -114,11 +114,6 @@ DEPENDENCIAS:    Seccion_CSS.html (.mk-partner-*, .mk-location-*,
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-  }
-  .pf-wa:active {
-    background: rgba(15, 23, 42, 0.04);
-    border-color: rgba(15, 23, 42, 0.3);
-    transform: scale(0.985);
   }
   .pf-wa-texto { text-align: center; }
   .pf-wa-icono {

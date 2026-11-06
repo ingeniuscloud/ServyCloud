@@ -11,8 +11,8 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
-VERSIÓN:         1.40.0
-CAMBIOS:         R139: el placeholder {tituloPost} viaja en los mensajes de WhatsApp. mensajeCta (modo whatsapp del CTA) ahora sustituye {tituloPost} con el título del post; mensajeDuda pasa de {titulo} a {tituloPost} (el viejo {titulo} sigue funcionando en posts que aún lo traigan). Fuente del título: descripcion.tituloPost del postJson, con post.titulo de miga — la MISMA que ya usaba la duda. Sin título, el mensaje viaja tal cual. SOLO el texto que viaja: click, sheet, Telegram, GA4 y procesos intactos.
+VERSIÓN:         1.41.0
+CAMBIOS:         R145: el CTA del post PRONTO vuelve al look tenue con la acción inerte (aclaración del dueño: así se veía antes de R144 y así debe quedarse). Fuera la marca cta-pronto y su reseteo — la rama pronto vuelve a ser solo btn.disabled = true y el tenue lo pinta el navegador lavando el botón :disabled. SOLO el caso pronto: activo, whatsapp, agotado (cupos 0) y sin post intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -566,6 +566,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
           var estado = postActivoGlobal.estado || 'activo';
 
           if (estado === 'pronto') {
+            /* R145: el post PRONTO no se reserva aún — el botón
+               queda sin acción (disabled) y el navegador lo lava
+               a naranja tenue: EL look que el dueño pide. Nada de
+               clase ni regla CSS extra (R144 revertida). */
             btn.disabled = true;
           } else if (esModoWhatsapp(postActivoGlobal)) {
             btn.disabled = false;

@@ -12,7 +12,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
 VERSIÓN:         2.19
-CAMBIOS:         R143: ajuste del dueño — PESO del slot de la grilla: precio / fecha / "A consultar" pasan de 300 a 600 para resaltar sobre la card (font-weight 600 !important en los 3 selectores del slot; gana sobre la maestra .subtitulo, que pinta 300 vía variable — el lienzo R142 y el resto de .subtitulo de la app NO se tocan). Color oficial, formato ML, badge y procesos intactos. Historial: bitácora/versiones.
+CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale de la card de la grilla (.grilla-item) y su neutralización en prefers-reduced-motion (código muerto). La grilla R140 y el peso 600 del slot R143 intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -690,7 +690,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.12s ease;
   }
-  .grilla-item:active { transform: scale(0.98); }
 
   /* FOTO · marco 1:1 con skeleton propio (mismo shimmer del
      sistema, definido en la sección skeleton del detalle). */
@@ -767,5 +766,4 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   @media (prefers-reduced-motion: reduce) {
     .grilla-foto-skeleton { animation: none; background: rgba(15, 23, 42, 0.08); }
-    .grilla-item:active { transform: none; }
   }
