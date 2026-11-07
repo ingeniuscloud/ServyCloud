@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
 VERSIÓN:         2.17
-CAMBIOS:         R145: el post PRONTO vuelve al tenue natural del botón :disabled (R144 revertida por el dueño: el tenue ES el look pedido) — fuera la regla .cta-pronto:disabled — y fuera el efecto de click del CTA (.cta-reservar:active con scale; barrido de efectos que no aplican en teléfono, app 100% teléfono). El bloque base del activo, .botonPrimario y los tenues de agotado/sin post intactos. Historial: bitácora/versiones.
+CAMBIOS:         R146: tenue GENERAL del CTA inactivo — UNA regla .cta-reservar:disabled para los DOS casos apagados (post PRONTO y suma de cupos en cero): naranja apagado con baja intensidad, sin sombra, blanco blindado con -webkit-text-fill-color para que ningún navegador lo re-lave. Antes el tenue era el lavado del navegador: Safari (teléfono) lo pintaba y el PC no. El bloque base del activo y .botonPrimario intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -294,6 +294,30 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     width: calc(100% - 86px); margin: 4px 60px 16px 26px;
   }
   .cta-fila .cta-reservar { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
+
+  /* ============================================================
+     R146 · CTA INACTIVO — UN tenue general para los DOS casos
+     apagados: post PRONTO y suma de cupos en cero. Naranja
+     apagado con baja intensidad y sin sombra. Declarado
+     EXPLÍCITO porque antes el tenue era el lavado del navegador:
+     Safari (teléfono) lava los :disabled y el PC no — ahora el
+     look es el mismo en todos lados. El segundo selector existe
+     para ganarle el !important con que Seccion_CSS re-viste al
+     activo. Sin acción: no abre la hoja de reserva.
+     ============================================================ */
+  .cta-reservar:disabled,
+  .secciones-track .cta-reservar.mk-cta-button:disabled {
+    opacity: 0.45;
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    box-shadow: none !important;
+    cursor: default;
+  }
+  .cta-reservar:disabled .cta-reservar-texto,
+  .secciones-track .cta-reservar.mk-cta-button:disabled .cta-reservar-texto {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+  }
 
   .user-fila {
     display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 12px;

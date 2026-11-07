@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/js/Reserva_Dato_Script.js (subir a GitHub Pages; editar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Vista del formulario de reserva: bloque 1 = horario; bloque 2 = nombre, teléfono, correo, OTP y post-validación (¿cómo te enteraste? + privacidad), con slots de error bajo cada campo. OTP delegado a window.ReservaOTP; validaciones a window.ReservaValida.
 VERSIÓN:         1.8.0
-CAMBIOS:         R138: el título del formulario (h3 .form-titulo) deja de ser fijo («Reservar cupo») y ahora dice LO MISMO que el CTA del post: lee meta.cta del MISMO postJson que ya trae el post del lienzo, con la MISMA miga que buildCTA (Seccion_Script). Si el dueño cambia el texto del CTA en la BD, el título del sheet cambia solo. SOLO el texto: clase, subtítulo, tipografía, OTP y procesos intactos. Historial: bitácora/versiones.
+CAMBIOS:         R146: código muerto fuera — textoCupos pierde la rama «Sin cupos» (el filtro de getPlanes ya solo deja vivir filas con cupo > 0) y el chequeo de cupo del horario elegido en la validación (imposible llegar a uno agotado). Filas, textos y procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
                  Reserva_OTP_Script.html (hard: window.ReservaOTP),
                  Reserva_Sheet_Script.html (window.Sheet),
@@ -34,9 +34,11 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
     var validarTelefono = V.telefono;
     var validarCorreo   = V.correo;
 
+    /* Texto de cupos de la fila · R146: solo viven filas con
+       cupo > 0 (el filtro está en getPlanes) — la rama «Sin
+       cupos» murió con ese filtro. */
     function textoCupos(cupo) {
       var n = Number(cupo || 0);
-      if (n === 0) return 'Sin cupos';
       if (n === 1) return '1 cupo';
       return n + ' cupos';
     }
@@ -602,16 +604,13 @@ DEPENDENCIAS:    Reserva_Valida_Script.html (hard: window.ReservaValida),
       function actualizarEstadoFormulario() {
         if (!el.btnConfirmar) return;
 
-        /* R95: el CTA se apaga si el horario elegido está en cero
-           (cupo: 0 del PLANJSON). El backend revalida igual. */
-        var planSel = (state.planes || [])[state.turnoSeleccionado || 0] || null;
-        var conCupo = !planSel || Number(planSel.cupo || 0) > 0;
-
+        /* R146: sin chequeo de cupo del horario elegido —
+           getPlanes ya solo lista horarios con cupo > 0. El
+           backend sigue revalidando igual. */
         var ok = validarNombre(el.inputNombre.value)
               && validarTelefono(el.inputTelefono.value)
               && state.correoValidado
               && !!state.horarioConfirmado
-              && conCupo
               && !!state.conocioSeleccionado
               && el.inputPrivacidad.checked;
 

@@ -12,7 +12,7 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
 VERSIÓN:         1.41.0
-CAMBIOS:         R145: el CTA del post PRONTO vuelve al look tenue con la acción inerte (aclaración del dueño: así se veía antes de R144 y así debe quedarse). Fuera la marca cta-pronto y su reseteo — la rama pronto vuelve a ser solo btn.disabled = true y el tenue lo pinta el navegador lavando el botón :disabled. SOLO el caso pronto: activo, whatsapp, agotado (cupos 0) y sin post intactos. Historial: bitácora/versiones.
+CAMBIOS:         R146: el CTA inactivo habla con meta.ctaInactivo — un solo texto para los DOS casos apagados (post PRONTO y suma de cupos en cero); el vivo sigue con meta.cta y si el post no trae ctaInactivo cae al texto normal. Sin cambios de acción: el inactivo no abre la hoja de reserva. El tenue ya no depende del navegador (el PC no lava los :disabled): lo pinta la regla general de Core_CSS. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -557,25 +557,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
           btn.disabled = true;
           span.textContent = 'Quiero reservar mi cupo';
         } else {
-          /* R76: meta.cta (ya existía). Mensaje del whatsapp ya
-             no decide el texto, solo el modo (esModoWhatsapp). */
+          /* R146 · DOS TEXTOS y un solo pintado inactivo. Vivo
+             habla con meta.cta; pronto o cupos en cero hablan con
+             meta.ctaInactivo (si el post no lo trae, cae al texto
+             normal). El tenue lo pinta UNA regla general de
+             Core_CSS sobre :disabled — nada de looks por caso. */
           var pj = postActivoGlobal.postJson || {};
           var meta = pj.meta || {};
-          span.textContent = meta.cta || 'Quiero reservar mi cupo';
-
           var estado = postActivoGlobal.estado || 'activo';
 
           if (estado === 'pronto') {
-            /* R145: el post PRONTO no se reserva aún — el botón
-               queda sin acción (disabled) y el navegador lo lava
-               a naranja tenue: EL look que el dueño pide. Nada de
-               clase ni regla CSS extra (R144 revertida). */
+            /* PRONTO: sin acción y con su texto de inactivo. */
             btn.disabled = true;
+            span.textContent = meta.ctaInactivo || meta.cta || 'Quiero reservar mi cupo';
           } else if (esModoWhatsapp(postActivoGlobal)) {
             btn.disabled = false;
+            span.textContent = meta.cta || 'Quiero reservar mi cupo';
           } else {
             var totalCupos = calcularTotalCupos(postActivoGlobal);
-            btn.disabled = (totalCupos === 0);
+            var inactivo = (totalCupos === 0);
+            btn.disabled = inactivo;
+            span.textContent = inactivo
+              ? (meta.ctaInactivo || meta.cta || 'Quiero reservar mi cupo')
+              : (meta.cta || 'Quiero reservar mi cupo');
           }
         }
       }

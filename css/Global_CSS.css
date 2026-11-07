@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Global_CSS.css (subir a GitHub Pages; editar en GAS 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del menú global y sus subvistas (Acerca de, Legales, instalar app: pestañas, pasos, botón instalar), más el marco de los bottom sheets.
 VERSIÓN:         1.16.0
-CAMBIOS:         R145: barrido de efectos que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active de solo cursor del handle de los sheets (.sheet-handle-area). El drag del handle y el feedback de toque sin movimiento (menú, cerrar, volver, tabs) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R146: puntero touch simulado para PC — la flecha nativa se retira y la sustituye un círculo gris con degradado radial y puntito central (look del modo dispositivo del inspector), SIEMPRE activo y para TODO (no solo clicables). Solo entra donde hay puntero fino real: el teléfono no tiene cursor y no cambia nada. Sheets, drag y feedback de toque intactos. Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
 
@@ -802,4 +802,47 @@ CAMBIOS:         R145: barrido de efectos que no aplican en teléfono (app 100% 
     border-radius: 12px;
     border-left: 3px solid #f97316;
     margin: 10px 0 0;
+  }
+
+  /* ============================================================
+     R146 · PUNTERO TOUCH SIMULADO (PC) — el look del modo
+     dispositivo del inspector: círculo gris con degradado radial
+     y puntito central. SIEMPRE activo y para TODO (no solo
+     clicables). Solo entra donde hay puntero fino de verdad: el
+     teléfono no tiene cursor y no cambia nada. El elemento lo
+     crea Global_Script; aquí vive solo el look.
+     ============================================================ */
+  .puntero-touch-circulo {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border-radius: 50%;
+    z-index: 2147483647;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%,
+      rgba(148, 163, 184, 0.55) 0%,
+      rgba(100, 116, 139, 0.42) 55%,
+      rgba(71, 85, 105, 0.30) 100%);
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.35);
+    will-change: transform;
+  }
+  .puntero-touch-circulo::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: rgba(51, 65, 85, 0.85);
+  }
+  @media (pointer: fine) and (hover: hover) {
+    body.puntero-touch,
+    body.puntero-touch * { cursor: none !important; }
+    body.puntero-touch .puntero-touch-circulo { display: block; }
   }

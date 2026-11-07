@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/js/Reserva_Script.js (subir a GitHub Pages; editar en GA
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Orquestador de la reserva: abre el sheet, envía la reserva, pinta cada mensaje DEBAJO de su campo (errorCampo/errorFlujo/limpiarErrores) y maneja el reintento.
 VERSIÓN:         1.5.0
-CAMBIOS:         R135: los selectores de error siguen la clase renombrada .errorForm (antes .form-error; mismos valores, cero efecto visual). Historial: bitácora/versiones.
+CAMBIOS:         R146: getPlanes lista SOLO los horarios con cupo > 0 — el de cupo cero no aparece en la hoja de reserva (menos datos, sin badges; orden del dueño). El backend sigue revalidando por su cuenta (SIN_CUPOS intacto). Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Reserva_Dato_Script.html (window.ReservaDatos),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -66,11 +66,15 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     }
     /* R95 · PLANJSON NUEVO: el detalle llega como ARRAY directo
        [{dias, horario, cupo}] (ya no {planes:[...]} con idTurno).
-       Solo cambia de dónde se lee; la pintada es intacta. */
+       R146 · FILTRO DE CUPOS: solo viven los horarios con cupo > 0;
+       el de cupo en cero no se muestra. Un solo punto filtra y
+       todos leen de aquí (state.planes y el índice de turnos). */
     function getPlanes() {
       var post = getPostActivo();
       if (!post || !Array.isArray(post.planJson)) return [];
-      return post.planJson;
+      return post.planJson.filter(function (p) {
+        return Number((p && p.cupo) || 0) > 0;
+      });
     }
     function getTurnoPorIndice(i) {
       return (getPlanes())[i] || null;

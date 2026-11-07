@@ -19,7 +19,7 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
                  aplicarPlaceholders y ventanaVigente
 VERSIÓN:         1.18.0
-CAMBIOS:         R140: aplicarColorPrimario() — ROOTJSON.app.colorPrimario → variable CSS central --color-primario (fallback #EA580C en Core_CSS). Un solo sitio manda; se aplica al cargar (página GAS: SISTEMA ya viene inyectado) y cada vez que abrirSesion entrega SISTEMA (Pages). Historial: bitácora/versiones.
+CAMBIOS:         R146: puntero touch simulado para PC — el círculo que viste Global_CSS nace SOLO donde hay puntero fino real, sigue al mouse 1:1 con translate3d y se oculta al salir de la ventana. El teléfono jamás ejecuta nada de esto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -520,3 +520,33 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
     if (ahora > hasta) return false;
     return true;
   }
+
+  /* ============================================================
+     R146 · PUNTERO TOUCH SIMULADO (PC) — el círculo que viste
+     Global_CSS. Nace SOLO donde hay puntero fino real (PC): el
+     teléfono no tiene cursor y jamás ejecuta nada de esto.
+     Sigue al mouse 1:1 con translate3d y se oculta al salir de
+     la ventana. Para TODO, no solo clicables.
+     ============================================================ */
+  (function () {
+    try {
+      if (!window.matchMedia('(pointer: fine) and (hover: hover)').matches) return;
+
+      var circulo = document.createElement('div');
+      circulo.className = 'puntero-touch-circulo';
+      circulo.style.opacity = '0';
+      document.body.appendChild(circulo);
+      document.body.classList.add('puntero-touch');
+
+      var visible = false;
+      document.addEventListener('mousemove', function (e) {
+        circulo.style.transform = 'translate3d(' + e.clientX + 'px, ' + e.clientY + 'px, 0)';
+        if (!visible) { visible = true; circulo.style.opacity = '1'; }
+      }, { passive: true });
+
+      document.documentElement.addEventListener('mouseleave', function () {
+        visible = false;
+        circulo.style.opacity = '0';
+      });
+    } catch (_) {}
+  })();
