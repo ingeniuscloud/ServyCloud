@@ -12,7 +12,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
 VERSIÓN:         2.19
-CAMBIOS:         R148: VERDE #16a34a para el overlay de la grilla — override .grilla-badge .badgeNuevo (el naranja de la maestra se perdía sobre fotos cálidas, naranja sobre naranja). ALCANCE EXACTO: solo la imagen de la grilla; la maestra .badgeNuevo del Core sigue naranja y las píldoras «Activo» de los sheets Ciudad y Ordenar NO se enteran. Letra, forma y altura intactas (solo fondo). R145 (barrido :active) y R140 (grilla) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R148 (hotfix 1): VERDE #16a34a para el overlay de la grilla — override .grilla-badge.badgeNuevo SELECTOR COMPUESTO (sin espacio): el badge pinta ambas clases sobre el MISMO span (class="grilla-badge badgeNuevo"), así que el combinador descendente de la primera versión (.grilla-badge .badgeNuevo) nunca matcheaba y la píldora seguía naranja. El naranja de la maestra se perdía sobre fotos cálidas, naranja sobre naranja. ALCANCE EXACTO: solo la imagen de la grilla; la maestra .badgeNuevo del Core sigue naranja y las píldoras «Activo» de los sheets Ciudad y Ordenar NO se enteran. Letra, forma y altura intactas (solo fondo). R145 (barrido :active) y R140 (grilla) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -724,13 +724,19 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
 
   /* VERDE de la grilla (R148 · orden del dueño): el naranja de
      la maestra se perdía sobre fotos cálidas (naranja sobre
-     naranja). Este override SUBE la especificidad sobre
-     .badgeNuevo y pinta el VERDE #16a34a SOLO en el overlay de
+     naranja). SELECTOR COMPUESTO (HOTFIX 1, sin espacio): el
+     badge pinta las DOS clases sobre el MISMO span
+     (class="grilla-badge badgeNuevo" en montarTarjetaGrilla),
+     así que el descendente .grilla-badge .badgeNuevo de la
+     primera versión nunca matcheaba (exige .badgeNuevo DENTRO
+     de otro .grilla-badge) y la píldora seguía naranja. El
+     compuesto sube la especificidad sobre .badgeNuevo (0,2,0
+     vs 0,1,0) y pinta el VERDE #16a34a SOLO en el overlay de
      la grilla — la maestra del Core sigue naranja para el resto
      de superficies (las píldoras «Activo» de los sheets Ciudad
      y Ordenar no se enteran). Letra, forma y altura intactas:
      solo cambia el fondo. El texto sigue blanco. */
-  .grilla-badge .badgeNuevo { background: #16a34a !important; }
+  .grilla-badge.badgeNuevo { background: #16a34a !important; }
 
   /* TÍTULO · la letra la manda la maestra .textoPrimario (en el
      HTML); aquí solo el carril: altura fija de 2 líneas
