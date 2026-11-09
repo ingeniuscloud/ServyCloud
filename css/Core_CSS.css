@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R149: nace .notificacionFlotante — clase CENTRALIZADA y UNIVERSAL de los avisos flotantes (hoy «respuesta a tu pregunta»; mañana cualquier función nueva). Paquete validado por el dueño: posición fija INFERIOR DERECHA incluida en la clase (respeta el safe-area, misma gramática de .mk-sheet-top), rojo #dc2620 con texto blanco (el hermano del verde #16a34a, contraste AA 4.8:1), letra propia 14px·600 vía variables (un solo sitio manda), borde redondeado + sombra flotante roja, entrada/salida suaves con .visible y cortesía prefers-reduced-motion. Va OCULTA por defecto: no pinta nada hasta que una función la use (0 colateral). R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R151: repintado del aviso validado punto por punto por el dueño — fondo AMARILLO #FFE600 y el texto vistiendo .textoPrimario con su color natural #1f2937 (tipografía CERO hardcodeada: mueren las variables --size/weight-notificacionFlotante de R149), nace la X de cerrar .avisoCerrar (circulito translúcido blanco + glifo close del repositorio Iconos en el oscuro del texto — blanca sobre amarillo desaparecía), sombra NEUTRA oscura (la roja se veía sucia sobre amarillo). Posición fija abajo-derecha + safe-area, forma, .visible y prefers-reduced-motion: intactos (R149). R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -50,12 +50,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        «Activo» del sheet Ciudad y del sheet Ordenar. Un solo
        sitio manda. */
     --size-badgeNuevo: 11px;      --weight-badgeNuevo: 600;
-
-    /* R149 · NOTIFICACIÓN FLOTANTE · letra propia del aviso
-       centralizado (.notificacionFlotante, al final del archivo).
-       Un solo sitio manda, como los badges R147. */
-    --size-notificacionFlotante: 14px;
-    --weight-notificacionFlotante: 600;
 
     /* ============================================================
        FAMILIA UI · tamaños recurrentes de sheets y controles
@@ -405,22 +399,27 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .mk-sheet-top:active { opacity: 0.5; }
 
   /* ============================================================
-     R149 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
+     R151 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
      Clase CENTRALIZADA y UNIVERSAL para los avisos flotantes de
-     la app (hoy: aviso «respuesta a tu pregunta»; mañana: las
-     funciones que nazcan) — un solo sitio manda. Paquete
-     completo validado por el dueño:
+     la app (hoy: aviso «te respondió»; mañana: las funciones
+     que nazcan) — un solo sitio manda. Paquete validado por el
+     dueño (R149 posición/forma/animación · R151 repintado):
      · POSICIÓN FIJA INFERIOR DERECHA INCLUIDA en la clase
        (decisión del dueño: las futuras la heredan o la
        sobrescriben). Respeta el safe-area del móvil (misma
        gramática de .mk-sheet-top).
-     · ROJO #dc2620 con texto blanco: el hermano directo del
-       verde #16a34a del badge (misma fuerza en la escala);
-       contraste AA garantizado (4.8:1 sobre blanco).
-     · TIPOGRAFÍA propia (variables en :root — un solo sitio
-       manda, como los badges R147): 14px · 600, la fuente de
-       la app (Inter).
-     · FORMA: borde redondeado 14px + sombra flotante roja.
+     · AMARILLO #FFE600: el fondo que eligió el dueño para el
+       aviso (adiós el rojo R149).
+     · TIPOGRAFÍA CERO HARDCODEADA: la línea de texto viste
+       .textoPrimario — la voz del sistema manda dentro del
+       aviso CON SU COLOR NATURAL (#1f2937). Por eso esta clase
+       ya no declara ni letra ni color de texto.
+     · X DE CERRAR (.avisoCerrar, la monta el aviso): circulito
+       translúcido blanco 28px + glifo close del repositorio
+       Iconos en el MISMO OSCURO del texto — blanca sobre
+       amarillo desaparecía (validado por el dueño).
+     · FORMA: borde redondeado 14px + sombra flotante NEUTRA
+       oscura (la roja R149 se veía sucia sobre amarillo).
      · ANIMACIÓN: entra subiendo suave desde abajo y sale igual
        (misma gramática .visible de .mk-sheet-top). Con
        prefers-reduced-motion el movimiento se apaga (solo
@@ -429,7 +428,11 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      NINGÚN elemento de la app hasta que una función la use
      (0 colateral). Uso recomendado en el markup:
      <div class="notificacionFlotante" role="status"
-          aria-live="polite">…texto…</div>
+          aria-live="polite">
+       <div class="textoPrimario">…texto…</div>
+       <button type="button" class="avisoCerrar"
+               data-glifo="close" aria-label="Cerrar"></button>
+     </div>
      y para encenderla/apagarla: clase .visible on/off.
      ============================================================ */
   .notificacionFlotante {
@@ -437,18 +440,15 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     max-width: min(320px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 12px 16px;
-    background: #dc2620 !important;
-    color: #ffffff !important;
-    font-family: var(--font-main) !important;
-    font-size: var(--size-notificacionFlotante) !important;
-    font-weight: var(--weight-notificacionFlotante) !important;
-    line-height: 1.45 !important;
-    letter-spacing: 0px !important;
+    background: #FFE600 !important;
     text-align: left !important;
     border: none;
     border-radius: 14px !important;
-    box-shadow: 0 8px 24px rgba(220, 38, 32, 0.32), 0 3px 10px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.32), 0 3px 10px rgba(15, 23, 42, 0.18);
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
@@ -463,6 +463,29 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     transform: translateY(0);
     pointer-events: auto;
     transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
+  }
+
+  /* R151 · la X: el circulito translúcido queda igual al del
+     banner instalar app (28px, blanco 22%) pero el glifo va en
+     el oscuro del texto — sobre amarillo la blanca no se ve. */
+  .notificacionFlotante .avisoCerrar {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    color: #1f2937;
+    cursor: pointer;
+  }
+  .notificacionFlotante .avisoCerrar svg {
+    width: 12px;
+    height: 12px;
+    display: block;
   }
 
   /* R149 · movimiento reducido: sin desplazamiento, solo
