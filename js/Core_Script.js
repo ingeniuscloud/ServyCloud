@@ -10,9 +10,12 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  en localStorage (stale-while-revalidate al
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
-                 token y detección de entorno.
+                 token y detección de entorno; módulo
+                 AvisoRespuesta (R150): el aviso flotante
+                 «Respondieron tu pregunta» — cola, VISTO y
+                 texto dinámico.
 VERSIÓN:         1.41.0
-CAMBIOS:         R149: nace fechaVenezuela() — único generador de horas del CLIENTE: SIEMPRE hora Venezuela real (yyyy-mm-ddThh:mm:ss, militar 24 h, T fija, sin offset/Z/milisegundos, America/Caracas fija vía Intl), el MISMO formato literal que escribe el backend (_fechaVenezuela_, 02 Tablas.gs) y el dueño a mano en la BD. La usa el fallback de fecha de anotarPregunta (R84 intacto). R146 (CTA inactivo con meta.ctaInactivo) intacto. Historial: bitácora/versiones.
+CAMBIOS:         R150: nace window.AvisoRespuesta — despierta la clase centralizada .notificacionFlotante (Core_CSS R149): revisa al abrir la app (+5 s), en cada entrada a un post (evento post:change de Lista) y cada 60 s; SOLO la respuesta del partner dispara el aviso — preguntas de ESTE dispositivo con RESPUESTA y sin VISTO entran a una COLA que muestra UN aviso a la vez (5 s en pantalla o hasta el tap — el tap abre el post con la respuesta y avanza la cola) y marca VISTO en la BD justo cuando muestra cada uno (si la app se cierra a mitad, lo pendiente avisa después). Texto dinámico ROOTJSON.app.avisoRespuesta con respaldo fijo — el dueño lo cambia desde el Setup sin tocar código. Todo silencioso: si algo falla, la app ni se entera. R149 (fechaVenezuela) intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -1185,4 +1188,132 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
     document.addEventListener('visibilitychange', onVisibilityChange);
 
+  })();
+
+  /* ============================================================
+     AVISO «RESPONDIERON TU PREGUNTA» · R150 · window.AvisoRespuesta
+     Despierta la clase centralizada .notificacionFlotante
+     (Core_CSS R149, GAS + Github). Va dormida hasta que ESTE
+     módulo la enciende con .visible.
+     · CUÁNDO SE REVISA: al abrir la app (5 s después de cargar,
+       con la sesión y el catálogo ya en vuelo), en cada entrada
+       a un post (evento post:change de Lista) y cada 60 s
+       mientras la app esté abierta. Throttle propio de 15 s:
+       abrir la app y entrar a un post casi juntos no duplican
+       la llamada.
+     · QUÉ DISPARA EL AVISO: SOLO la respuesta del partner —
+       preguntas de ESTE dispositivo con RESPUESTA en la BD y
+       sin marcar VISTO (respuestasPendientes, 02 Acciones.gs).
+       Nada de tiempo transcurrido, nada de preguntas nuevas.
+     · LA COLA: un aviso a la vez (5 s en pantalla o hasta que
+       lo toquen); el tap abre el post con la respuesta y
+       avanza la cola. Cada aviso se marca VISTO en la BD
+       JUSTO CUANDO SE MUESTRA: si la app se cierra a mitad de
+       la cola, lo pendiente avisa la próxima vez.
+     · EL TEXTO: ROOTJSON.app.avisoRespuesta (el dueño lo
+       cambia desde el Setup sin tocar código; respaldo fijo).
+     · TODO SILENCIOSO: si algo falla, la app ni se entera.
+     ============================================================ */
+  window.AvisoRespuesta = (function () {
+    var TEXTO_DEFAULT  = 'Respondieron tu pregunta';
+    var ARRANQUE_MS    = 5000;        /* primera revisión tras abrir */
+    var CADA_MS        = 60 * 1000;   /* revisión de rutina */
+    var GAP_MINIMO_MS  = 15 * 1000;   /* anti-ráfaga entre revisiones */
+    var EN_PANTALLA_MS = 5000;        /* cada aviso visible */
+    var PAUSA_ENTRE_MS = 450;         /* salida (.visible 0.28s) + aire */
+    var TOPE_COLA      = 20;          /* el backend ya topa en 20 */
+
+    var _cola           = [];
+    var _enCola         = false;
+    var _elemento       = null;
+    var _lineaTexto     = null;
+    var _lineaPost      = null;
+    var _temporizador   = null;
+    var _ultimaRevision = 0;
+
+    function textoAviso() {
+      try {
+        var app = (window.SISTEMA && window.SISTEMA.root &&
+                   window.SISTEMA.root.app) || null;
+        var texto = app ? String(app.avisoRespuesta || '').trim() : '';
+        return texto || TEXTO_DEFAULT;
+      } catch (_) {
+        return TEXTO_DEFAULT;
+      }
+    }
+
+    function asegurarElemento() {
+      if (_elemento) return _elemento;
+      _elemento = document.createElement('div');
+      _elemento.className = 'notificacionFlotante';
+      _elemento.setAttribute('role', 'status');
+      _elemento.setAttribute('aria-live', 'polite');
+      _lineaTexto = document.createElement('div');
+      _lineaPost  = document.createElement('div');
+      _elemento.appendChild(_lineaTexto);
+      _elemento.appendChild(_lineaPost);
+      _elemento.addEventListener('click', function () {
+        var item = _cola[0];
+        if (item && item.idPost && window.Lista &&
+            typeof window.Lista.abrirDetalle === 'function') {
+          window.Lista.abrirDetalle(item.idPost);
+        }
+        avanzar();
+      });
+      document.body.appendChild(_elemento);
+      return _elemento;
+    }
+
+    function mostrar(item) {
+      asegurarElemento();
+      _lineaTexto.textContent = textoAviso();
+      _lineaPost.textContent  = item.titulo || '';
+      _lineaPost.hidden       = !item.titulo;
+      marcarVisto(item);
+      _elemento.classList.add('visible');
+      _temporizador = setTimeout(avanzar, EN_PANTALLA_MS);
+    }
+
+    function avanzar() {
+      if (_temporizador) { clearTimeout(_temporizador); _temporizador = null; }
+      if (!_elemento) { _cola = []; _enCola = false; return; }
+      _elemento.classList.remove('visible');
+      _cola.shift();
+      if (!_cola.length) { _enCola = false; return; }
+      _temporizador = setTimeout(function () { mostrar(_cola[0]); }, PAUSA_ENTRE_MS);
+    }
+
+    function marcarVisto(item) {
+      if (!item || !item.fila) return;
+      if (typeof window.postBackend !== 'function') return;
+      window.postBackend('marcarVisto', { marcas: [{ fila: item.fila }] })
+        .catch(function () { /* si falla, la próxima revisión lo reavisa */ });
+    }
+
+    function revisar() {
+      if (_enCola || document.hidden) return;
+      if (typeof window.postBackend !== 'function') return;
+      var ahora = Date.now();
+      if (ahora - _ultimaRevision < GAP_MINIMO_MS) return;
+      _ultimaRevision = ahora;
+
+      window.postBackend('respuestasPendientes', {})
+        .then(function (data) {
+          var lista = (data && data.pendientes) || [];
+          if (!lista.length || _enCola || document.hidden) return;
+          _cola   = lista.slice(0, TOPE_COLA);
+          _enCola = true;
+          mostrar(_cola[0]);
+        })
+        .catch(function () { /* silencioso: el aviso no molesta */ });
+    }
+
+    setTimeout(revisar, ARRANQUE_MS);
+    setInterval(revisar, CADA_MS);
+    document.addEventListener('post:change', revisar);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) revisar();
+    });
+
+    return { revisar: revisar };
   })();
