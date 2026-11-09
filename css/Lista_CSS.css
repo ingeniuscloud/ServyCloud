@@ -12,7 +12,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
 VERSIÓN:         2.19
-CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale de la card de la grilla (.grilla-item) y su neutralización en prefers-reduced-motion (código muerto). La grilla R140 y el peso 600 del slot R143 intactos. Historial: bitácora/versiones.
+CAMBIOS:         R148: VERDE #16a34a para el overlay de la grilla — override .grilla-badge .badgeNuevo (el naranja de la maestra se perdía sobre fotos cálidas, naranja sobre naranja). ALCANCE EXACTO: solo la imagen de la grilla; la maestra .badgeNuevo del Core sigue naranja y las píldoras «Activo» de los sheets Ciudad y Ordenar NO se enteran. Letra, forma y altura intactas (solo fondo). R145 (barrido :active) y R140 (grilla) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -721,6 +721,16 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     position: absolute; top: 8px; left: 8px;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
   }
+
+  /* VERDE de la grilla (R148 · orden del dueño): el naranja de
+     la maestra se perdía sobre fotos cálidas (naranja sobre
+     naranja). Este override SUBE la especificidad sobre
+     .badgeNuevo y pinta el VERDE #16a34a SOLO en el overlay de
+     la grilla — la maestra del Core sigue naranja para el resto
+     de superficies (las píldoras «Activo» de los sheets Ciudad
+     y Ordenar no se enteran). Letra, forma y altura intactas:
+     solo cambia el fondo. El texto sigue blanco. */
+  .grilla-badge .badgeNuevo { background: #16a34a !important; }
 
   /* TÍTULO · la letra la manda la maestra .textoPrimario (en el
      HTML); aquí solo el carril: altura fija de 2 líneas

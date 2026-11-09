@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders y del modo móvil del lienzo.
 VERSIÓN:         2.17
-CAMBIOS:         R147: la maestra .badgeActivo pasa a llamarse .badgeNuevo (MISMA píldora: 11px · 600, naranja, blanco — la visten el overlay de la grilla y las píldoras «Activo» de los sheets Ciudad y Ordenar; cero cambios visuales, solo el nombre) y nace .badgeUsado: idéntica pero fondo blanco, texto gris #475569 (el de los chips) y borde fino suave #cbd5e1. La clase la elige el titulo del BADGEJSON en la grilla: «Usado» → blanca; cualquier otro título → naranja. .badge (dashed) intacta. Historial: bitácora/versiones.
+CAMBIOS:         R148: paridad de altura de las píldoras — .badgeUsado pasa su padding vertical de 5px a 4px porque su borde de 1px suma 2px; con 4+4+1+1 = 10px repone los 5+5 del Nuevo y ambas miden EXACTAMENTE 21px (el texto queda a 5px del borde exterior en las dos). La maestra .badgeNuevo NO cambia aquí: el VERDE #16a34a de la grilla lo pinta la Lista_CSS con el override .grilla-badge .badgeNuevo (R148, solo ahí) y el resto de superficies («Activo» de Ciudad y Ordenar) sigue naranja. R147 (renombe .badgeActivo→.badgeNuevo + alta .badgeUsado) intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -190,20 +190,27 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     R147 · BADGE NUEVO / BADGE USADO · píldoras de la app (la
-     «Activo» de los sheets Ciudad y Ordenar y el overlay de la
-     imagen en la grilla). La clase lleva la PÍLDORA COMPLETA:
+     R147/R148 · BADGE NUEVO / BADGE USADO · píldoras de la app
+     (la «Activo» de los sheets Ciudad y Ordenar y el overlay de
+     la imagen en la grilla). La clase lleva la PÍLDORA COMPLETA:
      letra (11px · 600), fondo, texto, padding y radio. El
      visible/invisible NO va aquí: es estado de cada superficie
      (.ciudad-card.activa / .ordenar-card.activa encienden la
      suya; en la grilla el overlay vive mientras haya badge).
      · .badgeNuevo → naranja con blanco (la de siempre, R131,
        renombrada en R147; también la usan «Nuevo», «Popular»,
-       «Promoción», «Último» y «Próximamente» en la grilla).
+       «Promoción», «Último» y «Próximamente» en la grilla;
+       en la grilla el VERDE #16a34a lo pinta la Lista_CSS con
+       el override .grilla-badge .badgeNuevo — R148, solo ahí).
      · .badgeUsado → la MISMA píldora en blanco con texto gris
        #475569 (el de los chips) y borde fino suave #cbd5e1
        para no perderse sobre fotos claras. Solo la viste el
        titulo «Usado» del BADGEJSON en la grilla.
+     · Altura idéntica (R148): el borde de 1px del Usado suma
+       2px, así que su padding vertical baja a 4px (4 + 4 + 1 +
+       1 = 10px, los mismos 10px del 5 + 5 del Nuevo) — ambas
+       píldoras miden 21px y el texto queda a 5px del borde
+       exterior en las dos.
      ============================================================ */
   .badgeNuevo {
     font-size: var(--size-badgeNuevo) !important;
@@ -227,7 +234,10 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     background: #ffffff !important;
     color: #475569 !important;
     border: 1px solid #cbd5e1 !important;
-    padding: 5px 12px !important;
+    /* R148 · padding vertical 4px (no 5px): los 2px que el borde
+       suma los devuelvo aquí para que .badgeNuevo y .badgeUsado
+       midan EXACTAMENTE lo mismo (21px). */
+    padding: 4px 12px !important;
     border-radius: 20px !important;
     flex-shrink: 0 !important;
   }
