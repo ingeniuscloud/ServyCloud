@@ -3,9 +3,9 @@
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders y del modo móvil del lienzo.
+RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R148: paridad de altura de las píldoras — .badgeUsado pasa su padding vertical de 5px a 4px porque su borde de 1px suma 2px; con 4+4+1+1 = 10px repone los 5+5 del Nuevo y ambas miden EXACTAMENTE 21px (el texto queda a 5px del borde exterior en las dos). La maestra .badgeNuevo NO cambia aquí: el VERDE #16a34a de la grilla lo pinta la Lista_CSS con el override .grilla-badge .badgeNuevo (R148, solo ahí) y el resto de superficies («Activo» de Ciudad y Ordenar) sigue naranja. R147 (renombe .badgeActivo→.badgeNuevo + alta .badgeUsado) intacto. Historial: bitácora/versiones.
+CAMBIOS:         R149: nace .notificacionFlotante — clase CENTRALIZADA y UNIVERSAL de los avisos flotantes (hoy «respuesta a tu pregunta»; mañana cualquier función nueva). Paquete validado por el dueño: posición fija INFERIOR DERECHA incluida en la clase (respeta el safe-area, misma gramática de .mk-sheet-top), rojo #dc2620 con texto blanco (el hermano del verde #16a34a, contraste AA 4.8:1), letra propia 14px·600 vía variables (un solo sitio manda), borde redondeado + sombra flotante roja, entrada/salida suaves con .visible y cortesía prefers-reduced-motion. Va OCULTA por defecto: no pinta nada hasta que una función la use (0 colateral). R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -50,6 +50,12 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        «Activo» del sheet Ciudad y del sheet Ordenar. Un solo
        sitio manda. */
     --size-badgeNuevo: 11px;      --weight-badgeNuevo: 600;
+
+    /* R149 · NOTIFICACIÓN FLOTANTE · letra propia del aviso
+       centralizado (.notificacionFlotante, al final del archivo).
+       Un solo sitio manda, como los badges R147. */
+    --size-notificacionFlotante: 14px;
+    --weight-notificacionFlotante: 600;
 
     /* ============================================================
        FAMILIA UI · tamaños recurrentes de sheets y controles
@@ -397,3 +403,77 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .mk-sheet-top svg { width: 18px; height: 18px; display: block; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .mk-sheet-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
   .mk-sheet-top:active { opacity: 0.5; }
+
+  /* ============================================================
+     R149 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
+     Clase CENTRALIZADA y UNIVERSAL para los avisos flotantes de
+     la app (hoy: aviso «respuesta a tu pregunta»; mañana: las
+     funciones que nazcan) — un solo sitio manda. Paquete
+     completo validado por el dueño:
+     · POSICIÓN FIJA INFERIOR DERECHA INCLUIDA en la clase
+       (decisión del dueño: las futuras la heredan o la
+       sobrescriben). Respeta el safe-area del móvil (misma
+       gramática de .mk-sheet-top).
+     · ROJO #dc2620 con texto blanco: el hermano directo del
+       verde #16a34a del badge (misma fuerza en la escala);
+       contraste AA garantizado (4.8:1 sobre blanco).
+     · TIPOGRAFÍA propia (variables en :root — un solo sitio
+       manda, como los badges R147): 14px · 600, la fuente de
+       la app (Inter).
+     · FORMA: borde redondeado 14px + sombra flotante roja.
+     · ANIMACIÓN: entra subiendo suave desde abajo y sale igual
+       (misma gramática .visible de .mk-sheet-top). Con
+       prefers-reduced-motion el movimiento se apaga (solo
+       aparece/desaparece).
+     Va OCULTA por defecto: .visible la enciende. No pinta
+     NINGÚN elemento de la app hasta que una función la use
+     (0 colateral). Uso recomendado en el markup:
+     <div class="notificacionFlotante" role="status"
+          aria-live="polite">…texto…</div>
+     y para encenderla/apagarla: clase .visible on/off.
+     ============================================================ */
+  .notificacionFlotante {
+    position: fixed !important;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    max-width: min(320px, calc(100vw - 32px));
+    padding: 12px 16px;
+    background: #dc2620 !important;
+    color: #ffffff !important;
+    font-family: var(--font-main) !important;
+    font-size: var(--size-notificacionFlotante) !important;
+    font-weight: var(--weight-notificacionFlotante) !important;
+    line-height: 1.45 !important;
+    letter-spacing: 0px !important;
+    text-align: left !important;
+    border: none;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 24px rgba(220, 38, 32, 0.32), 0 3px 10px rgba(15, 23, 42, 0.18);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .notificacionFlotante.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
+  }
+
+  /* R149 · movimiento reducido: sin desplazamiento, solo
+     aparece/desaparece (misma cortesía a11y de los sheets). */
+  @media (prefers-reduced-motion: reduce) {
+    .notificacionFlotante {
+      transform: none;
+      transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    }
+    .notificacionFlotante.visible {
+      transform: none;
+      transition: opacity 0.2s ease, visibility 0s;
+    }
+  }

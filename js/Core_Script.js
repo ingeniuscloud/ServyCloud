@@ -12,7 +12,7 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  al volver la app a primer plano; guardia del
                  token y detección de entorno.
 VERSIÓN:         1.41.0
-CAMBIOS:         R146: el CTA inactivo habla con meta.ctaInactivo — un solo texto para los DOS casos apagados (post PRONTO y suma de cupos en cero); el vivo sigue con meta.cta y si el post no trae ctaInactivo cae al texto normal. Sin cambios de acción: el inactivo no abre la hoja de reserva. El tenue ya no depende del navegador (el PC no lava los :disabled): lo pinta la regla general de Core_CSS. Historial: bitácora/versiones.
+CAMBIOS:         R149: nace fechaVenezuela() — único generador de horas del CLIENTE: SIEMPRE hora Venezuela real (yyyy-mm-ddThh:mm:ss, militar 24 h, T fija, sin offset/Z/milisegundos, America/Caracas fija vía Intl), el MISMO formato literal que escribe el backend (_fechaVenezuela_, 02 Tablas.gs) y el dueño a mano en la BD. La usa el fallback de fecha de anotarPregunta (R84 intacto). R146 (CTA inactivo con meta.ctaInactivo) intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -21,6 +21,38 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Iconos.html, Core_CSS.html
 ════════════════════════════════════════════════════════════════════*/
 
+
+  /* ============================================================
+     HORA VENEZUELA REAL · R149 · fechaVenezuela()
+     Único generador de horas del CLIENTE. Devuelve SIEMPRE la
+     hora real de Venezuela (America/Caracas, sin horario de
+     verano): yyyy-mm-ddThh:mm:ss — militar 24 h, T fija, SIN
+     offset, SIN Z y SIN milisegundos: el MISMO formato literal
+     que escribe el backend (_fechaVenezuela_, 02 Tablas.gs) y
+     el dueño a mano en la BD. Zona FIJA por nombre vía Intl:
+     no depende del reloj ni de la zona del dispositivo.
+     La usa window.Pregunta (publicar) y anotarPregunta aquí.
+     ============================================================ */
+  function fechaVenezuela() {
+    var partes = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Caracas',
+      hour12:   false,
+      year:     'numeric',
+      month:    '2-digit',
+      day:      '2-digit',
+      hour:     '2-digit',
+      minute:   '2-digit',
+      second:   '2-digit'
+    }).formatToParts(new Date());
+    var v = {};
+    for (var i = 0; i < partes.length; i++) {
+      v[partes[i].type] = partes[i].value;
+    }
+    /* Motor viejo: medianoche puede salir "24" → normaliza a 00. */
+    if (v.hour === '24') v.hour = '00';
+    return v.year + '-' + v.month + '-' + v.day + 'T' +
+           v.hour + ':' + v.minute + ':' + v.second;
+  }
 
   /* ============================================================
      CACHEL2 · capa del dispositivo
@@ -180,7 +212,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       pq.lista = (Array.isArray(pq.lista) ? pq.lista : []).slice();
       pq.lista.unshift({
         texto:     String(pregunta.texto || ''),
-        fecha:     pregunta.fecha || new Date().toISOString(),
+        fecha:     pregunta.fecha || fechaVenezuela(),   /* R149: hora Venezuela real. */
         respuesta: null
       });
       pq.lista = pq.lista.slice(0, 2);

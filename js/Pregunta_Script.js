@@ -15,7 +15,7 @@ RESPONSABILIDAD: Módulo window.Pregunta. Q&A del post completo en el
                  respuestas del post en UNA llamada (acción
                  `preguntas`). Sin borrado y sin nombre.
 VERSIÓN:         1.3.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+CAMBIOS:         R149: el eco local de la pregunta recién publicada usa fechaVenezuela() (Core_Script R149) — hora Venezuela real yyyy-mm-ddThh:mm:ss, el MISMO formato que escribe el backend en TIMESTAMPINI: eco y recarga de la BD se ven idénticos. formatoFecha (R86) intacto: pinta bien el formato nuevo y el legacy. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Iconos.html (pintarGlifos), Seccion_Script.html
                  (monta buildHTML/enganchar/cargar), Seccion_CSS.html
@@ -50,9 +50,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       });
     }
 
-    /* R86 · "20-10-2026 9:23 pm" (hora local del dispositivo;
-       los ISO del backend vienen en UTC y new Date() los
-       convierte solos). Devuelve '' si la fecha no es válida. */
+    /* R86 · "20-10-2026 9:23 pm". R149: la BD habla en hora
+       Venezuela real SIN offset (yyyy-mm-ddThh:mm:ss) — new Date()
+       la lee como hora local y pinta los mismos dígitos en
+       cualquier dispositivo; el legacy UTC también pinta bien.
+       Devuelve '' si la fecha no es válida. */
     function formatoFecha(iso) {
       if (!iso) return '';
       var d = new Date(iso);
@@ -291,7 +293,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
           var nueva = {
             texto:         texto,
-            fecha:         new Date().toISOString(),
+            fecha:         fechaVenezuela(),   /* R149: hora Venezuela real — el MISMO formato de la BD. */
             dispositivoId: (typeof getDeviceId === 'function' ? getDeviceId() : ''),
             respuesta:     null
           };
