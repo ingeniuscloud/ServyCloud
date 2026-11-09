@@ -3,9 +3,9 @@
 ARCHIVO:         Orden_Sheet_CSS.html
 ESPEJO GITHUB:   github/css/Orden_Sheet_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Estilos del bottom sheet de orden: stack vertical de opciones (icono, título, descripción, píldora .badgeActivo), estado activo y responsive.
+RESPONSABILIDAD: Estilos del bottom sheet de orden: stack vertical de opciones (icono, título, descripción, píldora .badgeNuevo), estado activo y responsive.
 VERSIÓN:         1.6
-CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera el :active con scale de las cards del ordenar (.ordenar-card) y el :active de solo cursor del handle (.ordenar-handle-area). El drag del handle y el feedback de toque sin movimiento intactos. Historial: bitácora/versiones.
+CAMBIOS:         R147: la píldora «Activo» viste la maestra .badgeNuevo (la ex .badgeActivo renombrada en el Core: misma píldora naranja, cero cambios visuales). Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
   /* ============================================================
@@ -147,7 +147,7 @@ CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (
      OPCIONES · STACK NATIVO (hermana de .ciudad-tarjetas)
      Tarjetas apiladas verticalmente (flex column, gap 12):
      blanca, borde fino #eef0f2, esquinas 18px. Fila: icono en
-     pastilla suave + título con descripción + píldora .badgeActivo
+     pastilla suave + título con descripción + píldora .badgeNuevo
      (SOLO la activa la muestra). ACTIVA: degradado tinte
      naranja→blanco + borde #f97316 + icono y título naranjas
      (NARANJA OFICIAL, jamás azul). Táctil: la tarjeta se
@@ -258,14 +258,15 @@ CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (
     display: block;
   }
 
-  /* Píldora «Activo» de la tarjeta activa · R131: MUERE el check
+  /* Píldora «Activo» de la tarjeta activa · R147: MUERE el check
      naranja (verificado + su animación) y entra la MISMA píldora
      del sheet Ciudad. La PÍLDORA COMPLETA vive en la clase
-     maestra .badgeActivo del Core; aquí queda SOLO el estado:
+     maestra .badgeNuevo del Core (la ex .badgeActivo de R131
+     renombrada — idéntica); aquí queda SOLO el estado:
      oculta en reposo, visible en la activa, con una aparición
      suave para que la elección se SIENTA. */
-  .ordenar-card .badgeActivo { display: none; }
-  .ordenar-card.activa .badgeActivo {
+  .ordenar-card .badgeNuevo { display: none; }
+  .ordenar-card.activa .badgeNuevo {
     display: inline-block;
     animation: ordenarBadgeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -280,7 +281,7 @@ CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (
       animation: none;
       opacity: 1;
     }
-    .ordenar-card .badgeActivo { animation: none; }
+    .ordenar-card .badgeNuevo { animation: none; }
   }
 
   /* ============================================================

@@ -20,12 +20,12 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  R140: los chips con vista 'grilla' (CHIPSJSON) pintan
                  tarjetas 2 por fila al estilo Mercado Libre — imagen
                  1:1 lazy con skeleton propio, badge píldora
-                 .badgeActivo, título a 2 líneas y slot fijo
+                 .badgeNuevo/.badgeUsado, título a 2 líneas y slot fijo
                  precio/fecha en .subtitulo ("A consultar" si no
                  hay). Datos horneados en el catálogo. La búsqueda
                  sigue SIEMPRE en lista.
 VERSIÓN:         2.18
-CAMBIOS:         R140: grilla data-driven para chips con vista 'grilla' (montarTarjetaGrilla + helpers: vistaDeChip, partesPrecio, textoFechaEvento, badgeDePost, slotPrecioFecha). Precio formato ML (centavos superíndice), fecha es-VE 12h con glifo calendario y "A consultar": el slot viaja en la maestra .subtitulo pintada con el oficial --color-primario (ajuste del dueño: UNA sola letra, sin distorsión); el badge viste la píldora maestra .badgeActivo (R131). La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
+CAMBIOS:         R147: el overlay de la imagen elige píldora por el titulo del BADGEJSON — «Usado» viste la nueva maestra .badgeUsado (blanca, gris #475569, borde fino suave) y cualquier otro título la .badgeNuevo (la ex .badgeActivo renombrada en el Core: mismo naranja, cero cambios visuales). Texto SIEMPRE el de la BD; comparación insensible a mayúsculas. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -170,7 +170,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
     /* BADGE OVERLAY: mismo contrato del banner (R98) —
        post.promo.idBadge buscado en SISTEMA.badges. Apagado o
-       sin título → sin overlay. */
+       sin título → sin overlay. R147: la píldora viste
+       .badgeUsado si el titulo de la BD es «Usado»; cualquier
+       otro título viste .badgeNuevo (naranja). */
     function badgeDePost(post) {
       var id = post && post.promo ? String(post.promo.idBadge || '').trim() : '';
       if (!id) return null;
@@ -221,7 +223,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Sin likes, sin marca y sin "Ver publicación": la grilla
        invita con el precio. Tipografía del dueño: título
        .textoPrimario · slot .subtitulo con el color oficial ·
-       badge píldora maestra .badgeActivo (clases maestras). */
+       badge píldora .badgeNuevo/.badgeUsado según titulo (R147). */
     function montarTarjetaGrilla(post) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -240,7 +242,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         html += '<span class="grilla-inicial">' + escapeHtml(inicial) + '</span>';
       }
       if (badge && badge.titulo) {
-        html += '<span class="grilla-badge badgeActivo">' + escapeHtml(badge.titulo) + '</span>';
+        /* R147 · la clase la elige el titulo de la BD (BADGEJSON):
+           «Usado» viste la píldora blanca .badgeUsado; cualquier
+           otro título (Nuevo, Popular, Promoción, Último,
+           Próximamente…) la naranja .badgeNuevo. El texto
+           SIEMPRE es el que llega de la BD. */
+        var claseBadge = String(badge.titulo).trim().toLowerCase() === 'usado'
+          ? 'badgeUsado'
+          : 'badgeNuevo';
+        html += '<span class="grilla-badge ' + claseBadge + '">' + escapeHtml(badge.titulo) + '</span>';
       }
       html += '</span>';
       html += '<span class="grilla-titulo textoPrimario">' + escapeHtml(titulo) + '</span>';

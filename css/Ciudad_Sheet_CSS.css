@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Ciudad_Sheet_CSS.css (subir a GitHub Pages; editar e
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Estilos del bottom sheet de ciudad: tarjetas apiladas (nombre, badge «Activo», métricas), estado activo naranja, responsive.
 VERSIÓN:         1.14
-CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con scale de la card de ciudad (.ciudad-card) y del aceptar cookies (.cookies-aceptar), y el :active de solo cursor del handle (.ciudad-handle-area). El drag del handle y el feedback de toque sin movimiento intactos. Historial: bitácora/versiones.
+CAMBIOS:         R147: la píldora «Activo» viste la maestra .badgeNuevo (la ex .badgeActivo renombrada en el Core: misma píldora naranja, cero cambios visuales). Historial: bitácora/versiones.
 ════════════════════════════════════════════════════════════════════*/
 
 
@@ -370,12 +370,13 @@ CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (
   }
   .ciudad-card.activa .ciudad-card-nombre { color: #f97316 !important; }
 
-  /* Píldora «Activo» de la tarjeta activa · R131: la PÍLDORA
-     COMPLETA vive en la clase maestra .badgeActivo del Core
-     (letra, fondo, padding, radio). Aquí queda SOLO el estado:
+  /* Píldora «Activo» de la tarjeta activa · R147: la PÍLDORA
+     COMPLETA vive en la clase maestra .badgeNuevo del Core
+     (la ex .badgeActivo de R131 renombrada: letra, fondo,
+     padding, radio — idéntica). Aquí queda SOLO el estado:
      oculta en reposo, visible en la activa. */
-  .ciudad-card .badgeActivo { display: none; }
-  .ciudad-card.activa .badgeActivo { display: inline-block; }
+  .ciudad-card .badgeNuevo { display: none; }
+  .ciudad-card.activa .badgeNuevo { display: inline-block; }
 
   /* Pills de métricas · fila horizontal con wrap por si la
      pantalla es muy pequeña. Fondo gris suave, cifra en

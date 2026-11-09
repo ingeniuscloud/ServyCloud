@@ -3,9 +3,9 @@
 ARCHIVO:         Core_CSS.html
 ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeActivo), voz única de los placeholders y del modo móvil del lienzo.
+RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders y del modo móvil del lienzo.
 VERSIÓN:         2.17
-CAMBIOS:         R146: tenue GENERAL del CTA inactivo — UNA regla .cta-reservar:disabled para los DOS casos apagados (post PRONTO y suma de cupos en cero): naranja apagado con baja intensidad, sin sombra, blanco blindado con -webkit-text-fill-color para que ningún navegador lo re-lave. Antes el tenue era el lavado del navegador: Safari (teléfono) lo pintaba y el PC no. El bloque base del activo y .botonPrimario intactos. Historial: bitácora/versiones.
+CAMBIOS:         R147: la maestra .badgeActivo pasa a llamarse .badgeNuevo (MISMA píldora: 11px · 600, naranja, blanco — la visten el overlay de la grilla y las píldoras «Activo» de los sheets Ciudad y Ordenar; cero cambios visuales, solo el nombre) y nace .badgeUsado: idéntica pero fondo blanco, texto gris #475569 (el de los chips) y borde fino suave #cbd5e1. La clase la elige el titulo del BADGEJSON en la grilla: «Usado» → blanca; cualquier otro título → naranja. .badge (dashed) intacta. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -45,10 +45,11 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     --size-chipsFiltros: 14px;    --weight-chipsFiltros: 300;
     --size-chipsFormulario: 12px; --weight-chipsFormulario: 300;
 
-    /* R131 · BADGE ACTIVO · la píldora completa (letra + forma +
-       color) que marca la opción activa: badge «Activo» del sheet
-       Ciudad y del sheet Ordenar. Un solo sitio manda. */
-    --size-badgeActivo: 11px;     --weight-badgeActivo: 600;
+    /* R147 · BADGE NUEVO/USADO · la píldora completa (letra +
+       forma + color) del overlay de la grilla y de las píldoras
+       «Activo» del sheet Ciudad y del sheet Ordenar. Un solo
+       sitio manda. */
+    --size-badgeNuevo: 11px;      --weight-badgeNuevo: 600;
 
     /* ============================================================
        FAMILIA UI · tamaños recurrentes de sheets y controles
@@ -189,20 +190,43 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     R131 · BADGE ACTIVO · píldora «Activo» (la del sheet Ciudad,
-     ahora también en Ordenar). La clase lleva la PÍLDORA COMPLETA:
-     letra (11px · 600), fondo naranja, blanco, padding y radio.
-     El visible/invisible NO va aquí: es estado de cada sheet
-     (.ciudad-card.activa / .ordenar-card.activa encienden la suya).
+     R147 · BADGE NUEVO / BADGE USADO · píldoras de la app (la
+     «Activo» de los sheets Ciudad y Ordenar y el overlay de la
+     imagen en la grilla). La clase lleva la PÍLDORA COMPLETA:
+     letra (11px · 600), fondo, texto, padding y radio. El
+     visible/invisible NO va aquí: es estado de cada superficie
+     (.ciudad-card.activa / .ordenar-card.activa encienden la
+     suya; en la grilla el overlay vive mientras haya badge).
+     · .badgeNuevo → naranja con blanco (la de siempre, R131,
+       renombrada en R147; también la usan «Nuevo», «Popular»,
+       «Promoción», «Último» y «Próximamente» en la grilla).
+     · .badgeUsado → la MISMA píldora en blanco con texto gris
+       #475569 (el de los chips) y borde fino suave #cbd5e1
+       para no perderse sobre fotos claras. Solo la viste el
+       titulo «Usado» del BADGEJSON en la grilla.
      ============================================================ */
-  .badgeActivo {
-    font-size: var(--size-badgeActivo) !important;
-    font-weight: var(--weight-badgeActivo) !important;
+  .badgeNuevo {
+    font-size: var(--size-badgeNuevo) !important;
+    font-weight: var(--weight-badgeNuevo) !important;
     line-height: 1 !important;
     letter-spacing: 0.01em !important;
 
     background: #f97316 !important;
     color: #ffffff !important;
+    padding: 5px 12px !important;
+    border-radius: 20px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .badgeUsado {
+    font-size: var(--size-badgeNuevo) !important;
+    font-weight: var(--weight-badgeNuevo) !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    background: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
     padding: 5px 12px !important;
     border-radius: 20px !important;
     flex-shrink: 0 !important;

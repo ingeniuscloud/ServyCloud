@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.CiudadSheet: lista de ciudades desde SISTEMA, tarjeta de la ciudad activa con badge «Activo» y métricas; selecciona ciudad y cierra.
 VERSIÓN:         1.12
-CAMBIOS:         R131: el badge «Activo» viste la clase maestra .badgeActivo (antes .ciudad-card-badge).
+CAMBIOS:         R147: la píldora «Activo» viste la maestra .badgeNuevo (la ex .badgeActivo renombrada en el Core: misma píldora naranja, cero cambios visuales). Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
@@ -419,7 +419,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
             (esActual ? 'true' : 'false') + '">' +
             '<span class="ciudad-card-top">' +
               '<span class="ciudad-card-nombre subtitulo">' + escapeHtml(c.titulo) + '</span>' +
-              '<span class="badgeActivo" aria-hidden="true">Activo</span>' +
+              '<span class="badgeNuevo" aria-hidden="true">Activo</span>' +
             '</span>' +
             '<span class="ciudad-card-metricas">' +
               '<span class="ciudad-card-metrica">' +

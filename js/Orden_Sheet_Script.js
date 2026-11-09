@@ -3,9 +3,9 @@
 ARCHIVO:         Orden_Sheet_Script.html
 ESPEJO GITHUB:   github/js/Orden_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Módulo window.Ordenar: opciones de orden (recomendado, nombre, categoría, precio), marca la activa con la píldora .badgeActivo y reordena la vidriera.
+RESPONSABILIDAD: Módulo window.Ordenar: opciones de orden (recomendado, nombre, categoría, precio), marca la activa con la píldora .badgeNuevo y reordena la vidriera.
 VERSIÓN:         1.4
-CAMBIOS:         R131: fuera el check (data-glifo verificado) — la opción activa muestra la píldora .badgeActivo «Activo».
+CAMBIOS:         R147: la píldora «Activo» viste la maestra .badgeNuevo (la ex .badgeActivo renombrada en el Core: misma píldora naranja, cero cambios visuales). Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
                  Iconos.html (window.pintarGlifos), Lista_CSS.html
                  (consumidor del evento: Lista_Script),
@@ -18,7 +18,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
     /* ============================================================
        OPCIONES DEL SHEET (orden del dueño, R66)
        glifo → Iconos 2.0 (lista/grupos/alfabeto) y reutilizados
-       (share/estrella); la activa muestra la píldora .badgeActivo.
+       (share/estrella); la activa muestra la píldora .badgeNuevo.
        ============================================================ */
     var OPCIONES = [
       { id: 'recomendado',  glifo: 'lista',    titulo: 'Recomendado',
@@ -187,7 +187,7 @@ DEPENDENCIAS:    Index.html (#btnOrdenar, .area-contenido),
               '<span class="ordenar-opt-titulo subtitulo">' + op.titulo + '</span>' +
               '<span class="ordenar-opt-desc textoPrimario">' + op.desc + '</span>' +
             '</span>' +
-            '<span class="badgeActivo" aria-hidden="true">Activo</span>' +
+            '<span class="badgeNuevo" aria-hidden="true">Activo</span>' +
           '</button>';
       });
 

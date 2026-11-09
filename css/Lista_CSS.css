@@ -668,8 +668,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      R140 · GRILLA (vista 'grilla' del chip) · patrón Mercado
      Libre: 2 tarjetas por fila y la CARD ENTERA es el botón.
      Imagen 1:1 cover con skeleton INDIVIDUAL (mismo shimmer del
-     sistema), badge overlay (la PÍLDORA COMPLETA vive en la
-     maestra .badgeActivo del Core — aquí solo posición/sombra),
+     sistema), badge overlay (la PÍLDORA COMPLETA vive en las
+     maestras .badgeNuevo/.badgeUsado del Core — aquí solo
+     posición/sombra),
      título .textoPrimario a 2 líneas con ALTURA FIJA (slots
      alineados entre cards) y slot único: precio / fecha (glifo
      calendario) / "A consultar" — UNA SOLA LETRA para todo el
@@ -711,9 +712,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* BADGE overlay (BADGEJSON vía promo.idBadge): la PÍLDORA
-     COMPLETA vive en la maestra .badgeActivo del Core (R131 —
-     la misma de Ciudad y Ordenar); aquí queda SOLO el estado:
-     posición sobre la foto y sombra. */
+     COMPLETA vive en las maestras .badgeNuevo/.badgeUsado del
+     Core (R147 — .badgeNuevo es la ex .badgeActivo de R131, la
+     misma de Ciudad y Ordenar; .badgeUsado es la blanca de
+     «Usado»); aquí queda SOLO el estado: posición sobre la
+     foto y sombra. */
   .grilla-badge {
     position: absolute; top: 8px; left: 8px;
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
