@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R151: repintado del aviso validado punto por punto por el dueño — fondo AMARILLO #FFE600 y el texto vistiendo .textoPrimario con su color natural #1f2937 (tipografía CERO hardcodeada: mueren las variables --size/weight-notificacionFlotante de R149), nace la X de cerrar .avisoCerrar (circulito translúcido blanco + glifo close del repositorio Iconos en el oscuro del texto — blanca sobre amarillo desaparecía), sombra NEUTRA oscura (la roja se veía sucia sobre amarillo). Posición fija abajo-derecha + safe-area, forma, .visible y prefers-reduced-motion: intactos (R149). R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R151: repintado del aviso validado punto por punto por el dueño — fondo AMARILLO #FFE600 y el texto vistiendo .textoPrimario con su color natural #1f2937 (tipografía CERO hardcodeada: mueren las variables --size/weight-notificacionFlotante de R149), nace la X de cerrar .avisoCerrar (glifo close del repositorio Iconos en el oscuro del texto), sombra NEUTRA oscura (la roja se veía sucia sobre amarillo). AFINACIÓN del dueño viéndola en pantalla: forma PÍLDORA (border-radius 999px, la geometría del CTA .cta-reservar de un post), círculo de la X BLANCO liso (el translúcido se perdía sobre el amarillo) y SUBIDA 52px (el borde superior anterior es ahora el borde inferior — Safari móvil pinta su barra de URL abajo y tapaba el aviso). Posición fija abajo-derecha + safe-area, .visible y prefers-reduced-motion: intactos. R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -403,11 +403,15 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      Clase CENTRALIZADA y UNIVERSAL para los avisos flotantes de
      la app (hoy: aviso «te respondió»; mañana: las funciones
      que nazcan) — un solo sitio manda. Paquete validado por el
-     dueño (R149 posición/forma/animación · R151 repintado):
+     dueño (R149 animación · R151 repintado y AFINADO en
+     pantalla: píldora 999px · X blanca · subida 52px):
      · POSICIÓN FIJA INFERIOR DERECHA INCLUIDA en la clase
        (decisión del dueño: las futuras la heredan o la
        sobrescriben). Respeta el safe-area del móvil (misma
-       gramática de .mk-sheet-top).
+       gramática de .mk-sheet-top) y va SUBIDA 52px (afinación
+       del dueño: el borde superior que tenía ahora es su borde
+       inferior — Safari móvil pinta su barra de URL abajo y el
+       aviso se confundía/se tapaba).
      · AMARILLO #FFE600: el fondo que eligió el dueño para el
        aviso (adiós el rojo R149).
      · TIPOGRAFÍA CERO HARDCODEADA: la línea de texto viste
@@ -415,11 +419,13 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        aviso CON SU COLOR NATURAL (#1f2937). Por eso esta clase
        ya no declara ni letra ni color de texto.
      · X DE CERRAR (.avisoCerrar, la monta el aviso): circulito
-       translúcido blanco 28px + glifo close del repositorio
-       Iconos en el MISMO OSCURO del texto — blanca sobre
-       amarillo desaparecía (validado por el dueño).
-     · FORMA: borde redondeado 14px + sombra flotante NEUTRA
-       oscura (la roja R149 se veía sucia sobre amarillo).
+       BLANCO liso 28px (afinación del dueño: el translúcido se
+       perdía sobre el amarillo) + glifo close del repositorio
+       Iconos en el MISMO OSCURO del texto.
+     · FORMA: PÍLDORA — border-radius 999px, la MISMA geometría
+       del CTA .cta-reservar de un post (afinación del dueño) +
+       sombra flotante NEUTRA oscura (la roja R149 se veía
+       sucia sobre amarillo).
      · ANIMACIÓN: entra subiendo suave desde abajo y sale igual
        (misma gramática .visible de .mk-sheet-top). Con
        prefers-reduced-motion el movimiento se apaga (solo
@@ -438,7 +444,10 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .notificacionFlotante {
     position: fixed !important;
     right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    /* R151 AFINADA: 16px de aire + 52px de píldora — el borde
+       superior que tenía el aviso es ahora su borde inferior
+       (Safari móvil pinta URL/círculos abajo y lo tapaba). */
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
     max-width: min(320px, calc(100vw - 32px));
     display: flex;
     align-items: center;
@@ -447,7 +456,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     background: #FFE600 !important;
     text-align: left !important;
     border: none;
-    border-radius: 14px !important;
+    border-radius: 999px !important;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.32), 0 3px 10px rgba(15, 23, 42, 0.18);
     z-index: 9999;
     opacity: 0;
@@ -465,9 +474,9 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
   }
 
-  /* R151 · la X: el circulito translúcido queda igual al del
-     banner instalar app (28px, blanco 22%) pero el glifo va en
-     el oscuro del texto — sobre amarillo la blanca no se ve. */
+  /* R151 AFINADA · la X: circulito BLANCO liso 28px — el dueño
+     lo pidió sólido porque el translúcido se perdía sobre el
+     amarillo; el glifo sigue en el oscuro del texto. */
   .notificacionFlotante .avisoCerrar {
     width: 28px;
     height: 28px;
@@ -478,7 +487,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.22);
+    background: #ffffff;
     color: #1f2937;
     cursor: pointer;
   }
