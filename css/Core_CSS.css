@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R151: repintado del aviso validado punto por punto por el dueño — fondo AMARILLO #FFE600 y el texto vistiendo .textoPrimario con su color natural #1f2937 (tipografía CERO hardcodeada: mueren las variables --size/weight-notificacionFlotante de R149), nace la X de cerrar .avisoCerrar (glifo close del repositorio Iconos en el oscuro del texto), sombra NEUTRA oscura (la roja se veía sucia sobre amarillo). AFINACIÓN del dueño viéndola en pantalla: forma PÍLDORA (border-radius 999px, la geometría del CTA .cta-reservar de un post), círculo de la X BLANCO liso (el translúcido se perdía sobre el amarillo) y SUBIDA 52px (el borde superior anterior es ahora el borde inferior — Safari móvil pinta su barra de URL abajo y tapaba el aviso). Posición fija abajo-derecha + safe-area, .visible y prefers-reduced-motion: intactos. R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R153: el aviso cambia de «alarma» a «aviso de calidad» — piel CRISTAL aprobada punto por punto por el dueño: fondo ámbar suave rgba(254,243,199,0.85) con blur detrás (backdrop-filter: el contenido de atrás se difumina y el texto siempre se lee), borde fino 1px rgba(253,230,138,0.9) (sin él el pill translúcido se diluye sobre fondos claros), texto vistiendo .textoPrimario con el color MARRÓN del look (#92400E — contraste ~7:1 sobre el ámbar; tamaño/peso siguen siendo los de la maestra), X DE CERRAR SIN CIRCULITO (el blanco ya no aporta sobre crema y ensuciaba el cristal): glifo close del repositorio directo en #92400E, y sombra suavizada (la pesada era del amarillo neón). Forma píldora 999px, posición (68px + safe-area), .visible y prefers-reduced-motion: intactos. R151/R150/R149 intactas. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -412,16 +412,21 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        del dueño: el borde superior que tenía ahora es su borde
        inferior — Safari móvil pinta su barra de URL abajo y el
        aviso se confundía/se tapaba).
-     · AMARILLO #FFE600: el fondo que eligió el dueño para el
-       aviso (adiós el rojo R149).
+     · CRISTAL (R153, piel aprobada por el dueño): fondo ámbar
+       suave rgba(254,243,199,0.85) con BLUR detrás — el
+       contenido de la app se difumina tras el pill y el texto
+       siempre se lee. Borde fino rgba(253,230,138,0.9): sin él
+       el pill translúcido se diluye sobre fondos claros.
+       Sombra suave (la pesada era del amarillo neón).
      · TIPOGRAFÍA CERO HARDCODEADA: la línea de texto viste
        .textoPrimario — la voz del sistema manda dentro del
-       aviso CON SU COLOR NATURAL (#1f2937). Por eso esta clase
-       ya no declara ni letra ni color de texto.
-     · X DE CERRAR (.avisoCerrar, la monta el aviso): circulito
-       BLANCO liso 28px (afinación del dueño: el translúcido se
-       perdía sobre el amarillo) + glifo close del repositorio
-       Iconos en el MISMO OSCURO del texto.
+       aviso (tamaño y peso de la maestra); el COLOR lo pinta
+       el aviso (#92400E, el marrón del look — contraste ~7:1
+       sobre el ámbar).
+     · X DE CERRAR (.avisoCerrar, la monta el aviso): SIN
+       CIRCULITO (el blanco ya no aporta sobre crema y
+       ensuciaba el cristal) — el glifo close del repositorio
+       Iconos directo en el MARRÓN del texto.
      · FORMA: PÍLDORA — border-radius 999px, la MISMA geometría
        del CTA .cta-reservar de un post (afinación del dueño) +
        sombra flotante NEUTRA oscura (la roja R149 se veía
@@ -453,11 +458,20 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    background: #FFE600 !important;
+    /* R153 · CRISTAL: ámbar suave translúcido + blur detrás
+       (-webkit- para Safari) — la app se ve difuminada tras
+       el pill y la letra manda. */
+    background: rgba(254, 243, 199, 0.85) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     text-align: left !important;
-    border: none;
+    /* R153 · borde fino ámbar: el contorno que sostiene al
+       pill translúcido sobre fondos claros. */
+    border: 1px solid rgba(253, 230, 138, 0.9);
     border-radius: 999px !important;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.32), 0 3px 10px rgba(15, 23, 42, 0.18);
+    /* R153 · sombra suave: acompaña la ligereza del cristal
+       (la sombra pesada 0.32 era del amarillo neón). */
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18), 0 3px 10px rgba(15, 23, 42, 0.10);
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
@@ -474,9 +488,9 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
   }
 
-  /* R151 AFINADA · la X: circulito BLANCO liso 28px — el dueño
-     lo pidió sólido porque el translúcido se perdía sobre el
-     amarillo; el glifo sigue en el oscuro del texto. */
+  /* R153 · la X SIN CIRCULITO: sobre el crema el blanco ya no
+     aporta y ensuciaba el cristal — el glifo close directo en
+     el marrón del texto (#92400E). Mismo tamaño táctil 28px. */
   .notificacionFlotante .avisoCerrar {
     width: 28px;
     height: 28px;
@@ -487,9 +501,17 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: #ffffff;
-    color: #1f2937;
+    background: transparent;
+    color: #92400E;
     cursor: pointer;
+  }
+
+  /* R153 · el texto del aviso: tipografía de la maestra
+     .textoPrimario (tamaño/peso intactos); el COLOR lo manda
+     el look del aviso (#92400E) — por eso esta regla vence el
+     color natural de la maestra SOLO aquí dentro. */
+  .notificacionFlotante .textoPrimario {
+    color: #92400E !important;
   }
   .notificacionFlotante .avisoCerrar svg {
     width: 12px;

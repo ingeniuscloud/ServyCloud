@@ -14,8 +14,13 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  AvisoRespuesta (R151): el aviso flotante
                  «te respondió» — tarjeta FIJA, una a la
                  vez, VISTO al actuar y texto dinámico.
+                 R153: tercer camino de salida del aviso —
+                 al ABRIR un post se marcan VISTO las
+                 respuestas pendientes de aviso de ESE post
+                 (marcarVistoPost) y la tarjeta se retira;
+                 entrar a OTRO post no la toca.
 VERSIÓN:         1.41.0
-CAMBIOS:         R151: el aviso pasa a TARJETA FIJA por orden del dueño — muere el temporizador de 5 s y la cola con reloj; UNA tarjeta en pantalla: la X marca VISTO y punto (ya perdió su oportunidad), el tap abre EL post de esa respuesta y marca VISTO; tras actuar sale con la animación y recién entonces sube la siguiente, una a la vez (mientras hay tarjeta fija, las revisiones SOLO observan). VISTO se marca AL ACTUAR, no al mostrar: cerrar la app con la tarjeta fija sin actuar reavisa en el próximo arranque — nada se pierde. Texto = nombre del partner (BD, cacheado) + ROOTJSON.app.avisoRespuesta — CERO constantes de texto (muere TEXTO_DEFAULT). Anti-carrera _tratadas: lo resuelto en la sesión no vuelve aunque la lectura de la BD corra junto a la marca. La X viste el glifo close del repositorio (Iconos). R150 (respuestasPendientes/marcarVisto) y R149 (fechaVenezuela) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R153: el aviso gana el TERCER CAMBIO DE SALIDA aprobado por el dueño — al abrir un post se marcan VISTO las respuestas pendientes de aviso DE ESE post (acción marcarVistoPost, 02 Acciones.gs): entrar manualmente a leer la respuesta limpia el aviso, y entrar a OTRO post NO lo toca. Anti-carrera _postsAbiertos: lo abierto en la sesión no vuelve a avisar aunque la lectura de la BD corra junto a la marca. La X conserva su regla R151 (VISTO y punto, fila por fila) y el tap sigue abriendo el post. R151 (tarjeta fija, una a la vez, texto del Setup) y R150 (respuestasPendientes/marcarVisto) y R149 (fechaVenezuela) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -1191,9 +1196,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
   })();
 
   /* ============================================================
-     AVISO «TE RESPONDIÓ» · R151 · window.AvisoRespuesta
+     AVISO «TE RESPONDIÓ» · R151/R153 · window.AvisoRespuesta
      Despierta la clase centralizada .notificacionFlotante
-     (Core_CSS R151, GAS + Github). Va dormida hasta que ESTE
+     (Core_CSS, GAS + Github). Va dormida hasta que ESTE
      módulo la enciende con .visible.
      · CUÁNDO SE REVISA: al abrir la app (5 s después de cargar,
        con la sesión y el catálogo ya en vuelo), en cada entrada
@@ -1214,17 +1219,21 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
        sube la siguiente pendiente, si la hay — una a la vez,
        nunca un bloque. Mientras hay tarjeta fija, las
        revisiones SOLO observan: no apilan nada encima.
-     · VISTO SE MARCA AL ACTUAR (no al mostrar): cerrar la app
-       con la tarjeta fija sin actuar no pierde nada — lo
-       pendiente reavisa en el próximo arranque.
+     · TERCER CAMINO (R153, aprobado por el dueño): ABRIR un
+       post marca VISTO las respuestas pendientes de aviso de
+       ESE post (marcarVistoPost) y retira su tarjeta — leer la
+       respuesta entrando por tu cuenta también limpia el
+       aviso. Entrar a OTRO post no lo toca. Anti-carrera
+       _postsAbiertos: lo abierto en la sesión no vuelve a
+       avisar aunque la lectura de la BD corra junto a la marca.
+     · VISTO POR X/TAP SE MARCA AL ACTUAR (no al mostrar):
+       cerrar la app con la tarjeta fija sin actuar no pierde
+       nada — lo pendiente reavisa en el próximo arranque.
      · EL TEXTO: nombre del partner (BD, cacheado) + espacio +
        ROOTJSON.app.avisoRespuesta. CERO constantes de texto
        aquí: lo que se dice SIEMPRE lo manda el Setup (el dueño
        lo cambia sin tocar código). Sin nada que decir, no
        nace tarjeta.
-     · ANTI-CARRERA: lo resuelto en esta sesión (_tratadas) no
-       vuelve, aunque la lectura de la BD corra junto a la
-       marca VISTO de la acción.
      · TODO SILENCIOSO: si algo falla, la app ni se entera.
      ============================================================ */
   window.AvisoRespuesta = (function () {
@@ -1236,6 +1245,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
     var _restantes      = [];         /* pendientes sin tratar (última revisión) */
     var _tratadas       = {};         /* filas resueltas EN ESTA sesión */
+    var _postsAbiertos  = {};         /* R153: posts abiertos en la sesión — sus pendientes no vuelven a avisar */
     var _enPantalla     = false;      /* hay tarjeta fija esperando acción */
     var _elemento       = null;
     var _lineaTexto     = null;
@@ -1297,7 +1307,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       if (_enPantalla || document.hidden) return;
       var linea = '';
       while (_restantes.length && !linea) {
-        linea = textoDe(_restantes[0]);
+        var p = _restantes[0];
+        if (!p || _postsAbiertos[p.idPost]) { _restantes.shift(); continue; }
+        linea = textoDe(p);
         if (!linea) _restantes.shift();   /* sin nada que decir: se salta */
       }
       if (!linea) return;
@@ -1339,15 +1351,73 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
         .then(function (data) {
           if (_enPantalla || document.hidden) return;
           var lista = ((data && data.pendientes) || []).slice(0, TOPE);
-          _restantes = lista.filter(function (p) { return p && !_tratadas[p.fila]; });
+          _restantes = lista.filter(function (p) {
+            return p && !_tratadas[p.fila] && !_postsAbiertos[p.idPost];
+          });
           if (_restantes.length) mostrarSiguiente();
         })
         .catch(function () { /* silencioso: el aviso no molesta */ });
     }
 
+    /* ============================================================
+       TERCER CAMINO (R153, aprobado por el dueño): abrir un post
+       marca VISTO las respuestas pendientes de aviso de ESE post
+       (marcarVistoPost, 02 Acciones.gs) y limpia el aviso de ese
+       post — leer la respuesta entrando por tu cuenta también
+       cuenta como visto. ENTRAR A OTRO POST NO TOCA NADA: solo
+       el post abierto se marca. Lo que quede pendiente de otros
+       posts sigue su curso (la revisión lo muestra).
+       La X conserva su regla R151 (VISTO y punto, fila por fila)
+       y el tap sigue abriendo el post: ambos intactos.
+       Fire-and-forget y silencioso: nada depende del eco.
+       ============================================================ */
+    function avisarApertura(idPost) {
+      var id = String(idPost || '').trim();
+      if (!id) return;
+      _postsAbiertos[id] = true;
+
+      /* Limpia del estado local TODO lo pendiente de este post:
+         la BD lo marca y lo abierto no puede volver a avisar. */
+      var quedan = [];
+      var enPantallaEraDelPost = false;
+      for (var i = 0; i < _restantes.length; i++) {
+        var p = _restantes[i];
+        if (p && p.idPost === id) {
+          _tratadas[p.fila] = true;
+          if (i === 0 && _enPantalla) enPantallaEraDelPost = true;
+          continue;
+        }
+        quedan.push(p);
+      }
+      _restantes = quedan;
+
+      /* La tarjeta en pantalla era de este post: sale YA — el
+         usuario está dentro de la respuesta. La siguiente pendiente
+         (de OTRO post) recién sube tras la pausa de salida. */
+      if (enPantallaEraDelPost) {
+        if (_temporizador) { clearTimeout(_temporizador); _temporizador = null; }
+        _enPantalla = false;
+        if (_elemento) _elemento.classList.remove('visible');
+        _temporizador = setTimeout(function () {
+          if (!_enPantalla && _restantes.length) mostrarSiguiente();
+        }, PAUSA_ENTRE_MS);
+      }
+
+      if (typeof window.postBackend === 'function') {
+        window.postBackend('marcarVistoPost', { idPost: id })
+          .catch(function () { /* silencioso: nada depende del eco */ });
+      }
+    }
+
+    function alCambiarPost(e) {
+      var post = (e && e.detail && e.detail.post) || null;
+      if (post && post.id) avisarApertura(post.id);
+      revisar();
+    }
+
     setTimeout(revisar, ARRANQUE_MS);
     setInterval(revisar, CADA_MS);
-    document.addEventListener('post:change', revisar);
+    document.addEventListener('post:change', alCambiarPost);
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) revisar();
     });

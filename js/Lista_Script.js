@@ -25,7 +25,7 @@ RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
                  hay). Datos horneados en el catálogo. La búsqueda
                  sigue SIEMPRE en lista.
 VERSIÓN:         2.18
-CAMBIOS:         R147: el overlay de la imagen elige píldora por el titulo del BADGEJSON — «Usado» viste la nueva maestra .badgeUsado (blanca, gris #475569, borde fino suave) y cualquier otro título la .badgeNuevo (la ex .badgeActivo renombrada en el Core: mismo naranja, cero cambios visuales). Texto SIEMPRE el de la BD; comparación insensible a mayúsculas. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
+CAMBIOS:         R153: el NOMBRE DEL PARTNER del item viste la maestra .textoSecundario del Core (el span .marca-texto lleva la clase en montarItem) — jerarquía del dueño: el título manda y el partner acompaña; el CSS de la marca (.lista-item .marca, Lista_CSS) habla el mismo idioma. R147: el overlay de la imagen elige píldora por el titulo del BADGEJSON — «Usado» viste la nueva maestra .badgeUsado (blanca, gris #475569, borde fino suave) y cualquier otro título la .badgeNuevo (la ex .badgeActivo renombrada en el Core: mismo naranja, cero cambios visuales). Texto SIEMPRE el de la BD; comparación insensible a mayúsculas. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
@@ -673,8 +673,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         html +=   '</span>';
         html +=   '<span class="pie">';
         if (marca) {
+          /* R153 · el nombre del partner viste la maestra
+             .textoSecundario del Core: el título manda, el
+             partner acompaña (jerarquía del dueño). */
           html +=   '<span class="marca">' +
-                    '<span class="marca-texto">' + escapeHtml(marca) + '</span>' +
+                    '<span class="marca-texto textoSecundario">' + escapeHtml(marca) + '</span>' +
                     '</span>';
         }
         html +=     '<span class="ver-detalles">Ver publicación' +
