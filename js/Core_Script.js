@@ -15,7 +15,7 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  «te respondió» — tarjeta FIJA, una a la
                  vez, VISTO al actuar y texto dinámico.
 VERSIÓN:         1.41.0
-CAMBIOS:         R155: (1) SWIPE DE CHIPS — nace window.SwipeChips: el arrastre horizontal sobre la lista cambia de chip por el MISMO camino del click (window.Chips.seleccionar → activarChip → chips:change; una sola fuente de verdad). Mapeo corregido por orden del dueño: arrastre a la IZQUIERDA = chip SIGUIENTE, a la DERECHA = ANTERIOR. La lista viaja con el dedo 1:1; umbral 25% del ancho o flick (0.45 px/ms); al cruzar el umbral el chip destino se PRENDE (.chip.prendido, Core_CSS), la lista saliente se ATENÚA 1.00 → 0.75 y la orilla de la pantalla destino ASOMA DE VERDAD ~24px del lado hacia el que se tira — render REAL: el destino lo pinta el MISMO pintar de Lista (window.Lista.pintar) y la orilla es su clon en una capa fija (.swipe-capa). Solo procede en modo lista, SIN búsqueda activa, con el gesto dentro de la lista, táctil, sin empezar en los 24px de los bordes de pantalla (ahí viven los gestos atrás/adelante del navegador) y con lock de eje 10px (el scroll vertical no se toca hasta que el horizontal domina). SIN CICLO en los extremos: elástico (resistencia, tope 64px) y rebote de vuelta; soltar dentro del umbral lo devuelve TODO (repintado del chip vigente); confirmar hace llegar la lista con animación (.llega-derecha/.llega-izquierda). (2) VISTO AL ABRIR EL POST — entrar a un post con pendientes PROPIOS los resuelve en el acto: accionMarcarVisto con la LISTA de filas (CERO .gs nuevos), salen de la cola (_tratadas) y si la tarjeta fija era de ese post se resuelve y sube la siguiente; abrir OTRO post no toca nada. R151 (tarjeta fija, una a la vez, VISTO al actuar) intacto. Historial: bitácora/versiones.
+CAMBIOS:         R156: CORRECCIÓN DE LA MÁQUINA DEL SWIPE (bug de la R155, detectado por el dueño en su iPhone: no se veía el asoma y el gesto se leía roto): el flag _congelado se DECLARABA y se CONSULTABA pero JAMÁS se encendía — congelar() no lo marcaba y descongelar() no lo apagaba. Costo real en producción: congelar re-corriendo en CADA frame pasado el umbral (el clon saliente dejaba de ser la lista vieja y pasaba a ser la pantalla destino repintada — el asoma de 24px quedaba sepultado bajo el mismo contenido), capas fantasma permanentes en el body (solo la última se limpiaba al soltar), descongelar como código muerto (volver dentro del umbral no restauraba nada hasta soltar) y confirmación SOLO por flick (los arrastres lentos que cruzaban el umbral rebotaban sin cambiar de chip). Fix quirúrgico: _congelado = true al cerrar la congelación y _congelado = false al iniciar el deshielo — la máquina queda COMPLETA: congela UNA vez, el saliente atenuado (0.75) viaja con el dedo, el asoma REAL de 24px del destino vive en pantalla con el chip prendido, al regresar dentro del umbral todo vuelve (repintado del chip vigente + traspaso pixel a pixel) y al soltar: dentro = rebote, fuera o flick = confirma por el MISMO camino del click (window.Chips.seleccionar). Mapeo de la R155 INTACTO: arrastre a la IZQUIERDA = chip SIGUIENTE, a la DERECHA = ANTERIOR. VISTO al abrir el post (R155) intacto. R151 (tarjeta fija, una a la vez, VISTO al actuar) intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -1452,6 +1452,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
      · Cifras del gesto (todas locales, nada mágico):
        bordes 24px · eje 10px · umbral 25% · flick 0.45 px/ms ·
        asoma 24px · elástico tope 64px (k 140).
+     · R156 · CORRECCIÓN: el flag _congelado VIVE — se enciende
+       al congelar y se apaga al deshelar (en la R155 faltaba y
+       la máquina se rompía: re-congelar en cada frame, capas
+       fantasma en el body y confirmación solo por flick).
      ============================================================ */
   window.SwipeChips = (function () {
 
@@ -1693,12 +1697,23 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       _asoma.style.overflow = 'hidden';
       _asoma.style.transform = 'none';
       _capa.appendChild(_asoma);
+
+      /* R156 · el flag se ENCIENDE al cerrar la congelación (en
+         la R155 faltaba esta línea y TODO se rompía: re-congelar
+         en cada frame, capas fantasma y confirmación solo por
+         flick). Congela UNA vez. */
+      _congelado = true;
     }
 
     /* VOLVIÓ DEL OTRO LADO DEL UMBRAL: el destino se retira y
        el gesto regresa a la lista real (mismo contenido,
        misma posición — traspaso pixel a pixel). */
     function descongelar(dx) {
+      /* R156 · el flag se APAGA al iniciar el deshielo (en la
+         R155 faltaba: descongelar era código muerto). Al apagarlo
+         AQUÍ, el mismo frame devuelve el movimiento a la lista
+         real — sin salto. */
+      _congelado = false;
       quitar(_asoma);   _asoma = null;
       prender(null, false);
       quitar(_clonVivo); _clonVivo = null;

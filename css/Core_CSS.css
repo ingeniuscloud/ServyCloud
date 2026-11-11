@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R155: la píldora del aviso pasa a CRISTAL (orden del dueño): fondo ámbar translúcido rgba(254,243,199,0.85) + blur (backdrop-filter con su prefijo -webkit- para Safari), borde 1px rgba(253,230,138,0.9) y TINTA ÚNICA #92400E para el texto (.textoPrimario scoped) y la ✕ — muere el circulito blanco (el glifo queda directo sobre el cristal), sombra suavizada 0.32 → 0.18 (capa corta a 0.10) y altura 52px → 44px (min-height border-box; el bottom 68px de la R152 SE MANTIENE: más aire sobre la barra de Safari). Nacen además los apoyos visuales del SWIPE de chips (el gesto vive en Core_Script): .chip.prendido (anticipo naranja del chip destino al cruzar el umbral), .swipe-capa (capa fija del gesto), .lista-wrap.swipe-saliente (la lista saliente se atenúa 1.00 → 0.75), .swipe-oculto, .swipe-asoma (la orilla REAL de la pantalla destino) y las llegadas .llega-derecha/.llega-izquierda con su reduced-motion. R151 (píldora, 999px, .visible), R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R156: AFINADO DEL CRISTAL (orden del dueño tras probarlo en su iPhone 11: con 0.85 solo pasaba el 15% de luz sobre el fondo crema #FFF7ED de la app y el vidrio se leía SÓLIDO — matemática, no Safari): la translucidez baja 0.85 → 0.60 y el cristal por fin SE LEE. Todo lo demás del cristal INTACTO: blur 8px (backdrop-filter con su prefijo -webkit- para Safari), borde 1px rgba(253,230,138,0.9), TINTA ÚNICA #92400E para el texto (.textoPrimario scoped) y la ✕ sin circulito blanco, sombra 0.18 (capa corta 0.10), alto 44px y bottom 68px de la R152 SE MANTIENE. Se mantienen los apoyos visuales del SWIPE de chips (el gesto vive en Core_Script): .chip.prendido, .swipe-capa, .lista-wrap.swipe-saliente (atenúa 1.00 → 0.75), .swipe-oculto, .swipe-asoma (la orilla REAL de la pantalla destino) y las llegadas .llega-derecha/.llega-izquierda con su reduced-motion. R155 (el cristal nace) · R151 (píldora, 999px, .visible) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -412,10 +412,13 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        SE MANTIENE (R155): el aire extra es de la barra de
        Safari, que pinta su URL/círculos abajo.
      · CRISTAL (R155, orden del dueño): fondo ámbar translúcido
-       rgba(254,243,199,0.85) + blur — backdrop-filter con su
+       rgba(254,243,199,0.60) + blur — backdrop-filter con su
        prefijo -webkit-, que es el que Safari entiende — y
        borde 1px rgba(253,230,138,0.9): se adivina lo que hay
-       detrás. Adiós el amarillo sólido #FFE600.
+       detrás. Adiós el amarillo sólido #FFE600. R156: la
+       translucidez baja 0.85 → 0.60 — con 0.85 el vidrio era
+       matemáticamente sólido sobre el fondo crema (el dueño
+       lo comprobó en su iPhone 11) y nunca se leía como vidrio.
      · ALTURA 44px (R155): min-height border-box (antes 52px
        con padding 12px vertical) — el aire vertical lo pone
        la caja (padding 0): menos alta, mismo aire lateral.
@@ -464,8 +467,12 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     gap: 10px;
     padding: 0 16px;
     /* R155 · CRISTAL: ámbar translúcido + blur (el prefijo
-       -webkit- es el que Safari entiende) + borde ámbar. */
-    background: rgba(254, 243, 199, 0.85) !important;
+       -webkit- es el que Safari entiende) + borde ámbar.
+       R156 · 0.85 → 0.60 (orden del dueño): con 0.85 solo el
+       15% dejaba ver lo de detrás y sobre el fondo crema el
+       vidrio se leía SÓLIDO — con 0.60 el cristal por fin
+       se ve. Blur, borde, tinta, sombra, alto y bottom: intactos. */
+    background: rgba(254, 243, 199, 0.60) !important;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(253, 230, 138, 0.9);
