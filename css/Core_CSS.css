@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R156: AFINADO DEL CRISTAL (orden del dueño tras probarlo en su iPhone 11: con 0.85 solo pasaba el 15% de luz sobre el fondo crema #FFF7ED de la app y el vidrio se leía SÓLIDO — matemática, no Safari): la translucidez baja 0.85 → 0.60 y el cristal por fin SE LEE. Todo lo demás del cristal INTACTO: blur 8px (backdrop-filter con su prefijo -webkit- para Safari), borde 1px rgba(253,230,138,0.9), TINTA ÚNICA #92400E para el texto (.textoPrimario scoped) y la ✕ sin circulito blanco, sombra 0.18 (capa corta 0.10), alto 44px y bottom 68px de la R152 SE MANTIENE. Se mantienen los apoyos visuales del SWIPE de chips (el gesto vive en Core_Script): .chip.prendido, .swipe-capa, .lista-wrap.swipe-saliente (atenúa 1.00 → 0.75), .swipe-oculto, .swipe-asoma (la orilla REAL de la pantalla destino) y las llegadas .llega-derecha/.llega-izquierda con su reduced-motion. R155 (el cristal nace) · R151 (píldora, 999px, .visible) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R157: 10% MÁS DE CRISTAL + FRANJA DE ASOMA (orden del dueño tras probar la R156 en su iPhone 11: «dale un 10% más de transparencia, aún se ve casi sólido» — «el deslizamiento está al revés» — «no se asoma nada, está muerto ese proceso, dame una solución alterna»): la translucidez baja 0.60 → 0.50 y el vidrio SE ADIVINA de verdad (mitad luz propia, mitad ajena). Todo lo demás del cristal INTACTO: blur 8px (backdrop-filter con su prefijo -webkit- para Safari), borde 1px rgba(253,230,138,0.9), TINTA ÚNICA #92400E para el texto (.textoPrimario scoped) y la ✕ sin circulito blanco, sombra 0.18 (capa corta 0.10), alto 44px y bottom 68px SE MANTIENEN. Y nace la FRANJA DE ASOMA del swipe (.swipe-franja, el gesto vive en Core_Script): div fijo con el NOMBRE REAL del chip vecino y un chevron, anclado al borde por donde entra la otra pantalla, que crece con el dedo desde el primer píxel — viste los colores del .chip.prendido y la letra maestra .chipsFiltros. Salen las reglas muertas de la máquina de clones (.swipe-capa, .lista-wrap.swipe-saliente, .swipe-oculto — el gesto R157 no las usa); se mantienen .chip.prendido y las llegadas .llega-derecha/.llega-izquierda con su reduced-motion. R155 (el cristal nace) · R151 (píldora, 999px, .visible) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -412,13 +412,14 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        SE MANTIENE (R155): el aire extra es de la barra de
        Safari, que pinta su URL/círculos abajo.
      · CRISTAL (R155, orden del dueño): fondo ámbar translúcido
-       rgba(254,243,199,0.60) + blur — backdrop-filter con su
+       rgba(254,243,199,0.50) + blur — backdrop-filter con su
        prefijo -webkit-, que es el que Safari entiende — y
        borde 1px rgba(253,230,138,0.9): se adivina lo que hay
-       detrás. Adiós el amarillo sólido #FFE600. R156: la
-       translucidez baja 0.85 → 0.60 — con 0.85 el vidrio era
-       matemáticamente sólido sobre el fondo crema (el dueño
-       lo comprobó en su iPhone 11) y nunca se leía como vidrio.
+       detrás. Adiós el amarillo sólido #FFE600. R156 bajó la
+       translucidez 0.85 → 0.60 y la R157 la baja OTRO 10%
+       (0.60 → 0.50, orden del dueño tras probar la R156 en su
+       iPhone 11: «aún se ve casi sólido») — la mitad del
+       cristal es luz ajena y el vidrio por fin SE VE.
      · ALTURA 44px (R155): min-height border-box (antes 52px
        con padding 12px vertical) — el aire vertical lo pone
        la caja (padding 0): menos alta, mismo aire lateral.
@@ -468,11 +469,12 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     padding: 0 16px;
     /* R155 · CRISTAL: ámbar translúcido + blur (el prefijo
        -webkit- es el que Safari entiende) + borde ámbar.
-       R156 · 0.85 → 0.60 (orden del dueño): con 0.85 solo el
-       15% dejaba ver lo de detrás y sobre el fondo crema el
-       vidrio se leía SÓLIDO — con 0.60 el cristal por fin
-       se ve. Blur, borde, tinta, sombra, alto y bottom: intactos. */
-    background: rgba(254, 243, 199, 0.60) !important;
+       R156 · 0.85 → 0.60 y R157 · 0.60 → 0.50 (orden del
+       dueño: «dale un 10% más de transparencia, aún se ve
+       casi sólido»): la MITAD del cristal es luz ajena y el
+       vidrio se adivina de verdad. Blur, borde, tinta,
+       sombra, alto y bottom: intactos. */
+    background: rgba(254, 243, 199, 0.50) !important;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(253, 230, 138, 0.9);
@@ -539,45 +541,88 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     R155 · SWIPE DE CHIPS · apoyos visuales del gesto
+     R157 · SWIPE DE CHIPS · apoyos visuales del gesto
      El gesto vive en Core_Script (window.SwipeChips); aquí
-     viven sus caras: el anticipo del chip destino, la capa
-     fija del gesto y las llegadas.
+     viven sus caras: la FRANJA de asoma, el anticipo del
+     chip destino y las llegadas.
+     · .swipe-franja: el ASOMA del R157 — un div FIJO con el
+       NOMBRE REAL del chip vecino y un chevron, anclado al
+       borde por donde entra la otra pantalla (derecha al
+       tirar a la izquierda · izquierda al tirar a la
+       derecha). Nace FUERA del borde (translateX ±110%) y
+       Core_Script la mete con el dedo: entra hasta 10px y
+       crece hasta 56px al cruzar el umbral. Viste los
+       colores del .chip.prendido (la promesa del destino) y
+       la letra maestra de los chips (.chipsFiltros).
+       pointer-events none y aria-hidden: el dedo manda, ella
+       solo anuncia. Un solo elemento: cero clones, cero
+       capas fantasma (la lección R155/R156).
+     · .swipe-franja-der / .swipe-franja-izq: el borde donde
+       vive, su pico redondeado y el giro del chevron (la
+       derecha invierte la fila: nombre primero, flecha
+       después).
      · .chip.prendido: al cruzar el umbral el chip destino se
        PRENDE — anticipo naranja (el activo sólido lo pone
        Chips_CSS al confirmar; el prendido es la promesa).
-     · .swipe-capa: capa FIJA que contiene los clones del
-       gesto (el saliente congelado y el asoma del destino).
-       Fija para que un salto de scroll del contenedor no
-       baile lo congelado. pointer-events none: el dedo
-       manda, no los clones.
-     · .lista-wrap.swipe-saliente: la lista que se va se
-       ATENÚA 1.00 → 0.75 al cruzar el umbral.
-     · .lista-wrap.swipe-oculto: la lista real se esconde
-       mientras su lugar lo toma el gesto (el asoma es clon
-       REAL del render destino).
      · .llega-derecha / .llega-izquierda: al confirmar, la
-       lista nueva LLEGA desde el lado del gesto. Con
-       prefers-reduced-motion la entrada se apaga.
+       lista nueva LLEGA desde el lado del gesto (la salida
+       espejo la pone Core_Script con transition inline).
+       Con prefers-reduced-motion la entrada se apaga.
+     MURIERON con la R157 (era la máquina de clones):
+     .swipe-capa, .lista-wrap.swipe-saliente y
+     .lista-wrap.swipe-oculto — el gesto nuevo ya no las usa
+     y sus reglas salieron de aquí.
      ============================================================ */
+  .swipe-franja {
+    position: fixed;
+    top: 50%;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 14px;
+    max-width: 44vw;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-50%) translateX(110%);
+    background: #ffedd5;
+    border: 1px solid #f97316;
+    color: #c2410c;
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+    transition: opacity 0.14s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .swipe-franja-der {
+    right: 0;
+    border-radius: 999px 0 0 999px;
+    flex-direction: row-reverse;   /* nombre primero, flecha después */
+  }
+  .swipe-franja-izq {
+    left: 0;
+    border-radius: 0 999px 999px 0;
+    transform: translateY(-50%) translateX(-110%);
+  }
+  .swipe-franja-txt {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 34vw;
+  }
+  .swipe-franja-chev {
+    flex-shrink: 0;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid #c2410c;
+    border-right: 2px solid #c2410c;
+  }
+  .swipe-franja-der .swipe-franja-chev { transform: rotate(45deg); }
+  .swipe-franja-izq .swipe-franja-chev { transform: rotate(-135deg); }
   .chip.prendido {
     background: #ffedd5;
     border-color: #f97316;
     color: #c2410c;
     box-shadow: 0 2px 10px rgba(249, 115, 22, 0.28);
   }
-  .swipe-capa {
-    position: fixed;
-    top: 0; right: 0; bottom: 0; left: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 50;
-  }
-  .lista-wrap.swipe-saliente {
-    opacity: 0.75;
-    transition: opacity 0.18s ease;
-  }
-  .lista-wrap.swipe-oculto { visibility: hidden; }
   @keyframes listaLlegaDerecha {
     from { opacity: 0.4; transform: translateX(64px); }
     to   { opacity: 1;   transform: translateX(0); }

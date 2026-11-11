@@ -15,7 +15,7 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  «te respondió» — tarjeta FIJA, una a la
                  vez, VISTO al actuar y texto dinámico.
 VERSIÓN:         1.41.0
-CAMBIOS:         R156: CORRECCIÓN DE LA MÁQUINA DEL SWIPE (bug de la R155, detectado por el dueño en su iPhone: no se veía el asoma y el gesto se leía roto): el flag _congelado se DECLARABA y se CONSULTABA pero JAMÁS se encendía — congelar() no lo marcaba y descongelar() no lo apagaba. Costo real en producción: congelar re-corriendo en CADA frame pasado el umbral (el clon saliente dejaba de ser la lista vieja y pasaba a ser la pantalla destino repintada — el asoma de 24px quedaba sepultado bajo el mismo contenido), capas fantasma permanentes en el body (solo la última se limpiaba al soltar), descongelar como código muerto (volver dentro del umbral no restauraba nada hasta soltar) y confirmación SOLO por flick (los arrastres lentos que cruzaban el umbral rebotaban sin cambiar de chip). Fix quirúrgico: _congelado = true al cerrar la congelación y _congelado = false al iniciar el deshielo — la máquina queda COMPLETA: congela UNA vez, el saliente atenuado (0.75) viaja con el dedo, el asoma REAL de 24px del destino vive en pantalla con el chip prendido, al regresar dentro del umbral todo vuelve (repintado del chip vigente + traspaso pixel a pixel) y al soltar: dentro = rebote, fuera o flick = confirma por el MISMO camino del click (window.Chips.seleccionar). Mapeo de la R155 INTACTO: arrastre a la IZQUIERDA = chip SIGUIENTE, a la DERECHA = ANTERIOR. VISTO al abrir el post (R155) intacto. R151 (tarjeta fija, una a la vez, VISTO al actuar) intacto. Historial: bitácora/versiones.
+CAMBIOS:         R157: EL SWIPE RENACE SIMPLE — SOLUCIÓN ALTERNA (orden del dueño tras probar la R155 y la R156 en su iPhone 11: «el deslizamiento está al revés», «no se asoma nada de la siguiente pantalla, está muerto ese proceso», «dame una solución alterna, pero hay que darle la sensación al usuario de que sí está pasando a la siguiente pantalla»): MUERE la máquina de congelar/clonar de la R155/R156 — cero clones, cero capas fantasma, cero flag _congelado — y nacen tres piezas a prueba de todo. (1) DIRECCIÓN ANCLADA A LA PANTALLA: los vecinos se MIDEN con getBoundingClientRect de los chips visibles comparando CENTROS con el chip activo — el que queda a la DERECHA del activo ES el SIGUIENTE y entra al ARRASTRAR A LA IZQUIERDA; ni el orden del arreglo ni el del DOM pueden invertir lo que los ojos ven. (2) FRANJA DE ASOMA INFALIBLE: un div fijo (.swipe-franja, Core_CSS) con el NOMBRE REAL del chip vecino y un chevron asoma por el borde por donde entra la otra pantalla (derecha al tirar a la izquierda · izquierda al tirar a la derecha) y CRECE con el dedo desde el primer píxel — un solo elemento, nada que pueda morir en silencio. (3) PANTALLA VIVA + SALIDA/ENTRADA: la lista viaja AMORTIGUADA con el dedo (0.22, tope 34px; muro de 8px en los extremos, sin ciclo), al confirmar (25% del ancho o flick 0.45 px/ms) la lista SALE hacia el lado del gesto (0.16s, espejo de la llegada) y el cambio viaja por el MISMO camino del click (window.Chips.seleccionar → chips:change) donde la lista nueva LLEGA con .llega-derecha/.llega-izquierda. El chip destino se PRENDE al cruzar el umbral (R155 intacto). Filtros de nacimiento y lock de eje 10px intactos (bordes 24px, modo lista, sin búsqueda). VISTO al abrir el post (R155) intacto. R151 (tarjeta fija, una a la vez, VISTO al actuar) intacto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -1415,31 +1415,39 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
   })();
 
   /* ============================================================
-     R155 · SWIPE DE CHIPS · window.SwipeChips
+     R157 · SWIPE DE CHIPS · window.SwipeChips
      El arrastre horizontal sobre la lista cambia de chip con el
      MISMO camino del click: window.Chips.seleccionar(idDestino)
      → activarChip → chips:change. Una sola fuente de verdad.
-     · MAPEO CORREGIDO (orden del dueño): arrastre a la
-       IZQUIERDA = chip SIGUIENTE (entra el de la derecha);
-       arrastre a la DERECHA = chip ANTERIOR (entra el de la
-       izquierda).
-     · LA LISTA VIAJA CON EL DEDO 1:1. En los EXTREMOS no hay
-       ciclo: elástico (resistencia, tope 64px) y al soltar
-       rebota de vuelta.
-     · UMBRAL: 25% del ancho de la lista o flick (velocidad ≥
-       0.45 px/ms hacia el mismo lado). Al CRUZAR: el chip
-       destino se PRENDE (.chip.prendido, Core_CSS), la lista
-       saliente se ATENÚA 1.00 → 0.75 y la orilla de la
-       pantalla destino ASOMA DE VERDAD ~24px del lado hacia
-       el que se tira.
-     · ASOMA REAL: el destino lo pinta el MISMO pintar de
-       Lista (window.Lista.pintar — cero lógica duplicada) y
-       la orilla es su clon tal cual (mismo DOM, mismas
-       clases) dentro de una capa fija (.swipe-capa). Al
-       soltar DENTRO del umbral todo vuelve: repintado del
-       chip vigente + rebote. Al CONFIRMAR, chips:change
-       repinta (idempotente) y la lista LLEGA con animación
-       (.llega-derecha / .llega-izquierda).
+     SOLUCIÓN ALTERNA pedida por el dueño tras la R155+R156:
+     «dame una solución alterna, pero hay que darle la
+     sensación al usuario de que sí está pasando a la
+     siguiente pantalla».
+     · DIRECCIÓN ANCLADA A LA PANTALLA (corazón del arreglo):
+       los vecinos se MIDEN con getBoundingClientRect de los
+       chips visibles comparando CENTROS con el chip activo.
+       El que queda a la DERECHA del activo ES el SIGUIENTE y
+       entra al ARRASTRAR A LA IZQUIERDA; el de la izquierda,
+       al arrastrar a la derecha. Lo que se ve manda: ni el
+       orden del arreglo ni el del DOM pueden invertirlo.
+     · FRANJA DE ASOMA (infalible): un div fijo con el NOMBRE
+       REAL del vecino (.swipe-franja, Core_CSS) asoma por el
+       borde por donde entra la otra pantalla — derecha al
+       tirar a la izquierda, izquierda al tirar a la derecha —
+       y CRECE con el dedo desde el primer píxel. Un solo
+       elemento: cero clones, cero capas fantasma, nada que
+       pueda morir en silencio (la lección R155/R156).
+     · PANTALLA VIVA: la lista viaja AMORTIGUADA con el dedo
+       (0.22 del recorrido, tope 34px; en los extremos, muro
+       de 8px — sin ciclo jamás). Al soltar dentro del umbral,
+       todo regresa.
+     · CONFIRMACIÓN: 25% del ancho o flick (0.45 px/ms hacia
+       el mismo lado). Al cruzar, el chip destino se PRENDE
+       (.chip.prendido). Al soltar FUERA: la lista SALE hacia
+       el lado del gesto (0.16s, espejo de la llegada) y el
+       cambio viaja por el MISMO camino del click; chips:change
+       repinta y la lista LLEGA (.llega-derecha /
+       .llega-izquierda, Core_CSS).
      · SOLO procede: gesto táctil, dentro de la lista, en modo
        lista, SIN búsqueda activa, sin empezar en los 24px de
        los bordes de pantalla (ahí viven los gestos de
@@ -1451,11 +1459,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
        se retira sin tocar nada.
      · Cifras del gesto (todas locales, nada mágico):
        bordes 24px · eje 10px · umbral 25% · flick 0.45 px/ms ·
-       asoma 24px · elástico tope 64px (k 140).
-     · R156 · CORRECCIÓN: el flag _congelado VIVE — se enciende
-       al congelar y se apaga al deshelar (en la R155 faltaba y
-       la máquina se rompía: re-congelar en cada frame, capas
-       fantasma en el body y confirmación solo por flick).
+       viaje 0.22 (tope 34px) · muro 8px · franja 10→56px ·
+       salida 0.16s / 72px.
      ============================================================ */
   window.SwipeChips = (function () {
 
@@ -1464,23 +1469,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var UMBRAL_FRACC   = 0.25; /* 25% del ancho de la lista */
     var FLICK_PX_MS    = 0.45; /* velocidad del flick */
     var FLICK_MIN_PX   = 30;   /* flick con andar mínimo */
-    var ASOMA_PX       = 24;   /* orilla real que asoma */
-    var ELASTICO_TOPE  = 64;   /* tope del elástico en extremos */
-    var ELASTICO_K     = 140;  /* suavidad del elástico */
+    var VIAJE_K        = 0.22; /* amortiguación del viaje 1:dedo */
+    var VIAJE_TOPE     = 34;   /* tope del viaje (px) */
+    var MURO_TOPE      = 8;    /* resistencia en extremos (px) */
+    var FRANJA_BASE    = 10;   /* asomo mínimo de la franja (px) */
+    var FRANJA_TOPE    = 56;   /* asomo al cruzar el umbral (px) */
+    var SALIDA_MS      = 160;  /* salida de la lista al confirmar */
+    var SALIDA_PX      = 72;   /* distancia de salida (espejo 64) */
 
-    var _tocoId    = null;     /* touch identifier del gesto */
-    var _x0 = 0, _y0 = 0, _t0 = 0;
+    var _tocoId = null;        /* touch identifier del gesto */
+    var _x0 = 0, _y0 = 0;
     var _xViejo = 0, _tViejo = 0, _vel = 0;
     var _ancho     = 0;        /* ancho de la lista (umbral) */
+    var _bloqueado = false;    /* eje horizontal decidido */
+    var _vecinos   = null;     /* { idIzq, idDer } medidos en pantalla */
     var _lado      = 0;        /* -1 siguiente · +1 anterior */
     var _destino   = null;     /* idChip destino (null = extremo) */
-    var _bloqueado = false;    /* eje horizontal decidido */
-    var _congelado = false;    /* cruzó el umbral (destino vivo) */
-    var _clonVivo  = null;     /* saliente congelado (viaja+se atenúa) */
-    var _asoma     = null;     /* orilla destino (24px reales) */
-    var _capa      = null;     /* capa fija .swipe-capa */
-    var _scrollY   = 0;        /* scroll del contenedor al congelar */
-    var _rectTop = 0, _rectIzq = 0, _rectAlto = 0, _rectAncho = 0;
+    var _franja    = null;     /* el div del asoma (singleton) */
+    var _franjaTxt = null;     /* su texto (nombre del vecino) */
+    var _franjaLado = 0;       /* último lado pintado */
+    var _enSalida  = false;    /* confirmación aterrizando */
     var _llegada   = null;     /* clase de llegada pendiente */
 
     function lista() { return document.getElementById('listaWrap'); }
@@ -1488,37 +1496,51 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
     function signo(n) { return n > 0 ? 1 : (n < 0 ? -1 : 0); }
 
-    function quitar(el) {
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    }
-
-    function idChipActual() {
-      return (window.Chips && typeof window.Chips.getChipActivo === 'function')
-        ? window.Chips.getChipActivo() : null;
-    }
-
-    /* Los chips VISIBLES, en su orden real del DOM (los
-       desactivados nunca llegaron a pintarse). */
-    function idsChips() {
+    /* VECINOS REALES DE PANTALLA (R157 · corazón del arreglo):
+       se miden los rectángulos de los chips visibles y se
+       comparan CENTROS con el activo. Derecha del centro
+       activo = siguiente; izquierda = anterior. Lo que decide
+       el gesto es lo MISMO que el dueño ve — el debate de
+       órdenes (arreglo, DOM, pintura) queda muerto para
+       siempre. */
+    function medirVecinos() {
+      var vacio = { idIzq: null, idDer: null };
       var cont = document.getElementById('filtros');
-      if (!cont) return [];
-      var todos = cont.querySelectorAll('.chip');
-      var out = [];
-      for (var i = 0; i < todos.length; i++) {
-        out.push(todos[i].getAttribute('data-chip'));
+      if (!cont) return vacio;
+      var activo = cont.querySelector('.chip.activo');
+      if (!activo) return vacio;
+      var ra = activo.getBoundingClientRect();
+      var centroActivo = ra.left + ra.width / 2;
+      var chips = cont.querySelectorAll('.chip');
+      var idIzq = null, idDer = null;
+      var mejorIzq = -Infinity, mejorDer = Infinity;
+      for (var i = 0; i < chips.length; i++) {
+        var c = chips[i];
+        if (c === activo) continue;
+        var r = c.getBoundingClientRect();
+        if (!r.width && !r.height) continue;   /* oculto */
+        var centro = r.left + r.width / 2;
+        if (centro < centroActivo && centro > mejorIzq) {
+          mejorIzq = centro;
+          idIzq = c.getAttribute('data-chip');
+        }
+        if (centro > centroActivo && centro < mejorDer) {
+          mejorDer = centro;
+          idDer = c.getAttribute('data-chip');
+        }
       }
-      return out;
+      return { idIzq: idIzq, idDer: idDer };
     }
 
-    /* El vecino en la dirección del gesto: lado -1 = SIGUIENTE
-       (a la derecha del activo) · lado +1 = ANTERIOR. Sin
-       vecino = extremo: elástico y rebote, JAMÁS ciclo. */
-    function vecinoDe(lado) {
-      var ids = idsChips();
-      var i = ids.indexOf(idChipActual());
-      if (i === -1) return null;
-      var j = i + (lado === -1 ? 1 : -1);
-      return (j >= 0 && j < ids.length) ? ids[j] : null;
+    /* El NOMBRE REAL del vecino, leído del chip pintado (el
+       mismo texto que el dueño ve en la fila — cero strings
+       hardcodeadas). */
+    function tituloDeChip(idChip) {
+      var cont = document.getElementById('filtros');
+      if (!cont || !idChip) return '';
+      var c = cont.querySelector('.chip[data-chip="' + idChip + '"]');
+      var t = c ? c.querySelector('.chip-texto') : null;
+      return t ? (t.textContent || '') : '';
     }
 
     function busquedaActiva() {
@@ -1544,12 +1566,71 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       }
     }
 
+    /* LA FRANJA · nace UNA vez, vive en el body, no captura
+       toques (pointer-events none) y su texto es el nombre
+       REAL del vecino. aria-hidden: es la decoración del
+       gesto; el cambio de pantalla lo anuncia chips:change. */
+    function franja() {
+      if (_franja) return _franja;
+      var f = document.createElement('div');
+      f.className = 'swipe-franja swipe-franja-der';
+      f.setAttribute('aria-hidden', 'true');
+      var chev = document.createElement('span');
+      chev.className = 'swipe-franja-chev';
+      f.appendChild(chev);
+      _franjaTxt = document.createElement('span');
+      _franjaTxt.className = 'swipe-franja-txt chipsFiltros';
+      f.appendChild(_franjaTxt);
+      document.body.appendChild(f);
+      _franja = f;
+      return f;
+    }
+
+    /* La franja ENTRA según el avance del dedo: 10px apenas
+       arranca, 56px al cruzar el umbral. El % de translateX
+       es su PROPIO ancho: cero mediciones de layout por
+       frame. translateY(-50%) del CSS viaja en CADA
+       transform (el inline lo pisa). */
+    function pintarFranja(lado, dx, umbral) {
+      var idVecino = (lado === -1) ? _vecinos.idDer : _vecinos.idIzq;
+      if (!idVecino) { ocultarFranja(); return; }
+      var f = franja();
+      var titulo = tituloDeChip(idVecino);
+      if (lado !== _franjaLado || titulo !== _franjaTxt.textContent) {
+        _franjaLado = lado;
+        _franjaTxt.textContent = titulo;
+        if (lado === -1) {
+          f.classList.add('swipe-franja-der');
+          f.classList.remove('swipe-franja-izq');
+        } else {
+          f.classList.add('swipe-franja-izq');
+          f.classList.remove('swipe-franja-der');
+        }
+      }
+      var prog = Math.max(0, Math.min(1, Math.abs(dx) / umbral));
+      var revela = FRANJA_BASE + prog * (FRANJA_TOPE - FRANJA_BASE);
+      f.style.opacity = String(Math.min(1, 0.35 + prog * 0.9));
+      f.style.transform = (lado === -1)
+        ? 'translateY(-50%) translateX(calc(100% - ' + revela + 'px))'
+        : 'translateY(-50%) translateX(calc(-100% + ' + revela + 'px))';
+    }
+
+    function ocultarFranja() {
+      if (!_franja) return;
+      _franja.style.opacity = '0';
+      _franja.style.transform = (_franjaLado === 1)
+        ? 'translateY(-50%) translateX(-110%)'
+        : 'translateY(-50%) translateX(110%)';
+      _franjaLado = 0;
+    }
+
     /* INICIO del toque: solo se postula (nada se bloquea aún).
        Filtros de nacimiento: táctil, un dedo, dentro de la
        lista, modo lista, sin búsqueda y sin bordes de
        pantalla. */
     function alEmpezar(e) {
       if (_tocoId !== null || e.touches.length !== 1) return;
+      if (_enSalida) return;   /* la confirmación está aterrizando */
       if (!enModoLista() || busquedaActiva()) return;
 
       var t = e.touches[0];
@@ -1561,17 +1642,16 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       if (!(t.target && cont.contains(t.target))) return;
 
       _tocoId = t.identifier;
-      _x0 = t.clientX; _y0 = t.clientY; _t0 = e.timeStamp;
-      _xViejo = _x0; _tViejo = _t0; _vel = 0;
-      _bloqueado = false; _congelado = false;
+      _x0 = t.clientX; _y0 = t.clientY;
+      _xViejo = _x0; _tViejo = e.timeStamp; _vel = 0;
+      _bloqueado = false;
       _lado = 0; _destino = null; _llegada = null;
-      _clonVivo = null; _asoma = null; _capa = null;
     }
 
-    /* MOVIMIENTO: primero decide el eje (10px), después manda
-       el horizontal: la lista viaja con el dedo (o el elástico
-       en el extremo), y al cruzar el umbral congela el
-       saliente y hace ASOMAR el destino real. */
+    /* MOVIMIENTO: primero decide el eje (10px); después manda
+       el horizontal: la lista viaja amortiguada con el dedo y
+       la FRANJA del vecino asoma por SU borde, creciendo con
+       el recorrido. */
     function alMover(e) {
       if (_tocoId === null) return;
       var t = null;
@@ -1590,21 +1670,15 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
         if (!cont0) { soltarNada(); return; }
         _bloqueado = true;
         _ancho = cont0.getBoundingClientRect().width || 1;
+        _vecinos = medirVecinos();   /* la PANTALLA manda (R157) */
       }
 
       e.preventDefault();   /* el horizontal es nuestro */
 
       _lado = signo(dx);
-      _destino = vecinoDe(_lado);
-
-      var viaje;
-      if (_destino) {
-        viaje = dx;   /* 1:1 — la lista viaja con el dedo */
-      } else {
-        /* extremo: elástico (resistencia, tope 64px) */
-        viaje = _lado * ELASTICO_TOPE *
-                (1 - Math.exp(-Math.abs(dx) / ELASTICO_K));
-      }
+      /* tirar a la IZQUIERDA = vecino DERECHO · a la derecha =
+         vecino IZQUIERDO. Medido en pantalla, no en arreglos. */
+      _destino = (_lado === -1) ? _vecinos.idDer : _vecinos.idIzq;
 
       var dt = e.timeStamp - _tViejo;
       if (dt > 0) {
@@ -1617,118 +1691,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
         (Math.abs(_vel) >= FLICK_PX_MS &&
          signo(_vel) === _lado && Math.abs(dx) > FLICK_MIN_PX));
 
-      if (cruzo && !_congelado) congelar(dx);
-      else if (!cruzo && _congelado) descongelar(dx);
-
-      if (_congelado) {
-        if (_clonVivo) _clonVivo.style.transform = 'translateX(' + viaje + 'px)';
-      } else {
-        var cont = lista();
-        if (cont) {
-          cont.style.transition = 'none';
-          cont.style.transform = 'translateX(' + viaje + 'px)';
-        }
-      }
-
-      prender(_destino, cruzo);
-    }
-
-    /* CRUZA EL UMBRAL · el saliente se congela tal cual se ve
-       (clon real en capa fija: un salto de scroll no lo
-       baila), se atenúa 0.75, la lista real recibe el render
-       DESTINO por el MISMO pintar de Lista y su orilla ASOMA
-       ~24px del lado hacia el que se tira. */
-    function congelar(dx) {
-      var cont = lista();
-      var wrap = scrollWrap();
-      if (!cont) return;
-
-      var rect = cont.getBoundingClientRect();
-      _scrollY   = wrap ? wrap.scrollTop : 0;
-      _rectTop   = rect.top;
-      _rectAlto  = rect.height;
-      _rectAncho = rect.width;
-      _rectIzq   = rect.left - dx;   /* el rect viaja con el gesto */
-
-      _clonVivo = cont.cloneNode(true);
-      _clonVivo.removeAttribute('id');
-      _clonVivo.classList.add('swipe-saliente');
-      _clonVivo.style.position = 'absolute';
-      _clonVivo.style.margin = '0';
-      _clonVivo.style.top = _rectTop + 'px';
-      _clonVivo.style.left = _rectIzq + 'px';
-      _clonVivo.style.width = _rectAncho + 'px';
-      _clonVivo.style.maxHeight = _rectAlto + 'px';
-      _clonVivo.style.overflow = 'hidden';
-      _clonVivo.style.transition = 'none';
-      _clonVivo.style.transform = 'translateX(' + dx + 'px)';
-      _clonVivo.scrollTop = _scrollY;   /* misma porción visible */
-
-      _capa = document.createElement('div');
-      _capa.className = 'swipe-capa';
-      _capa.appendChild(_clonVivo);
-      document.body.appendChild(_capa);
-
-      cont.classList.add('swipe-oculto');
-      cont.style.transition = 'none';
-      cont.style.transform = 'none';
-
-      if (window.Lista && typeof window.Lista.pintar === 'function') {
-        window.Lista.pintar(_destino, null);
-      }
-
-      /* la orilla de la pantalla destino: siguiente entra por
-         la DERECHA (su borde izquierdo a 24px del borde),
-         anterior por la IZQUIERDA (su borde derecho a 24px). */
-      var orilla = (_lado === -1)
-        ? _rectIzq + _rectAncho - ASOMA_PX
-        : _rectIzq - _rectAncho + ASOMA_PX;
-
-      _asoma = cont.cloneNode(true);
-      _asoma.removeAttribute('id');
-      _asoma.classList.remove('swipe-oculto');
-      _asoma.classList.add('swipe-asoma');
-      _asoma.style.position = 'absolute';
-      _asoma.style.margin = '0';
-      _asoma.style.top = _rectTop + 'px';
-      _asoma.style.left = orilla + 'px';
-      _asoma.style.width = _rectAncho + 'px';
-      _asoma.style.maxHeight = _rectAlto + 'px';
-      _asoma.style.overflow = 'hidden';
-      _asoma.style.transform = 'none';
-      _capa.appendChild(_asoma);
-
-      /* R156 · el flag se ENCIENDE al cerrar la congelación (en
-         la R155 faltaba esta línea y TODO se rompía: re-congelar
-         en cada frame, capas fantasma y confirmación solo por
-         flick). Congela UNA vez. */
-      _congelado = true;
-    }
-
-    /* VOLVIÓ DEL OTRO LADO DEL UMBRAL: el destino se retira y
-       el gesto regresa a la lista real (mismo contenido,
-       misma posición — traspaso pixel a pixel). */
-    function descongelar(dx) {
-      /* R156 · el flag se APAGA al iniciar el deshielo (en la
-         R155 faltaba: descongelar era código muerto). Al apagarlo
-         AQUÍ, el mismo frame devuelve el movimiento a la lista
-         real — sin salto. */
-      _congelado = false;
-      quitar(_asoma);   _asoma = null;
-      prender(null, false);
-      quitar(_clonVivo); _clonVivo = null;
-      quitar(_capa);    _capa = null;
-
+      /* la lista se siente viva: viaje amortiguado (o muro en
+         el extremo, donde NO hay vecino) */
       var cont = lista();
       if (cont) {
-        if (window.Lista && typeof window.Lista.pintar === 'function') {
-          window.Lista.pintar(idChipActual(), null);
-        }
-        var wrap = scrollWrap();
-        if (wrap) wrap.scrollTop = _scrollY;
-        cont.style.transform = 'translateX(' + dx + 'px)';
-        cont.classList.remove('swipe-oculto');
+        var viaje = _destino
+          ? dx * VIAJE_K
+          : _lado * Math.min(Math.abs(dx) * VIAJE_K, MURO_TOPE);
+        if (viaje > VIAJE_TOPE) viaje = VIAJE_TOPE;
+        if (viaje < -VIAJE_TOPE) viaje = -VIAJE_TOPE;
+        cont.style.transition = 'none';
+        cont.style.transform = 'translateX(' + viaje + 'px)';
       }
+
+      /* el asoma: franja del vecino por SU borde, creciendo */
+      if (_destino) pintarFranja(_lado, dx, _ancho * UMBRAL_FRACC);
+      else ocultarFranja();
+
+      prender(_destino, cruzo);
     }
 
     /* SUELTA · dentro del umbral: TODO vuelve (rebote). Fuera
@@ -1748,13 +1728,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
 
       var dx = t ? (t.clientX - _x0) : (_xViejo - _x0);
       var destino = _destino;
-      var cruzando = !!(destino && _congelado);
-
-      if (!cruzando && destino &&
-          Math.abs(_vel) >= FLICK_PX_MS &&
-          signo(_vel) === signo(dx) && Math.abs(dx) > FLICK_MIN_PX) {
-        cruzando = true;
-      }
+      var cruzando = !!destino && (
+        Math.abs(dx) >= _ancho * UMBRAL_FRACC ||
+        (Math.abs(_vel) >= FLICK_PX_MS &&
+         signo(_vel) === signo(dx) && Math.abs(dx) > FLICK_MIN_PX));
 
       if (cruzando) confirmar(destino);
       else rebotar();
@@ -1767,73 +1744,68 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       else soltarNada();
     }
 
-    /* CONFIRMA · el destino era real: se retira el asoma, se
-       limpia el prendido y el cambio viaja por el MISMO camino
-       del click (Chips.seleccionar). El receptor de
-       chips:change levanta la llegada desde el lado del gesto. */
+    /* CONFIRMA · la lista SALE hacia el lado del gesto (espejo
+       de la llegada), la franja se retira, el prendido se
+       limpia y el cambio viaja por el MISMO camino del click
+       (Chips.seleccionar → chips:change). El receptor de
+       chips:change levanta la llegada desde el lado del gesto
+       (.llega-derecha / .llega-izquierda). Con
+       prefers-reduced-motion: cambio seco, sin salida. */
     function confirmar(idDestino) {
-      _llegada = (_lado === -1) ? 'llega-derecha' : 'llega-izquierda';
+      var reduce = !!(window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      var lado = _lado;
+      _llegada = (lado === -1) ? 'llega-derecha' : 'llega-izquierda';
 
-      quitar(_asoma); _asoma = null;
+      ocultarFranja();
       prender(null, false);
-      quitar(_clonVivo); _clonVivo = null;
-      quitar(_capa); _capa = null;
+      _lado = 0; _destino = null;
+
+      if (!reduce) {
+        var cont = lista();
+        if (cont) {
+          var salirX = (lado === -1) ? -SALIDA_PX : SALIDA_PX;
+          cont.style.transition =
+            'transform ' + (SALIDA_MS / 1000) + 's ease, opacity ' +
+            (SALIDA_MS / 1000) + 's ease';
+          cont.style.transform = 'translateX(' + salirX + 'px)';
+          cont.style.opacity = '0.4';
+        }
+      }
+      _enSalida = true;
+
+      setTimeout(function () {
+        if (window.Chips && typeof window.Chips.seleccionar === 'function') {
+          window.Chips.seleccionar(idDestino);
+        }
+        var c = lista();
+        if (c) {
+          c.style.transition = '';
+          c.style.transform = '';
+          c.style.opacity = '';
+        }
+        _enSalida = false;
+      }, reduce ? 0 : SALIDA_MS + 10);
+    }
+
+    /* REBOTA · sin cruzar el umbral (o extremo): la lista
+       regresa a su sitio con una molla suave y la franja se
+       retira. Cero clones que limpiar: la lista NUNCA dejó
+       de ser la lista. */
+    function rebotar() {
+      ocultarFranja();
+      prender(null, false);
 
       var cont = lista();
       if (cont) {
-        cont.classList.remove('swipe-oculto', 'swipe-saliente');
-        cont.style.transition = 'none';
-        cont.style.transform = 'none';
-      }
-
-      if (window.Chips && typeof window.Chips.seleccionar === 'function') {
-        window.Chips.seleccionar(idDestino);
-      }
-      _lado = 0; _destino = null;
-    }
-
-    /* REBOTA · sin cruzar el umbral (o extremo elástico):
-       todo vuelve a su sitio. Si había congelado, el clon
-       hace el rebote visible y debajo ya espera la lista real
-       repintada con el chip vigente. */
-    function rebotar() {
-      prender(null, false);
-      quitar(_asoma); _asoma = null;
-
-      var cont = lista();
-
-      if (_clonVivo) {
-        var clon = _clonVivo; _clonVivo = null;
-        if (window.Lista && typeof window.Lista.pintar === 'function') {
-          window.Lista.pintar(idChipActual(), null);
-        }
-        clon.style.transition =
-          'transform 0.26s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.26s ease';
-        clon.style.transform = 'translateX(0)';
-        clon.style.opacity = '1';
+        cont.style.transition =
+          'transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1)';
+        cont.style.transform = 'translateX(0)';
         setTimeout(function () {
-          quitar(clon);
-          quitar(_capa); _capa = null;
-          var c = lista();
-          if (c) {
-            var wrap = scrollWrap();
-            if (wrap) wrap.scrollTop = _scrollY;
-            c.classList.remove('swipe-oculto', 'swipe-saliente');
-            c.style.transition = '';
-            c.style.transform = '';
-          }
-        }, 300);
-      } else {
-        quitar(_capa); _capa = null;
-        if (cont) {
-          cont.style.transition =
-            'transform 0.26s cubic-bezier(0.2, 0.8, 0.3, 1)';
-          cont.style.transform = 'translateX(0)';
-          setTimeout(function () {
-            cont.style.transition = '';
-            cont.style.transform = '';
-          }, 300);
-        }
+          if (_tocoId !== null) return;   /* nuevo gesto vivo: no tocar */
+          cont.style.transition = '';
+          cont.style.transform = '';
+        }, 260);
       }
       _lado = 0; _destino = null;
     }
@@ -1841,8 +1813,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     /* El gesto se retira sin haberse trabado (vertical ganó o
        sin condiciones): cero efectos, cero rastros. */
     function soltarNada() {
-      _tocoId = null; _bloqueado = false; _congelado = false;
+      _tocoId = null; _bloqueado = false;
       _lado = 0; _destino = null;
+      ocultarFranja();
     }
 
     /* LLEGADA · tras confirmar, chips:change repinta la lista
@@ -1855,11 +1828,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       _llegada = null;
       if (!cont) return;
       cont.classList.add(clase);
-      cont.addEventListener('animationend', function alLlegar(e) {
-        if (e.target !== cont) return;
+      cont.addEventListener('animationend', function alLlegar(ev) {
+        if (ev.target !== cont) return;
         cont.classList.remove('llega-derecha', 'llega-izquierda');
         cont.style.transition = '';
         cont.style.transform = '';
+        cont.style.opacity = '';
         cont.removeEventListener('animationend', alLlegar);
       });
     });
