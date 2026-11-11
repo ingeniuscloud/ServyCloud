@@ -31,13 +31,28 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  · Compartir lista con cantidad de items. Orden por
                  'orden:change': recomendado, nombre, categoría (con
                  cabecera de grupo), más compartidos y mejor
-                 valorados. Emite nada: solo escucha 'chips:change',
-                 'buscar:change', 'ciudad:change' y 'orden:change'.
+                 valorados.
+                 · R160 · EL CARRIL MANDA EL RITMO: mientras el
+                 carril está EN VIAJE, los chips:change que llegan
+                 como consecuencia del deslizamiento NO pintan ni
+                 resetean (SwipeChips.enViaje) — pintar en pleno
+                 vuelo abortaba los viajes (pantalla cortada,
+                 saltos de dos chips, regreso contra el dedo). Al
+                 reposo, 'carril:asentado' repinta la página llegada
+                 SIN respiro vertical y PREPARA LOS VECINOS (solo
+                 texto: las fotos siguen a demanda) — alturas
+                 estables antes del próximo viaje. El RESPIRO de
+                 scroll vertical queda RESERVADO AL CLICK: cambiar
+                 de chip con un toque vuelve arriba; deslizar,
+                 jamás. La FIRMA hace que preparar un vecino ya al
+                 día no cueste nada. Escucha 'chips:change',
+                 'carril:asentado', 'buscar:change',
+                 'ciudad:change' y 'orden:change'.
                  · El detalle vive en window.ListaDetalle; las
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.20
+VERSIÓN:         2.30
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
@@ -592,7 +607,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
        La PRECARGA del primer post solo corre si la página es la
        VISIBLE (la cuota no paga por páginas ocultas).
        ============================================================ */
-    function pintarLista(listaParam, modoBusqueda, enLimite, idChipPagina) {
+    function pintarLista(listaParam, modoBusqueda, enLimite, idChipPagina, conRespiro) {
       var cont = contenedorDe(idChipPagina);
       if (!cont) return;
 
@@ -600,10 +615,17 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       var firma = firmaDe(idChipPagina, lista, modoBusqueda, enLimite);
       var pag = cont.closest('.carril-pagina');
 
+      /* R160 · los rótulos (compartir, aviso) describen lo que
+         el dueño está VIENDO: solo la página visible los toca.
+         Preparar vecinos ocultos no debe ni tocarlos. */
+      var esPaginaVisible = !pag || idChipPagina === chipVisible();
+
       if (pag && pag.dataset.firma === firma) {
         /* la página ya está al día: nada que remontar */
-        actualizarCompartir(lista ? lista.length : 0);
-        actualizarAvisoBusqueda(!!modoBusqueda && !(lista && lista.length), enLimite);
+        if (esPaginaVisible) {
+          actualizarCompartir(lista ? lista.length : 0);
+          actualizarAvisoBusqueda(!!modoBusqueda && !(lista && lista.length), enLimite);
+        }
         if (window.SwipeChips && typeof window.SwipeChips.poblarVisibles === 'function') {
           window.SwipeChips.poblarVisibles();
         }
@@ -612,18 +634,24 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
 
       /* R64 · compartir vive con items: visible solo si la
          lista trae algo (chip o búsqueda, da igual el modo). */
-      actualizarCompartir(lista ? lista.length : 0);
+      if (esPaginaVisible) {
+        actualizarCompartir(lista ? lista.length : 0);
+      }
 
       cont.innerHTML = '';
 
       if (!lista || lista.length === 0) {
-        actualizarAvisoBusqueda(modoBusqueda, enLimite);
+        if (esPaginaVisible) {
+          actualizarAvisoBusqueda(modoBusqueda, enLimite);
+        }
         if (pag) pag.dataset.firma = firma;
-        respirarScroll();
+        if (conRespiro !== false) respirarScroll();
         return;
       }
 
-      actualizarAvisoBusqueda(false, enLimite);
+      if (esPaginaVisible) {
+        actualizarAvisoBusqueda(false, enLimite);
+      }
 
       /* la vista la define el CHIP (CHIPSJSON.vista): 'grilla'
          pinta tarjetas 2 por fila (Ventas/Eventos); todo lo demás
@@ -727,8 +755,10 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       if (pag) pag.dataset.firma = firma;
 
       /* el contenedor re-evalúa su scroll con contenido nuevo
-         (cura el scroll pegado tras cambiar de ciudad). */
-      respirarScroll();
+         (cura el scroll pegado tras cambiar de ciudad). R160:
+         el respiro es del CLICK — preparar vecinos o repintar
+         una llegada del carril jamás mueve el scroll vertical. */
+      if (conRespiro !== false) respirarScroll();
 
       /* fotos pendientes de las páginas ya asomadas */
       if (window.SwipeChips && typeof window.SwipeChips.poblarVisibles === 'function') {
@@ -745,9 +775,9 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       }
     }
 
-    function pintar(idChip) {
+    function pintar(idChip, conRespiro) {
       chipActivoActual = idChip;
-      pintarLista(postsDeChip(idChip), false, false, idChip);
+      pintarLista(postsDeChip(idChip), false, false, idChip, conRespiro);
     }
 
     function pintarBusqueda(termino, enLimite) {
@@ -759,8 +789,51 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
+      /* R160 · en pleno viaje el carril manda: nadie pinta ni
+         resetea a mitad de vuelo (eso abortaba los viajes y
+         cortaba la pantalla). La llegada la pinta
+         'carril:asentado' cuando la tira reposa. */
+      if (window.SwipeChips && typeof window.SwipeChips.enViaje === 'function' &&
+          window.SwipeChips.enViaje()) return;
       respirarScroll();
       pintar(idChip);
+    });
+
+    /* ============================================================
+       CARRIL:ASENTADO (R160) · la tira reposó en una página:
+       repinta la llegada SIN respiro vertical (el dedo manda;
+       el respiro es del click) y PREPARA LOS VECINOS: izquierda
+       y derecha quedan alimentadas con su texto (las fotos
+       siguen a demanda) — alturas estables antes del próximo
+       viaje y ninguna página vacía al llegar.
+       ============================================================ */
+    function prepararPagina(idChipVecino) {
+      if (!idChipVecino) return;
+      pintarLista(postsDeChip(idChipVecino), false, false, idChipVecino, false);
+    }
+
+    document.addEventListener('carril:asentado', function (e) {
+      var idChip = e.detail && e.detail.idChip;
+      if (!idChip) return;
+
+      pintar(idChip, false);
+
+      var c = document.getElementById('listaWrap');
+      if (!c || !c.classList.contains('carril')) return;
+
+      var pgs = c.querySelectorAll('.carril-pagina');
+      var idx = -1;
+      for (var i = 0; i < pgs.length; i++) {
+        if (pgs[i].getAttribute('data-chip') === idChip) { idx = i; break; }
+      }
+      if (idx < 0) return;
+
+      if (idx > 0) {
+        prepararPagina(pgs[idx - 1].getAttribute('data-chip'));
+      }
+      if (idx < pgs.length - 1) {
+        prepararPagina(pgs[idx + 1].getAttribute('data-chip'));
+      }
     });
 
     document.addEventListener('buscar:change', function (e) {

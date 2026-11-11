@@ -24,11 +24,29 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento del área de
                  click en un chip pide al carril que se deslice
                  suave hasta esa página. El chip jamás mueve
                  contenido a mano.
+                 · VIAJE Y ASENTAMIENTO (R160): mientras el carril
+                 se mueve —dedo, ratón o viaje por chip— está EN
+                 VIAJE: los cruces de centro encienden el chip pero
+                 NADIE pinta páginas ni resetea scroll en pleno
+                 vuelo (ese trabajo abortaba los viajes: pantallas
+                 cortadas, saltos de dos chips, ida y vuelta). Al
+                 reposo (160ms sin scroll) el carril avisa
+                 'carril:asentado' y Lista repinta la página llegada
+                 y PREPARA LOS VECINOS: alturas estables antes del
+                 próximo viaje y ninguna página vacía al llegar.
+                 · RESPIRO VERTICAL DEL CLICK (R160): el scroll
+                 vertical vuelve arriba SOLO cuando el dueño pulsa
+                 un chip; el deslizamiento jamás lo toca (Lista lo
+                 decide con enViaje y carril:asentado).
                  · PROFUNDIDAD: cada página, según qué tan lejos
                  está del centro, se corre hacia atrás (parallax
                  15%), se achica hasta 10% y se desvanece hasta
-                 60% — el carrusel respira con el movimiento real.
-                 Con prefers-reduced-motion el efecto se apaga.
+                 60% — recalculada fotograma a fotograma PEGADA al
+                 scroll real, SIN transición que la persiga (la
+                 transición era el temblor de los items en PC). La
+                 página en reposo queda EXACTA al centro: cero
+                 escala residual. Con prefers-reduced-motion el
+                 efecto se apaga.
                  · EL RATÓN HACE DE DEDO en PC (GAS y GitHub):
                  presionar y arrastrar con el puntero mueve el
                  carril pixel a pixel (mismo imán al soltar). Solo
@@ -44,7 +62,7 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento del área de
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
                  .fijo): los resultados viven en la página visible y
                  no se sale de ella hasta limpiar la búsqueda.
-VERSIÓN:         1.0
+VERSIÓN:         2.0
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
@@ -124,6 +142,11 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       c.addEventListener('click', _suprimirClickTrasArrastre, true);
 
       _efecto();
+
+      /* R160 · nacimiento: agenda el primer asentamiento para
+         que los vecinos queden preparados desde el arranque
+         (sin marcar viaje: la página activa la pinta Lista ya). */
+      _programarAsentamiento(false);
     }
 
     /* ============================================================
@@ -135,7 +158,48 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
        ============================================================ */
     var _raf = null;
 
+    /* ============================================================
+       VIAJE Y ASENTAMIENTO (R160) · mientras el carril se mueve
+       está EN VIAJE: nadie pinta ni resetea en pleno vuelo (ese
+       trabajo abortaba los viajes —pantalla cortada, saltos de
+       dos chips, regreso contra el dedo—). Al reposo (160ms sin
+       eventos de scroll) avisa 'carril:asentado' con la página
+       centrada: Lista repinta la llegada y prepara vecinos.
+       ============================================================ */
+    var _enViaje = false;
+    var _timerAsentar = null;
+
+    function _programarAsentamiento(marcar) {
+      if (_timerAsentar) clearTimeout(_timerAsentar);
+      if (marcar) _enViaje = true;
+      _timerAsentar = setTimeout(_alAsentar, 160);
+    }
+
+    function _alAsentar() {
+      _timerAsentar = null;
+      _enViaje = false;
+
+      var c = carril();
+      if (!c || c.hidden || !c.classList.contains('carril')) return;
+
+      var pgs = paginas();
+      if (!pgs.length) return;
+
+      var w = anchoPagina();
+      var idx = Math.round(c.scrollLeft / w);
+      if (idx < 0) idx = 0;
+      if (idx > pgs.length - 1) idx = pgs.length - 1;
+
+      var idChip = pgs[idx].getAttribute('data-chip');
+      if (!idChip) return;
+
+      document.dispatchEvent(new CustomEvent('carril:asentado', {
+        detail: { idChip: idChip }
+      }));
+    }
+
     function _enScroll() {
+      _programarAsentamiento(true);
       if (_raf) return;
       _raf = requestAnimationFrame(function () {
         _raf = null;
@@ -155,18 +219,26 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       for (var i = 0; i < pgs.length; i++) {
         var pag = pgs[i];
         var centroPag = pag.offsetLeft + w / 2;
-        var ratio = Math.min(Math.abs(centroVista - centroPag) / w, 1);
+        var d = Math.abs(centroVista - centroPag);
+        /* POSE EXACTA EN REPOSO (R160): una desviación menor a
+           1.5px es redondeo del layout, no movimiento — ratio 0
+           para que la página centrada quede sin escala ni
+           corrimiento residual (adiós al temblor de los items). */
+        var ratio = d < 1.5 ? 0 : Math.min(d / w, 1);
 
         if (reduce) {
-          pag.style.transform = '';
-          pag.style.opacity = '';
+          if (pag._tf !== '') { pag.style.transform = ''; pag._tf = ''; }
+          if (pag._op !== '') { pag.style.opacity = ''; pag._op = ''; }
         } else {
           var escala = 1 - ratio * 0.10;
           var opa = 1 - ratio * 0.6;
           var dx = (centroPag - centroVista) * 0.15;
-          pag.style.transform =
-            'translateX(' + dx.toFixed(1) + 'px) scale(' + escala.toFixed(4) + ')';
-          pag.style.opacity = opa.toFixed(3);
+          var tf = 'translateX(' + dx.toFixed(1) + 'px) scale(' + escala.toFixed(4) + ')';
+          var op = opa.toFixed(3);
+          /* solo se escribe si cambió: ni re-declaraciones de
+             estilo, ni transición persiguiendo el fotograma */
+          if (pag._tf !== tf) { pag.style.transform = tf; pag._tf = tf; }
+          if (pag._op !== op) { pag.style.opacity = op; pag._op = op; }
         }
 
         /* fotos pendientes de las páginas que ya se asoman */
@@ -314,6 +386,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
     return {
       poblarVisibles: poblarVisibles,
+      enViaje: function () { return _enViaje; },
       construido: function () {
         var c = carril();
         return !!(c && c.classList.contains('carril'));

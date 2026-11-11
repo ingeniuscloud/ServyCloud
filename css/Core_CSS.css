@@ -549,10 +549,18 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        reactiva. El dedo táctil no lo siente.
      · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
        resultados viven en la página visible.
+     · ASENTAMIENTO (R160): mientras el carril viaja, NADIE
+       remonta páginas (Lista espera 'carril:asentado'); los
+       vecinos se preparan en reposo para que las alturas no
+       cambien en pleno vuelo — fin de los viajes abortados y
+       de las pantallas cortadas.
      · PROFUNDIDAD: la página que sale se corre hacia atrás
        (parallax), se achica hasta 10% y se desvanece hasta 60%
-       — el movimiento lo calcula Core_Swipe al scrollear y la
-       transición solo acompaña el asentamiento. Con
+       — el movimiento lo calcula Core_Swipe fotograma a
+       fotograma PEGADO al scroll real: SIN transición que lo
+       persiga (la transición reiniciada en cada fotograma era
+       el temblor de los items en PC). En reposo la página
+       centrada queda EXACTA al centro. Con
        prefers-reduced-motion el efecto se apaga.
      ============================================================ */
   .carril {
@@ -574,7 +582,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     scroll-behavior: auto;
     cursor: grabbing;
   }
-  .carril.arrastrando .carril-pagina { transition: none; }
   .carril.fijo {
     overflow-x: hidden;
     scroll-snap-type: none;
@@ -583,9 +590,5 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     flex: 0 0 100%;
     min-width: 100%;
     scroll-snap-align: center;
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
     will-change: transform, opacity;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .carril-pagina { transition: none; }
   }
