@@ -14,8 +14,11 @@ RESPONSABILIDAD: Todo lo relacionado con imágenes:
                  cierre al tocar el fondo.
                  Los estilos viven en Seccion_CSS.
                  Expone window.SeccionImagen.
-VERSIÓN:         1.4.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.4.1
+NOTA:            La memoria L2 de fotos guarda hasta 120 imágenes
+                 (tope alto para que grillas grandes no desalojen
+                 fotos guardadas). Encabezados: solo lo que funciona
+                 HOY; historial en bitácora y versiones/.
 DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
                  Seccion_Imagen_CSS.html (clases lightbox-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -64,13 +67,13 @@ DEPENDENCIAS:    Seccion_CSS.html (clases carrusel-*),
        después la pinta desde disco SIN red. Clave = ID de la
        foto de Drive (no la URL completa); cualquier otra URL
        se guarda ENTERA (sin el #), nunca recortada por query:
-       fotos distintas, entradas distintas. Tope 40 entradas
+       fotos distintas, entradas distintas. Tope 120 entradas
        (se recorta la más vieja). Sin Cache API o ante cualquier
        fallo: la imagen carga por su URL de siempre, como hasta
        hoy.
        ============================================================ */
     var NOMBRE_L2 = 'servy-img-v1';
-    var MAX_L2    = 40;
+    var MAX_L2    = 120;
     var _blobURLs = (typeof WeakMap === 'function') ? new WeakMap() : null;
 
     function _claveL2(url) {

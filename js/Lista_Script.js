@@ -2,35 +2,34 @@
 
 ARCHIVO:         Lista_Script.html
 ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
-PROYECTO:        INGeniusCloud | ServyCloud
-RESPONSABILIDAD: Módulo window.Lista. Menú lista: pinta los posts
-                 filtrados por ciudad activa + chip activo sobre
-                 TABLAS.posts. Item: avatar circular con la
-                 INICIAL DEL TÍTULO (tipografía .tituloPost y
-                 color oficial del post; sin imagen) + título
-                 (.subtitulo) + estrella métrica pasiva + fila con
-                 "Ver publicación". Decide el botón "Compartir lista"
-                 con la cantidad de items. Ordenamiento por
-                 'orden:change': recomendado, nombre, categoría
-                 (con cabecera de grupo), más compartidos y mejor
-                 valorados. Modo lista ↔ detalle con fade, botón
-                 volver y skeleton. Emite 'post:change'; escucha
-                 'chips:change', 'buscar:change', 'ciudad:change'
-                 y 'orden:change'.
-                 R140: los chips con vista 'grilla' (CHIPSJSON) pintan
-                 tarjetas 2 por fila al estilo Mercado Libre — imagen
-                 1:1 lazy con skeleton propio, badge píldora
-                 .badgeNuevo/.badgeUsado, título a 2 líneas y slot fijo
-                 precio/fecha en .subtitulo ("A consultar" si no
+PROYECTO:        INGeniousCloud | ServyCloud
+RESPONSABILIDAD: Módulo window.Lista. La vidriera de items (modos
+                 LISTA y GRILLA): lista = avatar circular con la
+                 INICIAL DEL TÍTULO + título (.subtitulo) + estrella
+                 métrica pasiva + "Ver publicación"; grilla (la
+                 define el campo vista del chip en CHIPSJSON) =
+                 tarjetas 2 por fila estilo Mercado Libre — imagen
+                 1:1 servida de la MEMORIA DE FOTOS de la app
+                 (Cache API: baja una vez y repinta desde disco,
+                 sin red), badge .badgeNuevo/.badgeUsado, título a 2
+                 líneas y slot precio/fecha ("A consultar" si no
                  hay). Datos horneados en el catálogo. La búsqueda
-                 sigue SIEMPRE en lista.
-VERSIÓN:         2.18
-CAMBIOS:         R153: el NOMBRE DEL PARTNER del item viste la maestra .textoSecundario del Core (el span .marca-texto lleva la clase en montarItem) — jerarquía del dueño: el título manda y el partner acompaña; el CSS de la marca (.lista-item .marca, Lista_CSS) habla el mismo idioma. R147: el overlay de la imagen elige píldora por el titulo del BADGEJSON — «Usado» viste la nueva maestra .badgeUsado (blanca, gris #475569, borde fino suave) y cualquier otro título la .badgeNuevo (la ex .badgeActivo renombrada en el Core: mismo naranja, cero cambios visuales). Texto SIEMPRE el de la BD; comparación insensible a mayúsculas. La lista, el detalle, el orden y los procesos intactos. Historial: bitácora/versiones.
+                 sigue SIEMPRE en lista. Compartir lista con
+                 cantidad de items. Orden por 'orden:change':
+                 recomendado, nombre, categoría (con cabecera de
+                 grupo), más compartidos y mejor valorados. Modo
+                 lista ↔ detalle con fade, botón volver y skeleton.
+                 Emite 'post:change'; escucha 'chips:change',
+                 'buscar:change', 'ciudad:change' y 'orden:change'.
+VERSIÓN:         2.19
+ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
+                 de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Seccion_Script.html (detalle,
-                 window.Secciones), Chips_Script.html,
-                 Buscar_Script.html,
+                 window.Secciones), Seccion_Imagen_Script.html
+                 (window.SeccionImagen · memoria de fotos L2),
+                 Chips_Script.html, Buscar_Script.html,
                  Ciudad_Script (window.Ciudad), Compartir_Script.html
                  (window.Compartir), Orden_Sheet_Script.html,
                  Core_CSS.html, Lista_CSS.html, Promo_CSS.html
@@ -259,7 +258,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       btn.innerHTML = html;
 
       /* El skeleton individual se retira cuando LA IMAGEN de esa
-         card llega (o falla: cae a la inicial). */
+         card llega (o falla: cae a la inicial). La foto sale de la
+         MEMORIA DE FOTOS de la app (window.SeccionImagen, Cache
+         API en disco): la primera vez baja y queda guardada; cada
+         repintado posterior de la grilla pinta de la copia
+         guardada SIN red — volver a Ventas/Eventos ya no recarga
+         fotos. Sin memoria disponible: URL directa de siempre. */
       var img = btn.querySelector('.grilla-img');
       if (img) {
         var retirarSkeleton = function () {
@@ -280,6 +284,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
               img.parentNode.removeChild(img);
             }
           });
+        }
+        if (window.SeccionImagen &&
+            typeof window.SeccionImagen.poblarConL2 === 'function') {
+          window.SeccionImagen.poblarConL2(img, post.imagen);
+        } else {
+          img.src = post.imagen;
         }
       }
 
@@ -673,11 +683,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         html +=   '</span>';
         html +=   '<span class="pie">';
         if (marca) {
-          /* R153 · el nombre del partner viste la maestra
-             .textoSecundario del Core: el título manda, el
-             partner acompaña (jerarquía del dueño). */
           html +=   '<span class="marca">' +
-                    '<span class="marca-texto textoSecundario">' + escapeHtml(marca) + '</span>' +
+                    '<span class="marca-texto">' + escapeHtml(marca) + '</span>' +
                     '</span>';
         }
         html +=     '<span class="ver-detalles">Ver publicación' +

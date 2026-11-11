@@ -2,7 +2,7 @@
 
 ARCHIVO:         Core_Script.html
 ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
-PROYECTO:        INGeniusCloud | ServyCloud
+PROYECTO:        INGeniousCloud | ServyCloud
 RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  arranca los componentes con datos; inyecta el
                  lienzo; decide el CTA (WhatsApp o sheet de
@@ -10,12 +10,16 @@ RESPONSABILIDAD: Núcleo de la página. Carga TABLAS por POST y
                  en localStorage (stale-while-revalidate al
                  reabrir); refresca catálogo y preguntas abiertas
                  al volver la app a primer plano; guardia del
-                 token y detección de entorno; módulo
-                 AvisoRespuesta (R151): el aviso flotante
-                 «te respondió» — tarjeta FIJA, una a la
-                 vez, VISTO al actuar y texto dinámico.
-VERSIÓN:         1.41.0
-CAMBIOS:         R157: EL SWIPE RENACE SIMPLE — SOLUCIÓN ALTERNA (orden del dueño tras probar la R155 y la R156 en su iPhone 11: «el deslizamiento está al revés», «no se asoma nada de la siguiente pantalla, está muerto ese proceso», «dame una solución alterna, pero hay que darle la sensación al usuario de que sí está pasando a la siguiente pantalla»): MUERE la máquina de congelar/clonar de la R155/R156 — cero clones, cero capas fantasma, cero flag _congelado — y nacen tres piezas a prueba de todo. (1) DIRECCIÓN ANCLADA A LA PANTALLA: los vecinos se MIDEN con getBoundingClientRect de los chips visibles comparando CENTROS con el chip activo — el que queda a la DERECHA del activo ES el SIGUIENTE y entra al ARRASTRAR A LA IZQUIERDA; ni el orden del arreglo ni el del DOM pueden invertir lo que los ojos ven. (2) FRANJA DE ASOMA INFALIBLE: un div fijo (.swipe-franja, Core_CSS) con el NOMBRE REAL del chip vecino y un chevron asoma por el borde por donde entra la otra pantalla (derecha al tirar a la izquierda · izquierda al tirar a la derecha) y CRECE con el dedo desde el primer píxel — un solo elemento, nada que pueda morir en silencio. (3) PANTALLA VIVA + SALIDA/ENTRADA: la lista viaja AMORTIGUADA con el dedo (0.22, tope 34px; muro de 8px en los extremos, sin ciclo), al confirmar (25% del ancho o flick 0.45 px/ms) la lista SALE hacia el lado del gesto (0.16s, espejo de la llegada) y el cambio viaja por el MISMO camino del click (window.Chips.seleccionar → chips:change) donde la lista nueva LLEGA con .llega-derecha/.llega-izquierda. El chip destino se PRENDE al cruzar el umbral (R155 intacto). Filtros de nacimiento y lock de eje 10px intactos (bordes 24px, modo lista, sin búsqueda). VISTO al abrir el post (R155) intacto. R151 (tarjeta fija, una a la vez, VISTO al actuar) intacto. Historial: bitácora/versiones.
+                 token y detección de entorno. Módulos:
+                 AvisoRespuesta — el aviso «te respondió»,
+                 tarjeta FIJA, una a la vez, VISTO al actuar —
+                 y SwipeChips — el gesto sobre la LISTA DE
+                 ITEMS cambia de pantalla: deslizar a la
+                 IZQUIERDA muestra la lista de la DERECHA; el
+                 chip se marca después, como consecuencia.
+VERSIÓN:         1.42.0
+ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
+                 de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
                  Index.html (SISTEMA, TOKEN, URL_EXEC),
                  Lista_Script.html, Seccion_Script.html,
@@ -1415,52 +1419,29 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
   })();
 
   /* ============================================================
-     R157 · SWIPE DE CHIPS · window.SwipeChips
-     El arrastre horizontal sobre la lista cambia de chip con el
-     MISMO camino del click: window.Chips.seleccionar(idDestino)
-     → activarChip → chips:change. Una sola fuente de verdad.
-     SOLUCIÓN ALTERNA pedida por el dueño tras la R155+R156:
-     «dame una solución alterna, pero hay que darle la
-     sensación al usuario de que sí está pasando a la
-     siguiente pantalla».
-     · DIRECCIÓN ANCLADA A LA PANTALLA (corazón del arreglo):
-       los vecinos se MIDEN con getBoundingClientRect de los
-       chips visibles comparando CENTROS con el chip activo.
-       El que queda a la DERECHA del activo ES el SIGUIENTE y
-       entra al ARRASTRAR A LA IZQUIERDA; el de la izquierda,
-       al arrastrar a la derecha. Lo que se ve manda: ni el
-       orden del arreglo ni el del DOM pueden invertirlo.
-     · FRANJA DE ASOMA (infalible): un div fijo con el NOMBRE
-       REAL del vecino (.swipe-franja, Core_CSS) asoma por el
-       borde por donde entra la otra pantalla — derecha al
-       tirar a la izquierda, izquierda al tirar a la derecha —
-       y CRECE con el dedo desde el primer píxel. Un solo
-       elemento: cero clones, cero capas fantasma, nada que
-       pueda morir en silencio (la lección R155/R156).
-     · PANTALLA VIVA: la lista viaja AMORTIGUADA con el dedo
-       (0.22 del recorrido, tope 34px; en los extremos, muro
-       de 8px — sin ciclo jamás). Al soltar dentro del umbral,
-       todo regresa.
-     · CONFIRMACIÓN: 25% del ancho o flick (0.45 px/ms hacia
-       el mismo lado). Al cruzar, el chip destino se PRENDE
-       (.chip.prendido). Al soltar FUERA: la lista SALE hacia
-       el lado del gesto (0.16s, espejo de la llegada) y el
-       cambio viaja por el MISMO camino del click; chips:change
-       repinta y la lista LLEGA (.llega-derecha /
-       .llega-izquierda, Core_CSS).
-     · SOLO procede: gesto táctil, dentro de la lista, en modo
-       lista, SIN búsqueda activa, sin empezar en los 24px de
-       los bordes de pantalla (ahí viven los gestos de
-       atrás/adelante del navegador) y con vecino en esa
-       dirección (los extremos NO ciclan).
-     · LOCK DE EJE 10px: hasta que el horizontal domina, el
-       scroll vertical sigue siendo del sistema (preventDefault
-       solo después del lock). Vertical al inicio = el gesto
-       se retira sin tocar nada.
-     · Cifras del gesto (todas locales, nada mágico):
-       bordes 24px · eje 10px · umbral 25% · flick 0.45 px/ms ·
-       viaje 0.22 (tope 34px) · muro 8px · franja 10→56px ·
-       salida 0.16s / 72px.
+     SWIPE DE LA LISTA · window.SwipeChips
+     El gesto nace SOLO sobre la lista de items (#listaWrap):
+     sus listeners viven EN la lista — si el dedo arranca en
+     los chips, el encabezado o cualquier otra zona, el gesto
+     ni se postula. Funciona igual en lista y en grilla; con
+     búsqueda activa no procede. DESLIZAR A LA IZQUIERDA
+     muestra la lista de la DERECHA; deslizar a la derecha, la
+     de la IZQUIERDA. El vecino se MIDE EN PANTALLA al soltar
+     (centros de los chips visibles contra el centro del chip
+     activo): lo que se ve manda. El chip destino se marca
+     DESPUÉS, como consecuencia, por el mismo camino del click
+     (window.Chips.seleccionar → chips:change). Al confirmar
+     (25% del ancho de la lista o flick 0.45 px/ms) la lista
+     actual sale hacia el lado del gesto y la nueva llega
+     desde el lado contrario (.llega-derecha /
+     .llega-izquierda, Core_CSS). A mitad del gesto NO ocurre
+     nada: sin asoma, sin viaje, sin clones — nada que pueda
+     morir en silencio. Candados: táctil, un dedo, 10px para
+     decidir el eje (si manda el vertical, el scroll sigue
+     siendo del sistema) y 24px de bordes de pantalla (ahí
+     viven los gestos atrás/adelante del navegador). Los
+     extremos NO ciclan. Solo teléfonos/tabletas: en
+     escritorio el módulo no existe.
      ============================================================ */
   window.SwipeChips = (function () {
 
@@ -1469,41 +1450,27 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
     var UMBRAL_FRACC   = 0.25; /* 25% del ancho de la lista */
     var FLICK_PX_MS    = 0.45; /* velocidad del flick */
     var FLICK_MIN_PX   = 30;   /* flick con andar mínimo */
-    var VIAJE_K        = 0.22; /* amortiguación del viaje 1:dedo */
-    var VIAJE_TOPE     = 34;   /* tope del viaje (px) */
-    var MURO_TOPE      = 8;    /* resistencia en extremos (px) */
-    var FRANJA_BASE    = 10;   /* asomo mínimo de la franja (px) */
-    var FRANJA_TOPE    = 56;   /* asomo al cruzar el umbral (px) */
     var SALIDA_MS      = 160;  /* salida de la lista al confirmar */
-    var SALIDA_PX      = 72;   /* distancia de salida (espejo 64) */
+    var SALIDA_PX      = 72;   /* distancia de salida */
 
     var _tocoId = null;        /* touch identifier del gesto */
     var _x0 = 0, _y0 = 0;
     var _xViejo = 0, _tViejo = 0, _vel = 0;
     var _ancho     = 0;        /* ancho de la lista (umbral) */
     var _bloqueado = false;    /* eje horizontal decidido */
-    var _vecinos   = null;     /* { idIzq, idDer } medidos en pantalla */
-    var _lado      = 0;        /* -1 siguiente · +1 anterior */
-    var _destino   = null;     /* idChip destino (null = extremo) */
-    var _franja    = null;     /* el div del asoma (singleton) */
-    var _franjaTxt = null;     /* su texto (nombre del vecino) */
-    var _franjaLado = 0;       /* último lado pintado */
     var _enSalida  = false;    /* confirmación aterrizando */
     var _llegada   = null;     /* clase de llegada pendiente */
 
     function lista() { return document.getElementById('listaWrap'); }
-    function scrollWrap() { return document.querySelector('.secciones-wrap'); }
 
     function signo(n) { return n > 0 ? 1 : (n < 0 ? -1 : 0); }
 
-    /* VECINOS REALES DE PANTALLA (R157 · corazón del arreglo):
-       se miden los rectángulos de los chips visibles y se
-       comparan CENTROS con el activo. Derecha del centro
-       activo = siguiente; izquierda = anterior. Lo que decide
-       el gesto es lo MISMO que el dueño ve — el debate de
-       órdenes (arreglo, DOM, pintura) queda muerto para
-       siempre. */
-    function medirVecinos() {
+    /* VECINOS DE PANTALLA: rectángulos de los chips visibles,
+       centros comparados con el centro del chip activo. El que
+       queda a la DERECHA del activo ES el vecino derecho; el de
+       la izquierda, el izquierdo. Lo que el dueño ve decide:
+       ni el orden del arreglo ni el del DOM pueden invertirlo. */
+    function vecinos() {
       var vacio = { idIzq: null, idDer: null };
       var cont = document.getElementById('filtros');
       if (!cont) return vacio;
@@ -1532,126 +1499,33 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       return { idIzq: idIzq, idDer: idDer };
     }
 
-    /* El NOMBRE REAL del vecino, leído del chip pintado (el
-       mismo texto que el dueño ve en la fila — cero strings
-       hardcodeadas). */
-    function tituloDeChip(idChip) {
-      var cont = document.getElementById('filtros');
-      if (!cont || !idChip) return '';
-      var c = cont.querySelector('.chip[data-chip="' + idChip + '"]');
-      var t = c ? c.querySelector('.chip-texto') : null;
-      return t ? (t.textContent || '') : '';
-    }
-
     function busquedaActiva() {
       var input = document.getElementById('buscarInput');
       return !!(input && String(input.value || '').trim());
     }
 
-    function enModoLista() {
-      return !!(window.Lista && typeof window.Lista.getModo === 'function' &&
-                window.Lista.getModo() === 'lista');
-    }
-
-    /* El prendido del chip destino (.chip.prendido, Core_CSS).
-       Con prende=false se apaga en TODOS (limpieza garante). */
-    function prender(idChip, prende) {
-      var cont = document.getElementById('filtros');
-      if (!cont) return;
-      var todos = cont.querySelectorAll('.chip');
-      for (var i = 0; i < todos.length; i++) {
-        var es = !!(prende && idChip &&
-                    todos[i].getAttribute('data-chip') === idChip);
-        todos[i].classList.toggle('prendido', es);
-      }
-    }
-
-    /* LA FRANJA · nace UNA vez, vive en el body, no captura
-       toques (pointer-events none) y su texto es el nombre
-       REAL del vecino. aria-hidden: es la decoración del
-       gesto; el cambio de pantalla lo anuncia chips:change. */
-    function franja() {
-      if (_franja) return _franja;
-      var f = document.createElement('div');
-      f.className = 'swipe-franja swipe-franja-der';
-      f.setAttribute('aria-hidden', 'true');
-      var chev = document.createElement('span');
-      chev.className = 'swipe-franja-chev';
-      f.appendChild(chev);
-      _franjaTxt = document.createElement('span');
-      _franjaTxt.className = 'swipe-franja-txt chipsFiltros';
-      f.appendChild(_franjaTxt);
-      document.body.appendChild(f);
-      _franja = f;
-      return f;
-    }
-
-    /* La franja ENTRA según el avance del dedo: 10px apenas
-       arranca, 56px al cruzar el umbral. El % de translateX
-       es su PROPIO ancho: cero mediciones de layout por
-       frame. translateY(-50%) del CSS viaja en CADA
-       transform (el inline lo pisa). */
-    function pintarFranja(lado, dx, umbral) {
-      var idVecino = (lado === -1) ? _vecinos.idDer : _vecinos.idIzq;
-      if (!idVecino) { ocultarFranja(); return; }
-      var f = franja();
-      var titulo = tituloDeChip(idVecino);
-      if (lado !== _franjaLado || titulo !== _franjaTxt.textContent) {
-        _franjaLado = lado;
-        _franjaTxt.textContent = titulo;
-        if (lado === -1) {
-          f.classList.add('swipe-franja-der');
-          f.classList.remove('swipe-franja-izq');
-        } else {
-          f.classList.add('swipe-franja-izq');
-          f.classList.remove('swipe-franja-der');
-        }
-      }
-      var prog = Math.max(0, Math.min(1, Math.abs(dx) / umbral));
-      var revela = FRANJA_BASE + prog * (FRANJA_TOPE - FRANJA_BASE);
-      f.style.opacity = String(Math.min(1, 0.35 + prog * 0.9));
-      f.style.transform = (lado === -1)
-        ? 'translateY(-50%) translateX(calc(100% - ' + revela + 'px))'
-        : 'translateY(-50%) translateX(calc(-100% + ' + revela + 'px))';
-    }
-
-    function ocultarFranja() {
-      if (!_franja) return;
-      _franja.style.opacity = '0';
-      _franja.style.transform = (_franjaLado === 1)
-        ? 'translateY(-50%) translateX(-110%)'
-        : 'translateY(-50%) translateX(110%)';
-      _franjaLado = 0;
-    }
-
-    /* INICIO del toque: solo se postula (nada se bloquea aún).
-       Filtros de nacimiento: táctil, un dedo, dentro de la
-       lista, modo lista, sin búsqueda y sin bordes de
-       pantalla. */
+    /* INICIO: solo se postula, nada se bloquea aún. */
     function alEmpezar(e) {
       if (_tocoId !== null || e.touches.length !== 1) return;
-      if (_enSalida) return;   /* la confirmación está aterrizando */
-      if (!enModoLista() || busquedaActiva()) return;
+      if (_enSalida) return;
+      if (busquedaActiva()) return;
 
       var t = e.touches[0];
       var w = window.innerWidth || document.documentElement.clientWidth;
       if (t.clientX < BORDE_EXCLUIDO || t.clientX > w - BORDE_EXCLUIDO) return;
 
       var cont = lista();
-      if (!cont || cont.hidden || !cont.firstChild) return;
-      if (!(t.target && cont.contains(t.target))) return;
+      if (!cont || !(t.target && cont.contains(t.target))) return;
 
       _tocoId = t.identifier;
       _x0 = t.clientX; _y0 = t.clientY;
       _xViejo = _x0; _tViejo = e.timeStamp; _vel = 0;
       _bloqueado = false;
-      _lado = 0; _destino = null; _llegada = null;
     }
 
-    /* MOVIMIENTO: primero decide el eje (10px); después manda
-       el horizontal: la lista viaja amortiguada con el dedo y
-       la FRANJA del vecino asoma por SU borde, creciendo con
-       el recorrido. */
+    /* MOVIMIENTO: el eje se decide a 10px; si manda el
+       vertical, el gesto se retira. El horizontal NO mueve
+       nada: solo mide la velocidad para el flick. */
     function alMover(e) {
       if (_tocoId === null) return;
       var t = null;
@@ -1670,53 +1544,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
         if (!cont0) { soltarNada(); return; }
         _bloqueado = true;
         _ancho = cont0.getBoundingClientRect().width || 1;
-        _vecinos = medirVecinos();   /* la PANTALLA manda (R157) */
       }
 
       e.preventDefault();   /* el horizontal es nuestro */
-
-      _lado = signo(dx);
-      /* tirar a la IZQUIERDA = vecino DERECHO · a la derecha =
-         vecino IZQUIERDO. Medido en pantalla, no en arreglos. */
-      _destino = (_lado === -1) ? _vecinos.idDer : _vecinos.idIzq;
 
       var dt = e.timeStamp - _tViejo;
       if (dt > 0) {
         _vel = _vel * 0.7 + ((t.clientX - _xViejo) / dt) * 0.3;
       }
       _xViejo = t.clientX; _tViejo = e.timeStamp;
-
-      var cruzo = !!_destino && (
-        Math.abs(dx) >= _ancho * UMBRAL_FRACC ||
-        (Math.abs(_vel) >= FLICK_PX_MS &&
-         signo(_vel) === _lado && Math.abs(dx) > FLICK_MIN_PX));
-
-      /* la lista se siente viva: viaje amortiguado (o muro en
-         el extremo, donde NO hay vecino) */
-      var cont = lista();
-      if (cont) {
-        var viaje = _destino
-          ? dx * VIAJE_K
-          : _lado * Math.min(Math.abs(dx) * VIAJE_K, MURO_TOPE);
-        if (viaje > VIAJE_TOPE) viaje = VIAJE_TOPE;
-        if (viaje < -VIAJE_TOPE) viaje = -VIAJE_TOPE;
-        cont.style.transition = 'none';
-        cont.style.transform = 'translateX(' + viaje + 'px)';
-      }
-
-      /* el asoma: franja del vecino por SU borde, creciendo */
-      if (_destino) pintarFranja(_lado, dx, _ancho * UMBRAL_FRACC);
-      else ocultarFranja();
-
-      prender(_destino, cruzo);
     }
 
-    /* SUELTA · dentro del umbral: TODO vuelve (rebote). Fuera
-       (o flick): CONFIRMA por el mismo camino del click. */
+    /* SUELTA: UNA medición, UNA decisión. Dentro del umbral:
+       nada (cero rastros). Fuera o flick: confirma por el
+       MISMO camino del click. */
     function alSoltar(e) {
       if (_tocoId === null) return;
       for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier === _tocoId) return;   /* otro dedo vive */
+        if (e.touches[i].identifier === _tocoId) return;
       }
       var t = null;
       var toques = e.changedTouches || [];
@@ -1727,39 +1572,43 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       if (!_bloqueado) return;   /* nunca se trabó: fue scroll */
 
       var dx = t ? (t.clientX - _x0) : (_xViejo - _x0);
-      var destino = _destino;
-      var cruzando = !!destino && (
-        Math.abs(dx) >= _ancho * UMBRAL_FRACC ||
-        (Math.abs(_vel) >= FLICK_PX_MS &&
-         signo(_vel) === signo(dx) && Math.abs(dx) > FLICK_MIN_PX));
+      var lado = signo(dx);
+      if (!lado) return;
 
-      if (cruzando) confirmar(destino);
-      else rebotar();
+      var cruzando = Math.abs(dx) >= _ancho * UMBRAL_FRACC ||
+        (Math.abs(_vel) >= FLICK_PX_MS &&
+         signo(_vel) === lado && Math.abs(dx) > FLICK_MIN_PX);
+      if (!cruzando) return;
+
+      /* tirar a la IZQUIERDA = vecino DERECHO · a la derecha =
+         vecino IZQUIERDO. Medido EN PANTALLA al soltar. */
+      var v = vecinos();
+      var destino = (lado === -1) ? v.idDer : v.idIzq;
+      if (destino) confirmar(destino, lado);
     }
 
+    /* El sistema cancela el toque: cero rastros (nada se
+       movió a mitad del gesto). */
     function alCancelar() {
-      if (_tocoId === null) return;
       _tocoId = null;
-      if (_bloqueado) rebotar();
-      else soltarNada();
+      _bloqueado = false;
+    }
+
+    function soltarNada() {
+      _tocoId = null;
+      _bloqueado = false;
     }
 
     /* CONFIRMA · la lista SALE hacia el lado del gesto (espejo
-       de la llegada), la franja se retira, el prendido se
-       limpia y el cambio viaja por el MISMO camino del click
-       (Chips.seleccionar → chips:change). El receptor de
-       chips:change levanta la llegada desde el lado del gesto
-       (.llega-derecha / .llega-izquierda). Con
-       prefers-reduced-motion: cambio seco, sin salida. */
-    function confirmar(idDestino) {
+       de la llegada) y el cambio viaja por el MISMO camino del
+       click (Chips.seleccionar → chips:change), donde el
+       receptor levanta la llegada desde el lado del gesto.
+       Con prefers-reduced-motion: cambio seco, sin salida. */
+    function confirmar(idDestino, lado) {
       var reduce = !!(window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      var lado = _lado;
       _llegada = (lado === -1) ? 'llega-derecha' : 'llega-izquierda';
-
-      ocultarFranja();
-      prender(null, false);
-      _lado = 0; _destino = null;
+      _enSalida = true;
 
       if (!reduce) {
         var cont = lista();
@@ -1772,7 +1621,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
           cont.style.opacity = '0.4';
         }
       }
-      _enSalida = true;
 
       setTimeout(function () {
         if (window.Chips && typeof window.Chips.seleccionar === 'function') {
@@ -1788,39 +1636,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       }, reduce ? 0 : SALIDA_MS + 10);
     }
 
-    /* REBOTA · sin cruzar el umbral (o extremo): la lista
-       regresa a su sitio con una molla suave y la franja se
-       retira. Cero clones que limpiar: la lista NUNCA dejó
-       de ser la lista. */
-    function rebotar() {
-      ocultarFranja();
-      prender(null, false);
-
-      var cont = lista();
-      if (cont) {
-        cont.style.transition =
-          'transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1)';
-        cont.style.transform = 'translateX(0)';
-        setTimeout(function () {
-          if (_tocoId !== null) return;   /* nuevo gesto vivo: no tocar */
-          cont.style.transition = '';
-          cont.style.transform = '';
-        }, 260);
-      }
-      _lado = 0; _destino = null;
-    }
-
-    /* El gesto se retira sin haberse trabado (vertical ganó o
-       sin condiciones): cero efectos, cero rastros. */
-    function soltarNada() {
-      _tocoId = null; _bloqueado = false;
-      _lado = 0; _destino = null;
-      ocultarFranja();
-    }
-
-    /* LLEGADA · tras confirmar, chips:change repinta la lista
-       (mismo camino del click) y aquí la anima desde el lado
-       del gesto. Sin _llegada (click normal) no hace NADA. */
+    /* LLEGADA · tras confirmar, chips:change repinta la lista y
+       aquí la anima desde el lado del gesto. Sin _llegada
+       (click normal en un chip) no hace NADA. */
     document.addEventListener('chips:change', function () {
       if (!_llegada) return;
       var cont = lista();
@@ -1838,14 +1656,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, helpers),
       });
     });
 
-    /* Solo teléfonos/tabletas: en escritorio el módulo no
-       existe (cero listeners, cero impacto). */
-    var wrap = scrollWrap();
-    if (wrap && 'ontouchstart' in window) {
-      wrap.addEventListener('touchstart', alEmpezar, { passive: true });
-      wrap.addEventListener('touchmove', alMover, { passive: false });
-      wrap.addEventListener('touchend', alSoltar, { passive: true });
-      wrap.addEventListener('touchcancel', alCancelar, { passive: true });
+    /* Los listeners viven EN LA LISTA de items. Solo teléfonos
+       y tabletas: en escritorio el módulo no existe. */
+    var contLista = lista();
+    if (contLista && 'ontouchstart' in window) {
+      contLista.addEventListener('touchstart', alEmpezar, { passive: true });
+      contLista.addEventListener('touchmove', alMover, { passive: false });
+      contLista.addEventListener('touchend', alSoltar, { passive: true });
+      contLista.addEventListener('touchcancel', alCancelar, { passive: true });
     }
 
     return { nada: null };   /* todo vive en sus listeners */
