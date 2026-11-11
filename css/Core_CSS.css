@@ -7,10 +7,9 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  (clases .tituloPost…badgeNuevo/badgeUsado), voz
                  única de los placeholders, del modo móvil del
                  lienzo, de la notificación flotante centralizada
-                 (.notificacionFlotante), del cristal de la píldora
-                 de avisos (0.50) y de la llegada de la pantalla
-                 nueva del swipe (.llega-derecha/.llega-izquierda).
-VERSIÓN:         2.18
+                 (.notificacionFlotante, cristal 0.40) y del CARRIL
+                 de páginas del área de items (.carril).
+VERSIÓN:         2.19
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
@@ -406,37 +405,28 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .mk-sheet-top:active { opacity: 0.5; }
 
   /* ============================================================
-     R151→R155 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
+     NOTIFICACIÓN FLOTANTE · .notificacionFlotante
      Clase CENTRALIZADA y UNIVERSAL para los avisos flotantes de
      la app (hoy: aviso «te respondió»; mañana: las funciones
-     que nazcan) — un solo sitio manda. Paquete validado por el
-     dueño (R149 animación · R151 repintado y afinado en
-     pantalla · R155 CRISTAL):
-     · POSICIÓN FIJA INFERIOR DERECHA INCLUIDA en la clase
+     que nazcan) — un solo sitio manda.
+     · POSICIÓN FIJA INFERIOR DERECHA incluida en la clase
        (decisión del dueño: las futuras la heredan o la
        sobrescriben). Respeta el safe-area del móvil (misma
-       gramática de .mk-sheet-top). El bottom 68px de la R152
-       SE MANTIENE (R155): el aire extra es de la barra de
-       Safari, que pinta su URL/círculos abajo.
-     · CRISTAL (R155, orden del dueño): fondo ámbar translúcido
-       rgba(254,243,199,0.50) + blur — backdrop-filter con su
-       prefijo -webkit-, que es el que Safari entiende — y
-       borde 1px rgba(253,230,138,0.9): se adivina lo que hay
-       detrás. Adiós el amarillo sólido #FFE600. R156 bajó la
-       translucidez 0.85 → 0.60 y la R157 la baja OTRO 10%
-       (0.60 → 0.50, orden del dueño tras probar la R156 en su
-       iPhone 11: «aún se ve casi sólido») — la mitad del
-       cristal es luz ajena y el vidrio por fin SE VE.
-     · ALTURA 44px (R155): min-height border-box (antes 52px
-       con padding 12px vertical) — el aire vertical lo pone
-       la caja (padding 0): menos alta, mismo aire lateral.
-     · TINTA ÚNICA #92400E (R155): el texto (.textoPrimario
-       dentro del aviso, regla scoped de este bloque) y la ✕
-       visten el mismo ámbar oscuro. Muere el circulito blanco
-       de la X: el glifo queda DIRECTO sobre el cristal.
-     · SOMBRA SUAVIZADA (R155): la principal baja 0.32 → 0.18
-       y su capa corta 0.18 → 0.10 — el cristal flota, no
-       pesa.
+       gramática de .mk-sheet-top). El bottom 68px respeta la
+       barra de Safari (URL/círculos abajo).
+     · CRISTAL: fondo ámbar translúcido rgba(254,243,199,0.40)
+       + blur — backdrop-filter con su prefijo -webkit-, que es
+       el que Safari entiende — y borde 1px rgba(253,230,138,0.9):
+       se adivina lo que hay detrás. La MAYORÍA del cristal es
+       luz ajena: el vidrio se ve de verdad.
+     · ALTURA 44px: min-height border-box — el aire vertical lo
+       pone la caja (padding 0): menos alta, mismo aire lateral.
+     · TINTA ÚNICA #92400E: el texto (.textoPrimario dentro del
+       aviso, regla scoped de este bloque) y la ✕ visten el
+       mismo ámbar oscuro. Sin circulito en la X: el glifo
+       queda DIRECTO sobre el cristal.
+     · SOMBRA SUAVIZADA: 0.18 la principal y 0.10 su capa corta
+       — el cristal flota, no pesa.
      · TIPOGRAFÍA CERO HARDCODEADA: la línea de texto viste
        .textoPrimario — la voz del sistema manda dentro del
        aviso. Solo su COLOR lo fija el cristal (regla scoped;
@@ -464,31 +454,28 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .notificacionFlotante {
     position: fixed !important;
     right: 16px;
-    /* R152 · SE MANTIENE (R155): 68px de aire sobre la barra
-       de Safari (URL/círculos abajo). */
+    /* 68px de aire sobre la barra de Safari (URL/círculos
+       abajo). */
     bottom: calc(68px + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
-    min-height: 44px;   /* R155: 52px → 44px */
+    min-height: 44px;
     max-width: min(320px, calc(100vw - 32px));
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 0 16px;
-    /* R155 · CRISTAL: ámbar translúcido + blur (el prefijo
-       -webkit- es el que Safari entiende) + borde ámbar.
-       R156 · 0.85 → 0.60 y R157 · 0.60 → 0.50 (orden del
-       dueño: «dale un 10% más de transparencia, aún se ve
-       casi sólido»): la MITAD del cristal es luz ajena y el
-       vidrio se adivina de verdad. Blur, borde, tinta,
-       sombra, alto y bottom: intactos. */
-    background: rgba(254, 243, 199, 0.50) !important;
+    /* CRISTAL: ámbar translúcido + blur (el prefijo -webkit- es
+       el que Safari entiende) + borde ámbar. La MAYORÍA del
+       cristal es luz ajena. Blur, borde, tinta, sombra, alto y
+       bottom: intactos. */
+    background: rgba(254, 243, 199, 0.40) !important;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(253, 230, 138, 0.9);
     text-align: left !important;
-    color: #92400E;   /* R155 · la tinta del cristal */
+    color: #92400E;   /* la tinta del cristal */
     border-radius: 999px !important;
-    /* R155 · sombra suavizada: 0.32 → 0.18 (y 0.18 → 0.10) */
+    /* sombra suavizada: el cristal flota */
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18), 0 3px 10px rgba(15, 23, 42, 0.10);
     z-index: 9999;
     opacity: 0;
@@ -548,32 +535,57 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     SWIPE DE LA LISTA · llegada de la pantalla nueva
-     El gesto vive en Core_Script (window.SwipeChips) sobre la
-     lista de items; deslizar a la IZQUIERDA muestra la lista de
-     la DERECHA y a la derecha la de la izquierda. Aquí vive
-     SOLO la llegada: al confirmar el cambio, la lista nueva
-     entra desde el lado contrario al gesto (.llega-derecha al
-     tirar a la izquierda · .llega-izquierda al tirar a la
-     derecha) — la salida espejo la pone Core_Script con
-     transition inline. Con prefers-reduced-motion la entrada
-     se apaga.
+     CARRIL DE PÁGINAS · el desplazamiento del área de items
+     La lista deja de ser una pila que se reemplaza: #listaWrap
+     es una TIRA de páginas una al lado de la otra, una por chip
+     (las crea Core_Swipe). El desplazamiento es NATIVO con
+     imán: el dedo arrastra 1:1 y al soltar la página más
+     cercana se engancha al centro (scroll-snap). Empujar el
+     listado a la IZQUIERDA muestra la lista de la DERECHA; a la
+     derecha, la de la IZQUIERDA. Los extremos no ciclan.
+     · EL RATÓN HACE DE DEDO en PC (GAS y GitHub): con puntero
+       fino el arrastre mueve el carril como el dedo; mientras
+       arrastra (.arrastrando) el imán se apaga y al soltar se
+       reactiva. El dedo táctil no lo siente.
+     · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
+       resultados viven en la página visible.
+     · PROFUNDIDAD: la página que sale se corre hacia atrás
+       (parallax), se achica hasta 10% y se desvanece hasta 60%
+       — el movimiento lo calcula Core_Swipe al scrollear y la
+       transición solo acompaña el asentamiento. Con
+       prefers-reduced-motion el efecto se apaga.
      ============================================================ */
-  @keyframes listaLlegaDerecha {
-    from { opacity: 0.4; transform: translateX(64px); }
-    to   { opacity: 1;   transform: translateX(0); }
+  .carril {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  @keyframes listaLlegaIzquierda {
-    from { opacity: 0.4; transform: translateX(-64px); }
-    to   { opacity: 1;   transform: translateX(0); }
+  .carril::-webkit-scrollbar { display: none; }
+  .carril:active { cursor: grabbing; }
+  .carril.arrastrando {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+    cursor: grabbing;
   }
-  .lista-wrap.llega-derecha {
-    animation: listaLlegaDerecha 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  .carril.arrastrando .carril-pagina { transition: none; }
+  .carril.fijo {
+    overflow-x: hidden;
+    scroll-snap-type: none;
   }
-  .lista-wrap.llega-izquierda {
-    animation: listaLlegaIzquierda 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  .carril-pagina {
+    flex: 0 0 100%;
+    min-width: 100%;
+    scroll-snap-align: center;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+    will-change: transform, opacity;
   }
   @media (prefers-reduced-motion: reduce) {
-    .lista-wrap.llega-derecha,
-    .lista-wrap.llega-izquierda { animation: none; }
+    .carril-pagina { transition: none; }
   }

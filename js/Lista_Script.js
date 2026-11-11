@@ -3,32 +3,51 @@
 ARCHIVO:         Lista_Script.html
 ESPEJO GITHUB:   github/js/Lista_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniousCloud | ServyCloud
-RESPONSABILIDAD: Módulo window.Lista. La vidriera de items (modos
-                 LISTA y GRILLA): lista = avatar circular con la
-                 INICIAL DEL TÍTULO + título (.subtitulo) + estrella
-                 métrica pasiva + "Ver publicación"; grilla (la
-                 define el campo vista del chip en CHIPSJSON) =
-                 tarjetas 2 por fila estilo Mercado Libre — imagen
-                 1:1 servida de la MEMORIA DE FOTOS de la app
-                 (Cache API: baja una vez y repinta desde disco,
-                 sin red), badge .badgeNuevo/.badgeUsado, título a 2
-                 líneas y slot precio/fecha ("A consultar" si no
-                 hay). Datos horneados en el catálogo. La búsqueda
-                 sigue SIEMPRE en lista. Compartir lista con
-                 cantidad de items. Orden por 'orden:change':
-                 recomendado, nombre, categoría (con cabecera de
-                 grupo), más compartidos y mejor valorados. Modo
-                 lista ↔ detalle con fade, botón volver y skeleton.
-                 Emite 'post:change'; escucha 'chips:change',
+RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
+                 (modos LISTA y GRILLA) y el pintado de las páginas
+                 del carril:
+                 · Cada página del carril (una por chip, las crea
+                 Core_Swipe) tiene su contenedor de items: pintar
+                 alimenta LA página de su chip; la FIRMA de la
+                 página (chip, orden, ciudad, modo y datos visibles
+                 de cada post) evita remontar lo que ya está al día
+                 — cero parpadeos al deslizar o al revalidar el
+                 catálogo.
+                 · lista = avatar circular con la INICIAL DEL TÍTULO
+                 + título (.subtitulo) + estrella métrica pasiva +
+                 "Ver publicación"; grilla (la define el campo vista
+                 del chip en CHIPSJSON) = tarjetas 2 por fila estilo
+                 Mercado Libre — imagen 1:1 montada SIN src (data-l2
+                 y el carril la cobra al verse: la MEMORIA DE FOTOS
+                 de la app baja cada foto UNA vez y repinta desde
+                 disco, sin red), badge .badgeNuevo/.badgeUsado,
+                 título a 2 líneas y slot precio/fecha ("A
+                 consultar" si no hay). Datos horneados en el
+                 catálogo. La búsqueda sigue SIEMPRE en lista (y
+                 fija el carril en la página visible).
+                 · La PRECARGA del primer post (PostFull) solo corre
+                 en la página VISIBLE: la cuota no paga por páginas
+                 que nadie mira.
+                 · Compartir lista con cantidad de items. Orden por
+                 'orden:change': recomendado, nombre, categoría (con
+                 cabecera de grupo), más compartidos y mejor
+                 valorados. Emite nada: solo escucha 'chips:change',
                  'buscar:change', 'ciudad:change' y 'orden:change'.
-VERSIÓN:         2.19
+                 · El detalle vive en window.ListaDetalle; las
+                 puertas clásicas (abrirDetalle, cerrarDetalle,
+                 partner, seleccionar, getModo, getPostActivo)
+                 delegan ahí.
+VERSIÓN:         2.20
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
-DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
-                 Index.html (SISTEMA, TABLAS), Iconos.html
-                 (pintarGlifos), Seccion_Script.html (detalle,
-                 window.Secciones), Seccion_Imagen_Script.html
-                 (window.SeccionImagen · memoria de fotos L2),
+DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
+                 Global_Script.html (postBackend),
+                 Core_Swipe_Script.html (window.SwipeChips · carril),
+                 Core_Memoria_Script.html (window.PostFull),
+                 Lista_Detalle_Script.html
+                 (window.ListaDetalle · detalle),
+                 Seccion_Imagen_Script.html (window.SeccionImagen),
+                 Iconos.html (pintarGlifos),
                  Chips_Script.html, Buscar_Script.html,
                  Ciudad_Script (window.Ciudad), Compartir_Script.html
                  (window.Compartir), Orden_Sheet_Script.html,
@@ -38,21 +57,27 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
   window.Lista = (function () {
 
-    var _popstateEsperado = false;   /* R19: popstate propio de history.back() */
-
-    var postActivoId = null;
     var chipActivoActual = null;
-    var modo = 'lista';
 
-    /* R66 · ORDEN ACTIVO de la vidriera ('recomendado' = el
-       orden de la hoja). Lo fija el sheet de ordenamiento vía
-       'orden:change'. Es de SESIÓN: al recargar vuelve al
-       recomendado. */
+    /* ORDEN ACTIVO de la vidriera ('recomendado' = el orden de la
+       hoja). Lo fija el sheet de ordenamiento vía 'orden:change'.
+       Es de SESIÓN: al recargar vuelve al recomendado. */
     var ordenActual = 'recomendado';
 
-    var scrollListaPrevio = 0;
+    function delegado(nombre, fallback) {
+      return function () {
+        var lp = window.ListaDetalle;
+        if (lp && typeof lp[nombre] === 'function') return lp[nombre]();
+        return fallback;
+      };
+    }
 
-    var DURACION_FADE_MS = 200;
+    /* Puerta del detalle para los items de la fábrica: vive en
+       ListaDetalle — los clicks de items y tarjetas la invocan
+       por el mismo camino de siempre. */
+    function abrirDetalle(idPost) {
+      if (window.ListaDetalle) window.ListaDetalle.abrirDetalle(idPost);
+    }
 
     function normalizar(s) {
       return String(s == null ? '' : s)
@@ -96,8 +121,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return '';
     }
 
-    /* R66 · Título del PRIMER grupo del post ('' si no
-       tiene) — la clave del orden por categoría. */
+    /* Título del PRIMER grupo del post ('' si no tiene) — la
+       clave del orden por categoría. */
     function tituloGrupoDe(post) {
       var grupos = post && post.idGrupo;
       if (!grupos || !grupos.length) return '';
@@ -105,14 +130,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       R140 · GRILLA (vista 'grilla' del chip) · HELPERS
+       GRILLA (vista 'grilla' del chip) · HELPERS
        La vista la define el CHIP en CHIPSJSON (campo vista):
        'grilla' → tarjetas 2 por fila al estilo Mercado Libre;
        todo lo demás → la lista de siempre. La BÚSQUEDA sigue
-       SIEMPRE en lista (definición vigente del dueño). Los datos
-       del slot (precio/fecha) y la imagen viajan HORNEADOS en el
-       catálogo (02 Cache.gs R140): la grilla NUNCA llama
-       postDetalle por post.
+       SIEMPRE en lista. Los datos del slot (precio/fecha) y la
+       imagen viajan HORNEADOS en el catálogo (02 Cache.gs): la
+       grilla NUNCA llama postDetalle por post.
        ============================================================ */
 
     /* Vista del chip: solo 'grilla' cambia la vidriera. Sin
@@ -167,11 +191,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       return txt;
     }
 
-    /* BADGE OVERLAY: mismo contrato del banner (R98) —
-       post.promo.idBadge buscado en SISTEMA.badges. Apagado o
-       sin título → sin overlay. R147: la píldora viste
-       .badgeUsado si el titulo de la BD es «Usado»; cualquier
-       otro título viste .badgeNuevo (naranja). */
+    /* BADGE OVERLAY: mismo contrato del banner — post.promo.idBadge
+       buscado en SISTEMA.badges. Apagado o sin título → sin
+       overlay. La píldora viste .badgeUsado si el titulo de la BD
+       es «Usado»; cualquier otro título viste .badgeNuevo. */
     function badgeDePost(post) {
       var id = post && post.promo ? String(post.promo.idBadge || '').trim() : '';
       if (!id) return null;
@@ -215,19 +238,24 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* CARD DE LA GRILLA (patrón Mercado Libre): la CARD ENTERA
-       es el botón. Imagen 1:1 cover con lazy y skeleton PROPIO
-       (cada card brilla hasta que SU foto llega; si falla, cae
-       a la inicial del título), badge y título a 2 líneas con
-       altura fija (los slots quedan alineados entre cards).
-       Sin likes, sin marca y sin "Ver publicación": la grilla
-       invita con el precio. Tipografía del dueño: título
-       .textoPrimario · slot .subtitulo con el color oficial ·
-       badge píldora .badgeNuevo/.badgeUsado según titulo (R147). */
+       es el botón. La imagen 1:1 se monta SIN src cuando la
+       memoria de fotos está disponible (data-l2 guarda la URL y
+       el carril la cobra cuando la página se ve): cero red en
+       páginas que nadie mira y cero recarga al volver. Con la
+       foto en pantalla el skeleton individual se retira; si
+       falla, cae a la inicial del título. Sin memoria
+       disponible: URL directa de siempre. Badge y título a 2
+       líneas con altura fija (los slots quedan alineados entre
+       cards). Sin likes, sin marca y sin "Ver publicación": la
+       grilla invita con el precio. */
     function montarTarjetaGrilla(post) {
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'grilla-item';
       btn.setAttribute('data-post', post.id);
+
+      var conMemoria = !!(window.SeccionImagen &&
+        typeof window.SeccionImagen.poblarConL2 === 'function');
 
       var badge   = badgeDePost(post);
       var titulo  = post.titulo || post.boton || post.id;
@@ -236,16 +264,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var html = '<span class="grilla-foto" aria-hidden="true">';
       html +=   '<span class="grilla-foto-skeleton"></span>';
       if (post.imagen) {
-        html += '<img class="grilla-img" src="' + escapeHtml(post.imagen) + '" alt="" loading="lazy" decoding="async">';
+        html += conMemoria
+          ? '<img class="grilla-img" data-l2="' + escapeHtml(post.imagen) + '" alt="" decoding="async">'
+          : '<img class="grilla-img" src="' + escapeHtml(post.imagen) + '" alt="" loading="lazy" decoding="async">';
       } else {
         html += '<span class="grilla-inicial">' + escapeHtml(inicial) + '</span>';
       }
       if (badge && badge.titulo) {
-        /* R147 · la clase la elige el titulo de la BD (BADGEJSON):
+        /* la clase la elige el titulo de la BD (BADGEJSON):
            «Usado» viste la píldora blanca .badgeUsado; cualquier
            otro título (Nuevo, Popular, Promoción, Último,
-           Próximamente…) la naranja .badgeNuevo. El texto
-           SIEMPRE es el que llega de la BD. */
+           Próximamente…) viste la verde .badgeNuevo de la grilla.
+           El texto SIEMPRE es el que llega de la BD. */
         var claseBadge = String(badge.titulo).trim().toLowerCase() === 'usado'
           ? 'badgeUsado'
           : 'badgeNuevo';
@@ -258,12 +288,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       btn.innerHTML = html;
 
       /* El skeleton individual se retira cuando LA IMAGEN de esa
-         card llega (o falla: cae a la inicial). La foto sale de la
-         MEMORIA DE FOTOS de la app (window.SeccionImagen, Cache
-         API en disco): la primera vez baja y queda guardada; cada
-         repintado posterior de la grilla pinta de la copia
-         guardada SIN red — volver a Ventas/Eventos ya no recarga
-         fotos. Sin memoria disponible: URL directa de siempre. */
+         card llega (o falla: cae a la inicial). */
       var img = btn.querySelector('.grilla-img');
       if (img) {
         var retirarSkeleton = function () {
@@ -284,12 +309,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
               img.parentNode.removeChild(img);
             }
           });
-        }
-        if (window.SeccionImagen &&
-            typeof window.SeccionImagen.poblarConL2 === 'function') {
-          window.SeccionImagen.poblarConL2(img, post.imagen);
-        } else {
-          img.src = post.imagen;
         }
       }
 
@@ -313,10 +332,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       ORDENAMIENTO (R66) · aplica el orden activo a lo que
-       llegue del filtro (chip o búsqueda). El array original
-       NUNCA se muta (se ordena una copia) y 'recomendado'
-       devuelve el orden tal cual (el de la hoja).
+       ORDENAMIENTO · aplica el orden activo a lo que llegue del
+       filtro (chip o búsqueda). El array original NUNCA se muta
+       (se ordena una copia) y 'recomendado' devuelve el orden tal
+       cual (el de la hoja).
        ============================================================ */
     function aplicarOrden(arr) {
       if (!arr || arr.length < 2) return arr;
@@ -388,58 +407,53 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       Skeleton del detalle
-       R86: actualizado a la ANATOMÍA REAL del post de hoy — marco
-       1:1 con vidrio (hero), título, promo, descripción, CTA
-       píldora y fila del partner.
+       PÁGINAS DEL CARRIL · el contenedor de items de un chip
+       (el carril vive en #listaWrap, lo construye Core_Swipe).
+       Sin carril aún: el contenedor directo (mismo de siempre).
        ============================================================ */
-    function htmlSkeletonDetalle() {
-      return '' +
-        '<div class="skeleton-detalle" aria-hidden="true">' +
-          '<div class="skeleton-foto"></div>' +
-          '<div class="skeleton-cuerpo">' +
-            '<span class="skeleton-linea skeleton-titulo"></span>' +
-            '<span class="skeleton-linea skeleton-promo"></span>' +
-            '<div class="skeleton-desc">' +
-              '<span class="skeleton-linea"></span>' +
-              '<span class="skeleton-linea"></span>' +
-              '<span class="skeleton-linea"></span>' +
-            '</div>' +
-          '</div>' +
-          '<div class="skeleton-cta"></div>' +
-          '<div class="skeleton-partner">' +
-            '<div class="skeleton-avatar"></div>' +
-            '<div class="skeleton-partner-info">' +
-              '<span class="skeleton-linea skeleton-partner-nombre"></span>' +
-              '<span class="skeleton-linea skeleton-partner-sub"></span>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
+    function contenedorDe(idChip) {
+      var c = document.getElementById('listaWrap');
+      if (c && c.classList.contains('carril')) {
+        var pag = c.querySelector('.carril-pagina[data-chip="' + idChip + '"]');
+        if (pag) return pag.querySelector('.carril-items');
+      }
+      return c;
     }
 
-    function mostrarSkeletonDetalle() {
-      var track = document.getElementById('seccionesTrack');
-      if (!track) return;
-      track.innerHTML = htmlSkeletonDetalle();
+    function chipVisible() {
+      return (window.Chips && typeof window.Chips.getChipActivo === 'function')
+        ? window.Chips.getChipActivo()
+        : chipActivoActual;
     }
 
-    /* ============================================================
-       Título del header en modo detalle
-       ============================================================ */
-    function tituloHeaderDetalle(post) {
-      if (!post) return '';
-
-      var chipsPost = post.idChips || [];
-      var chipParaMostrar = (chipActivoActual && chipsPost.indexOf(chipActivoActual) !== -1)
-        ? chipActivoActual
-        : (chipsPost[0] || null);
-
-      var chipStr  = nombreChip(chipParaMostrar);
-      var grupos   = post.idGrupo || [];
-      var grupoStr = grupos.length ? nombreGrupo(grupos[0]) : '';
-
-      if (chipStr && grupoStr) return chipStr + ' : ' + grupoStr;
-      return chipStr || grupoStr || '';
+    /* FIRMA de una página: chip + modo + orden + ciudad + los
+       datos VISIBLES de cada post. Si la firma coincide, la
+       página ya está al día y NO se remonta (cero parpadeo de
+       fotos al deslizar o al revalidar el catálogo). */
+    function firmaDe(idChip, lista, modoBusqueda, enLimite) {
+      var f = idChip + '|' + (modoBusqueda ? 'b' + (enLimite ? '1' : '0') : 'l') +
+        '|' + ordenActual + '|' + String(ciudadActiva() || '') +
+        '|' + (lista ? lista.length : 0);
+      if (lista) {
+        for (var i = 0; i < lista.length; i++) {
+          var p = lista[i];
+          f += '|' + p.id +
+            ':' + String(p.titulo || '') +
+            ':' + String(p.boton || '') +
+            ':' + (Number(p.like) || 0) +
+            ':' + (Number(p.comparte) || 0) +
+            ':' + String(p.precioVenta || '') +
+            ':' + String(p.monedaVenta || '') +
+            ':' + String(p.fechaEvento || '') +
+            ':' + String(p.imagen || '') +
+            ':' + String(p.colorOficial || '') +
+            ':' + String(p.colorClaro || '') +
+            ':' + (p.idGrupo || []).join(',') +
+            ':' + (p.idChips || []).join(',') +
+            ':' + ((p.promo && p.promo.idBadge) || '');
+        }
+      }
+      return f;
     }
 
     /* ============================================================
@@ -518,12 +532,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       });
     }
 
-    function emitirCambio(post) {
-      document.dispatchEvent(new CustomEvent('post:change', {
-        detail: { idPost: post ? post.id : null, post: post }
-      }));
-    }
-
     function actualizarAvisoBusqueda(mostrar, enLimite) {
       var aviso = document.getElementById('buscarVacio');
       if (!aviso) return;
@@ -543,7 +551,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
     }
 
     /* ============================================================
-       COMPARTIR LISTA (R65) · BLOQUE DE ITEMS
+       COMPARTIR LISTA · BLOQUE DE ITEMS
        El botón vive encima de la lista (dentro de
        .secciones-wrap): visible SIEMPRE que la lista traiga
        items (chip o búsqueda, da igual el modo) y con la
@@ -566,60 +574,41 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       }
     }
 
-    /* R55 · Al cerrar el detalle, las estrellas se re-leen de
-       TABLAS: si el usuario dio (o quitó) like con el corazón
-       flotante, el número de la fila queda IGUAL al que dejó
-       el corazón. Mismo dato, cero descuadre. */
-    function sincronizarEstrellas() {
-      var items = document.querySelectorAll('#listaWrap .lista-item');
-      for (var i = 0; i < items.length; i++) {
-        var post = buscarPost(items[i].getAttribute('data-post'));
-        if (!post) continue;
-
-        var col = items[i].querySelector('.estrella-col');
-        if (!col) continue;
-
-        var like = Number(post.like) || 0;
-        var num  = col.querySelector('.estrella-num');
-        if (num) num.textContent = String(like);
-        col.hidden = like <= 0;
-      }
-    }
-
-    function setModo(nuevoModo) {
-      if (modo === nuevoModo) return;
-      modo = nuevoModo;
-      var body = document.body;
-      if (modo === 'lista') {
-        body.classList.remove('modo-detalle');
-        body.classList.remove('modo-partner');
-        body.classList.add('modo-lista');
-      } else {
-        /* R87: el modo partner conserva las reglas del detalle
-           (filtros ocultos, volver visible) y añade la suya. */
-        body.classList.remove('modo-lista');
-        body.classList.add('modo-detalle');
-        body.classList.toggle('modo-partner', modo === 'partner');
-      }
-    }
-
     /* ============================================================
-       RESPIRO DE SCROLL (R63) · tras un repintado (cambio de
-       ciudad o de chip) el contenedor de la lista vuelve arriba
-       y re-evalúa su scroll.
+       RESPIRO DE SCROLL · tras un repintado (cambio de ciudad o
+       de chip) el contenedor de la lista vuelve arriba y
+       re-evalúa su scroll.
        ============================================================ */
     function respirarScroll() {
       var wrap = document.querySelector('.secciones-wrap');
       if (wrap) wrap.scrollTop = 0;
     }
 
-    function pintarLista(listaParam, modoBusqueda, enLimite) {
-      var cont = document.getElementById('listaWrap');
+    /* ============================================================
+       PINTAR LISTA · alimenta la página de un chip del carril.
+       La FIRMA decide: página al día → solo aviso/compartir/fotos
+       pendientes; página distinta → remonta (el orden activo se
+       aplica SIEMPRE: recomendado deja el array tal cual).
+       La PRECARGA del primer post solo corre si la página es la
+       VISIBLE (la cuota no paga por páginas ocultas).
+       ============================================================ */
+    function pintarLista(listaParam, modoBusqueda, enLimite, idChipPagina) {
+      var cont = contenedorDe(idChipPagina);
       if (!cont) return;
 
-      /* R66 · el orden activo se aplica SIEMPRE (recomendado
-         deja el array tal cual): chip y búsqueda pasan por aquí. */
       var lista = aplicarOrden(listaParam);
+      var firma = firmaDe(idChipPagina, lista, modoBusqueda, enLimite);
+      var pag = cont.closest('.carril-pagina');
+
+      if (pag && pag.dataset.firma === firma) {
+        /* la página ya está al día: nada que remontar */
+        actualizarCompartir(lista ? lista.length : 0);
+        actualizarAvisoBusqueda(!!modoBusqueda && !(lista && lista.length), enLimite);
+        if (window.SwipeChips && typeof window.SwipeChips.poblarVisibles === 'function') {
+          window.SwipeChips.poblarVisibles();
+        }
+        return;
+      }
 
       /* R64 · compartir vive con items: visible solo si la
          lista trae algo (chip o búsqueda, da igual el modo). */
@@ -628,27 +617,26 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       cont.innerHTML = '';
 
       if (!lista || lista.length === 0) {
-        postActivoId = null;
         actualizarAvisoBusqueda(modoBusqueda, enLimite);
+        if (pag) pag.dataset.firma = firma;
         respirarScroll();
         return;
       }
 
       actualizarAvisoBusqueda(false, enLimite);
 
-      /* R140 · la vista la define el CHIP (CHIPSJSON.vista):
-         'grilla' pinta tarjetas 2 por fila (Ventas/Eventos);
-         todo lo demás pinta la lista de siempre. La BÚSQUEDA
-         SIEMPRE lista (definición vigente del dueño). */
-      var esGrilla = !modoBusqueda && vistaDeChip(chipActivoActual) === 'grilla';
+      /* la vista la define el CHIP (CHIPSJSON.vista): 'grilla'
+         pinta tarjetas 2 por fila (Ventas/Eventos); todo lo demás
+         pinta la lista de siempre. La BÚSQUEDA SIEMPRE lista. */
+      var esGrilla = !modoBusqueda && vistaDeChip(idChipPagina) === 'grilla';
       cont.classList.toggle('en-grilla', esGrilla);
 
       var frag = document.createDocumentFragment();
 
-      /* Construye el botón de UN post (anatomía R64 · LIMPIO:
-         fila del título + fila del partner — sin subtítulo ni
-         divisoria ni check verde; la división la pinta el CSS
-         con la línea tenue entre items). */
+      /* Construye el botón de UN post (anatomía LIMPIA: fila del
+         título + fila del partner — sin subtítulo ni divisoria ni
+         check verde; la división la pinta el CSS con la línea
+         tenue entre items). */
       function montarItem(post) {
         var partner = buscarPartner(post.idPartner);
 
@@ -658,11 +646,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         var like    = Number(post.like) || 0;
         var marca   = marcaDePartner(partner);
 
-        /* R113 · AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo
-           centra y le da 52×52), SOLO la INICIAL DEL TÍTULO —
-           sin imagen (el avatar nunca lleva foto). La letra
-           lleva la tipografía .tituloPost y el colorOficial
-           del post; fondo colorClaro de siempre. */
+        /* AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo centra y
+           le da 52×52), SOLO la INICIAL DEL TÍTULO — sin imagen
+           (el avatar nunca lleva foto). La letra lleva la
+           tipografía .tituloPost y el colorOficial del post;
+           fondo colorClaro de siempre. */
         var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
 
         var btn = document.createElement('button');
@@ -709,10 +697,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
         return btn;
       }
 
-      /* R66 · se renderiza TODO lo que llega del filtro, con el
-         ORDEN activo aplicado. Con "Por categoría" el agrupado
-         ES el orden: se intercala una cabecera
-         .lista-grupo-header al abrir cada bloque de grupo. */
+      /* se renderiza TODO lo que llega del filtro, con el ORDEN
+         activo aplicado. Con "Por categoría" el agrupado ES el
+         orden: se intercala una cabecera .lista-grupo-header al
+         abrir cada bloque de grupo. */
       var renderizados = [];
       var bloqueActual = null;
       var agrupando = (ordenActual === 'categoria') && !esGrilla;
@@ -736,301 +724,104 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
 
       cont.appendChild(frag);
 
-      /* R63 · el contenedor re-evalúa su scroll con contenido
-         nuevo (cura el scroll pegado tras cambiar de ciudad). */
+      if (pag) pag.dataset.firma = firma;
+
+      /* el contenedor re-evalúa su scroll con contenido nuevo
+         (cura el scroll pegado tras cambiar de ciudad). */
       respirarScroll();
 
-      /* Precarga del PRIMER post renderizado · si el usuario
-         toca ese item (el más probable), ya está en caché y el
-         detalle sale sin skeleton. */
-      if (window.PostFull && renderizados.length > 0) {
+      /* fotos pendientes de las páginas ya asomadas */
+      if (window.SwipeChips && typeof window.SwipeChips.poblarVisibles === 'function') {
+        window.SwipeChips.poblarVisibles();
+      }
+
+      /* Precarga del PRIMER post renderizado · SOLO si la página
+         es la visible (el usuario que toca ese item ya lo tiene
+         en caché y el detalle sale sin skeleton). Páginas
+         ocultas: la cuota no paga por ellas. */
+      if (window.PostFull && renderizados.length > 0 &&
+          idChipPagina === chipVisible()) {
         window.PostFull.obtener(renderizados[0].id).catch(function () {});
       }
     }
 
-    function pintar(idChip, idRestaurar) {
+    function pintar(idChip) {
       chipActivoActual = idChip;
-      pintarLista(postsDeChip(idChip), false, false);
+      pintarLista(postsDeChip(idChip), false, false, idChip);
     }
 
     function pintarBusqueda(termino, enLimite) {
-      pintarLista(postsDeBusqueda(termino), true, enLimite);
+      pintarLista(postsDeBusqueda(termino), true, enLimite, chipVisible());
     }
-
-    /* ============================================================
-       Abrir / cerrar detalle
-       ============================================================ */
-    function abrirDetalle(idPost) {
-      var post = buscarPost(idPost);
-      if (!post) return;
-
-      var wrap = document.querySelector('.secciones-wrap');
-      scrollListaPrevio = wrap ? wrap.scrollTop : 0;
-
-      var lista = document.getElementById('listaWrap');
-      var detalle = document.getElementById('seccionesTrack');
-      if (!lista || !detalle) return;
-
-      var tituloCat = document.getElementById('tituloCategoria');
-      if (tituloCat) {
-        tituloCat.textContent = tituloHeaderDetalle(post);
-        tituloCat.hidden = false;
-      }
-
-      var btnVolver = document.getElementById('btnVolver');
-      if (btnVolver) btnVolver.hidden = false;
-
-      setModo('detalle');
-
-      /* Skeleton del detalle antes del fade. Si PostFull ya tiene
-         el detalle (por la precarga), se reemplaza casi al toque. */
-      mostrarSkeletonDetalle();
-
-      lista.classList.add('fade-out');
-
-      setTimeout(function () {
-        lista.hidden = true;
-        lista.classList.remove('fade-out');
-
-        detalle.hidden = false;
-        detalle.classList.add('fade-in');
-
-        setTimeout(function () {
-          detalle.classList.remove('fade-in');
-        }, DURACION_FADE_MS);
-      }, DURACION_FADE_MS);
-
-      if (wrap) wrap.scrollTop = 0;
-
-      try { history.pushState({ sv: 'detalle' }, ''); } catch (e) {}
-
-      window.PostFull.obtener(idPost)
-        .then(function (det) {
-          /* R84: las últimas 2 preguntas (con respuesta) viajan
-             dentro del detalle y suben con el post. */
-          post.postJson = det.postJson || {};
-          post.planJson = det.planJson || null;
-          post.preguntas = det.preguntas || null;
-
-          postActivoId = idPost;
-          emitirCambio(post);
-        })
-        .catch(function (err) {
-          console.warn('[Lista] No se pudo cargar el detalle:', err.message);
-          postActivoId = idPost;
-          emitirCambio(post);
-        });
-    }
-
-    function cerrarDetalle(desdePopstate) {
-      if (modo !== 'detalle') return;
-
-      var lista = document.getElementById('listaWrap');
-      var detalle = document.getElementById('seccionesTrack');
-      if (!lista || !detalle) return;
-
-      var btnVolver = document.getElementById('btnVolver');
-      if (btnVolver) btnVolver.hidden = true;
-
-      var tituloCat = document.getElementById('tituloCategoria');
-      if (tituloCat) {
-        tituloCat.textContent = '';
-        tituloCat.hidden = true;
-      }
-
-      postActivoId = null;
-      setModo('lista');
-      sincronizarEstrellas();
-
-      var wrap = document.querySelector('.secciones-wrap');
-      if (wrap) wrap.scrollTop = scrollListaPrevio;
-
-      emitirCambio(null);
-
-      detalle.classList.add('fade-out');
-
-      setTimeout(function () {
-        /* R19: si entre el cierre y este borrado (200 ms) se abrió
-           OTRO detalle, el modo ya es 'detalle' de nuevo: abortar
-           el borrado para no vaciar el post nuevo. */
-        if (modo !== 'lista') return;
-
-        detalle.hidden = true;
-        detalle.classList.remove('fade-out');
-        detalle.innerHTML = '';
-
-        lista.hidden = false;
-        lista.classList.add('fade-in');
-
-        setTimeout(function () {
-          lista.classList.remove('fade-in');
-        }, DURACION_FADE_MS);
-      }, DURACION_FADE_MS);
-
-      if (!desdePopstate) {
-        _popstateEsperado = true;
-        try { history.back(); } catch (e) {}
-      }
-    }
-
-    /* ============================================================
-       R87 · MODO PARTNER · el perfil del vendedor como lienzo
-       propio, hijo del detalle. El contenido lo pinta
-       window.Partner en #partnerTrack; aquí solo modo, título
-       del header e historial. El volver REGRESA AL POST.
-       ============================================================ */
-    function abrirPartner() {
-      if (!postActivoId) return;
-
-      var tituloCat = document.getElementById('tituloCategoria');
-      if (tituloCat) {
-        tituloCat.textContent = 'Perfil del vendedor';
-        tituloCat.hidden = false;
-      }
-
-      var btnVolver = document.getElementById('btnVolver');
-      if (btnVolver) btnVolver.hidden = false;
-
-      setModo('partner');
-
-      try { history.pushState({ sv: 'partner' }, ''); } catch (e) {}
-    }
-
-    function cerrarPartner(desdePopstate) {
-      if (modo !== 'partner') return;
-
-      var post = postActivoId ? buscarPost(postActivoId) : null;
-
-      var tituloCat = document.getElementById('tituloCategoria');
-      if (tituloCat) {
-        var t = tituloHeaderDetalle(post);
-        tituloCat.textContent = t;
-        tituloCat.hidden = !t;
-      }
-
-      setModo('detalle');
-
-      /* El fade de vuelta al post lo hace window.Partner. */
-      document.dispatchEvent(new CustomEvent('partner:ocultar'));
-
-      if (!desdePopstate) {
-        _popstateEsperado = true;
-        try { history.back(); } catch (e) {}
-      }
-    }
-
-    function seleccionar(idPost) {
-      var post = buscarPost(idPost);
-      if (!post) return false;
-
-      var chips = post.idChips || [];
-      if (chipActivoActual && chips.indexOf(chipActivoActual) === -1 && chips.length) {
-        if (window.Chips && typeof window.Chips.seleccionar === 'function') {
-          window.Chips.seleccionar(chips[0]);
-        }
-        setTimeout(function () { abrirDetalle(idPost); }, 80);
-        return true;
-      }
-
-      abrirDetalle(idPost);
-      return true;
-    }
-
-    function getPostActivo() {
-      if (!postActivoId) return null;
-      return buscarPost(postActivoId);
-    }
-
-    function getModo() { return modo; }
-
-    function getOrden() { return ordenActual; }
 
     /* ============================================================
        Eventos
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
-      if (modo === 'partner') cerrarPartner(false);
-      if (modo === 'detalle') cerrarDetalle(false);
-      pintar(idChip, null);
+      respirarScroll();
+      pintar(idChip);
     });
 
     document.addEventListener('buscar:change', function (e) {
       var termino  = e.detail && e.detail.termino;
       var enLimite = e.detail && e.detail.enLimite;
+
+      /* con búsqueda el carril se FIJA en la página visible */
+      var c = document.getElementById('listaWrap');
+      if (c) c.classList.toggle('fijo', !!(termino && termino.trim()));
+
       if (termino && termino.trim()) {
         pintarBusqueda(termino, enLimite);
       } else {
-        pintar(chipActivoActual, null);
+        pintar(chipActivoActual || chipVisible(), null);
       }
     });
 
     document.addEventListener('ciudad:change', function () {
-      if (modo === 'partner') cerrarPartner(false);
-      if (modo === 'detalle') cerrarDetalle(false);
-
       var input = document.getElementById('buscarInput');
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
       } else {
-        pintar(chipActivoActual, null);
+        pintar(chipActivoActual || chipVisible(), null);
       }
     });
 
-    /* ============================================================
-       R66 · ORDEN:change · el sheet de ordenamiento fijó otro
-       orden: se recuerda y se repinta la vista VIVA.
-       ============================================================ */
+    /* ORDEN:change · el sheet de ordenamiento fijó otro orden:
+       se recuerda y se repinta la vista VIVA. */
     document.addEventListener('orden:change', function (e) {
       ordenActual = (e.detail && e.detail.orden) || 'recomendado';
 
-      if (modo === 'partner') cerrarPartner(false);
-      if (modo === 'detalle') cerrarDetalle(false);
-
       var input = document.getElementById('buscarInput');
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
       } else {
-        pintar(chipActivoActual, null);
+        pintar(chipActivoActual || chipVisible(), null);
       }
     });
-
-    document.addEventListener('post:solicitar', function (e) {
-      var idPost = e.detail && e.detail.idPost;
-      if (idPost) seleccionar(idPost);
-    });
-
-    document.addEventListener('click', function (e) {
-      var btn = e.target && e.target.closest && e.target.closest('#btnVolver');
-      if (!btn) return;
-      e.preventDefault();
-      /* R87: en el lienzo del partner el volver regresa al POST. */
-      if (modo === 'partner') { cerrarPartner(false); return; }
-      cerrarDetalle(false);
-    });
-
-    window.addEventListener('popstate', function () {
-      if (_popstateEsperado) {
-        _popstateEsperado = false;
-        return;
-      }
-      if (modo === 'partner') { cerrarPartner(true); return; }
-      if (modo === 'detalle') cerrarDetalle(true);
-    });
-
-    document.body.classList.add('modo-lista');
 
     return {
       pintar:         pintar,
       pintarBusqueda: pintarBusqueda,
-      seleccionar:    seleccionar,
-      getPostActivo:  getPostActivo,
-      getModo:        getModo,
-      getOrden:       getOrden,
-      abrirDetalle:   abrirDetalle,
-      cerrarDetalle:  cerrarDetalle,
-      abrirPartner:   abrirPartner,
-      cerrarPartner:  cerrarPartner
+
+      /* Puertas clásicas del detalle — viven en window.ListaDetalle */
+      abrirDetalle:  abrirDetalle,
+      cerrarDetalle: function (desdePopstate) {
+        if (window.ListaDetalle) window.ListaDetalle.cerrarDetalle(desdePopstate);
+      },
+      abrirPartner:  function () {
+        if (window.ListaDetalle) window.ListaDetalle.abrirPartner();
+      },
+      cerrarPartner: function (desdePopstate) {
+        if (window.ListaDetalle) window.ListaDetalle.cerrarPartner(desdePopstate);
+      },
+      seleccionar:   function (idPost) {
+        if (window.ListaDetalle) return window.ListaDetalle.seleccionar(idPost);
+        return false;
+      },
+      getModo:       delegado('getModo', 'lista'),
+      getPostActivo: delegado('getPostActivo', null),
+      getOrden:      function () { return ordenActual; }
     };
 
   })();

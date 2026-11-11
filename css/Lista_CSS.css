@@ -9,10 +9,14 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  con la inicial del título + título .subtitulo + estrella
                  métrica + fila con "Ver publicación" naranja),
                  cabecera de grupo,
+                 grilla estilo Mercado Libre (el grid vive en el
+                 contenedor de items de la página del carril:
+                 .carril-items.en-grilla),
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.19
-CAMBIOS:         R155: la marca del partner en los items viste textoSecundario — la voz gris del sistema — en vez de textoPrimario (orden del dueño: el nombre acompaña, no compite con el título del post). Muere el override móvil de 12px en el @media 360px: la marca viste --size-enlaces en TODO ancho (una sola ley para su letra). R148 (hotfix 1) y R145 (barrido :active) intactos. Historial: bitácora/versiones.
+VERSIÓN:         2.20
+ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
+                 de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -682,7 +686,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      pintada en el COLOR OFICIAL CENTRALIZADO --color-primario.
      Sin likes ni marca: la grilla invita con el precio.
      ============================================================ */
-  .lista-wrap.en-grilla {
+  .carril-items.en-grilla {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px 10px;
@@ -783,7 +787,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   @media (max-width: 360px) {
-    .lista-wrap.en-grilla { gap: 10px 8px; padding: 10px 12px 20px; }
+    .carril-items.en-grilla { gap: 10px 8px; padding: 10px 12px 20px; }
     .grilla-item { border-radius: 12px; }
   }
 
