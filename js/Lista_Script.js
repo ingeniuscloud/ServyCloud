@@ -32,27 +32,29 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  'orden:change': recomendado, nombre, categoría (con
                  cabecera de grupo), más compartidos y mejor
                  valorados.
-                 · R160 · EL CARRIL MANDA EL RITMO: mientras el
-                 carril está EN VIAJE, los chips:change que llegan
-                 como consecuencia del deslizamiento NO pintan ni
-                 resetean (SwipeChips.enViaje) — pintar en pleno
-                 vuelo abortaba los viajes (pantalla cortada,
-                 saltos de dos chips, regreso contra el dedo). Al
-                 reposo, 'carril:asentado' repinta la página llegada
-                 SIN respiro vertical y PREPARA LOS VECINOS (solo
-                 texto: las fotos siguen a demanda) — alturas
-                 estables antes del próximo viaje. El RESPIRO de
-                 scroll vertical queda RESERVADO AL CLICK: cambiar
-                 de chip con un toque vuelve arriba; deslizar,
-                 jamás. La FIRMA hace que preparar un vecino ya al
-                 día no cueste nada. Escucha 'chips:change',
+                 · R161 · LAS PÁGINAS NACEN PINTADAS: cada cambio
+                 de catálogo, ciudad u orden repinta la TIRA
+                 COMPLETA (pintarTodo) — pintura local, cero
+                 llamadas al servidor; las fotos siguen cobrándose
+                 solo cuando una página se asoma. Nunca hay
+                 vecinos vacíos, ni estallido de remontes al
+                 aterrizar, ni alturas que cambien en pleno vuelo.
+                 'carril:asentado' repinta SOLO lo vencido (la
+                 FIRMA barre lo al día: en reposo no hay trabajo).
+                 El RESPIRO del scroll vertical es del PULSO del
+                 dueño (lo ordena el propio carril antes de
+                 viajar): cambiar de chip con un toque vuelve
+                 arriba; deslizar, jamás. 'chips:change' solo
+                 anota el chip activo — el chip en vuelo se
+                 ilumina sin trabajo y la llegada se avisa UNA
+                 vez, al asentarse. Escucha 'chips:change',
                  'carril:asentado', 'buscar:change',
                  'ciudad:change' y 'orden:change'.
                  · El detalle vive en window.ListaDetalle; las
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.30
+VERSIÓN:         2.31
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
@@ -629,7 +631,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
         if (window.SwipeChips && typeof window.SwipeChips.poblarVisibles === 'function') {
           window.SwipeChips.poblarVisibles();
         }
-        return;
+        return false;   /* sin cambios: pintarTodo no respira */
       }
 
       /* R64 · compartir vive con items: visible solo si la
@@ -646,7 +648,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
         }
         if (pag) pag.dataset.firma = firma;
         if (conRespiro !== false) respirarScroll();
-        return;
+        return true;
       }
 
       if (esPaginaVisible) {
@@ -773,6 +775,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
           idChipPagina === chipVisible()) {
         window.PostFull.obtener(renderizados[0].id).catch(function () {});
       }
+
+      return true;   /* la página se remontó: pintarTodo respira */
     }
 
     function pintar(idChip, conRespiro) {
@@ -785,55 +789,59 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     }
 
     /* ============================================================
-       Eventos
+       PINTAR TODO (R161) · las páginas del carril NACEN PINTADAS:
+       cada chip monta su texto de una vez (pintura local, cero
+       llamadas al servidor — las fotos siguen a demanda vía
+       poblarVisibles). Con catálogo, ciudad u orden nuevos se
+       repinta la TIRA COMPLETA: nunca hay vecinos vacíos, ni
+       estallido de remontes al aterrizar, ni alturas que cambien
+       en pleno vuelo. El respiro vertical solo si ALGO se
+       remontó y el llamado lo pidió.
+       ============================================================ */
+    function pintarTodo(conRespiro) {
+      var c = document.getElementById('listaWrap');
+
+      /* sin carril todavía (modo de siempre): una página, la viva */
+      if (!c || !c.classList.contains('carril')) {
+        pintar(chipActivoActual || chipVisible(), conRespiro);
+        return;
+      }
+
+      var chips = document.querySelectorAll('#filtros .chip');
+      var cambio = false;
+
+      for (var i = 0; i < chips.length; i++) {
+        var idChip = chips[i].getAttribute('data-chip');
+        if (!idChip) continue;
+        if (pintarLista(postsDeChip(idChip), false, false, idChip, false)) {
+          cambio = true;
+        }
+      }
+
+      if (cambio && conRespiro !== false) respirarScroll();
+    }
+
+    /* ============================================================
+       CHIPS:CHANGE (R161) · solo anota el chip activo. Las
+       páginas NACEN PINTADAS: un cambio de chip no remonta NADA.
+       El respiro vertical del pulso lo ordena el propio carril
+       (Core_Swipe) antes de viajar; el chip en vuelo se ilumina
+       sin trabajo; la llegada se avisa una vez, al asentarse.
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
-      /* R160 · en pleno viaje el carril manda: nadie pinta ni
-         resetea a mitad de vuelo (eso abortaba los viajes y
-         cortaba la pantalla). La llegada la pinta
-         'carril:asentado' cuando la tira reposa. */
-      if (window.SwipeChips && typeof window.SwipeChips.enViaje === 'function' &&
-          window.SwipeChips.enViaje()) return;
-      respirarScroll();
-      pintar(idChip);
+      if (idChip) chipActivoActual = idChip;
     });
 
     /* ============================================================
-       CARRIL:ASENTADO (R160) · la tira reposó en una página:
-       repinta la llegada SIN respiro vertical (el dedo manda;
-       el respiro es del click) y PREPARA LOS VECINOS: izquierda
-       y derecha quedan alimentadas con su texto (las fotos
-       siguen a demanda) — alturas estables antes del próximo
-       viaje y ninguna página vacía al llegar.
+       CARRIL:ASENTADO (R161) · la tira reposó: repinta SOLO lo
+       VENCIDO. El nacimiento del carril y todo repintado de
+       fondo quedan alimentados aquí (la FIRMA barre lo que ya
+       está al día: en reposo esto no remonta nada) — sin
+       respiro vertical: el deslizamiento jamás toca tu lectura.
        ============================================================ */
-    function prepararPagina(idChipVecino) {
-      if (!idChipVecino) return;
-      pintarLista(postsDeChip(idChipVecino), false, false, idChipVecino, false);
-    }
-
-    document.addEventListener('carril:asentado', function (e) {
-      var idChip = e.detail && e.detail.idChip;
-      if (!idChip) return;
-
-      pintar(idChip, false);
-
-      var c = document.getElementById('listaWrap');
-      if (!c || !c.classList.contains('carril')) return;
-
-      var pgs = c.querySelectorAll('.carril-pagina');
-      var idx = -1;
-      for (var i = 0; i < pgs.length; i++) {
-        if (pgs[i].getAttribute('data-chip') === idChip) { idx = i; break; }
-      }
-      if (idx < 0) return;
-
-      if (idx > 0) {
-        prepararPagina(pgs[idx - 1].getAttribute('data-chip'));
-      }
-      if (idx < pgs.length - 1) {
-        prepararPagina(pgs[idx + 1].getAttribute('data-chip'));
-      }
+    document.addEventListener('carril:asentado', function () {
+      pintarTodo(false);
     });
 
     document.addEventListener('buscar:change', function (e) {
@@ -856,7 +864,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
       } else {
-        pintar(chipActivoActual || chipVisible(), null);
+        pintarTodo(null);   /* ciudad nueva: tira completa + respiro */
       }
     });
 
@@ -869,13 +877,14 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       if (input && input.value.trim()) {
         pintarBusqueda(input.value.trim(), false);
       } else {
-        pintar(chipActivoActual || chipVisible(), null);
+        pintarTodo(null);   /* orden nuevo: tira completa + respiro */
       }
     });
 
     return {
       pintar:         pintar,
       pintarBusqueda: pintarBusqueda,
+      pintarTodo:     pintarTodo,
 
       /* Puertas clásicas del detalle — viven en window.ListaDetalle */
       abrirDetalle:  abrirDetalle,

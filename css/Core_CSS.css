@@ -9,7 +9,7 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  lienzo, de la notificación flotante centralizada
                  (.notificacionFlotante, cristal 0.40) y del CARRIL
                  de páginas del área de items (.carril).
-VERSIÓN:         2.19
+VERSIÓN:         2.20
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
@@ -543,25 +543,31 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      cercana se engancha al centro (scroll-snap). Empujar el
      listado a la IZQUIERDA muestra la lista de la DERECHA; a la
      derecha, la de la IZQUIERDA. Los extremos no ciclan.
+     · DIANAS QUIETAS (R161): la página es lo que el navegador
+       MIDE para imantar (scroll-snap-align) — nadie la mueve.
+       El imán obligatorio apunta a cajas fijas: fin de las
+       pantallas cortadas, de los saltos de dos chips y del
+       regreso contra el empuje. La página lleva overflow
+       hidden para que la profundidad de la capa interior no
+       sangre hacia la vecina.
      · EL RATÓN HACE DE DEDO en PC (GAS y GitHub): con puntero
        fino el arrastre mueve el carril como el dedo; mientras
-       arrastra (.arrastrando) el imán se apaga y al soltar se
-       reactiva. El dedo táctil no lo siente.
+       arrastra (.arrastrando) el imán queda DORMIDO y al soltar
+       UNA animación lleva el carril a su página — el imán
+       despierta ya en reposo (Core_Swipe). El dedo táctil no lo
+       siente.
      · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
        resultados viven en la página visible.
-     · ASENTAMIENTO (R160): mientras el carril viaja, NADIE
-       remonta páginas (Lista espera 'carril:asentado'); los
-       vecinos se preparan en reposo para que las alturas no
-       cambien en pleno vuelo — fin de los viajes abortados y
-       de las pantallas cortadas.
-     · PROFUNDIDAD: la página que sale se corre hacia atrás
-       (parallax), se achica hasta 10% y se desvanece hasta 60%
-       — el movimiento lo calcula Core_Swipe fotograma a
-       fotograma PEGADO al scroll real: SIN transición que lo
-       persiga (la transición reiniciada en cada fotograma era
-       el temblor de los items en PC). En reposo la página
-       centrada queda EXACTA al centro. Con
-       prefers-reduced-motion el efecto se apaga.
+     · ASENTAMIENTO (R161): al reposo el carril avisa
+       'carril:asentado' y despierta el imán dormido; Lista
+       repinta solo lo VENCIDO (las páginas nacen pintadas).
+     · PROFUNDIDAD EN LA CAPA INTERIOR (R161): el parallax y el
+       achique viven en .carril-items (lo que el navegador NO
+       mide); el desvanecido, en la página (opacidad no mueve
+       cajas). Core_Swipe lo calcula fotograma a fotograma
+       PEGADO al scroll real, SIN transición que lo persiga. En
+       reposo, cero transform: la página centrada queda EXACTA
+       al centro. Con prefers-reduced-motion el efecto se apaga.
      ============================================================ */
   .carril {
     display: flex;
@@ -589,6 +595,13 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .carril-pagina {
     flex: 0 0 100%;
     min-width: 100%;
+    overflow: hidden;
     scroll-snap-align: center;
-    will-change: transform, opacity;
+    will-change: opacity;
+  }
+  /* la capa interior de la PROFUNDIDAD (R161): lo que se corre
+     y se achica es esto, NO la página — el imán mide la página,
+     que queda quieta siempre */
+  .carril-items {
+    will-change: transform;
   }

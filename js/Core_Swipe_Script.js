@@ -17,41 +17,51 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento del área de
                  IZQUIERDA muestra la lista de la DERECHA; empujar a
                  la derecha, la de la IZQUIERDA. Los extremos no
                  ciclan.
-                 · EL CHIP ES CONSECUENCIA: mientras el carril viaja,
-                 se mira qué página quedó centrada y ese chip se
-                 enciende SOLO, por el mismo camino del click
-                 (Chips.seleccionar → chips:change). Al revés: un
-                 click en un chip pide al carril que se deslice
-                 suave hasta esa página. El chip jamás mueve
-                 contenido a mano.
-                 · VIAJE Y ASENTAMIENTO (R160): mientras el carril
-                 se mueve —dedo, ratón o viaje por chip— está EN
-                 VIAJE: los cruces de centro encienden el chip pero
-                 NADIE pinta páginas ni resetea scroll en pleno
-                 vuelo (ese trabajo abortaba los viajes: pantallas
-                 cortadas, saltos de dos chips, ida y vuelta). Al
-                 reposo (160ms sin scroll) el carril avisa
-                 'carril:asentado' y Lista repinta la página llegada
-                 y PREPARA LOS VECINOS: alturas estables antes del
-                 próximo viaje y ninguna página vacía al llegar.
-                 · RESPIRO VERTICAL DEL CLICK (R160): el scroll
-                 vertical vuelve arriba SOLO cuando el dueño pulsa
-                 un chip; el deslizamiento jamás lo toca (Lista lo
-                 decide con enViaje y carril:asentado).
-                 · PROFUNDIDAD: cada página, según qué tan lejos
-                 está del centro, se corre hacia atrás (parallax
-                 15%), se achica hasta 10% y se desvanece hasta
-                 60% — recalculada fotograma a fotograma PEGADA al
-                 scroll real, SIN transición que la persiga (la
-                 transición era el temblor de los items en PC). La
-                 página en reposo queda EXACTA al centro: cero
-                 escala residual. Con prefers-reduced-motion el
-                 efecto se apaga.
-                 · EL RATÓN HACE DE DEDO en PC (GAS y GitHub):
-                 presionar y arrastrar con el puntero mueve el
-                 carril pixel a pixel (mismo imán al soltar). Solo
-                 despierta con puntero fino (mouse/pen): el dedo
-                 táctil sigue siendo nativo y no lo siente.
+                 · EL IMÁN APUNTA A DIANAS QUIETAS (R161): la página
+                 es lo que el navegador MIDE para imantar, así que
+                 nadie la mueve. La profundidad (parallax 15%,
+                 achique hasta 10%) vive en la CAPA INTERIOR
+                 (.carril-items, que el navegador no mide) y el
+                 desvanecido (hasta 60%) en la página — la opacidad
+                 no mueve cajas. Con dianas fijas el imán obligatorio
+                 del navegador trabaja solo y certero: fin de las
+                 pantallas cortadas, de los saltos de dos chips y del
+                 regreso contra el empuje. La página en reposo queda
+                 EXACTA al centro, sin escala residual. Con
+                 prefers-reduced-motion el efecto se apaga.
+                 · LA LLEGADA SE LEE COMO EL OJO (R161): la página
+                 llegada es la que tiene su centro más cerca del
+                 centro de la vista (rectángulos reales, scroll ya
+                 dentro), no la que sale de dividir la posición por
+                 el ancho — con anchos con decimales (zoom de
+                 Windows, DPR del teléfono) la división elegía al
+                 vecino.
+                 · EL CHIP EN VUELO SOLO SE ILUMINA (R161): los
+                 cruces de centro encienden la lucecita del chip
+                 (clase, nada más). Guardar la elección en el
+                 teléfono y avisar al resto (chips:change) pasa UNA
+                 vez, al asentarse; el pulso del dueño ya avisa por
+                 sí mismo.
+                 · ASENTAMIENTO (R161): 160ms sin scroll = reposo. Al
+                 reposo el carril despierta el imán dormido por el
+                 arrastre del ratón (ya en posición, sin pelear con
+                 ninguna animación) y avisa 'carril:asentado' — Lista
+                 repinta lo que esté VENCIDO (las páginas nacen
+                 pintadas: en reposo no hay nada que hacer).
+                 · RESPIRO VERTICAL DEL PULSO (R161): el scroll
+                 vertical vuelve arriba cuando el dueño PULSA un chip
+                 (antes de viajar), jamás como consecuencia del
+                 deslizamiento.
+                 · EL CHIP ES CONSECUENCIA: un click en un chip pide
+                 al carril que se deslice suave hasta esa página. El
+                 chip jamás mueve contenido a mano.
+                 · UN SOLO ANIMADOR (R161): el ratón hace de dedo en
+                 PC (GAS y GitHub) con el imán DORMIDO mientras
+                 arrastra (.arrastrando); al soltar, UNA animación
+                 lleva el carril a su página y el imán despierta ya
+                 en reposo — nunca dos que tiren de la soga a la vez.
+                 Solo despierta con puntero fino (mouse/pen): el
+                 dedo táctil sigue siendo nativo y no lo siente.
                  · IMÁGENES DE GRILLA A DEMANDA: las fotos de las
                  páginas solo bajan cuando la página se acerca a la
                  vista (poblarVisibles, llamada por Lista al pintar
@@ -62,7 +72,7 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento del área de
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
                  .fijo): los resultados viven en la página visible y
                  no se sale de ella hasta limpiar la búsqueda.
-VERSIÓN:         2.0
+VERSIÓN:         2.1
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
@@ -86,12 +96,6 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       return c ? c.querySelectorAll('.carril-pagina') : [];
     }
 
-    function anchoPagina() {
-      var c = carril();
-      if (!c) return 1;
-      return c.getBoundingClientRect().width || 1;
-    }
-
     function indiceDe(idChip) {
       var pgs = paginas();
       for (var i = 0; i < pgs.length; i++) {
@@ -103,6 +107,63 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     function reduceMovimiento() {
       return !!(window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    /* ============================================================
+       GEOMETRÍA DEL OJO (R161) · todo se mide con rectángulos
+       reales: el scroll ya está dentro de ellos, no hay divisiones
+       ni redondeos que elijan al vecino.
+       · paginaCentrada: la página cuyo centro está más cerca del
+         centro de la vista.
+       · scrollParaCentrar: el scrollLeft exacto para que una
+         página quede centrada (centro de página = centro de vista).
+       ============================================================ */
+    function paginaCentrada() {
+      var c = carril();
+      if (!c || c.hidden) return null;
+      var pgs = paginas();
+      if (!pgs.length) return null;
+
+      var crect = c.getBoundingClientRect();
+      var centroVista = crect.left + crect.width / 2;
+
+      var mejor = null;
+      var mejorD = Infinity;
+      for (var i = 0; i < pgs.length; i++) {
+        var r = pgs[i].getBoundingClientRect();
+        var d = Math.abs((r.left + r.width / 2) - centroVista);
+        if (d < mejorD) { mejorD = d; mejor = pgs[i]; }
+      }
+      return mejor;
+    }
+
+    function scrollParaCentrar(pag) {
+      var c = carril();
+      if (!c || !pag) return c ? c.scrollLeft : 0;
+      var r = pag.getBoundingClientRect();
+      var crect = c.getBoundingClientRect();
+      return c.scrollLeft + (r.left + r.width / 2) - (crect.left + crect.width / 2);
+    }
+
+    /* ============================================================
+       LA LUZ DEL CHIP (R161) · SOLO la clase .activo en la barra:
+       sin memoria, sin aviso, sin listeners. La memoria y el
+       aviso son del asentamiento (llegada) y del pulso del dueño.
+       ============================================================ */
+    var _chipLuz = null;
+
+    function _encenderLuz(idChip) {
+      if (!idChip || _chipLuz === idChip) return;
+      _chipLuz = idChip;
+
+      var contenedor = document.getElementById('filtros');
+      if (!contenedor) return;
+      var chips = contenedor.querySelectorAll('.chip');
+      for (var i = 0; i < chips.length; i++) {
+        var chip = chips[i];
+        if (chip.getAttribute('data-chip') === idChip) chip.classList.add('activo');
+        else chip.classList.remove('activo');
+      }
     }
 
     /* CONSTRUIR: nace en el primer chips:change con lienzo vivo.
@@ -127,12 +188,17 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         var items = document.createElement('div');
         items.className = 'carril-items';
         pag.appendChild(items);
+        pag._items = items;   /* la capa interior de la profundidad */
         c.appendChild(pag);
         if (chips[i].classList.contains('activo')) activo = idChip;
       }
 
+      _chipLuz = activo;
+      _chipAvisado = activo;
+
+      var pgs = paginas();
       var idx = indiceDe(activo);
-      if (idx > 0) c.scrollLeft = idx * anchoPagina();
+      if (idx > 0) c.scrollLeft = scrollParaCentrar(pgs[idx]);
 
       c.addEventListener('scroll', _enScroll, { passive: true });
       c.addEventListener('pointerdown', _alPresionar);
@@ -143,63 +209,26 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       _efecto();
 
-      /* R160 · nacimiento: agenda el primer asentamiento para
-         que los vecinos queden preparados desde el arranque
-         (sin marcar viaje: la página activa la pinta Lista ya). */
-      _programarAsentamiento(false);
+      /* nacimiento: agenda el primer asentamiento — Lista repinta
+         TODAS las páginas vencidas (nacen pintadas) en cuanto la
+         tira reposa. */
+      _agendaAsentar();
     }
 
     /* ============================================================
        PROFUNDIDAD + CHIP CONSECUENCIA (el rAF del scroll)
-       Cada página, según su distancia al centro: parallax 15%,
-       escala hasta -10%, opacidad hasta -60%. La página centrada
-       enciende SU chip solo (por el camino del click). Las
-       páginas cerca de la vista cobran sus fotos pendientes.
+       La profundidad vive en la CAPA INTERIOR (.carril-items):
+       parallax 15% y achique hasta 10% — el navegador no mide esa
+       capa para imantar, la diana queda quieta. El desvanecido
+       (hasta 60%) va en la página: opacidad no mueve cajas. La
+       página centrada en reposo queda EXACTA (cero transform) y
+       su chip solo se ILUMINA. Primero se lee (rects), después se
+       escribe: nada de reflow ida y vuelta dentro del bucle.
        ============================================================ */
     var _raf = null;
 
-    /* ============================================================
-       VIAJE Y ASENTAMIENTO (R160) · mientras el carril se mueve
-       está EN VIAJE: nadie pinta ni resetea en pleno vuelo (ese
-       trabajo abortaba los viajes —pantalla cortada, saltos de
-       dos chips, regreso contra el dedo—). Al reposo (160ms sin
-       eventos de scroll) avisa 'carril:asentado' con la página
-       centrada: Lista repinta la llegada y prepara vecinos.
-       ============================================================ */
-    var _enViaje = false;
-    var _timerAsentar = null;
-
-    function _programarAsentamiento(marcar) {
-      if (_timerAsentar) clearTimeout(_timerAsentar);
-      if (marcar) _enViaje = true;
-      _timerAsentar = setTimeout(_alAsentar, 160);
-    }
-
-    function _alAsentar() {
-      _timerAsentar = null;
-      _enViaje = false;
-
-      var c = carril();
-      if (!c || c.hidden || !c.classList.contains('carril')) return;
-
-      var pgs = paginas();
-      if (!pgs.length) return;
-
-      var w = anchoPagina();
-      var idx = Math.round(c.scrollLeft / w);
-      if (idx < 0) idx = 0;
-      if (idx > pgs.length - 1) idx = pgs.length - 1;
-
-      var idChip = pgs[idx].getAttribute('data-chip');
-      if (!idChip) return;
-
-      document.dispatchEvent(new CustomEvent('carril:asentado', {
-        detail: { idChip: idChip }
-      }));
-    }
-
     function _enScroll() {
-      _programarAsentamiento(true);
+      _agendaAsentar();
       if (_raf) return;
       _raf = requestAnimationFrame(function () {
         _raf = null;
@@ -211,33 +240,48 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var c = carril();
       if (!c || c.hidden) return;
 
-      var w = anchoPagina();
-      var centroVista = c.scrollLeft + w / 2;
       var pgs = paginas();
+      if (!pgs.length) return;
+
+      var crect = c.getBoundingClientRect();
+      var w = crect.width || 1;
+      var centroVista = crect.left + w / 2;
       var reduce = reduceMovimiento();
 
+      var rects = [];
       for (var i = 0; i < pgs.length; i++) {
+        rects.push(pgs[i].getBoundingClientRect());
+      }
+
+      var centrada = null;
+      var mejorD = Infinity;
+
+      for (i = 0; i < pgs.length; i++) {
         var pag = pgs[i];
-        var centroPag = pag.offsetLeft + w / 2;
+        var r = rects[i];
+        var centroPag = r.left + r.width / 2;
         var d = Math.abs(centroVista - centroPag);
-        /* POSE EXACTA EN REPOSO (R160): una desviación menor a
-           1.5px es redondeo del layout, no movimiento — ratio 0
-           para que la página centrada quede sin escala ni
-           corrimiento residual (adiós al temblor de los items). */
+        if (d < mejorD) { mejorD = d; centrada = pag; }
+
+        /* POSE EXACTA EN REPOSO: desviación menor a 1.5px es
+           redondeo del layout, no movimiento — ratio 0 y cero
+           transform en la capa interior (adiós al temblor). */
         var ratio = d < 1.5 ? 0 : Math.min(d / w, 1);
+        var items = pag._items || pag.querySelector('.carril-items');
 
         if (reduce) {
-          if (pag._tf !== '') { pag.style.transform = ''; pag._tf = ''; }
+          if (items && items._tf !== '') { items.style.transform = ''; items._tf = ''; }
           if (pag._op !== '') { pag.style.opacity = ''; pag._op = ''; }
         } else {
-          var escala = 1 - ratio * 0.10;
-          var opa = 1 - ratio * 0.6;
-          var dx = (centroPag - centroVista) * 0.15;
-          var tf = 'translateX(' + dx.toFixed(1) + 'px) scale(' + escala.toFixed(4) + ')';
-          var op = opa.toFixed(3);
-          /* solo se escribe si cambió: ni re-declaraciones de
-             estilo, ni transición persiguiendo el fotograma */
-          if (pag._tf !== tf) { pag.style.transform = tf; pag._tf = tf; }
+          if (items) {
+            var escala = 1 - ratio * 0.10;
+            var dx = (centroPag - centroVista) * 0.15;
+            var tf = ratio === 0 ? '' :
+              'translateX(' + dx.toFixed(1) + 'px) scale(' + escala.toFixed(4) + ')';
+            /* solo se escribe si cambió: ni re-declaraciones */
+            if (items._tf !== tf) { items.style.transform = tf; items._tf = tf; }
+          }
+          var op = (1 - ratio * 0.6).toFixed(3);
           if (pag._op !== op) { pag.style.opacity = op; pag._op = op; }
         }
 
@@ -245,17 +289,59 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         if (ratio < 1.05) _poblarPagina(pag);
       }
 
-      /* EL CHIP ES CONSECUENCIA: la página centrada enciende su
-         chip por el MISMO camino del click. */
-      var idx = Math.round(c.scrollLeft / w);
-      if (idx >= 0 && idx < pgs.length &&
-          window.Chips && typeof window.Chips.seleccionar === 'function' &&
-          typeof window.Chips.getChipActivo === 'function') {
-        var idChip = pgs[idx].getAttribute('data-chip');
-        if (window.Chips.getChipActivo() !== idChip) {
-          window.Chips.seleccionar(idChip);
+      /* EL CHIP EN VUELO SOLO SE ILUMINA: clase, nada más. */
+      if (centrada) _encenderLuz(centrada.getAttribute('data-chip'));
+    }
+
+    /* ============================================================
+       ASENTAMIENTO (R161) · 160ms sin scroll = reposo. Al reposo:
+       el imán dormido por el arrastre del ratón despierta YA EN
+       POSICIÓN (re-engancha donde está parado, sin pelear con
+       ninguna animación), la elección se guarda y se avisa UNA vez
+       (solo si la llegada no fue avisada por un pulso), y sale
+       'carril:asentado' para que Lista repinte lo vencido.
+       ============================================================ */
+    var _timerAsentar = null;
+    var _chipAvisado = null;
+    var _avisandoLlegada = false;
+
+    function _agendaAsentar() {
+      if (_timerAsentar) clearTimeout(_timerAsentar);
+      _timerAsentar = setTimeout(_alAsentar, 160);
+    }
+
+    function _alAsentar() {
+      _timerAsentar = null;
+
+      /* el dueño sigue sosteniendo el carril: nada está en reposo */
+      if (_drag) return;
+
+      var c = carril();
+      if (!c || c.hidden || !c.classList.contains('carril')) return;
+
+      /* el imán despierta ya en reposo: re-snap donde está parado */
+      c.classList.remove('arrastrando');
+
+      var centrada = paginaCentrada();
+      var idChip = centrada ? centrada.getAttribute('data-chip') : null;
+      if (!idChip) return;
+
+      if (_chipAvisado !== idChip) {
+        _chipAvisado = idChip;
+        /* aviso de llegada: el pulso del dueño no viaja por aquí */
+        _avisandoLlegada = true;
+        try {
+          if (window.Chips && typeof window.Chips.seleccionar === 'function') {
+            window.Chips.seleccionar(idChip);
+          }
+        } finally {
+          _avisandoLlegada = false;
         }
       }
+
+      document.dispatchEvent(new CustomEvent('carril:asentado', {
+        detail: { idChip: idChip }
+      }));
     }
 
     /* ============================================================
@@ -282,12 +368,16 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     function poblarVisibles() {
       var c = carril();
       if (!c || c.hidden) return;
-      var w = anchoPagina();
-      var centroVista = c.scrollLeft + w / 2;
       var pgs = paginas();
+      if (!pgs.length) return;
+
+      var crect = c.getBoundingClientRect();
+      var w = crect.width || 1;
+      var centroVista = crect.left + w / 2;
+
       for (var i = 0; i < pgs.length; i++) {
-        var centroPag = pgs[i].offsetLeft + w / 2;
-        if (Math.abs(centroVista - centroPag) < w * 1.05) {
+        var r = pgs[i].getBoundingClientRect();
+        if (Math.abs(r.left + r.width / 2 - centroVista) < w * 1.05) {
           _poblarPagina(pgs[i]);
         }
       }
@@ -295,11 +385,12 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
     /* ============================================================
        EL RATÓN HACE DE DEDO · puntero fino (mouse/pen) en PC.
-       Arrastre 1:1 con la sensación del modelo validado (x1.5),
-       imán apagado mientras arrastra (clase .arrastrando) y al
-       soltar la página más cercana se engancha al centro. El
-       click que el arrastre deje a medio camino se suprime.
-       El dedo táctil no pasa por aquí: su scroll ya es nativo.
+       Arrastre 1:1 con la sensación del modelo validado (x1.5) y
+       el imán DORMIDO (.arrastrando, sin scroll-snap) mientras
+       arrastra: al soltar, UNA animación lleva el carril a su
+       página y el imán despierta al asentarse, ya en reposo. El
+       click que el arrastre deje a medio camino se suprime. El
+       dedo táctil no pasa por aquí: su scroll ya es nativo.
        ============================================================ */
     var _drag = null;
     var _suprimir = false;
@@ -330,18 +421,25 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       var c = carril();
       if (!c) return;
-      c.classList.remove('arrastrando');
 
-      /* imán: la página más cercana al centro */
-      var destino = Math.round(c.scrollLeft / anchoPagina()) * anchoPagina();
+      /* UN SOLO ANIMADOR: el imán sigue dormido mientras la
+         animación lleva el carril a la página más cercana. */
+      var centrada = paginaCentrada();
+      var destino = centrada ? scrollParaCentrar(centrada) : c.scrollLeft;
+
       if (reduceMovimiento()) {
         c.scrollLeft = destino;
+        c.classList.remove('arrastrando');   /* sin animación: despierta ya */
       } else {
         try { c.scrollTo({ left: destino, behavior: 'smooth' }); }
-        catch (_) { c.scrollLeft = destino; }
+        catch (_) {
+          c.scrollLeft = destino;
+          c.classList.remove('arrastrando');
+        }
       }
 
       _suprimir = movio;
+      _agendaAsentar();   /* asentamiento garantizado aunque no se mueva */
     }
 
     function _suprimirClickTrasArrastre(e) {
@@ -352,44 +450,51 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       CHIPS:CHANGE · el chip pide el viaje.
-       Click en un chip → el carril se desliza suave hasta esa
-       página. Si el cambio llegó como consecuencia del propio
-       scroll, el carril ya está ahí (sin nada que hacer). La
-       PRIMERA vez que un chip se enciende con lienzo vivo, el
-       carril nace.
+       CHIPS:CHANGE · el PULSO del dueño (o el aviso de llegada).
+       · Aviso de llegada (_avisandoLlegada): el asentamiento ya
+         hizo su trabajo — nada que hacer.
+       · Carril sin nacer: nace aquí mismo.
+       · Pulso real: el scroll vertical vuelve arriba ANTES de
+         viajar (respiro del pulso) y el carril se desliza suave
+         hasta la página pedida.
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
       var c = carril();
       if (!c) return;
 
+      if (_avisandoLlegada) return;   /* consecuencia del asentamiento */
+
       if (!c.classList.contains('carril')) {
+        _chipLuz = idChip;
+        _chipAvisado = idChip;
         construir();
         return;
       }
 
+      _chipAvisado = idChip;   /* el pulso avisa por sí mismo */
+      _encenderLuz(idChip);    /* la clase ya la puso Chips: no-op */
+
+      var pgs = paginas();
       var idx = indiceDe(idChip);
       if (idx < 0) return;
 
-      var w = anchoPagina();
-      var actual = Math.round(c.scrollLeft / w);
-      if (actual === idx) return;   /* consecuencia del scroll: ya llegó */
+      /* RESPIRO VERTICAL DEL PULSO: arriba antes de viajar */
+      var wrap = document.querySelector('.secciones-wrap');
+      if (wrap) wrap.scrollTop = 0;
+
+      var destino = pgs[idx];
+      if (paginaCentrada() === destino) return;   /* ya está en ella */
 
       if (reduceMovimiento()) {
-        c.scrollLeft = idx * w;
+        c.scrollLeft = scrollParaCentrar(destino);
       } else {
-        try { c.scrollTo({ left: idx * w, behavior: 'smooth' }); }
-        catch (_) { c.scrollLeft = idx * w; }
+        try { c.scrollTo({ left: scrollParaCentrar(destino), behavior: 'smooth' }); }
+        catch (_) { c.scrollLeft = scrollParaCentrar(destino); }
       }
     });
 
     return {
-      poblarVisibles: poblarVisibles,
-      enViaje: function () { return _enViaje; },
-      construido: function () {
-        var c = carril();
-        return !!(c && c.classList.contains('carril'));
-      }
+      poblarVisibles: poblarVisibles
     };
   })();

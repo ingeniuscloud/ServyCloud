@@ -28,7 +28,7 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.43.0
+VERSIÓN:         1.44.0
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
@@ -347,10 +347,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
                   typeof window.Lista.pintarBusqueda === 'function') {
                 window.Lista.pintarBusqueda(terminoVivo, false);
               } else {
-                var chip = (window.Chips &&
-                            typeof window.Chips.getChipActivo === 'function')
-                  ? window.Chips.getChipActivo() : null;
-                window.Lista.pintar(chip);
+                /* R161 · las páginas NACEN PINTADAS: el catálogo
+                   nuevo repinta la TIRA COMPLETA (pintarTodo),
+                   no solo la página visible. */
+                window.Lista.pintarTodo(null);
               }
             }
           }
