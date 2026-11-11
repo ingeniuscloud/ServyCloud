@@ -12,7 +12,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
 VERSIÓN:         2.19
-CAMBIOS:         R153: el NOMBRE DEL PARTNER del item viste la maestra .textoSecundario (la CLASE la pone montarItem, Lista_Script) — .lista-item .marca deja de vestir las variables de textoPrimario/enlaces y habla el idioma de textoSecundario (respaldo de la maestra, cero contradicción). Título y «Ver publicación» intactos. R148 (hotfix 1): VERDE #16a34a para el overlay de la grilla — override .grilla-badge.badgeNuevo SELECTOR COMPUESTO (sin espacio): el badge pinta ambas clases sobre el MISMO span (class="grilla-badge badgeNuevo"), así que el combinador descendente de la primera versión (.grilla-badge .badgeNuevo) nunca matcheaba y la píldora seguía naranja. El naranja de la maestra se perdía sobre fotos cálidas, naranja sobre naranja. ALCANCE EXACTO: solo la imagen de la grilla; la maestra .badgeNuevo del Core sigue naranja y las píldoras «Activo» de los sheets Ciudad y Ordenar NO se enteran. Letra, forma y altura intactas (solo fondo). R145 (barrido :active) y R140 (grilla) intactos. Historial: bitácora/versiones.
+CAMBIOS:         R155: la marca del partner en los items viste textoSecundario — la voz gris del sistema — en vez de textoPrimario (orden del dueño: el nombre acompaña, no compite con el título del post). Muere el override móvil de 12px en el @media 360px: la marca viste --size-enlaces en TODO ancho (una sola ley para su letra). R148 (hotfix 1) y R145 (barrido :active) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura), Promo_CSS.html (regla
                  .badge re-estilizada)
@@ -393,12 +393,11 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     display: flex;
     align-items: center;
     gap: 5px;
-    /* R153 · el partner viste la maestra .textoSecundario (la
-       CLASE la pone montarItem en el span interior): aquí las
-       variables de respaldo hablan el MISMO idioma — el título
-       manda y el partner acompaña. */
-    font-size: var(--size-textoSecundario);
-    font-weight: var(--weight-textoSecundario);
+    font-size: var(--size-enlaces);
+    font-weight: var(--weight-enlaces);
+    /* R155 · textoSecundario: el partner acompaña con la voz
+       gris del sistema (antes textoPrimario competía con el
+       título). Misma letra y peso de siempre. */
     color: var(--color-textoSecundario);
     min-width: 0;
   }
@@ -653,7 +652,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-item { padding: 12px 14px; }
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
     .lista-item .estrella-num { font-size: var(--size-cita); }
-    .lista-item .marca { font-size: 12px; }
+    /* R155 · la marca ya NO achica en móvil: viste
+       --size-enlaces en todo ancho (el override 12px murió). */
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
     .lista-item .item-avatar { width: 44px; height: 44px; }

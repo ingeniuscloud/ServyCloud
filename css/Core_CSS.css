@@ -5,7 +5,7 @@ ESPEJO GITHUB:   github/css/Core_CSS.css (subir a GitHub Pages; editar en GAS y 
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra (clases .tituloPost…badgeNuevo/badgeUsado), voz única de los placeholders, del modo móvil del lienzo y de la notificación flotante centralizada (.notificacionFlotante).
 VERSIÓN:         2.17
-CAMBIOS:         R153: el aviso cambia de «alarma» a «aviso de calidad» — piel CRISTAL aprobada punto por punto por el dueño: fondo ámbar suave rgba(254,243,199,0.85) con blur detrás (backdrop-filter: el contenido de atrás se difumina y el texto siempre se lee), borde fino 1px rgba(253,230,138,0.9) (sin él el pill translúcido se diluye sobre fondos claros), texto vistiendo .textoPrimario con el color MARRÓN del look (#92400E — contraste ~7:1 sobre el ámbar; tamaño/peso siguen siendo los de la maestra), X DE CERRAR SIN CIRCULITO (el blanco ya no aporta sobre crema y ensuciaba el cristal): glifo close del repositorio directo en #92400E, y sombra suavizada (la pesada era del amarillo neón). Forma píldora 999px, posición (68px + safe-area), .visible y prefers-reduced-motion: intactos. R151/R150/R149 intactas. Historial: bitácora/versiones.
+CAMBIOS:         R155: la píldora del aviso pasa a CRISTAL (orden del dueño): fondo ámbar translúcido rgba(254,243,199,0.85) + blur (backdrop-filter con su prefijo -webkit- para Safari), borde 1px rgba(253,230,138,0.9) y TINTA ÚNICA #92400E para el texto (.textoPrimario scoped) y la ✕ — muere el circulito blanco (el glifo queda directo sobre el cristal), sombra suavizada 0.32 → 0.18 (capa corta a 0.10) y altura 52px → 44px (min-height border-box; el bottom 68px de la R152 SE MANTIENE: más aire sobre la barra de Safari). Nacen además los apoyos visuales del SWIPE de chips (el gesto vive en Core_Script): .chip.prendido (anticipo naranja del chip destino al cruzar el umbral), .swipe-capa (capa fija del gesto), .lista-wrap.swipe-saliente (la lista saliente se atenúa 1.00 → 0.75), .swipe-oculto, .swipe-asoma (la orilla REAL de la pantalla destino) y las llegadas .llega-derecha/.llega-izquierda con su reduced-motion. R151 (píldora, 999px, .visible), R148 (paridad de altura) y R147 (badges) intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -399,38 +399,42 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .mk-sheet-top:active { opacity: 0.5; }
 
   /* ============================================================
-     R151 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
+     R151→R155 · NOTIFICACIÓN FLOTANTE · .notificacionFlotante
      Clase CENTRALIZADA y UNIVERSAL para los avisos flotantes de
      la app (hoy: aviso «te respondió»; mañana: las funciones
      que nazcan) — un solo sitio manda. Paquete validado por el
-     dueño (R149 animación · R151 repintado y AFINADO en
-     pantalla: píldora 999px · X blanca · subida 52px):
+     dueño (R149 animación · R151 repintado y afinado en
+     pantalla · R155 CRISTAL):
      · POSICIÓN FIJA INFERIOR DERECHA INCLUIDA en la clase
        (decisión del dueño: las futuras la heredan o la
        sobrescriben). Respeta el safe-area del móvil (misma
-       gramática de .mk-sheet-top) y va SUBIDA 52px (afinación
-       del dueño: el borde superior que tenía ahora es su borde
-       inferior — Safari móvil pinta su barra de URL abajo y el
-       aviso se confundía/se tapaba).
-     · CRISTAL (R153, piel aprobada por el dueño): fondo ámbar
-       suave rgba(254,243,199,0.85) con BLUR detrás — el
-       contenido de la app se difumina tras el pill y el texto
-       siempre se lee. Borde fino rgba(253,230,138,0.9): sin él
-       el pill translúcido se diluye sobre fondos claros.
-       Sombra suave (la pesada era del amarillo neón).
+       gramática de .mk-sheet-top). El bottom 68px de la R152
+       SE MANTIENE (R155): el aire extra es de la barra de
+       Safari, que pinta su URL/círculos abajo.
+     · CRISTAL (R155, orden del dueño): fondo ámbar translúcido
+       rgba(254,243,199,0.85) + blur — backdrop-filter con su
+       prefijo -webkit-, que es el que Safari entiende — y
+       borde 1px rgba(253,230,138,0.9): se adivina lo que hay
+       detrás. Adiós el amarillo sólido #FFE600.
+     · ALTURA 44px (R155): min-height border-box (antes 52px
+       con padding 12px vertical) — el aire vertical lo pone
+       la caja (padding 0): menos alta, mismo aire lateral.
+     · TINTA ÚNICA #92400E (R155): el texto (.textoPrimario
+       dentro del aviso, regla scoped de este bloque) y la ✕
+       visten el mismo ámbar oscuro. Muere el circulito blanco
+       de la X: el glifo queda DIRECTO sobre el cristal.
+     · SOMBRA SUAVIZADA (R155): la principal baja 0.32 → 0.18
+       y su capa corta 0.18 → 0.10 — el cristal flota, no
+       pesa.
      · TIPOGRAFÍA CERO HARDCODEADA: la línea de texto viste
        .textoPrimario — la voz del sistema manda dentro del
-       aviso (tamaño y peso de la maestra); el COLOR lo pinta
-       el aviso (#92400E, el marrón del look — contraste ~7:1
-       sobre el ámbar).
-     · X DE CERRAR (.avisoCerrar, la monta el aviso): SIN
-       CIRCULITO (el blanco ya no aporta sobre crema y
-       ensuciaba el cristal) — el glifo close del repositorio
-       Iconos directo en el MARRÓN del texto.
+       aviso. Solo su COLOR lo fija el cristal (regla scoped;
+       el tamaño y el peso siguen siendo del sistema).
+     · X DE CERRAR (.avisoCerrar, la monta el aviso): glifo
+       close del repositorio Iconos, fondo transparente, en la
+       MISMA tinta #92400E del texto.
      · FORMA: PÍLDORA — border-radius 999px, la MISMA geometría
-       del CTA .cta-reservar de un post (afinación del dueño) +
-       sombra flotante NEUTRA oscura (la roja R149 se veía
-       sucia sobre amarillo).
+       del CTA .cta-reservar de un post.
      · ANIMACIÓN: entra subiendo suave desde abajo y sale igual
        (misma gramática .visible de .mk-sheet-top). Con
        prefers-reduced-motion el movimiento se apaga (solo
@@ -449,28 +453,26 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .notificacionFlotante {
     position: fixed !important;
     right: 16px;
-    /* R151 AFINADA: 16px de aire + 52px de píldora — el borde
-       superior que tenía el aviso es ahora su borde inferior
-       (Safari móvil pinta URL/círculos abajo y lo tapaba). */
+    /* R152 · SE MANTIENE (R155): 68px de aire sobre la barra
+       de Safari (URL/círculos abajo). */
     bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+    min-height: 44px;   /* R155: 52px → 44px */
     max-width: min(320px, calc(100vw - 32px));
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 16px;
-    /* R153 · CRISTAL: ámbar suave translúcido + blur detrás
-       (-webkit- para Safari) — la app se ve difuminada tras
-       el pill y la letra manda. */
+    padding: 0 16px;
+    /* R155 · CRISTAL: ámbar translúcido + blur (el prefijo
+       -webkit- es el que Safari entiende) + borde ámbar. */
     background: rgba(254, 243, 199, 0.85) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    text-align: left !important;
-    /* R153 · borde fino ámbar: el contorno que sostiene al
-       pill translúcido sobre fondos claros. */
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     border: 1px solid rgba(253, 230, 138, 0.9);
+    text-align: left !important;
+    color: #92400E;   /* R155 · la tinta del cristal */
     border-radius: 999px !important;
-    /* R153 · sombra suave: acompaña la ligereza del cristal
-       (la sombra pesada 0.32 era del amarillo neón). */
+    /* R155 · sombra suavizada: 0.32 → 0.18 (y 0.18 → 0.10) */
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18), 0 3px 10px rgba(15, 23, 42, 0.10);
     z-index: 9999;
     opacity: 0;
@@ -488,9 +490,15 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
   }
 
-  /* R153 · la X SIN CIRCULITO: sobre el crema el blanco ya no
-     aporta y ensuciaba el cristal — el glifo close directo en
-     el marrón del texto (#92400E). Mismo tamaño táctil 28px. */
+  /* R155 · el texto viste .textoPrimario (la voz del sistema)
+     pero DENTRO del aviso su color es la tinta del cristal. */
+  .notificacionFlotante .textoPrimario {
+    color: #92400E;
+  }
+
+  /* R155 · la X: SIN circulito (muere el blanco de la R152) —
+     el glifo close queda directo sobre el cristal, en la
+     MISMA tinta #92400E del texto. */
   .notificacionFlotante .avisoCerrar {
     width: 28px;
     height: 28px;
@@ -500,18 +508,9 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     justify-content: center;
     padding: 0;
     border: none;
-    border-radius: 50%;
     background: transparent;
     color: #92400E;
     cursor: pointer;
-  }
-
-  /* R153 · el texto del aviso: tipografía de la maestra
-     .textoPrimario (tamaño/peso intactos); el COLOR lo manda
-     el look del aviso (#92400E) — por eso esta regla vence el
-     color natural de la maestra SOLO aquí dentro. */
-  .notificacionFlotante .textoPrimario {
-    color: #92400E !important;
   }
   .notificacionFlotante .avisoCerrar svg {
     width: 12px;
@@ -530,4 +529,63 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
       transform: none;
       transition: opacity 0.2s ease, visibility 0s;
     }
+  }
+
+  /* ============================================================
+     R155 · SWIPE DE CHIPS · apoyos visuales del gesto
+     El gesto vive en Core_Script (window.SwipeChips); aquí
+     viven sus caras: el anticipo del chip destino, la capa
+     fija del gesto y las llegadas.
+     · .chip.prendido: al cruzar el umbral el chip destino se
+       PRENDE — anticipo naranja (el activo sólido lo pone
+       Chips_CSS al confirmar; el prendido es la promesa).
+     · .swipe-capa: capa FIJA que contiene los clones del
+       gesto (el saliente congelado y el asoma del destino).
+       Fija para que un salto de scroll del contenedor no
+       baile lo congelado. pointer-events none: el dedo
+       manda, no los clones.
+     · .lista-wrap.swipe-saliente: la lista que se va se
+       ATENÚA 1.00 → 0.75 al cruzar el umbral.
+     · .lista-wrap.swipe-oculto: la lista real se esconde
+       mientras su lugar lo toma el gesto (el asoma es clon
+       REAL del render destino).
+     · .llega-derecha / .llega-izquierda: al confirmar, la
+       lista nueva LLEGA desde el lado del gesto. Con
+       prefers-reduced-motion la entrada se apaga.
+     ============================================================ */
+  .chip.prendido {
+    background: #ffedd5;
+    border-color: #f97316;
+    color: #c2410c;
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.28);
+  }
+  .swipe-capa {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .lista-wrap.swipe-saliente {
+    opacity: 0.75;
+    transition: opacity 0.18s ease;
+  }
+  .lista-wrap.swipe-oculto { visibility: hidden; }
+  @keyframes listaLlegaDerecha {
+    from { opacity: 0.4; transform: translateX(64px); }
+    to   { opacity: 1;   transform: translateX(0); }
+  }
+  @keyframes listaLlegaIzquierda {
+    from { opacity: 0.4; transform: translateX(-64px); }
+    to   { opacity: 1;   transform: translateX(0); }
+  }
+  .lista-wrap.llega-derecha {
+    animation: listaLlegaDerecha 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  .lista-wrap.llega-izquierda {
+    animation: listaLlegaIzquierda 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lista-wrap.llega-derecha,
+    .lista-wrap.llega-izquierda { animation: none; }
   }
