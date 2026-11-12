@@ -11,27 +11,35 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    chip visible (#filtros .chip), todas nacen
                    pintadas; el desplazamiento no carga nada, solo
                    viaja.
-                 · EL NAVEGADOR IMANTA: el scroll-snap del CSS
-                   clava cada página al llegar; el JS no pelea con
-                   el dedo.
+                 · EL IMÁN CLAVA AL SOLTAR: mientras el arrastre
+                   camina, el imán duerme (.arrastrando); al soltar,
+                   UNA animación lleva el carril a la página más
+                   cercana y el scroll-snap vuelve a mandar.
                  · EL CHIP SE SINCRONIZA: mientras el carril viaja,
                    el chip de la página visible se ilumina (clase,
                    nada más); al asentarse (160ms sin scroll) la
                    elección se guarda y se avisa UNA vez
                    (chips:change) — el pulso del dueño avisa por sí
                    mismo.
+                 · LA LUZ NO REGRESA: en cuanto el destino queda
+                   decidido (al soltar el arrastre o al pulsar un
+                   chip), la luz se FIJA en ese chip hasta el
+                   asentamiento — jamás vuelve al chip anterior ni
+                   parpadea a mitad del viaje.
                  · GEOMETRÍA SIMPLE: todas las páginas miden lo
                    mismo que la vista — la página visible es
                    scrollLeft dividido por ese ancho, redondeado y
                    clavado al rango real de páginas. El viaje a una
                    página es ese mismo número multiplicado de
                    vuelta.
-                 · AXIS LOCK EN PC (ratón/pen): el arrastre decide
-                   eje con los primeros píxeles; si el gesto es
-                   vertical, suelta el carril para que la lista
-                   suba y baje; si es horizontal, mueve el carril
-                   (x1.5) y reserva el eje. El dedo táctil no pasa
-                   por aquí: su scroll ya es nativo.
+                 · AXIS LOCK (dedo, ratón y pen): el arrastre decide
+                   eje con los primeros píxeles decisivos; si el
+                   gesto es vertical, suelta el carril para que la
+                   lista suba y baje; si es horizontal, mueve el
+                   carril (x1.5) y reserva el eje. EL DEDO VIAJA POR
+                   EL MISMO CAMINO QUE EL RATÓN: una sola ley para
+                   todos los punteros — lo que en PC es perfecto, en
+                   el teléfono es LO MISMO.
                  · DIRECCIÓN FÍSICA: empujar el listado a la
                    IZQUIERDA muestra la lista de la DERECHA; a la
                    derecha, la de la IZQUIERDA. Los extremos no
@@ -55,7 +63,7 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
                    .fijo): los resultados viven en la página
                    visible hasta limpiar la búsqueda.
-VERSIÓN:         3.0
+VERSIÓN:         3.1
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -91,16 +99,22 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
        viaje a una página es ese mismo número multiplicado de
        vuelta. Nada más.
        ============================================================ */
-    function indiceActivo() {
+    function indiceDeValor(v) {
       var c = carril();
-      if (!c || c.hidden) return -1;
+      if (!c) return -1;
       var n = paginas().length;
       var w = c.clientWidth;
       if (!n || !w) return -1;
-      var i = Math.round(c.scrollLeft / w);
+      var i = Math.round(v / w);
       if (i < 0) i = 0;
       if (i > n - 1) i = n - 1;
       return i;
+    }
+
+    function indiceActivo() {
+      var c = carril();
+      if (!c || c.hidden) return -1;
+      return indiceDeValor(c.scrollLeft);
     }
 
     function irAPagina(i, suave) {
@@ -108,6 +122,8 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       if (!c || i < 0) return;
       var left = i * c.clientWidth;
       if (!suave) { c.scrollLeft = left; return; }
+      var pag = paginas()[i];
+      if (pag) fijarLuz(pag.getAttribute('data-chip'));
       try { c.scrollTo({ left: left, behavior: 'smooth' }); }
       catch (_) { c.scrollLeft = left; }
     }
@@ -116,8 +132,19 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
        LA LUZ DEL CHIP · SOLO la clase .activo en la barra mientras
        el carril viaja. Guardar la elección y avisar al resto es
        del asentamiento (y del pulso del dueño).
+       LA LUZ FIJA · decidido el destino (soltar el arrastre o
+       pulsar un chip), la luz se congela en ese chip hasta el
+       asentamiento: ningún cálculo intermedio del viaje la
+       devuelve al chip anterior — el destello del teléfono muere
+       aquí.
        ============================================================ */
     var _chipLuz = null;
+    var _luzFija = null;
+
+    function fijarLuz(idChip) {
+      _luzFija = idChip;
+      _encenderLuz(idChip);
+    }
 
     function _encenderLuz(idChip) {
       if (!idChip || _chipLuz === idChip) return;
@@ -161,6 +188,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       _chipLuz = activo;
       _chipAvisado = activo;
+      _luzFija = null;
 
       var idx = indiceDe(activo);
       if (idx > 0) irAPagina(idx, false);
@@ -186,7 +214,9 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
        ligeras: el chip de la página visible se ILUMINA (clase,
        nada más) y las fotos de las páginas que se asoman cobran.
        Nada se mueve, nada se pinta, nada se resetea en pleno
-       vuelo. Primero se lee, después se escribe.
+       vuelo. Primero se lee, después se escribe. Con la luz FIJA
+       (destino decidido) la iluminación espera: nadie devuelve la
+       luz a mitad del viaje.
        ============================================================ */
     var _raf = null;
 
@@ -200,10 +230,12 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     function _alVolar() {
-      var i = indiceActivo();
-      if (i >= 0) {
-        var pag = paginas()[i];
-        if (pag) _encenderLuz(pag.getAttribute('data-chip'));
+      if (!_luzFija) {
+        var i = indiceActivo();
+        if (i >= 0) {
+          var pag = paginas()[i];
+          if (pag) _encenderLuz(pag.getAttribute('data-chip'));
+        }
       }
       poblarVisibles();
     }
@@ -236,7 +268,12 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       var i = indiceActivo();
       if (i < 0) return;
-      var idChip = paginas()[i].getAttribute('data-chip');
+
+      /* el destino DECIDIDO manda sobre cualquier lectura tardía
+         del teléfono: la luz termina donde se decidió, una vez */
+      var idChip = _luzFija || paginas()[i].getAttribute('data-chip');
+      _luzFija = null;
+      _encenderLuz(idChip);
 
       if (_chipAvisado !== idChip) {
         _chipAvisado = idChip;
@@ -296,31 +333,34 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       EL RATÓN HACE DE DEDO EN PC (mouse/pen) · AXIS LOCK: el
-       arrastre decide eje con los primeros píxeles — si el gesto
-       es vertical, suelta el carril para que la lista suba y baje;
-       si es horizontal, mueve el carril (x1.5) y reserva el eje.
-       Al soltar, UNA animación lleva el carril a la página más
-       cercana y el imán vuelve a mandar. El click que el arrastre
-       deje a medio camino se suprime. El dedo táctil no pasa por
-       aquí: su scroll ya es nativo.
+       EL DEDO Y EL RATÓN HACEN LO MISMO (touch/mouse/pen) ·
+       AXIS LOCK: el arrastre decide eje con los primeros píxeles
+       decisivos — si el gesto es vertical, suelta el carril para
+       que la lista suba y baje; si es horizontal, mueve el carril
+       (x1.5) y reserva el eje. Al soltar, UNA animación lleva el
+       carril a la página más cercana y el imán vuelve a mandar.
+       El click que el arrastre deje a medio camino se suprime.
+       Un solo camino para todos los punteros: el dedo deja de
+       fiarse del imán nativo del teléfono (que revira y rebota)
+       y obedece la misma ley que el ratón de la PC.
        ============================================================ */
     var _drag = null;
     var _suprimir = false;
 
     function _alPresionar(e) {
-      if (e.pointerType === 'touch') return;   /* el dedo: nativo */
       if (_drag) return;
       var c = carril();
       if (!c || c.hidden || c.classList.contains('fijo')) return;
 
+      _luzFija = null;   /* gesto nuevo: la luz vuelve a vivir */
       _drag = {
         id: e.pointerId,
         x0: e.clientX,
         y0: e.clientY,
         scroll0: c.scrollLeft,
         eje: null,
-        movio: false
+        movio: false,
+        ultimo: null
       };
       c.classList.add('arrastrando');
       try { c.setPointerCapture(e.pointerId); } catch (_) {}
@@ -331,8 +371,10 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var dx = e.clientX - _drag.x0;
       var dy = e.clientY - _drag.y0;
 
-      /* AXIS LOCK: los primeros píxeles deciden el eje */
+      /* AXIS LOCK: los primeros píxeles DECISIVOS (6) eligen el
+         eje; antes de eso solo es ruido de dedo — nada se decide */
       if (!_drag.eje) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         if (Math.abs(dx) <= Math.abs(dy)) { _soltarEjeY(e); return; }
         _drag.eje = 'x';
       }
@@ -341,7 +383,10 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       if (Math.abs(dx) > 8) _drag.movio = true;
       if (e.cancelable) e.preventDefault();
       var c = carril();
-      if (c) c.scrollLeft = _drag.scroll0 - dx * 1.5;
+      if (c) {
+        _drag.ultimo = _drag.scroll0 - dx * 1.5;
+        c.scrollLeft = _drag.ultimo;
+      }
     }
 
     function _soltarEjeY(e) {
@@ -356,6 +401,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       if (!_drag || (e.pointerId !== undefined && e.pointerId !== _drag.id)) return;
       var movio = _drag.movio;
       var fueHorizontal = _drag.eje === 'x';
+      var ultimo = _drag.ultimo;
       _drag = null;
 
       var c = carril();
@@ -364,8 +410,12 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       c.classList.remove('arrastrando');   /* el imán vuelve a mandar */
 
       if (fueHorizontal) {
-        /* la página más cercana, UNA animación */
-        irAPagina(indiceActivo(), true);
+        /* la página más cercana AL ÚLTIMO VALOR ESCRITO, UNA
+           animación — sin releer scrollLeft (en el teléfono la
+           lectura llega tarde y discute con la pluma) */
+        irAPagina(indiceDeValor(
+          (ultimo === null || ultimo === undefined) ? c.scrollLeft : ultimo
+        ), true);
       }
 
       _suprimir = movio;

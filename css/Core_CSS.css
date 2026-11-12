@@ -9,7 +9,7 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  lienzo, de la notificación flotante centralizada
                  (.notificacionFlotante, cristal 0.40) y del CARRIL
                  de páginas del área de items (.carril).
-VERSIÓN:         2.23
+VERSIÓN:         2.24
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -531,11 +531,10 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      EL MODELO: pantallas cargadas, desplazamiento lateral
      simple, chip sincronizado. #listaWrap es una TIRA de páginas
      una al lado de la otra, una por chip (las crea Core_Swipe).
-     El desplazamiento es NATIVO con imán: el dedo arrastra 1:1 y
-     al soltar la página más cercana se clava (scroll-snap).
-     Empujar el listado a la IZQUIERDA muestra la lista de la
-     DERECHA; a la derecha, la de la IZQUIERDA. Los extremos no
-     ciclan.
+     El arrastre camina con el dedo (y con el ratón) y al soltar
+     la página más cercana se clava. Empujar el listado a la
+     IZQUIERDA muestra la lista de la DERECHA; a la derecha, la
+     de la IZQUIERDA. Los extremos no ciclan.
      · EL IMÁN SOLO APUNTA A SITIOS ALCANZABLES: la página se
        clava por su MARCO (start) — el punto de la primera página
        es el propio inicio del carril y el de la última el final
@@ -554,11 +553,11 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        teléfono.
      · LA PÁGINA LLEVA overflow hidden: cada página recorta lo
        suyo y nada de una página asoma sobre la vecina.
-     · EL RATÓN HACE DE DEDO en PC (GAS y GitHub): AXIS LOCK en
-       Core_Swipe — el arrastre decide eje con los primeros
-       píxeles; mientras arrastra (.arrastrando) el imán queda
-       DORMIDO y al soltar UNA animación lleva el carril a su
-       página. El dedo táctil no lo siente.
+     · EL DEDO Y EL RATÓN HACEN LO MISMO (GAS y GitHub): AXIS
+       LOCK en Core_Swipe — el arrastre decide eje con los
+       primeros píxeles; mientras arrastra (.arrastrando) el imán
+       queda DORMIDO y al soltar UNA animación lleva el carril a
+       su página. Una sola ley para el dedo y el ratón.
      · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
        resultados viven en la página visible.
      · ASENTAMIENTO: al reposo el carril avisa 'carril:asentado'
