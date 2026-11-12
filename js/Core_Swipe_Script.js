@@ -4,64 +4,58 @@ ARCHIVO:         Core_Swipe_Script.html
 ESPEJO GITHUB:   github/js/Core_Swipe_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniousCloud | ServyCloud
 RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
-                 área de items. La lista es una TIRA de páginas una
-                 al lado de la otra, una por chip visible, dentro de
-                 un carril horizontal (#listaWrap convertido en
-                 carril con scroll nativo + imán, Core_CSS .carril).
-                 · PAGINACIÓN LATERAL PLANA: todas las páginas son
-                   iguales — mismo tamaño, mismo brillo, siempre
-                   completas. El único movimiento es el viaje suave
-                   de una página a la siguiente.
-                 · EL DEDO MANDA: arrastrar desplaza el carril 1:1 y
-                   al soltar la página más cercana se imanta al centro
-                   (scroll-snap). El navegador hace el trabajo: sin
-                   clones, sin muros, sin nada congelado.
-                 · DIRECCIÓN FÍSICA: empujar el listado a la
-                   IZQUIERDA muestra la lista de la DERECHA; empujar a
-                   la derecha, la de la IZQUIERDA. Los extremos no
-                   ciclan.
-                 · EL OJO: la página llegada es la que tiene su centro
-                   más cerca del centro de la vista (rectángulos
-                   reales, scroll ya dentro) — sin divisiones que
-                   elijan al vecino con anchos con decimales (zoom de
-                   Windows, DPR del teléfono).
-                 · EL CHIP EN VUELO SOLO SE ILUMINA: los cruces de
-                   centro encienden la lucecita del chip (clase, nada
-                   más). Guardar la elección en el teléfono y avisar
-                   al resto (chips:change) pasa UNA vez, al
-                   asentarse; el pulso del dueño ya avisa por sí
+                 área de items. EL MODELO: pantallas cargadas,
+                 desplazamiento lateral simple, chip sincronizado.
+                 Nada más.
+                 · PANTALLAS CARGADAS: la tira es una página por
+                   chip visible (#filtros .chip), todas nacen
+                   pintadas; el desplazamiento no carga nada, solo
+                   viaja.
+                 · EL NAVEGADOR IMANTA: el scroll-snap del CSS
+                   clava cada página al llegar; el JS no pelea con
+                   el dedo.
+                 · EL CHIP SE SINCRONIZA: mientras el carril viaja,
+                   el chip de la página visible se ilumina (clase,
+                   nada más); al asentarse (160ms sin scroll) la
+                   elección se guarda y se avisa UNA vez
+                   (chips:change) — el pulso del dueño avisa por sí
                    mismo.
-                 · ASENTAMIENTO: 160ms sin scroll = reposo. Al reposo
-                   el carril despierta el imán dormido por el
-                   arrastre del ratón (ya en posición, sin pelear con
-                   ninguna animación) y avisa 'carril:asentado' —
-                   Lista repinta lo que esté VENCIDO (las páginas
-                   nacen pintadas: en reposo no hay nada que hacer).
+                 · GEOMETRÍA SIMPLE: todas las páginas miden lo
+                   mismo que la vista — la página visible es
+                   scrollLeft dividido por ese ancho, redondeado y
+                   clavado al rango real de páginas. El viaje a una
+                   página es ese mismo número multiplicado de
+                   vuelta.
+                 · AXIS LOCK EN PC (ratón/pen): el arrastre decide
+                   eje con los primeros píxeles; si el gesto es
+                   vertical, suelta el carril para que la lista
+                   suba y baje; si es horizontal, mueve el carril
+                   (x1.5) y reserva el eje. El dedo táctil no pasa
+                   por aquí: su scroll ya es nativo.
+                 · DIRECCIÓN FÍSICA: empujar el listado a la
+                   IZQUIERDA muestra la lista de la DERECHA; a la
+                   derecha, la de la IZQUIERDA. Los extremos no
+                   ciclan.
+                 · UN CHIP POR GESTO: cada página frena la inercia
+                   (scroll-snap-stop en Core_CSS) — un flick
+                   violento avanza UNA página, nunca la tira.
                  · RESPIRO VERTICAL DEL PULSO: el scroll vertical
-                   vuelve arriba cuando el dueño PULSA un chip (antes
-                   de viajar), jamás como consecuencia del
+                   vuelve arriba cuando el dueño PULSA un chip
+                   (antes de viajar), jamás como consecuencia del
                    deslizamiento.
-                 · EL CHIP ES CONSECUENCIA: un click en un chip pide
-                   al carril que se deslice suave hasta esa página.
-                   El chip jamás mueve contenido a mano.
-                 · UN SOLO ANIMADOR: el ratón hace de dedo en PC (GAS
-                   y GitHub) con el imán DORMIDO mientras arrastra
-                   (.arrastrando); al soltar, UNA animación lleva el
-                   carril a su página y el imán despierta ya en
-                   reposo — nunca dos que tiren de la soga a la vez.
-                   Solo despierta con puntero fino (mouse/pen): el
-                   dedo táctil sigue siendo nativo y no lo siente.
-                 · IMÁGENES DE GRILLA A DEMANDA: las fotos de las
-                   páginas solo bajan cuando la página se acerca a la
-                   vista (poblarVisibles, llamada por Lista al pintar
-                   y por el propio carril al deslizar) — agilidad sin
-                   gastar datos en páginas que nadie mira. La memoria
+                 · EL CHIP ES CONSECUENCIA: un click en un chip
+                   pide el viaje suave hasta esa página; el chip
+                   jamás mueve contenido a mano.
+                 · FOTOS A DEMANDA: las fotos de las páginas solo
+                   bajan cuando la página se acerca a la vista
+                   (poblarVisibles, llamada por Lista al pintar y
+                   por el propio carril al deslizar). La memoria
                    L2 (SeccionImagen) guarda cada foto: se baja UNA
                    vez y repinta desde disco sin red.
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
-                   .fijo): los resultados viven en la página visible
-                   y no se sale de ella hasta limpiar la búsqueda.
-VERSIÓN:         2.2
+                   .fijo): los resultados viven en la página
+                   visible hasta limpiar la búsqueda.
+VERSIÓN:         3.0
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -73,8 +67,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     /* ============================================================
        EL CARRIL · #listaWrap convertido en tira de páginas.
        Una página por chip PINTADO en pantalla (#filtros .chip):
-       lo que se ve manda — ni el orden del arreglo ni el del
-       DOM pueden inventar vecino.
+       lo que se ve manda.
        ============================================================ */
     function carril() { return document.getElementById('listaWrap'); }
 
@@ -91,51 +84,38 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       return -1;
     }
 
-    function reduceMovimiento() {
-      return !!(window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }
-
     /* ============================================================
-       GEOMETRÍA DEL OJO · todo se mide con rectángulos reales: el
-       scroll ya está dentro de ellos, no hay divisiones ni
-       redondeos que elijan al vecino.
-       · paginaCentrada: la página cuyo centro está más cerca del
-         centro de la vista.
-       · scrollParaCentrar: el scrollLeft exacto para que una
-         página quede centrada (centro de página = centro de vista).
+       GEOMETRÍA SIMPLE · todas las páginas miden lo mismo que la
+       vista: la página visible es el scrollLeft dividido por ese
+       ancho, redondeado y clavado al rango real de páginas. El
+       viaje a una página es ese mismo número multiplicado de
+       vuelta. Nada más.
        ============================================================ */
-    function paginaCentrada() {
+    function indiceActivo() {
       var c = carril();
-      if (!c || c.hidden) return null;
-      var pgs = paginas();
-      if (!pgs.length) return null;
-
-      var crect = c.getBoundingClientRect();
-      var centroVista = crect.left + crect.width / 2;
-
-      var mejor = null;
-      var mejorD = Infinity;
-      for (var i = 0; i < pgs.length; i++) {
-        var r = pgs[i].getBoundingClientRect();
-        var d = Math.abs((r.left + r.width / 2) - centroVista);
-        if (d < mejorD) { mejorD = d; mejor = pgs[i]; }
-      }
-      return mejor;
+      if (!c || c.hidden) return -1;
+      var n = paginas().length;
+      var w = c.clientWidth;
+      if (!n || !w) return -1;
+      var i = Math.round(c.scrollLeft / w);
+      if (i < 0) i = 0;
+      if (i > n - 1) i = n - 1;
+      return i;
     }
 
-    function scrollParaCentrar(pag) {
+    function irAPagina(i, suave) {
       var c = carril();
-      if (!c || !pag) return c ? c.scrollLeft : 0;
-      var r = pag.getBoundingClientRect();
-      var crect = c.getBoundingClientRect();
-      return c.scrollLeft + (r.left + r.width / 2) - (crect.left + crect.width / 2);
+      if (!c || i < 0) return;
+      var left = i * c.clientWidth;
+      if (!suave) { c.scrollLeft = left; return; }
+      try { c.scrollTo({ left: left, behavior: 'smooth' }); }
+      catch (_) { c.scrollLeft = left; }
     }
 
     /* ============================================================
-       LA LUZ DEL CHIP · SOLO la clase .activo en la barra: sin
-       memoria, sin aviso, sin listeners. La memoria y el aviso
-       son del asentamiento (llegada) y del pulso del dueño.
+       LA LUZ DEL CHIP · SOLO la clase .activo en la barra mientras
+       el carril viaja. Guardar la elección y avisar al resto es
+       del asentamiento (y del pulso del dueño).
        ============================================================ */
     var _chipLuz = null;
 
@@ -154,8 +134,8 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* CONSTRUIR: nace en el primer chips:change con lienzo vivo.
-       Crea las páginas (una por chip visible), posiciona el
-       carril al chip activo SIN animación y engancha el scroll. */
+       Crea las páginas (una por chip visible), posiciona el carril
+       al chip activo SIN animación y engancha los oyentes. */
     function construir() {
       var c = carril();
       if (!c || c.classList.contains('carril')) return;
@@ -182,15 +162,15 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       _chipLuz = activo;
       _chipAvisado = activo;
 
-      var pgs = paginas();
       var idx = indiceDe(activo);
-      if (idx > 0) c.scrollLeft = scrollParaCentrar(pgs[idx]);
+      if (idx > 0) irAPagina(idx, false);
 
       c.addEventListener('scroll', _enScroll, { passive: true });
       c.addEventListener('pointerdown', _alPresionar);
       c.addEventListener('pointermove', _alArrastrar);
       c.addEventListener('pointerup', _alSoltar);
       c.addEventListener('pointercancel', _alSoltar);
+      c.addEventListener('pointerleave', _alSoltar);
       c.addEventListener('click', _suprimirClickTrasArrastre, true);
 
       _alVolar();
@@ -203,11 +183,10 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
     /* ============================================================
        EN VUELO · mientras el carril viaja solo se hacen dos cosas
-       ligeras: el chip de la página centrada se ILUMINA (clase,
+       ligeras: el chip de la página visible se ILUMINA (clase,
        nada más) y las fotos de las páginas que se asoman cobran.
        Nada se mueve, nada se pinta, nada se resetea en pleno
-       vuelo: el desplazamiento es plano y el imán del navegador
-       trabaja solo. Primero se lee (rects), después se escribe.
+       vuelo. Primero se lee, después se escribe.
        ============================================================ */
     var _raf = null;
 
@@ -221,18 +200,19 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     function _alVolar() {
-      var centrada = paginaCentrada();
-      if (centrada) _encenderLuz(centrada.getAttribute('data-chip'));
+      var i = indiceActivo();
+      if (i >= 0) {
+        var pag = paginas()[i];
+        if (pag) _encenderLuz(pag.getAttribute('data-chip'));
+      }
       poblarVisibles();
     }
 
     /* ============================================================
-       ASENTAMIENTO · 160ms sin scroll = reposo. Al reposo: el imán
-       dormido por el arrastre del ratón despierta YA EN POSICIÓN
-       (re-engancha donde está parado, sin pelear con ninguna
-       animación), la elección se guarda y se avisa UNA vez (solo
-       si la llegada no fue avisada por un pulso), y sale
-       'carril:asentado' para que Lista repinte lo vencido.
+       ASENTAMIENTO · 160ms sin scroll = reposo. Al reposo: la
+       elección se guarda y se avisa UNA vez (solo si la llegada no
+       fue avisada por un pulso), y sale 'carril:asentado' para que
+       Lista repinte lo vencido.
        ============================================================ */
     var _timerAsentar = null;
     var _chipAvisado = null;
@@ -252,12 +232,11 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var c = carril();
       if (!c || c.hidden || !c.classList.contains('carril')) return;
 
-      /* el imán despierta ya en reposo: re-snap donde está parado */
       c.classList.remove('arrastrando');
 
-      var centrada = paginaCentrada();
-      var idChip = centrada ? centrada.getAttribute('data-chip') : null;
-      if (!idChip) return;
+      var i = indiceActivo();
+      if (i < 0) return;
+      var idChip = paginas()[i].getAttribute('data-chip');
 
       if (_chipAvisado !== idChip) {
         _chipAvisado = idChip;
@@ -317,13 +296,14 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       EL RATÓN HACE DE DEDO · puntero fino (mouse/pen) en PC.
-       Arrastre 1:1 con la sensación del modelo validado (x1.5) y
-       el imán DORMIDO (.arrastrando, sin scroll-snap) mientras
-       arrastra: al soltar, UNA animación lleva el carril a su
-       página y el imán despierta al asentarse, ya en reposo. El
-       click que el arrastre deje a medio camino se suprime. El
-       dedo táctil no pasa por aquí: su scroll ya es nativo.
+       EL RATÓN HACE DE DEDO EN PC (mouse/pen) · AXIS LOCK: el
+       arrastre decide eje con los primeros píxeles — si el gesto
+       es vertical, suelta el carril para que la lista suba y baje;
+       si es horizontal, mueve el carril (x1.5) y reserva el eje.
+       Al soltar, UNA animación lleva el carril a la página más
+       cercana y el imán vuelve a mandar. El click que el arrastre
+       deje a medio camino se suprime. El dedo táctil no pasa por
+       aquí: su scroll ya es nativo.
        ============================================================ */
     var _drag = null;
     var _suprimir = false;
@@ -334,7 +314,14 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var c = carril();
       if (!c || c.hidden || c.classList.contains('fijo')) return;
 
-      _drag = { id: e.pointerId, x0: e.clientX, scroll0: c.scrollLeft, movio: false };
+      _drag = {
+        id: e.pointerId,
+        x0: e.clientX,
+        y0: e.clientY,
+        scroll0: c.scrollLeft,
+        eje: null,
+        movio: false
+      };
       c.classList.add('arrastrando');
       try { c.setPointerCapture(e.pointerId); } catch (_) {}
     }
@@ -342,33 +329,43 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     function _alArrastrar(e) {
       if (!_drag || e.pointerId !== _drag.id) return;
       var dx = e.clientX - _drag.x0;
+      var dy = e.clientY - _drag.y0;
+
+      /* AXIS LOCK: los primeros píxeles deciden el eje */
+      if (!_drag.eje) {
+        if (Math.abs(dx) <= Math.abs(dy)) { _soltarEjeY(e); return; }
+        _drag.eje = 'x';
+      }
+      if (_drag.eje !== 'x') return;
+
       if (Math.abs(dx) > 8) _drag.movio = true;
+      if (e.cancelable) e.preventDefault();
       var c = carril();
       if (c) c.scrollLeft = _drag.scroll0 - dx * 1.5;
+    }
+
+    function _soltarEjeY(e) {
+      _drag = null;
+      var c = carril();
+      if (!c) return;
+      c.classList.remove('arrastrando');   /* el imán sigue mandando */
+      try { c.releasePointerCapture(e.pointerId); } catch (_) {}
     }
 
     function _alSoltar(e) {
       if (!_drag || (e.pointerId !== undefined && e.pointerId !== _drag.id)) return;
       var movio = _drag.movio;
+      var fueHorizontal = _drag.eje === 'x';
       _drag = null;
 
       var c = carril();
       if (!c) return;
 
-      /* UN SOLO ANIMADOR: el imán sigue dormido mientras la
-         animación lleva el carril a la página más cercana. */
-      var centrada = paginaCentrada();
-      var destino = centrada ? scrollParaCentrar(centrada) : c.scrollLeft;
+      c.classList.remove('arrastrando');   /* el imán vuelve a mandar */
 
-      if (reduceMovimiento()) {
-        c.scrollLeft = destino;
-        c.classList.remove('arrastrando');   /* sin animación: despierta ya */
-      } else {
-        try { c.scrollTo({ left: destino, behavior: 'smooth' }); }
-        catch (_) {
-          c.scrollLeft = destino;
-          c.classList.remove('arrastrando');
-        }
+      if (fueHorizontal) {
+        /* la página más cercana, UNA animación */
+        irAPagina(indiceActivo(), true);
       }
 
       _suprimir = movio;
@@ -388,8 +385,8 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
          hizo su trabajo — nada que hacer.
        · Carril sin nacer: nace aquí mismo.
        · Pulso real: el scroll vertical vuelve arriba ANTES de
-         viajar (respiro del pulso) y el carril se desliza suave
-         hasta la página pedida.
+         viajar (respiro del pulso) y el carril viaja suave hasta
+         la página pedida.
        ============================================================ */
     document.addEventListener('chips:change', function (e) {
       var idChip = e.detail && e.detail.idChip;
@@ -408,7 +405,6 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       _chipAvisado = idChip;   /* el pulso avisa por sí mismo */
       _encenderLuz(idChip);    /* la clase ya la puso Chips: no-op */
 
-      var pgs = paginas();
       var idx = indiceDe(idChip);
       if (idx < 0) return;
 
@@ -416,15 +412,8 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var wrap = document.querySelector('.secciones-wrap');
       if (wrap) wrap.scrollTop = 0;
 
-      var destino = pgs[idx];
-      if (paginaCentrada() === destino) return;   /* ya está en ella */
-
-      if (reduceMovimiento()) {
-        c.scrollLeft = scrollParaCentrar(destino);
-      } else {
-        try { c.scrollTo({ left: scrollParaCentrar(destino), behavior: 'smooth' }); }
-        catch (_) { c.scrollLeft = scrollParaCentrar(destino); }
-      }
+      if (indiceActivo() === idx) return;   /* ya está en ella */
+      irAPagina(idx, true);
     });
 
     return {
