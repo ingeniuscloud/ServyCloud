@@ -9,9 +9,7 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  lienzo, de la notificación flotante centralizada
                  (.notificacionFlotante, cristal 0.40) y del CARRIL
                  de páginas del área de items (.carril).
-VERSIÓN:         2.20
-ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
-                 de rondas vive en la bitácora y en versiones/.
+VERSIÓN:         2.21
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -35,7 +33,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     --size-botonSecundario: 16px; --weight-botonSecundario: 400; --color-botonSecundario: #7A828A;
     --size-badge: 9px;            --weight-badge: 700;
 
-    /* R140 · COLOR PRIMARIO · el naranja oficial vive CENTRALIZADO
+    /* COLOR PRIMARIO · el naranja oficial vive CENTRALIZADO
        aquí (mismo trato que las variables de tipografía). El
        fallback #EA580C (el más profundo de la familia sin dejar
        de ser naranja: 3.54:1 sobre blanco, AA texto grande); si
@@ -44,14 +42,14 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        var(--color-primario) — nada de naranjas sueltos. */
     --color-primario: #EA580C;
 
-    /* R130 · CHIPS · letras propias de los dos carriles de chips.
+    /* CHIPS · letras propias de los dos carriles de chips.
        Color dinámico: cada chip conserva el suyo (gris reposo /
        blanco sobre naranja el activo del lienzo; gris/naranja del
        formulario). La clase solo manda tamaño y peso. */
     --size-chipsFiltros: 14px;    --weight-chipsFiltros: 300;
     --size-chipsFormulario: 12px; --weight-chipsFormulario: 300;
 
-    /* R147 · BADGE NUEVO/USADO · la píldora completa (letra +
+    /* BADGE NUEVO/USADO · la píldora completa (letra +
        forma + color) del overlay de la grilla y de las píldoras
        «Activo» del sheet Ciudad y del sheet Ordenar. Un solo
        sitio manda. */
@@ -179,7 +177,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     R130 · CHIPS MAESTROS · dos letras propias (como .badge:
+     CHIPS MAESTROS · dos letras propias (como .badge:
      SOLO tamaño y peso — el color lo viste cada elemento y sus
      estados, que quedan intactos).
      .chipsFiltros    → chips del LIENZO principal (14px · 300).
@@ -196,23 +194,23 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     R147/R148 · BADGE NUEVO / BADGE USADO · píldoras de la app
+     BADGE NUEVO / BADGE USADO · píldoras de la app
      (la «Activo» de los sheets Ciudad y Ordenar y el overlay de
      la imagen en la grilla). La clase lleva la PÍLDORA COMPLETA:
      letra (11px · 600), fondo, texto, padding y radio. El
      visible/invisible NO va aquí: es estado de cada superficie
      (.ciudad-card.activa / .ordenar-card.activa encienden la
      suya; en la grilla el overlay vive mientras haya badge).
-     · .badgeNuevo → naranja con blanco (la de siempre, R131,
-       renombrada en R147; también la usan «Nuevo», «Popular»,
-       «Promoción», «Último» y «Próximamente» en la grilla;
-       en la grilla el VERDE #16a34a lo pinta la Lista_CSS con
-       el override .grilla-badge .badgeNuevo — R148, solo ahí).
+     · .badgeNuevo → naranja con blanco (también la usan
+       «Nuevo», «Popular», «Promoción», «Último» y
+       «Próximamente» en la grilla; en la grilla el VERDE
+       #16a34a lo pinta la Lista_CSS con el override
+       .grilla-badge .badgeNuevo, solo ahí).
      · .badgeUsado → la MISMA píldora en blanco con texto gris
        #475569 (el de los chips) y borde fino suave #cbd5e1
        para no perderse sobre fotos claras. Solo la viste el
        titulo «Usado» del BADGEJSON en la grilla.
-     · Altura idéntica (R148): el borde de 1px del Usado suma
+     · Altura idéntica: el borde de 1px del Usado suma
        2px, así que su padding vertical baja a 4px (4 + 4 + 1 +
        1 = 10px, los mismos 10px del 5 + 5 del Nuevo) — ambas
        píldoras miden 21px y el texto queda a 5px del borde
@@ -240,7 +238,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     background: #ffffff !important;
     color: #475569 !important;
     border: 1px solid #cbd5e1 !important;
-    /* R148 · padding vertical 4px (no 5px): los 2px que el borde
+    /* padding vertical 4px (no 5px): los 2px que el borde
        suma los devuelvo aquí para que .badgeNuevo y .badgeUsado
        midan EXACTAMENTE lo mismo (21px). */
     padding: 4px 12px !important;
@@ -249,7 +247,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     PLACEHOLDERS · voz única en toda la app (R77)
+     PLACEHOLDERS · voz única en toda la app
      Todos los placeholder hablan como textoSecundario: una sola
      regla aquí manda sobre Buscar, Reserva, Q&A y los que vengan.
      ============================================================ */
@@ -267,19 +265,15 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     MODO MÓVIL Y LIENZO (Restaurado)
+     MODO MÓVIL Y LIENZO
      ============================================================ */
   body.is-mobile {
     display: block !important;
     padding: 0 !important;
-    /* R98.1 · RESTAURACIÓN del degradado del documento (orden del
-       dueño): el bloque R70 llevaba COLOR sólido #fdf3ec (lo que
-       iOS pinta en la franja de Safari y el respaldo bajo la
-       imagen) + el degradado de R69 encima (clarito #fdf3ec
-       arriba, blanco desde 30%) — ese es el degradado que vestía
-       el preloader y el arranque. Quedó reemplazado por blanco
-       plano en una ronda intermedia; vuelve EXACTO el bloque R70.
-       El degradado del LIENZO (.area-contenido) NO se toca. */
+    /* degradado del documento: ámbar #fdf3ec arriba y blanco
+       desde el 30% — el mismo que viste el preloader y el
+       arranque. El degradado del LIENZO (.area-contenido) NO
+       se toca. */
     background-color: #fdf3ec !important;
     background-image: linear-gradient(180deg, #fdf3ec 0%, #fdf3ec 12%, #ffffff 30%, #ffffff 100%) !important;
     background-repeat: no-repeat !important;
@@ -314,7 +308,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   }
 
   /* ============================================================
-     CTA Y PARTNER ORIGINALES (Restaurados)
+     CTA Y PARTNER
      ============================================================ */
   .cta-reservar {
     flex-shrink: 0; width: calc(100% - 86px); margin: 4px 60px 16px 26px;
@@ -336,7 +330,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .cta-fila .cta-reservar { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
 
   /* ============================================================
-     R146 · CTA INACTIVO — UN tenue general para los DOS casos
+     CTA INACTIVO — UN tenue general para los DOS casos
      apagados: post PRONTO y suma de cupos en cero. Naranja
      apagado con baja intensidad y sin sombra. Declarado
      EXPLÍCITO porque antes el tenue era el lavado del navegador:
@@ -379,12 +373,11 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
   .user-eslogan { display: block; font-size: 12px; line-height: 1.3; margin-top: 2px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* ============================================================
-     R96 · VOLVER ARRIBA DE LOS BOTTOM SHEETS (clase compartida)
+     VOLVER ARRIBA DE LOS BOTTOM SHEETS (clase compartida)
      Mismo botón circular del volver de la app (34px, borde
-     fino tenue) pero con la flecha hacia ARRIBA y — como manda el
-     uso normal de apps y web — en la ESQUINA INFERIOR DERECHA
-     del sheet (el dueño corrigió la ubicación de la R95: arriba
-     a la izquierda estaba mal). Aparece solo cuando hay scroll
+     fino tenue) pero con la flecha hacia ARRIBA y — como manda
+     el uso normal de apps y web — en la ESQUINA INFERIOR
+     DERECHA del sheet. Aparece solo cuando hay scroll
      (.visible la pone cada sheet al escuchar su propio scroll)
      y desaparece al llegar arriba. Queda sobre la zona de la
      raya nativa (safe-area) y sobre el fade. Botón 100% local:
@@ -493,15 +486,14 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
   }
 
-  /* R155 · el texto viste .textoPrimario (la voz del sistema)
+  /* el texto viste .textoPrimario (la voz del sistema)
      pero DENTRO del aviso su color es la tinta del cristal. */
   .notificacionFlotante .textoPrimario {
     color: #92400E;
   }
 
-  /* R155 · la X: SIN circulito (muere el blanco de la R152) —
-     el glifo close queda directo sobre el cristal, en la
-     MISMA tinta #92400E del texto. */
+  /* la X: sin circulito — el glifo close queda directo sobre
+     el cristal, en la MISMA tinta #92400E del texto. */
   .notificacionFlotante .avisoCerrar {
     width: 28px;
     height: 28px;
@@ -521,7 +513,7 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     display: block;
   }
 
-  /* R149 · movimiento reducido: sin desplazamiento, solo
+  /* movimiento reducido: sin desplazamiento, solo
      aparece/desaparece (misma cortesía a11y de los sheets). */
   @media (prefers-reduced-motion: reduce) {
     .notificacionFlotante {
@@ -543,13 +535,12 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      cercana se engancha al centro (scroll-snap). Empujar el
      listado a la IZQUIERDA muestra la lista de la DERECHA; a la
      derecha, la de la IZQUIERDA. Los extremos no ciclan.
-     · DIANAS QUIETAS (R161): la página es lo que el navegador
-       MIDE para imantar (scroll-snap-align) — nadie la mueve.
-       El imán obligatorio apunta a cajas fijas: fin de las
-       pantallas cortadas, de los saltos de dos chips y del
-       regreso contra el empuje. La página lleva overflow
-       hidden para que la profundidad de la capa interior no
-       sangre hacia la vecina.
+     · PAGINACIÓN LATERAL PLANA: todas las páginas son iguales —
+       mismo tamaño, mismo brillo, siempre completas. El imán
+       obligatorio apunta a cajas que nunca cambian y el viaje
+       de una página a la otra es el único movimiento.
+     · LA PÁGINA LLEVA overflow hidden: cada página recorta lo
+       suyo y nada de una página asoma sobre la vecina.
      · EL RATÓN HACE DE DEDO en PC (GAS y GitHub): con puntero
        fino el arrastre mueve el carril como el dedo; mientras
        arrastra (.arrastrando) el imán queda DORMIDO y al soltar
@@ -558,16 +549,9 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        siente.
      · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
        resultados viven en la página visible.
-     · ASENTAMIENTO (R161): al reposo el carril avisa
-       'carril:asentado' y despierta el imán dormido; Lista
-       repinta solo lo VENCIDO (las páginas nacen pintadas).
-     · PROFUNDIDAD EN LA CAPA INTERIOR (R161): el parallax y el
-       achique viven en .carril-items (lo que el navegador NO
-       mide); el desvanecido, en la página (opacidad no mueve
-       cajas). Core_Swipe lo calcula fotograma a fotograma
-       PEGADO al scroll real, SIN transición que lo persiga. En
-       reposo, cero transform: la página centrada queda EXACTA
-       al centro. Con prefers-reduced-motion el efecto se apaga.
+     · ASENTAMIENTO: al reposo el carril avisa 'carril:asentado'
+       y despierta el imán dormido; Lista repinta solo lo
+       VENCIDO (las páginas nacen pintadas).
      ============================================================ */
   .carril {
     display: flex;
@@ -597,11 +581,4 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     min-width: 100%;
     overflow: hidden;
     scroll-snap-align: center;
-    will-change: opacity;
-  }
-  /* la capa interior de la PROFUNDIDAD (R161): lo que se corre
-     y se achica es esto, NO la página — el imán mide la página,
-     que queda quieta siempre */
-  .carril-items {
-    will-change: transform;
   }
