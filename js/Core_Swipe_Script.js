@@ -11,16 +11,23 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    chip visible (#filtros .chip), todas nacen
                    pintadas; el desplazamiento no carga nada, solo
                    viaja.
-                 · EL IMÁN CLAVA AL SOLTAR: mientras el arrastre
-                   camina, el imán duerme (.arrastrando); al soltar,
-                   UNA animación lleva el carril a la página más
-                   cercana y el scroll-snap vuelve a mandar.
+                 · EL IMÁN CLAVA AL SOLTAR: el imán vive en el CSS y
+                   lo aplica el navegador. En la pluma del ratón,
+                   mientras el arrastre camina el imán duerme
+                   (.arrastrando); al soltar, UNA animación lleva el
+                   carril a la página más cercana. En el dedo, el
+                   propio navegador pannea y clava: nadie escribe
+                   scrollLeft por debajo de su mano.
                  · EL CHIP SE SINCRONIZA: mientras el carril viaja,
                    el chip de la página visible se ilumina (clase,
-                   nada más); al asentarse (160ms sin scroll) la
-                   elección se guarda y se avisa UNA vez
-                   (chips:change) — el pulso del dueño avisa por sí
-                   mismo.
+                   nada más); la página visible se MIDE por
+                   geometría — la página cuyo centro queda en el
+                   medio de la vista — y no con scrollLeft, que en
+                   el teléfono llega tarde y devolvía la luz al
+                   chip de atrás a mitad de llegada; al asentarse
+                   (160ms sin scroll) la elección se guarda y se
+                   avisa UNA vez (chips:change) — el pulso del
+                   dueño avisa por sí mismo.
                  · LA LUZ NO REGRESA: en cuanto el destino queda
                    decidido (al soltar el arrastre o al pulsar un
                    chip), la luz se FIJA en ese chip hasta el
@@ -32,14 +39,16 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    clavado al rango real de páginas. El viaje a una
                    página es ese mismo número multiplicado de
                    vuelta.
-                 · AXIS LOCK (dedo, ratón y pen): el arrastre decide
-                   eje con los primeros píxeles decisivos; si el
-                   gesto es vertical, suelta el carril para que la
-                   lista suba y baje; si es horizontal, mueve el
-                   carril (x1.5) y reserva el eje. EL DEDO VIAJA POR
-                   EL MISMO CAMINO QUE EL RATÓN: una sola ley para
-                   todos los punteros — lo que en PC es perfecto, en
-                   el teléfono es LO MISMO.
+                 · UNA SOLA FUERZA POR MUNDO: el dedo y el pen son
+                   DEL NAVEGADOR — desplazamiento nativo 1:1, con
+                   su inercia y su imán; la pluma jamás los toca.
+                   Solo el RATÓN de la PC lleva la pluma (axis
+                   lock): decide eje con los primeros píxeles
+                   decisivos; si el gesto es vertical suelta el
+                   carril para que la lista suba y baje; si es
+                   horizontal lo mueve (x1.5). Dos fuerzas
+                   escribiendo el mismo carril fue la guerra que
+                   enloqueció el teléfono: murió aquí.
                  · DIRECCIÓN FÍSICA: empujar el listado a la
                    IZQUIERDA muestra la lista de la DERECHA; a la
                    derecha, la de la IZQUIERDA. Los extremos no
@@ -63,7 +72,7 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
                    .fijo): los resultados viven en la página
                    visible hasta limpiar la búsqueda.
-VERSIÓN:         3.1
+VERSIÓN:         3.2
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -94,10 +103,13 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
     /* ============================================================
        GEOMETRÍA SIMPLE · todas las páginas miden lo mismo que la
-       vista: la página visible es el scrollLeft dividido por ese
-       ancho, redondeado y clavado al rango real de páginas. El
-       viaje a una página es ese mismo número multiplicado de
-       vuelta. Nada más.
+       vista. ESCRIBIR: el viaje a una página es su número
+       multiplicado por el ancho de la vista. LEER: la página
+       visible es la cuyo centro queda en el medio de la vista,
+       medida con los rectángulos reales (los mismos que usa el
+       poblado de fotos) — el scrollLeft del teléfono llega tarde
+       y devolvía la luz al chip de atrás a mitad de llegada.
+       Nada más.
        ============================================================ */
     function indiceDeValor(v) {
       var c = carril();
@@ -114,7 +126,21 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     function indiceActivo() {
       var c = carril();
       if (!c || c.hidden) return -1;
-      return indiceDeValor(c.scrollLeft);
+      var pgs = paginas();
+      var n = pgs.length;
+      if (!n) return -1;
+      var crect = c.getBoundingClientRect();
+      var w = crect.width;
+      if (!w) return -1;
+      var centro = crect.left + w / 2;
+      var mejor = -1;
+      var mejorD = Infinity;
+      for (var i = 0; i < n; i++) {
+        var r = pgs[i].getBoundingClientRect();
+        var d = Math.abs(r.left + r.width / 2 - centro);
+        if (d < mejorD) { mejorD = d; mejor = i; }
+      }
+      return mejor;
     }
 
     function irAPagina(i, suave) {
@@ -333,21 +359,24 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       EL DEDO Y EL RATÓN HACEN LO MISMO (touch/mouse/pen) ·
-       AXIS LOCK: el arrastre decide eje con los primeros píxeles
-       decisivos — si el gesto es vertical, suelta el carril para
-       que la lista suba y baje; si es horizontal, mueve el carril
-       (x1.5) y reserva el eje. Al soltar, UNA animación lleva el
-       carril a la página más cercana y el imán vuelve a mandar.
-       El click que el arrastre deje a medio camino se suprime.
-       Un solo camino para todos los punteros: el dedo deja de
-       fiarse del imán nativo del teléfono (que revira y rebota)
-       y obedece la misma ley que el ratón de la PC.
+       EL RATÓN EN PC (mouse) · AXIS LOCK: el arrastre decide eje
+       con los primeros píxeles decisivos — si el gesto es
+       vertical, suelta el carril para que la lista suba y baje;
+       si es horizontal, mueve el carril (x1.5) y reserva el eje.
+       Al soltar, UNA animación lleva el carril a la página más
+       cercana y el imán vuelve a mandar. El click que el
+       arrastre deje a medio camino se suprime.
+       EL DEDO Y EL PEN NO PASAN POR AQUÍ (UNA SOLA FUERZA POR
+       PUNTERO): su desplazamiento es el nativo del navegador —
+       1:1, con su inercia y su imán al soltar. Que la pluma
+       escribiera scrollLeft mientras el navegador panneaba fue
+       la guerra de las dos fuerzas.
        ============================================================ */
     var _drag = null;
     var _suprimir = false;
 
     function _alPresionar(e) {
+      if (e.pointerType !== 'mouse') return;   /* dedo y pen: UNA sola fuerza, la nativa */
       if (_drag) return;
       var c = carril();
       if (!c || c.hidden || c.classList.contains('fijo')) return;
@@ -411,8 +440,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       if (fueHorizontal) {
         /* la página más cercana AL ÚLTIMO VALOR ESCRITO, UNA
-           animación — sin releer scrollLeft (en el teléfono la
-           lectura llega tarde y discute con la pluma) */
+           animación — sin releer el scrollLeft del navegador */
         irAPagina(indiceDeValor(
           (ultimo === null || ultimo === undefined) ? c.scrollLeft : ultimo
         ), true);

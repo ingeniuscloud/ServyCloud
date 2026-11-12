@@ -9,7 +9,7 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  lienzo, de la notificación flotante centralizada
                  (.notificacionFlotante, cristal 0.40) y del CARRIL
                  de páginas del área de items (.carril).
-VERSIÓN:         2.24
+VERSIÓN:         2.25
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -531,10 +531,10 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      EL MODELO: pantallas cargadas, desplazamiento lateral
      simple, chip sincronizado. #listaWrap es una TIRA de páginas
      una al lado de la otra, una por chip (las crea Core_Swipe).
-     El arrastre camina con el dedo (y con el ratón) y al soltar
-     la página más cercana se clava. Empujar el listado a la
-     IZQUIERDA muestra la lista de la DERECHA; a la derecha, la
-     de la IZQUIERDA. Los extremos no ciclan.
+     La tira camina con el dedo (nativa) y con el ratón (pluma),
+     y al soltar la página más cercana se clava. Empujar el
+     listado a la IZQUIERDA muestra la lista de la DERECHA; a la
+     derecha, la de la IZQUIERDA. Los extremos no ciclan.
      · EL IMÁN SOLO APUNTA A SITIOS ALCANZABLES: la página se
        clava por su MARCO (start) — el punto de la primera página
        es el propio inicio del carril y el de la última el final
@@ -547,17 +547,19 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
      · EL GESTO NO SE PRESTA: overscroll-behavior contain — la
        tirada horizontal del carril no encadena con el
        navegador.
-     · CADA PÁGINA RESERVA SU EJE (touch-action pan-y): el
-       navegador lleva el scroll vertical de la lista y el
-       carril lleva el horizontal — sin tirones de eje en el
-       teléfono.
+     · UNA SOLA FUERZA EN EL TELÉFONO: el dedo es del navegador.
+       Sin vetos touch-action: el propio navegador reparte cada
+       gesto por su eje — el horizontal se lo lleva el carril
+       (con su imán) y el vertical la lista. Una sola mano por
+       dirección, cero tirones de eje.
      · LA PÁGINA LLEVA overflow hidden: cada página recorta lo
        suyo y nada de una página asoma sobre la vecina.
-     · EL DEDO Y EL RATÓN HACEN LO MISMO (GAS y GitHub): AXIS
-       LOCK en Core_Swipe — el arrastre decide eje con los
+     · EL RATÓN LLEVA LA PLUMA EN PC (GAS y GitHub): axis lock
+       SOLO para el ratón — el arrastre decide eje con los
        primeros píxeles; mientras arrastra (.arrastrando) el imán
        queda DORMIDO y al soltar UNA animación lleva el carril a
-       su página. Una sola ley para el dedo y el ratón.
+       su página. El dedo y el pen no pasan por ahí: una sola
+       fuerza por puntero (teléfono: navegador; PC: pluma).
      · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
        resultados viven en la página visible.
      · ASENTAMIENTO: al reposo el carril avisa 'carril:asentado'
@@ -592,7 +594,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     flex: 0 0 100%;
     min-width: 100%;
     overflow: hidden;
-    touch-action: pan-y;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
