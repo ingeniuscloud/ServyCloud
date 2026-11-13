@@ -17,25 +17,29 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    UNA animación lleva el carril a la página más
                    cercana y el imán despierta apuntando a la misma
                    página: nadie tira con nadie.
-                 · LA ADOPCIÓN SUAVE · EL IMÁN PROPONE, EL CHIP
-                   DISPONE: mientras la mano camina, silencio
-                   total — espectáculo puro, nadie escribe nada
-                   fuera del carril. Cuando el imán estaciona y
-                   la tira reposa, el carril lee la página
-                   estacionada y le cede la palabra UNA vez al
-                   chip: el chip la ADOPTA — su luz camina con
-                   todo quieto, la elección se escribe en
-                   memoria y su propio eco regresa apagado (el
-                   carril no vuelve a viajar: ya está en ella).
-                   ADOPTAR, nunca imponer: la lista no se mueve
-                   ni un píxel. Si estacionó en el valor ya
-                   real: silencio total, cero eventos.
-                 · LA LUZ ES DEL CHIP: con la mano en el carril la
-                   luz queda CONGELADA en el chip real desde el
-                   primer píxel del gesto; al estacionar camina
-                   UNA vez al chip estacionado (la transición
-                   propia del chip la viste de suave); un
-                   pulso (tap) la clava en su chip.
+                 · LA LUZ QUE SE APAGA Y NACE · EL IMÁN PROPONE,
+                   EL CHIP DISPONE: en cuanto el swipe COMIENZA
+                   (el candado de eje decide 'x'), la luz del
+                   chip muere AL INSTANTE — sin transición, sin
+                   despedida — y la tira sigue viajando SIN
+                   ninguna luz, en silencio total (nadie escribe
+                   nada fuera del carril). Cuando el imán
+                   estaciona y la tira reposa, el carril lee la
+                   página estacionada y la luz NACE en su chip:
+                   de transparente a su color, con la transición
+                   propia del chip (0.18s) — una sola animación
+                   de aparición, con todo quieto. ADOPTAR, nunca
+                   imponer: la lista no se mueve ni un píxel. Si
+                   estacionó en el valor ya real, la luz nace
+                   igual y el silencio se mantiene: cero eventos,
+                   cero escritura. Si es un valor nuevo, el chip
+                   comete el cambio (memoria + aviso) y su propio
+                   eco regresa apagado (el carril no vuelve a
+                   viajar: ya está en ella).
+                 · LA LUZ ES DEL CHIP: el swipe la APAGA al
+                   comenzar (instante, sin despedida) y la NACE
+                   al reposar (transparente → color, suave); un
+                   pulso (tap) la clava en su chip como siempre.
                  · GEOMETRÍA SIMPLE: todas las páginas miden lo
                    mismo que la vista — la página visible es
                    scrollLeft dividido por ese ancho, redondeado y
@@ -86,7 +90,7 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                  · CON BÚSQUEDA ACTIVA el carril se fija (clase
                    .fijo): los resultados viven en la página
                    visible hasta limpiar la búsqueda.
-VERSIÓN:         3.5
+VERSIÓN:         3.6
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -169,14 +173,17 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       LA LUZ DEL CHIP · SOLO la clase .activo en la barra mientras
-       el carril viaja. Guardar la elección y avisar al resto es
-       del asentamiento (y del pulso del dueño).
+       LA LUZ DEL CHIP · SOLO la clase .activo en la barra. Guardar
+       la elección y avisar al resto es del asentamiento (y del
+       pulso del dueño).
+       EL APAGÓN · al comenzar el swipe (eje 'x' decidido) la luz
+       muere AL INSTANTE: transition none + reflujo, y el chip
+       recobra su transición propia — la muerte no negocia, el
+       nacimiento será suave. La tira viaja sin ninguna luz.
        LA LUZ FIJA · decidido el destino (soltar el arrastre o
-       pulsar un chip), la luz se congela en ese chip hasta el
-       asentamiento: ningún cálculo intermedio del viaje la
-       devuelve al chip anterior — el destello del teléfono muere
-       aquí.
+       pulsar un chip), NADA enciende chips hasta el asentamiento:
+       ningún cálculo intermedio del viaje devuelve la luz — el
+       destello del teléfono muere aquí.
        ============================================================ */
     var _chipLuz = null;
     var _luzFija = null;
@@ -198,6 +205,26 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         if (chip.getAttribute('data-chip') === idChip) chip.classList.add('activo');
         else chip.classList.remove('activo');
       }
+    }
+
+    /* EL APAGÓN · la muerte INSTANTÁNEA de la luz: solo llega
+       aquí el chip encendido — transition none, la clase fuera,
+       reflujo para que la muerte se escriba YA, y el chip
+       recobra su transición propia (el nacimiento será suave).
+       Un gesto vertical jamás llega aquí: suelta el carril con
+       su luz intacta. */
+    function _apagonLuzYa() {
+      var contenedor = document.getElementById('filtros');
+      if (!contenedor) return;
+      var encendidos = contenedor.querySelectorAll('.chip.activo');
+      for (var i = 0; i < encendidos.length; i++) {
+        var chip = encendidos[i];
+        chip.style.transition = 'none';
+        chip.classList.remove('activo');
+        void chip.offsetWidth;
+        chip.style.transition = '';
+      }
+      _chipLuz = null;
     }
 
     /* CONSTRUIR: nace en el primer chips:change con lienzo vivo.
@@ -260,12 +287,13 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
     /* ============================================================
        EN VUELO · mientras el carril viaja solo se hacen dos cosas
-       ligeras: el chip de la página visible se ILUMINA (clase,
-       nada más) y las fotos de las páginas que se asoman cobran.
+       ligeras: las fotos de las páginas que se asoman cobran y —
+       SOLO cuando no hay mano en el carril ni luz fija — el chip
+       de la página visible se ILUMINA (clase, nada más). Durante
+       el swipe la tira viaja SIN ninguna luz: el apagón manda y
+       nadie la enciende a mitad del vuelo ni del aterrizaje.
        Nada se mueve, nada se pinta, nada se resetea en pleno
-       vuelo. Primero se lee, después se escribe. Con la luz FIJA
-       (destino decidido) la iluminación espera: nadie devuelve la
-       luz a mitad del viaje.
+       vuelo. Primero se lee, después se escribe.
        ============================================================ */
     var _raf = null;
 
@@ -279,7 +307,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     function _alVolar() {
-      if (!_luzFija) {
+      if (!_drag && !_luzFija) {
         var i = indiceActivo();
         if (i >= 0) {
           var pag = paginas()[i];
@@ -315,9 +343,9 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var c = carril();
       if (!c || c.hidden || !c.classList.contains('carril')) return;
 
-      /* ADOPCIÓN SUAVE · aterrizaje de una MANO: el imán ya
-         estacionó — ahora, con todo quieto, el chip adopta la
-         página estacionada. Una sola palabra, al reposo. */
+      /* EL NACIMIENTO · aterrizaje de una MANO: el imán ya
+         estacionó — ahora, con todo quieto, la luz nace en el
+         chip de la página estacionada. Una sola aparición. */
       if (_fueMano) {
         _fueMano = false;
         c.classList.remove('arrastrando');
@@ -355,16 +383,20 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       LA ADOPCIÓN SUAVE · el imán estacionó y la tira reposa:
-       aquí —y solo aquí— la mano habla. Se lee la página
-       estacionada (vecino más cercano, rectángulos reales) y el
-       CHIP la adopta: la luz camina UNA vez (la transición
-       propia del chip la viste de suave), la elección se escribe
-       en memoria y su eco 'chips:change' regresa APAGADO
-       (_avisandoLlegada): el carril no vuelve a viajar — ya está
-       en ella. ADOPTAR, nunca imponer: la lista no se mueve ni
-       un píxel y el respiro vertical sigue siendo exclusivo del
-       pulso. Si estacionó en el valor ya real: silencio total.
+       EL NACIMIENTO · el imán estacionó y la tira reposa: aquí
+       —y solo aquí— la mano habla. Se lee la página estacionada
+       (vecino más cercano, rectángulos reales) y la luz NACE en
+       el chip de esa página: de transparente a su color, con la
+       transición propia del chip (0.18s) — una sola animación de
+       aparición, con todo absolutamente quieto. Si el valor
+       estacionado es DISTINTO del real, el CHIP comete el
+       cambio: la elección se escribe en memoria y su eco
+       'chips:change' regresa APAGADO (_avisandoLlegada): el
+       carril no vuelve a viajar — ya está en ella. Si estacionó
+       en el valor ya real, la luz nace igual y el silencio se
+       mantiene: cero eventos, cero escritura. ADOPTAR, nunca
+       imponer: la lista no se mueve ni un píxel y el respiro
+       vertical sigue siendo exclusivo del pulso.
        ============================================================ */
     function _adoptarEstacionado() {
       var i = indiceActivo();
@@ -374,12 +406,14 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var idChip = pag ? pag.getAttribute('data-chip') : null;
       if (!idChip) { _luzFija = null; return; }
 
-      /* estacionó en el valor ya real: nada que decir */
-      if (_chipAvisado === idChip) { _luzFija = null; return; }
+      _luzFija = null;         /* el congelamiento muere al reposar */
+      _encenderLuz(idChip);    /* LA LUZ NACE: transparente → color, una vez, suave */
+
+      /* estacionó en el valor ya real: la luz volvió y NADA más
+         se dice — cero eventos, cero escritura. Silencio total. */
+      if (_chipAvisado === idChip) return;
 
       _chipAvisado = idChip;   /* una sola palabra por cambio */
-      _luzFija = null;         /* el congelamiento muere al reposar */
-      _encenderLuz(idChip);    /* la luz camina una vez, suave */
 
       /* LA PALABRA ÚNICA · el chip comete el cambio real
          (memoria y aviso); su eco regresa apagado — nadie
@@ -463,7 +497,10 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       var c = carril();
       if (!c || c.hidden || c.classList.contains('fijo')) return;
 
-      _luzFija = _chipLuz;   /* la luz nace y muere en el chip real */
+      /* la luz nace y muere en el chip real; si la tira va a
+         oscuras (re-agarre tras un apagón), el silencio visual
+         se sostiene con el último chip cometido */
+      _luzFija = _chipLuz || _chipAvisado;
       _drag = {
         id: e.pointerId,
         x0: e.clientX,
@@ -488,6 +525,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         if (Math.abs(dx) <= Math.abs(dy)) { _soltarEjeY(e); return; }
         _drag.eje = 'x';
+        _apagonLuzYa();   /* el swipe COMIENZA: la luz muere ya, sin despedida */
       }
       if (_drag.eje !== 'x') return;
 
@@ -523,11 +561,11 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       if (fueHorizontal) {
         /* la página más cercana AL ÚLTIMO VALOR ESCRITO, UNA
            animación — sin releer el scrollLeft del navegador.
-           viaja SIN mover la luz (queda clavada en el chip
-           real); al estacionar, el chip ADOPTA la página
-           (adopción suave: una sola palabra al reposo). */
+           viaja SIN ninguna luz (el apagón la mató al partir y
+           la luz fija de la presión la sostiene apagada); al
+           estacionar, la luz NACE en el chip de la página (el
+           nacimiento: una sola aparición al reposo). */
         _fueMano = true;
-        _luzFija = _chipLuz;
         irAPagina(indiceDeValor(
           (ultimo === null || ultimo === undefined) ? c.scrollLeft : ultimo
         ), true, false);
@@ -545,10 +583,9 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     }
 
     /* ============================================================
-       CHIPS:CHANGE · el PULSO del dueño. La adopción suave
-       también pasa por aquí, pero su eco llega APAGADO
-       (_avisandoLlegada): el carril reconoce su propia voz y
-       no vuelve a viajar.
+       CHIPS:CHANGE · el PULSO del dueño. El nacimiento también
+       pasa por aquí, pero su eco llega APAGADO (_avisandoLlegada):
+       el carril reconoce su propia voz y no vuelve a viajar.
        · Carril sin nacer: nace aquí mismo.
        · Pulso real: el scroll vertical vuelve arriba ANTES de
          viajar (respiro del pulso), la luz se clava en el chip
