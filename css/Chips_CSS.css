@@ -10,8 +10,14 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  chips (reparten TODO el ancho según cuántos
                  estén activos en la BD), fila de promos y
                  envoltorios de filtros.
-VERSIÓN:         2.12
-CAMBIOS:         R153: nace la ANIMACIÓN DEL GESTO DE CAMBIO DE CHIP (la lógica vive en Chips_Script) — .lista-wrap.swipe-enVuelo: la lista sigue al dedo sin transiciones (will-change avisa al compositor) y .lista-wrap.swipe-acomodando: al soltar entra a su sitio con una transición corta; con prefers-reduced-motion el acomodado se apaga. R135 (limpieza) y R134 (alto de la FILA 1) intactos. Historial: bitácora/versiones.
+VERSIÓN:         2.13
+CAMBIOS:         R171: MUEREN las reglas del modo compartido-post
+                 (cápsula del detalle sustituyendo al par
+                 volver/título) — el modo murió con el Open Ad del
+                 post compartido; la cápsula .compartida queda
+                 EXCLUSIVA de la lista compartida (menú global
+                 siempre visible, decisión R108 intacta). Historial:
+                 bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Index.html (estructura de filtros),
                  Lista_CSS.html (lista y buscar-vacio),
@@ -423,16 +429,16 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      ============================================================ */
 
   /* ============================================================
-     ESTADO · compartida (recepción de un enlace)
-     Campo desplegado y BLOQUEADO (readOnly + pointer-events
-     none): chips, ciudad y filtro fuera; la X queda
-     FIJA y libera la vista (Compartir.limpiar). El header del
-     detalle lo decide el TIPO de enlace (Compartir marca el
-     body): con un POST compartido esta fila reemplaza al par
-     volver/título (reglas de abajo); con una LISTA compartida
-     el post abre con volver/título normales y la fila solo
-     cabecera la lista. R65 · en compartida el campo recobra
-     el BLANCO (es el header de esa vista).
+     ESTADO · compartida (recepción de una LISTA compartida)
+     R171 · SOLO LISTA: el modo compartido-post murió con el Open
+     Ad del post compartido. Campo desplegado y BLOQUEADO
+     (readOnly + pointer-events none): chips, ciudad y filtro
+     fuera; la X queda FIJA y libera la vista (Compartir.limpiar).
+     Dentro del post el header vuelve al par volver/título (reglas
+     de abajo). R65 · en compartida el campo recobra el BLANCO
+     (es el header de esa vista). El MENÚ GLOBAL siempre visible
+     (decisión R108 del dueño): sin regla de apagón — nunca
+     existió para la lista.
      ============================================================ */
   body.modo-compartido .filtros-fila-dos { display: none !important; }
 
@@ -453,28 +459,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   .filtros-wrap.compartida .menu-global {
-    display: none;
-  }
-
-  /* R108 · LISTA compartida: el MENÚ GLOBAL SIEMPRE visible
-     (decisión del dueño): el receptor que llega por un enlace de
-     lista compartida conserva el menú. Solo el modo
-     compartido-post (detalle de un post) sigue sin él. */
-  body.compartido-lista .filtros-wrap.compartida .menu-global {
     display: flex;
-  }
-
-  /* Post compartido: la app entra en modo detalle (Lista_CSS
-     oculta las filas con !important). En compartida la fila 1
-     ES el header: visible (con .compartida gana la
-     especificidad), y el par volver/título fuera. */
-  body.modo-detalle.compartido-post .filtros-fila.compartida {
-    display: flex !important;
-  }
-
-  body.modo-detalle.compartido-post .filtros-wrap.compartida .btn-volver,
-  body.modo-detalle.compartido-post .filtros-wrap.compartida .titulo-categoria {
-    display: none !important;
   }
 
   /* LISTA compartida: dentro del post el header vuelve al par
@@ -513,35 +498,4 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .buscar-input-wrap { padding: 0 6px 0 12px; }
     .buscar-limpiar { width: 25px; height: 25px; }
     .buscar-limpiar svg { width: 16px; height: 16px; }
-  }
-
-  /* ============================================================
-     GESTO DE CAMBIO DE CHIP · R153 · la animación del arrastre
-     (la LÓGICA vive en Chips_Script; aprobada por el dueño con
-     valores y Opción B). SOLO el contenedor de la lista se
-     arrastra: la lista sigue al dedo en vivo, el chip de arriba
-     se prende al cruzar el umbral (Opción B) y al soltar la
-     lista se acomoda a su sitio.
-     · swipe-enVuelo · el dedo manda: CERO transiciones durante
-       el arrastre (el transform lo pinta el toque, frame a
-       frame); will-change avisa al compositor.
-     · swipe-acomodando · al soltar (confirmado o rebote): la
-       lista entra a su sitio con una transición corta y
-       natural. Con prefers-reduced-motion se apaga (aparece
-       en su sitio, sin movimiento).
-     Las clases las pone y las quita Chips_Script; NINGÚN otro
-     elemento las usa (0 colateral).
-     ============================================================ */
-  .lista-wrap.swipe-enVuelo {
-    transition: none !important;
-    will-change: transform;
-  }
-  .lista-wrap.swipe-acomodando {
-    transition: transform 0.22s cubic-bezier(0.33, 0.9, 0.35, 1) !important;
-    will-change: transform;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .lista-wrap.swipe-acomodando {
-      transition: none !important;
-    }
   }

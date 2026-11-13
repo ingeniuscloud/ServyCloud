@@ -4,8 +4,10 @@ ARCHIVO:         Ciudad_Sheet_Script.html
 ESPEJO GITHUB:   github/js/Ciudad_Sheet_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.CiudadSheet: lista de ciudades desde SISTEMA, tarjeta de la ciudad activa con badge «Activo» y métricas; selecciona ciudad y cierra.
-VERSIÓN:         1.12
-CAMBIOS:         R147: la píldora «Activo» viste la maestra .badgeNuevo (la ex .badgeActivo renombrada en el Core: misma píldora naranja, cero cambios visuales). Historial: bitácora/versiones.
+VERSIÓN:         1.13
+CAMBIOS:         R171: metricasDe compara contra la MATRIZ DE
+                 ESTADOS (SISTEMA.estadosPost — Constantes.gs) en
+                 vez del estado a mano. Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
                  (pintarGlifos), Ciudad_Sheet_CSS.html
 ════════════════════════════════════════════════════════════════════*/
@@ -148,6 +150,19 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
       return true;
     }
 
+    /* R171 · MATRIZ DE ESTADOS (Constantes.gs → SISTEMA): la
+       fuente de verdad de los estados de publicación viaja en el
+       SISTEMA de la sesión. El literal es SOLO respaldo de
+       emergencia para un SISTEMA viejo. */
+    function _estadosPost() {
+      return (window.SISTEMA && window.SISTEMA.estadosPost) || {
+        activo: 'activo', pronto: 'pronto',
+        inactivo: 'inactivo', pausado: 'pausado',
+        publicables: ['activo', 'pronto'],
+        excluidos: ['inactivo', 'pausado']
+      };
+    }
+
     function metricasDe(idCiudad) {
       var posts = (window.TABLAS && window.TABLAS.posts) || [];
       var promo = (window.SISTEMA && window.SISTEMA.promo) || {};
@@ -172,7 +187,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, .area-contenido), Iconos.html
 
       posts.forEach(function (p) {
         if (!p || !p.id) return;
-        if (p.estado !== 'activo') return;
+        if (p.estado !== _estadosPost().activo) return;
 
         var ciudades = p.idCiudad || [];
         if (ciudades.indexOf(idCiudad) === -1) return;

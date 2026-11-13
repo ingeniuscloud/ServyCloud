@@ -11,15 +11,30 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  visibilidad con los items) comparte el filtro
                  visible: término de búsqueda O chip activo, más
                  la ciudad.
-VERSIÓN:         2.7
-CAMBIOS:         R132: el cache-bust de los enlaces ?s= va con separador «&» (un segundo «?» empalmaba el token y el receptor no filtraba ni veía la palabra en Buscar) + sin token no se emite ?s=null (enlace pelado a la app).
+                 RECEPTOR · R171: la carga por enlace de UN POST ya
+                 NO activa modo compartido — la app carga NORMAL y
+                 el ad de esa carga es EL DEL POST (OpenAd.adDePost,
+                 cross-sell directo: el post SOLO abre con el click
+                 del ad). El modo compartido es SOLO de LISTA.
+                 veredictoEntrante() le dice al OpenAd qué trae la
+                 carga ANTES de montar el promo.
+VERSIÓN:         2.8
+CAMBIOS:         R171: MUERE el modo compartido-post (cápsula,
+                 CANCELAR, título en el input, apertura automática
+                 y aviso amable del receptor — orden del dueño).
+                 recibirPost solo le pasa el id al OpenAd
+                 (adDePost). Nace veredictoEntrante (?s= sync, ?d=
+                 legacy async). Buscar_post y liberarTrasApertura
+                 retirados (código sin función). El receptor de
+                 LISTA queda INTACTO al 100%. Historial:
+                 bitácora/versiones.
 DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  TABLAS), Lista_Script.html (TABLAS.posts,
                  visibilidad de #btnCompartir),
                  Ciudad_Sheet_Script.html (getActual, getLista,
                  aplicarGuardada), Chips_Script.html (chips:change,
                  getChipActivo, seleccionar),
-                 Seccion_Script.html (irAPost público),
+                 Opend_Ad_Script.html (adDePost — R171),
                  Core_Script.html (llama pintar/recibir),
                  Social_Script.html (urlDePost), Chips_CSS.html
                  (.btn-compartir / .compartida)
@@ -415,6 +430,44 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       return !!(leerParam('s') || leerParam('d'));
     }
 
+    /* ============================================================
+       R171 · VEREDICTO DE ENTRADA · ¿qué trae esta carga?
+       El OpenAd lo pregunta ANTES de montar el promo: si la carga
+       viene por el enlace de UN POST (?s= token 'p' — o el ?d=
+       legacy que descifre a un post), el promo queda APAGADO para
+       esa carga y el ad es EL DEL POST. Lista compartida y carga
+       normal → promo como siempre.
+       · ?s=  → desempaquetar es LOCAL y SINCRÓNICO: resuelve al
+                instante.
+       · ?d=  → descifrar (crypto local, legacy): resuelve al
+                milisegundo.
+       SIEMPRE resuelve (fallo → null): el promo nunca queda
+       colgado. No toca la URL ni el estado: solo LEE.
+       ============================================================ */
+    function veredictoEntrante() {
+      var corto = leerParam('s');
+      var crudo = corto || leerParam('d');
+      if (!crudo) return Promise.resolve(null);
+
+      if (corto) {
+        try {
+          var d = desempaquetar(corto);
+          if (d && d.t === 'p') return Promise.resolve('post');
+          if (d && d.t === 'l') return Promise.resolve('lista');
+          return Promise.resolve(null);
+        } catch (_) {
+          return Promise.resolve(null);
+        }
+      }
+
+      return descifrar(crudo).then(function (datos) {
+        if (!datos || !datos.t) return null;
+        return datos.t === 'p' ? 'post' : 'lista';
+      }).catch(function () {
+        return null;
+      });
+    }
+
     function limpiarUrl() {
       try {
         history.replaceState(null, '', window.location.pathname + window.location.hash);
@@ -455,14 +508,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         });
     }
 
-    function buscarPost(id) {
-      var posts = (window.TABLAS && window.TABLAS.posts) || [];
-      for (var i = 0; i < posts.length; i++) {
-        if (posts[i].id === id) return posts[i];
-      }
-      return null;
-    }
-
     /* Nombres legibles para la plantilla del BD: [textoBuscado]
        toma el título del chip cuando se comparte por chip (los
        chips se escriben en plural: "Cursos"). */
@@ -482,8 +527,11 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       el.hidden = false;
     }
 
-    function activarModo(tipo, textoCampo) {
-      modoCompartido = tipo;
+    /* R171 · SOLO LISTA: el modo compartido-post murió. La cápsula
+       bloqueada con su CANCELAR es exclusiva del receptor de una
+       lista filtrada (su flujo intacto al 100%). */
+    function activarModo(textoCampo) {
+      modoCompartido = 'lista';
 
       var wrap  = document.querySelector('.filtros-wrap');
       var fila  = document.querySelector('.filtros-fila');
@@ -491,7 +539,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
       /* La CÁPSULA queda desplegada y bloqueada — la clase
          .compartida viste la fila (chips/lupa/compartir fuera,
-         solo CANCELAR activo) y la cabecera (menú global fuera). */
+         solo CANCELAR activo) y la cabecera. */
       if (wrap) wrap.classList.add('compartida');
       if (fila) fila.classList.add('compartida');
       if (input) {
@@ -500,69 +548,31 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         if (typeof input.blur === 'function') input.blur();
       }
 
-      /* El header del detalle lo decide el TIPO de enlace:
-         compartido-lista → dentro del post vuelve el par
-         volver/título (Chips_CSS) para recorrer la lista;
-         compartido-post  → la fila con CANCELAR sigue
-         sustituyendo a ese par. */
-      document.body.classList.remove('compartido-post');
-      document.body.classList.remove('compartido-lista');
-      document.body.classList.add(
-        tipo === 'post' ? 'compartido-post' : 'compartido-lista'
-      );
+      document.body.classList.add('compartido-lista');
 
       /* La ciudad se ve pero NO se toca (CSS en Chips_CSS) */
       document.body.classList.add('modo-compartido');
     }
 
+    /* R171 · RECEPTOR DE POST · la app carga NORMAL detrás y el
+       post SOLO abre con el click del open ad del post (la puerta
+       de entrada convalidada: cross-sell directo). Aquí no se
+       activa modo, no se abre nada y no hay aviso amable: la
+       cadena de imagen y los destinos viven en OpenAd.adDePost
+       (propio o de emergencia — el ad nunca falta). */
     function recibirPost(datos) {
       var id = String(datos.id || '').trim();
-      if (!id) { aplicando = false; return; }
+      aplicando = false;
+      if (!id) return;
 
-      var post = buscarPost(id);
-      var vivo = post &&
-                 post.estado !== 'inactivo' &&
-                 post.estado !== 'pausado';
-
-      if (!vivo) {
-        aplicando = false;
-        avisoAmable('Este contenido ya no está disponible.');
-        return;
-      }
-
-      activarModo('post', post.titulo || post.boton || 'Publicación');
-
-      /* Mismo camino probado del cross-sell: ciudad con
-         aplicarGuardada + chip + apertura diferida. Los eventos
-         que dispara (ciudad:change / chips:change) no limpian el
-         modo porque aplicando está en true. */
       try {
-        if (window.Secciones && typeof window.Secciones.irAPost === 'function') {
-          window.Secciones.irAPost(id);
-          liberarTrasApertura(id);
+        if (window.OpenAd && typeof window.OpenAd.adDePost === 'function') {
+          window.OpenAd.adDePost(id);
           return;
         }
       } catch (err) {
-        console.warn('[Compartir] Apertura del post falló:', err && err.message);
+        console.warn('[Compartir] Ad del post falló:', err && err.message);
       }
-
-      aplicando = false;
-    }
-
-    function liberarTrasApertura(idPost) {
-      var on_change = function (e) {
-        var p = e.detail && e.detail.post;
-        if (p && p.id === idPost) {
-          document.removeEventListener('post:change', on_change);
-          setTimeout(function () { aplicando = false; }, 250);
-        }
-      };
-      document.addEventListener('post:change', on_change);
-
-      setTimeout(function () {
-        document.removeEventListener('post:change', on_change);
-        aplicando = false;
-      }, 2500);
     }
 
     function recibirLista(datos) {
@@ -593,7 +603,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         return;
       }
 
-      activarModo('lista', termino);
+      activarModo(termino);
 
       var aplicarFiltro = function () {
         if (termino) {
@@ -668,13 +678,12 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
 
       modoCompartido = null;
-      document.body.classList.remove('compartido-post');
       document.body.classList.remove('compartido-lista');
       document.body.classList.remove('modo-compartido');
 
-      /* Post compartido: la app está en modo detalle. Limpiar
-         devuelve a la normalidad COMPLETA: cerrar el detalle y
-         volver al listado. */
+      /* Lista compartida: si el receptor abrió el detalle de un
+         post de la lista, limpiar devuelve a la normalidad
+         COMPLETA: cerrar el detalle y volver al listado. */
       try {
         if (window.Lista && typeof window.Lista.getModo === 'function' &&
             window.Lista.getModo() === 'detalle' &&

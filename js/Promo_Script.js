@@ -54,8 +54,11 @@ RESPONSABILIDAD: Marquesina de titulares destacados. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.4.0
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.5.0
+CAMBIOS:         R171: construir compara el estado del post contra
+                 la MATRIZ DE ESTADOS (SISTEMA.estadosPost —
+                 Constantes.gs) en vez del estado a mano. Historial:
+                 bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
                  #promoEncabezado), Global_Script.html
                  (ventanaVigente), Ciudad_Sheet_Script.html
@@ -510,6 +513,19 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     /* ============================================================
        Construir el carrusel completo
        ============================================================ */
+    /* R171 · MATRIZ DE ESTADOS (Constantes.gs → SISTEMA): la
+       fuente de verdad de los estados de publicación viaja en el
+       SISTEMA de la sesión. El literal es SOLO respaldo de
+       emergencia para un SISTEMA viejo. */
+    function _estadosPost() {
+      return (window.SISTEMA && window.SISTEMA.estadosPost) || {
+        activo: 'activo', pronto: 'pronto',
+        inactivo: 'inactivo', pausado: 'pausado',
+        publicables: ['activo', 'pronto'],
+        excluidos: ['inactivo', 'pausado']
+      };
+    }
+
     function construir() {
       detenerMarquesina();
       if (reanudarTimer) { clearTimeout(reanudarTimer); reanudarTimer = null; }
@@ -545,7 +561,7 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
         if (!estaVigente(item)) return;
         var post = buscarPost(idPost);
         if (!post) return;
-        if (post.estado !== 'activo') return;
+        if (post.estado !== _estadosPost().activo) return;
         vigentes.push({ item: item, post: post });
       });
 

@@ -4,8 +4,11 @@ ARCHIVO:         Partner_Script.html
 ESPEJO GITHUB:   github/js/Partner_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Partner. LIENZO propio del partner
-VERSIÓN:         1.2
-CAMBIOS:         R134: «Cómo llegar» → «Ver cómo llegar» (orden del dueño: el cambio es en los DOS sitios — aquí y en el sheet Academia de Seccion_Script). Gemelo GAS sincronizado.
+VERSIÓN:         1.3
+CAMBIOS:         R171: postsDelPartner compara contra la MATRIZ DE
+                 ESTADOS (SISTEMA.estadosPost — Constantes.gs) en
+                 vez de estados a mano. Gemelo GAS sincronizado.
+                 Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
                  Lista_Script.html (abrirPartner/cerrarPartner/
                  getModo), Iconos.html (pintarGlifos),
@@ -55,12 +58,25 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
       return null;
     }
 
+    /* R171 · MATRIZ DE ESTADOS (Constantes.gs → SISTEMA): la
+       fuente de verdad de los estados de publicación viaja en el
+       SISTEMA de la sesión. El literal es SOLO respaldo de
+       emergencia para un SISTEMA viejo. */
+    function _estadosPost() {
+      return (window.SISTEMA && window.SISTEMA.estadosPost) || {
+        activo: 'activo', pronto: 'pronto',
+        inactivo: 'inactivo', pausado: 'pausado',
+        publicables: ['activo', 'pronto'],
+        excluidos: ['inactivo', 'pausado']
+      };
+    }
+
     function postsDelPartner(idPartner) {
       if (!idPartner) return [];
       var posts = (window.TABLAS && window.TABLAS.posts) || [];
+      var excluidos = _estadosPost().excluidos;
       return posts.filter(function (p) {
-        return p.estado !== 'inactivo'
-            && p.estado !== 'pausado'
+        return excluidos.indexOf(p.estado) === -1
             && p.idPartner === idPartner;
       });
     }

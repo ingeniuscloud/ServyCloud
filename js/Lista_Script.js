@@ -54,9 +54,12 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.31
+VERSIÓN:         2.32
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
+                 R171: los filtros de posts comparan contra la
+                 MATRIZ DE ESTADOS (SISTEMA.estadosPost —
+                 Constantes.gs), nunca contra estados a mano.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
                  Global_Script.html (postBackend),
                  Core_Swipe_Script.html (window.SwipeChips · carril),
@@ -476,6 +479,19 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     /* ============================================================
        Filtro · ciudad + chip
        ============================================================ */
+    /* R171 · MATRIZ DE ESTADOS (Constantes.gs → SISTEMA): la
+       fuente de verdad de los estados de publicación viaja en el
+       SISTEMA de la sesión. El literal es SOLO respaldo de
+       emergencia para un SISTEMA viejo. */
+    function _estadosPost() {
+      return (window.SISTEMA && window.SISTEMA.estadosPost) || {
+        activo: 'activo', pronto: 'pronto',
+        inactivo: 'inactivo', pausado: 'pausado',
+        publicables: ['activo', 'pronto'],
+        excluidos: ['inactivo', 'pausado']
+      };
+    }
+
     function postsDeChip(idChip) {
       if (!idChip) return [];
 
@@ -483,10 +499,11 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
 
       var ciudad = ciudadActiva();
       var posts  = (window.TABLAS && window.TABLAS.posts) || [];
+      var excluidos = _estadosPost().excluidos;
 
       return posts.filter(function (p) {
         if (!p || !p.id) return false;
-        if (p.estado === 'inactivo' || p.estado === 'pausado') return false;
+        if (excluidos.indexOf(p.estado) !== -1) return false;
 
         var chips = p.idChips || [];
         if (chips.indexOf(idChip) === -1) return false;
@@ -512,10 +529,11 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       var ciudad = ciudadActiva();
       var posts  = (window.TABLAS && window.TABLAS.posts) || [];
       var grupos = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
+      var excluidos = _estadosPost().excluidos;
 
       return posts.filter(function (p) {
         if (!p || !p.id) return false;
-        if (p.estado === 'inactivo' || p.estado === 'pausado') return false;
+        if (excluidos.indexOf(p.estado) !== -1) return false;
 
         if (ciudad) {
           var ciudades = p.idCiudad || [];

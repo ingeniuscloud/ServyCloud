@@ -26,9 +26,11 @@ RESPONSABILIDAD: window.CorePost — la vida del POST ABIERTO.
                  AMBOS modos, antes del corte de WhatsApp.
                  · El pintado inicial (área neutra + CTA) corre con
                  el evento 'app-lista', al inyectarse el lienzo.
-VERSIÓN:         1.0
+VERSIÓN:         1.1
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
+                 R171: actualizarTextoCTA compara contra la MATRIZ
+                 DE ESTADOS (SISTEMA.estadosPost — Constantes.gs).
 DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
                  Index.html (TABLAS), Core_CSS.html,
                  Iconos.html (pintarGlifos no se usa aquí)
@@ -143,6 +145,19 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
       return total;
     }
 
+    /* R171 · MATRIZ DE ESTADOS (Constantes.gs → SISTEMA): la
+       fuente de verdad de los estados de publicación viaja en el
+       SISTEMA de la sesión. El literal es SOLO respaldo de
+       emergencia para un SISTEMA viejo. */
+    function _estadosPost() {
+      return (window.SISTEMA && window.SISTEMA.estadosPost) || {
+        activo: 'activo', pronto: 'pronto',
+        inactivo: 'inactivo', pausado: 'pausado',
+        publicables: ['activo', 'pronto'],
+        excluidos: ['inactivo', 'pausado']
+      };
+    }
+
     function actualizarTextoCTA() {
       var btn  = document.querySelector('.cta-reservar');
       var span = document.querySelector('.cta-reservar .cta-reservar-texto');
@@ -159,9 +174,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
              Core_CSS sobre :disabled — nada de looks por caso. */
           var pj = postActivoGlobal.postJson || {};
           var meta = pj.meta || {};
-          var estado = postActivoGlobal.estado || 'activo';
+          var estado = postActivoGlobal.estado || _estadosPost().activo;
 
-          if (estado === 'pronto') {
+          if (estado === _estadosPost().pronto) {
             /* PRONTO: sin acción y con su texto de inactivo. */
             btn.disabled = true;
             span.textContent = meta.ctaInactivo || meta.cta || 'Quiero reservar mi cupo';
