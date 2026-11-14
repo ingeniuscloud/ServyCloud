@@ -18,8 +18,21 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.9.3
-CAMBIOS:         R179: ORDEN DEL DUEÑO — CARGA DE PRIMERA VEZ: el
+VERSIÓN:         2.9.4
+CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: del
+                 enlace compartido despiertan CIUDAD y CHIP.
+                 recibirLista vuelve (reducido): puerta SÍNCRONA
+                 que Core llama cuando el veredicto es 'lista',
+                 ANTES del chequeo de ciudad pendiente. Misma
+                 mecánica nativa de Puente.aplicarEstado:
+                 aplicarGuardada + app_vista — Chips.pintar nace
+                 con el chip del enlace activo y el carril monta
+                 sus páginas ya filtradas en la ÚNICA pintada del
+                 ciclo de siempre (sin buscar:change, sin
+                 repintados, cero cuotas). La palabra de búsqueda
+                 SIGUE DORMIDA (no se toca el campo). Legacy ?d=
+                 (ya no se emiten) sigue dormido (R179).
+                 R179: ORDEN DEL DUEÑO — CARGA DE PRIMERA VEZ: el
                  enlace compartido NO se aplica y su código de
                  precarga se ELIMINA (fuera recibirLista,
                  activarModo y avisoAmable). Ciudad, chip y
@@ -33,7 +46,7 @@ CAMBIOS:         R179: ORDEN DEL DUEÑO — CARGA DE PRIMERA VEZ: el
                  OpenAd.adDePost intacto. La X de salida (limpiar)
                  se queda: es la puerta que Buscar usa.
                  R178: receptor con la lista completa sin filtro
-                 (prueba sustituida por esta ronda).
+                 (prueba sustituida por R179/R180).
                  R174: el cambio de CHIP ya NO limpia el modo
                  compartido (orden del dueño: mientras la palabra
                  esté en el campo, cada chip muestra SUS items que
@@ -575,6 +588,86 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
+       R180 · RECEPTOR DE LISTA (despierto parcial, orden del
+       dueño): del enlace SOLO despiertan CIUDAD y CHIP — la
+       palabra de búsqueda sigue dormida (no se toca el campo).
+       Es la puerta SÍNCRONA que Core llama en el arranque cuando
+       el veredicto es 'lista', ANTES del chequeo de ciudad
+       pendiente. Misma mecánica nativa de Puente.aplicarEstado:
+       · ciudad → Ciudad.aplicarGuardada (queda como la del
+                  receptor, pinta el botón y emite ciudad:change —
+                  el ciclo de siempre; su resetearVista escribe el
+                  chip de servicio y ATRÁS llega el chip del
+                  enlace).
+       · chip   → app_vista en localStorage (validado contra
+                  SISTEMA.chips): Chips.pintar lo NACE activo y el
+                  carril monta sus páginas con ese chip — la lista
+                  sale filtrada en la ÚNICA pintada del ciclo
+                  normal. Sin buscar:change, sin repintados, cero
+                  llamadas GAS nuevas.
+       Enlace legacy ?d= (ya no se emiten): dormido (R179).
+       ============================================================ */
+    function aplicarDatosLista(datos) {
+      var chip = String(datos.g || '').trim();
+
+      /* Ciudad del enlace: misma búsqueda de siempre (R178). Si
+         ya no existe, la ciudad no se aplica (carga normal). */
+      var ciudad = null;
+      try {
+        if (window.Ciudad && typeof window.Ciudad.getLista === 'function') {
+          var idCiudad = String(datos.c || '').trim();
+          var lista = window.Ciudad.getLista() || [];
+          for (var i = 0; i < lista.length; i++) {
+            if (lista[i].idCiudad === idCiudad) { ciudad = lista[i]; break; }
+          }
+        }
+      } catch (_) {}
+
+      if (ciudad) {
+        try { window.Ciudad.aplicarGuardada(ciudad); } catch (_) {}
+      }
+
+      /* El chip del enlace va DESPUÉS de la ciudad: el
+         ciudad:change de la aplicación escribe el chip de
+         servicio (resetearVista, R63) y el chip del enlace manda
+         al final. Si no existe o está apagado, la vista no se
+         toca (camino de siempre). */
+      if (chip) {
+        var chips = (window.SISTEMA && window.SISTEMA.chips) || [];
+        for (var j = 0; j < chips.length; j++) {
+          if (chips[j] && chips[j].idChip === chip &&
+              chips[j].estado !== false) {
+            try {
+              localStorage.setItem('app_vista',
+                JSON.stringify({ idChip: chip }));
+            } catch (_) {}
+            break;
+          }
+        }
+      }
+    }
+
+    function recibirLista() {
+      var corto = leerParam('s');
+      if (!corto) return;   /* legacy ?d=: dormido (R179) */
+
+      var datos = null;
+      try {
+        datos = desempaquetar(corto);
+      } catch (err) {
+        console.warn('[Compartir] Enlace no válido:', err && err.message);
+        return;
+      }
+      if (!datos || datos.t !== 'l') return;
+
+      /* La barra queda limpia YA (misma regla de recibir):
+         recargar no re-ejecuta el enlace compartido. */
+      limpiarUrl();
+
+      aplicarDatosLista(datos);
+    }
+
+    /* ============================================================
        Limpiar · la X del campo + auto-limpieza
        Devuelve la app a su estado normal: ciudades, chips y
        todas las listas. La ciudad aplicada por el enlace queda
@@ -636,6 +729,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       hayEntrante:       hayEntrante,
       veredictoEntrante: veredictoEntrante,
       recibir:           recibir,
+      recibirLista:      recibirLista,
       urlDePost:         urlDePost,
       limpiar:           limpiar,
       estaCompartido:    function () { return !!modoCompartido; }

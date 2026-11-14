@@ -27,9 +27,19 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  ROOTJSON, arranque de componentes y detección de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
-                 compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.1
-CAMBIOS:         R179: CARGA DE PRIMERA VEZ (orden del dueño): el
+                 compartidas (post abre su ad; lista aplica ciudad
+                 y chip del enlace) / ciudad pendiente / lienzo.
+VERSIÓN:         1.45.2
+CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: el
+                 veredicto 'lista' llama Compartir.recibirLista()
+                 ANTES del chequeo de ciudad pendiente — ciudad y
+                 chip del enlace aplicados por la mecánica nativa
+                 de Puente.aplicarEstado (aplicarGuardada +
+                 app_vista): el lienzo NACE con la ciudad y el
+                 chip del enlace y la lista sale filtrada en la
+                 única pintada del ciclo de siempre. La palabra
+                 sigue dormida. Cero cuotas.
+                 R179: CARGA DE PRIMERA VEZ (orden del dueño): el
                  enlace compartido NO precarga nada — el arranque
                  pregunta el veredicto (puerta local de siempre,
                  cero cuotas): 'post' → recibe el enlace (R171,
@@ -82,9 +92,19 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  ROOTJSON, arranque de componentes y detección de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
-                 compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.1
-CAMBIOS:         R179: CARGA DE PRIMERA VEZ (orden del dueño): el
+                 compartidas (post abre su ad; lista aplica ciudad
+                 y chip del enlace) / ciudad pendiente / lienzo.
+VERSIÓN:         1.45.2
+CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: el
+                 veredicto 'lista' llama Compartir.recibirLista()
+                 ANTES del chequeo de ciudad pendiente — ciudad y
+                 chip del enlace aplicados por la mecánica nativa
+                 de Puente.aplicarEstado (aplicarGuardada +
+                 app_vista): el lienzo NACE con la ciudad y el
+                 chip del enlace y la lista sale filtrada en la
+                 única pintada del ciclo de siempre. La palabra
+                 sigue dormida. Cero cuotas.
+                 R179: CARGA DE PRIMERA VEZ (orden del dueño): el
                  enlace compartido NO precarga nada — el arranque
                  pregunta el veredicto (puerta local de siempre,
                  cero cuotas): 'post' → recibe el enlace (R171,
@@ -742,6 +762,27 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
                 }
               });
               return;
+            }
+
+            /* R180 · ORDEN DEL DUEÑO — EL VERDADERO FILTRO: la
+               lista compartida despierta SOLO ciudad y chip, y
+               ANTES del chequeo de ciudad pendiente: el enlace
+               trae ciudad → no hay elección obligatoria. Misma
+               mecánica nativa de Puente.aplicarEstado
+               (aplicarGuardada + app_vista): el lienzo NACE con
+               la ciudad y el chip del enlace y la lista sale
+               filtrada en la única pintada del ciclo de siempre.
+               La palabra sigue dormida. Cero cuotas. */
+            if (veredicto === 'lista') {
+              try {
+                if (window.Compartir &&
+                    typeof window.Compartir.recibirLista === 'function') {
+                  window.Compartir.recibirLista();
+                }
+              } catch (e3) {
+                console.warn('[Core] Compartir.recibirLista:',
+                             e3 && e3.message);
+              }
             }
 
             var hayPendiente = window.Ciudad &&
