@@ -16,13 +16,11 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  con puente se retransmite y sin él van directos a
                  gtag de la página.
                  · DATOS: cargarTablas (L2 primero, backend
-                 después, stale-while-revalidate; si la 1ª llamada
-                 falla, revalidación muda de recuperación), la VIDA
-                 del post en el teléfono (_postExpiraVivo_: la
-                 ventana meta.expira se filtra en vivo con el reloj
-                 local), refrescar catálogo al volver la app a
-                 primer plano (throttle 60 s) y revalidación muda
-                 del catálogo.
+                 después, stale-while-revalidate), la VIDA del post
+                 en el teléfono (_postExpiraVivo_: la ventana
+                 meta.expira se filtra en vivo con el reloj local),
+                 refrescar catálogo al volver la app a primer plano
+                 (throttle 60 s) y revalidación muda del catálogo.
                  · LIENZO: inyección del template, esqueleto de
                  lista (en la página activa del carril), título del
                  encabezado y placeholder del buscador desde
@@ -30,17 +28,8 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.1
-CAMBIOS:         R177: el arranque con catálogo FALLIDO ya no deja
-                 la pantalla sin items — el catch de cargarTablas
-                 arma la revalidación muda de siempre (la misma que
-                 corre en todo boot L2) y refrescarCatalogo
-                 repinta por pintarTodo cuando su refresco trae
-                 datos a un teléfono que arrancó vacío. Mismo
-                 pintor de siempre: pintarTodo aplica el término en
-                 cada chip y la FIRMA evita remontes de más. Cero
-                 puertas nuevas, cero llamadas en el camino exitoso.
-                 R173: el repintado de fondo del catálogo ya no
+VERSIÓN:         1.45.0
+CAMBIOS:         R173: el repintado de fondo del catálogo ya no
                  consulta el campo buscar — el término es ESTADO
                  de Lista y pintarTodo lo respeta en cada chip.
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
@@ -325,17 +314,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
           window.TABLAS.posts    = [];
           window.TABLAS.partners = [];
           datosListos = true;
-
-          /* R177 · RECUPERACIÓN con la pieza de siempre: la misma
-             revalidación muda que corre en todo boot L2. El boot
-             NO puede quedarse vacío — el receptor de una lista
-             compartida aterriza por aquí con su palabra ya puesta
-             y cuando la revalidación trae el catálogo, pintarTodo
-             repinta la tira COMPLETA (postsDeChip aplica el
-             término en cada chip, FIRMA evita remontes de más).
-             Costo: la MISMA llamada muda que ya paga todo boot
-             con L2. En el camino exitoso esto no existe. */
-          _revalidarCatalogo('');
         });
     }
 
@@ -734,26 +712,11 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
     var THROTTLE_REFRESH_MS = 60 * 1000;
 
     function refrescarCatalogo() {
-      /* R177 · ¿arrancó el teléfono sin catálogo? (1ª llamada
-         fallida). Si este refresco trae datos, la tira se
-         repinta por el pintor de SIEMPRE — pintarTodo lee el
-         término de su estado y la FIRMA evita remontes de más.
-         Es la misma puerta que _revalidarCatalogo usa desde
-         siempre; cero llamadas nuevas. */
-      var arrancoVacio = !(window.TABLAS.posts && window.TABLAS.posts.length);
-
       return postBackend('catalogo', null, { mudo: true })
         .then(function (data) {
           if (data && Array.isArray(data.posts))     window.TABLAS.posts    = _postExpiraVivo_(data.posts);
           if (data && Array.isArray(data.partners))  window.TABLAS.partners = data.partners;
           window.CacheL2.guardarCatalogo(data);
-
-          if (arrancoVacio && window.TABLAS.posts.length &&
-              window.Lista && typeof window.Lista.getModo === 'function' &&
-              window.Lista.getModo() === 'lista' &&
-              typeof window.Lista.pintarTodo === 'function') {
-            window.Lista.pintarTodo(null);
-          }
         })
         .catch(function (err) {
           console.warn('[Core] No se pudo refrescar catálogo:', err.message);

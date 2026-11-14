@@ -18,8 +18,16 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.9.1
-CAMBIOS:         R174: el cambio de CHIP ya NO limpia el modo
+VERSIÓN:         2.9.2
+CAMBIOS:         R178: ORDEN DEL DUEÑO (prueba desde cero) — el
+                 receptor aterriza en la LISTA COMPLETA sin filtro:
+                 recibirLista ya NO selecciona el chip ni dispara
+                 buscar:change (fuera también la segunda pasada
+                 R126). La palabra queda SOLO en el campo
+                 (activarModo) y el listado pinta completo por el
+                 ciclo de siempre, el mismo de la pantalla normal.
+                 El token NO cambia.
+                 R174: el cambio de CHIP ya NO limpia el modo
                  compartido (orden del dueño: mientras la palabra
                  esté en el campo, cada chip muestra SUS items que
                  concuerdan — solo el campo vacío quita el filtro).
@@ -58,8 +66,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                  Social_Script.html (urlDePost), Chips_CSS.html
                  (.btn-compartir / .compartida)
 ════════════════════════════════════════════════════════════════════*/
-
-
   window.Compartir = (function () {
 
     /* ============================================================
@@ -624,47 +630,13 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
 
       activarModo(termino);
 
-      var aplicarFiltro = function () {
-        /* R173 · CHIP + PALABRA JUNTOS: la búsqueda es por chip
-           (Lista), así que la vista del emisor es chip + término.
-           Se selecciona el chip del enlace Y se aplica la palabra:
-           el receptor aterriza en la MISMA lista filtrada que se
-           compartió. */
-        if (chip &&
-            window.Chips && typeof window.Chips.seleccionar === 'function') {
-          window.Chips.seleccionar(chip);
-        }
-
-        if (termino) {
-          var input = document.getElementById('buscarInput');
-          if (input) input.value = termino;
-
-          /* Mismo carril que el buscador: Lista repinta TODAS las
-             páginas con el filtro por chip (y avisa "sin
-             resultados" en la visible si ya no hay). */
-          document.dispatchEvent(new CustomEvent('buscar:change', {
-            detail: { termino: termino, enLimite: false }
-          }));
-
-          /* R126 · SEGUNDA PASADA en el ciclo siguiente: el
-             aterrizaje dispara ciudad:change / chips:change
-             (repintados R63) que pueden llegar DESPUÉS de este
-             filtro; la palabra re-afirma aquí su repintado y
-             queda como estado FINAL del enlace compartido.
-             Core_Script 1.38 hace lo propio en sus repintados
-             de fondo (catálogo L2 distinto). */
-          setTimeout(function () {
-            if (modoCompartido === 'lista') {
-              document.dispatchEvent(new CustomEvent('buscar:change', {
-                detail: { termino: termino, enLimite: false }
-              }));
-            }
-          }, 0);
-        }
-
-        aplicando = false;
-      };
-
+      /* R178 · ORDEN DEL DUEÑO (prueba desde cero): el receptor
+         aterriza en la LISTA COMPLETA, sin filtro alguno. La
+         palabra queda SOLO en el campo (activarModo) y el listado
+         pinta completo por el ciclo de siempre, el MISMO camino
+         de la pantalla normal (boot normal / ciudad:change →
+         pintarTodo con busquedaActual vacío). Ni chip ni
+         buscar:change: aquí no se aplica filtro. */
       try {
         var actual = (window.Ciudad && typeof window.Ciudad.getActual === 'function')
           ? window.Ciudad.getActual() : null;
@@ -678,7 +650,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         console.warn('[Compartir] Aplicar ciudad falló:', err && err.message);
       }
 
-      aplicarFiltro();
+      aplicando = false;
     }
 
     /* ============================================================
