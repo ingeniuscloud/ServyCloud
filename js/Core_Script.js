@@ -28,8 +28,70 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.0
-CAMBIOS:         R173: el repintado de fondo del catálogo ya no
+VERSIÓN:         1.45.1
+CAMBIOS:         R179: CARGA DE PRIMERA VEZ (orden del dueño): el
+                 enlace compartido NO precarga nada — el arranque
+                 pregunta el veredicto (puerta local de siempre,
+                 cero cuotas): 'post' → recibe el enlace (R171,
+                 intacto); 'lista'/null → arranque NORMAL completo
+                 (ciudad pendiente → elección obligatoria; si no,
+                 lienzo tras la carga).
+                 R173: el repintado de fondo del catálogo ya no
+                 consulta el campo buscar — el término es ESTADO
+                 de Lista y pintarTodo lo respeta en cada chip.
+ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
+                 de rondas vive en la bitácora y en versiones/.
+DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
+                 _mostrarErrorRed),
+                 Core_Memoria_Script.html (window.CacheL2,
+                 window.PostFull),
+                 Index.html (SISTEMA, TOKEN, URL_EXEC),
+                 Lista_Script.html (window.Lista),
+                 Lista_Detalle_Script.html (window.ListaDetalle),
+                 Seccion_Script.html
+                 (window.Secciones), Chips_Script.html,
+                 Pregunta_Script.html (window.Pregunta),
+                 Reserva_Script.html y hojas de reserva, Iconos.html
+════════════════════════════════════════════════════════════════════*/
+/*════════════════════════════════════════════════════════════════════
+
+ARCHIVO:         Core_Script.html
+ESPEJO GITHUB:   github/js/Core_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
+PROYECTO:        INGeniousCloud | ServyCloud
+RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
+                 vida. Los empleados viven en sus propios módulos
+                 (Core_Memoria la memoria, Core_Aviso el aviso,
+                 Core_Post el post abierto, Core_Swipe el
+                 desplazamiento).
+                 · window.Puente — persistencia de preferencias vía
+                 envoltorio: pedirEstado/aplicarEstado/guardar con
+                 la ventana contenedora (postMessage), ciudad y
+                 vista.
+                 · window.Analitica — Capa 1 GA4: eventos blancos,
+                 con puente se retransmite y sin él van directos a
+                 gtag de la página.
+                 · DATOS: cargarTablas (L2 primero, backend
+                 después, stale-while-revalidate), la VIDA del post
+                 en el teléfono (_postExpiraVivo_: la ventana
+                 meta.expira se filtra en vivo con el reloj local),
+                 refrescar catálogo al volver la app a primer plano
+                 (throttle 60 s) y revalidación muda del catálogo.
+                 · LIENZO: inyección del template, esqueleto de
+                 lista (en la página activa del carril), título del
+                 encabezado y placeholder del buscador desde
+                 ROOTJSON, arranque de componentes y detección de
+                 móvil (is-mobile).
+                 · ARRANQUE: sesión → estado del puente → entradas
+                 compartidas / ciudad pendiente / lienzo.
+VERSIÓN:         1.45.1
+CAMBIOS:         R179: CARGA DE PRIMERA VEZ (orden del dueño): el
+                 enlace compartido NO precarga nada — el arranque
+                 pregunta el veredicto (puerta local de siempre,
+                 cero cuotas): 'post' → recibe el enlace (R171,
+                 intacto); 'lista'/null → arranque NORMAL completo
+                 (ciudad pendiente → elección obligatoria; si no,
+                 lienzo tras la carga).
+                 R173: el repintado de fondo del catálogo ya no
                  consulta el campo buscar — el término es ESTADO
                  de Lista y pintarTodo lo respeta en cada chip.
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
@@ -655,34 +717,48 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
         window.Puente.pedirEstado().then(function (estado) {
           window.Puente.aplicarEstado(estado);
 
-          if (window.Compartir &&
-              typeof window.Compartir.hayEntrante === 'function' &&
-              window.Compartir.hayEntrante()) {
+          /* R179 · CARGA DE PRIMERA VEZ (orden del dueño): el
+             enlace compartido NO precarga nada — ciudad, chip y
+             palabra viajan DORMIDOS (su código de precarga fue
+             eliminado). El veredicto (puerta LOCAL de siempre,
+             cero cuotas) separa los dos únicos caminos:
+             'post' → el enlace de UN POST abre su ad (R171,
+             intacto); 'lista'/null → el arranque NORMAL completo
+             de primera vez: ciudad pendiente → elección
+             obligatoria; si no, lienzo tras la carga. */
+          var entrante = (window.Compartir &&
+                          typeof window.Compartir.veredictoEntrante === 'function')
+            ? window.Compartir.veredictoEntrante()
+            : Promise.resolve(null);
+
+          entrante.then(function (veredicto) {
+            if (veredicto === 'post') {
+              promesaCarga.then(function () {
+                inyectarLienzo();
+                try {
+                  window.Compartir.recibir();
+                } catch (e2) {
+                  console.warn('[Core] Compartir.recibir:', e2 && e2.message);
+                }
+              });
+              return;
+            }
+
+            var hayPendiente = window.Ciudad &&
+                               typeof window.Ciudad.hayPendiente === 'function' &&
+                               window.Ciudad.hayPendiente();
+
+            if (hayPendiente) {
+              inyectarLienzo();
+              setTimeout(function () {
+                window.Ciudad.abrirObligatorio();
+              }, 80);
+              return;
+            }
+
             promesaCarga.then(function () {
               inyectarLienzo();
-              try {
-                window.Compartir.recibir();
-              } catch (e2) {
-                console.warn('[Core] Compartir.recibir:', e2 && e2.message);
-              }
             });
-            return;
-          }
-
-          var hayPendiente = window.Ciudad &&
-                             typeof window.Ciudad.hayPendiente === 'function' &&
-                             window.Ciudad.hayPendiente();
-
-          if (hayPendiente) {
-            inyectarLienzo();
-            setTimeout(function () {
-              window.Ciudad.abrirObligatorio();
-            }, 80);
-            return;
-          }
-
-          promesaCarga.then(function () {
-            inyectarLienzo();
           });
         });
       });
@@ -746,3 +822,4 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
     document.addEventListener('visibilitychange', onVisibilityChange);
 
   })();
+

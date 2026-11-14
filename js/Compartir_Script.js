@@ -18,15 +18,22 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.9.2
-CAMBIOS:         R178: ORDEN DEL DUEÑO (prueba desde cero) — el
-                 receptor aterriza en la LISTA COMPLETA sin filtro:
-                 recibirLista ya NO selecciona el chip ni dispara
-                 buscar:change (fuera también la segunda pasada
-                 R126). La palabra queda SOLO en el campo
-                 (activarModo) y el listado pinta completo por el
-                 ciclo de siempre, el mismo de la pantalla normal.
-                 El token NO cambia.
+VERSIÓN:         2.9.3
+CAMBIOS:         R179: ORDEN DEL DUEÑO — CARGA DE PRIMERA VEZ: el
+                 enlace compartido NO se aplica y su código de
+                 precarga se ELIMINA (fuera recibirLista,
+                 activarModo y avisoAmable). Ciudad, chip y
+                 palabra viajan DORMIDOS: el emisor sigue
+                 empaquetándolos igual, el receptor los ignora y
+                 su app carga NORMAL — su ciudad guardada o, si no
+                 tiene, la elección obligatoria de primera vez
+                 (el arranque de Core decide con veredictoEntrante,
+                 puerta local de siempre, cero cuotas). Solo el
+                 POST compartido (R171) despierta: recibirPost →
+                 OpenAd.adDePost intacto. La X de salida (limpiar)
+                 se queda: es la puerta que Buscar usa.
+                 R178: receptor con la lista completa sin filtro
+                 (prueba sustituida por esta ronda).
                  R174: el cambio de CHIP ya NO limpia el modo
                  compartido (orden del dueño: mientras la palabra
                  esté en el campo, cada chip muestra SUS items que
@@ -519,14 +526,15 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         .then(function (datos) {
           if (!datos || typeof datos !== 'object') return;
 
-          /* Guardia: la apertura del contenido dispara
-             ciudad:change / chips:change legítimos (cambio de
-             ciudad y chip del enlace) que NO deben limpiar el
-             modo compartido recién activado. */
-          aplicando = true;
+          /* R179 · SOLO EL POST DESPIERTA (orden del dueño): el
+             enlace de LISTA no se aplica — ciudad, chip y palabra
+             viajan dormidos y la app carga normal de primera vez
+             (el arranque de Core enruta con veredictoEntrante).
+             El código de precarga de lista fue ELIMINADO. */
+          if (datos.t !== 'p') return;
 
-          if (datos.t === 'p') recibirPost(datos);
-          else if (datos.t === 'l') recibirLista(datos);
+          aplicando = true;
+          recibirPost(datos);
         })
         .catch(function (err) {
           console.warn('[Compartir] Enlace no válido:', err && err.message);
@@ -543,40 +551,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
         if (chips[i].idChip === id) return String(chips[i].titulo || '').trim();
       }
       return '';
-    }
-
-    function avisoAmable(texto) {
-      var el = document.getElementById('buscarVacio');
-      if (!el) return;
-      el.textContent = texto;
-      el.hidden = false;
-    }
-
-    /* R171 · SOLO LISTA: el modo compartido-post murió. La cápsula
-       bloqueada con su CANCELAR es exclusiva del receptor de una
-       lista filtrada (su flujo intacto al 100%). */
-    function activarModo(textoCampo) {
-      modoCompartido = 'lista';
-
-      var wrap  = document.querySelector('.filtros-wrap');
-      var fila  = document.querySelector('.filtros-fila');
-      var input = document.getElementById('buscarInput');
-
-      /* La CÁPSULA queda desplegada y bloqueada — la clase
-         .compartida viste la fila (chips/lupa/compartir fuera,
-         solo CANCELAR activo) y la cabecera. */
-      if (wrap) wrap.classList.add('compartida');
-      if (fila) fila.classList.add('compartida');
-      if (input) {
-        input.value = textoCampo || '';
-        input.readOnly = true;
-        if (typeof input.blur === 'function') input.blur();
-      }
-
-      document.body.classList.add('compartido-lista');
-
-      /* La ciudad se ve pero NO se toca (CSS en Chips_CSS) */
-      document.body.classList.add('modo-compartido');
     }
 
     /* R171 · RECEPTOR DE POST · la app carga NORMAL detrás y el
@@ -598,59 +572,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       } catch (err) {
         console.warn('[Compartir] Ad del post falló:', err && err.message);
       }
-    }
-
-    function recibirLista(datos) {
-      var termino = String(datos.q || '').trim().slice(0, 40);
-      var chip = String(datos.g || '').trim();
-
-      /* El enlace puede venir por término de búsqueda, por CHIP
-         sin término, o por AMBOS (R173: la vista del emisor es
-         chip + palabra). Sin ninguno no hay lista que abrir. */
-      if (!termino && !chip) { aplicando = false; return; }
-
-      /* La lista filtrada depende de la ciudad: si la ciudad del
-         enlace ya no existe, aviso amable y app normal. */
-      var ciudad = null;
-      try {
-        if (window.Ciudad && typeof window.Ciudad.getLista === 'function') {
-          var idCiudad = String(datos.c || '').trim();
-          var lista = window.Ciudad.getLista() || [];
-          for (var i = 0; i < lista.length; i++) {
-            if (lista[i].idCiudad === idCiudad) { ciudad = lista[i]; break; }
-          }
-        }
-      } catch (_) {}
-
-      if (!ciudad) {
-        aplicando = false;
-        avisoAmable('Esta lista ya no está disponible.');
-        return;
-      }
-
-      activarModo(termino);
-
-      /* R178 · ORDEN DEL DUEÑO (prueba desde cero): el receptor
-         aterriza en la LISTA COMPLETA, sin filtro alguno. La
-         palabra queda SOLO en el campo (activarModo) y el listado
-         pinta completo por el ciclo de siempre, el MISMO camino
-         de la pantalla normal (boot normal / ciudad:change →
-         pintarTodo con busquedaActual vacío). Ni chip ni
-         buscar:change: aquí no se aplica filtro. */
-      try {
-        var actual = (window.Ciudad && typeof window.Ciudad.getActual === 'function')
-          ? window.Ciudad.getActual() : null;
-
-        if (!actual || actual.idCiudad !== ciudad.idCiudad) {
-          /* aplicarGuardada guarda, pinta y emite ciudad:change
-             (repintado completo sincrónico cuando TABLAS ya está). */
-          window.Ciudad.aplicarGuardada(ciudad);
-        }
-      } catch (err) {
-        console.warn('[Compartir] Aplicar ciudad falló:', err && err.message);
-      }
-
-      aplicando = false;
     }
 
     /* ============================================================
