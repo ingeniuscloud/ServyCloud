@@ -28,20 +28,8 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.1
-CAMBIOS:         R175: el catálogo que llega TARDE vuelve a pintar
-                 la tira. Dos huecos cerrados: (1) un catálogo ok
-                 pero VACÍO al primer arranque montaba la
-                 recepción de un enlace compartido con páginas
-                 de FIRMA vacía y NADA las repintaba jamás (el
-                 receptor veía ciudad y chip correctos y la lista
-                 en blanco hasta mover chips) → un revalidado mudo
-                 de rescate trae el catálogo real y repinta; (2)
-                 el relleno tardío del visibilitychange
-                 (refrescarCatalogo) llenaba TABLAS sin tocar la
-                 vista → mismo carril que _revalidarCatalogo:
-                 repinta respetando el modo y el término vivo.
-                 R173: el repintado de fondo del catálogo ya no
+VERSIÓN:         1.45.0
+CAMBIOS:         R173: el repintado de fondo del catálogo ya no
                  consulta el campo buscar — el término es ESTADO
                  de Lista y pintarTodo lo respeta en cada chip.
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
@@ -320,22 +308,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
           window.TABLAS.partners = (data && Array.isArray(data.partners)) ? data.partners : [];
           datosListos = true;
           window.CacheL2.guardarCatalogo(data);
-
-          /* R175 · SEGUNDA OPORTUNIDAD DEL CATÁLOGO VACÍO: una
-             respuesta ok pero SIN posts (pico del backend, red
-             caprichosa) dejaba la app pintada vacía para
-             SIEMPRE: la recepción de un enlace compartido monta
-             sus páginas con FIRMA vacía y ningún evento vuelve a
-             repintarlas — el receptor veía ciudad y chip
-             correctos y la lista en blanco hasta mover chips.
-             Un solo revalidado mudo de rescate: trae el catálogo
-             real (rawAnterior null → aunque el raw coincida, se
-             repinta) y pintarTodo respeta el modo y el término
-             vivo. Un catálogo LEGÍTIMAMENTE vacío solo paga una
-             llamada más. */
-          if (!window.TABLAS.posts.length) {
-            _revalidarCatalogo(null);
-          }
         })
         .catch(function (err) {
           console.warn('[Core] No se pudo cargar catálogo:', err.message);
@@ -745,24 +717,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
           if (data && Array.isArray(data.posts))     window.TABLAS.posts    = _postExpiraVivo_(data.posts);
           if (data && Array.isArray(data.partners))  window.TABLAS.partners = data.partners;
           window.CacheL2.guardarCatalogo(data);
-
-          /* R175 · EL RELLENO TARDÍO REPARTE: el receptor que
-             aterrizó con catálogo vacío y recuperó el real al
-             volver de segundo plano tenía TABLAS llenas y la
-             lista en blanco — los items solo aparecían al mover
-             chips (asentado). Mismo carril que
-             _revalidarCatalogo: el modo de Lista manda y
-             pintarTodo respeta el término vivo (la FIRMA barre lo
-             al día: sin cambio de datos esto no remonta nada). */
-          if (window.Lista && typeof window.Lista.getModo === 'function' &&
-              window.Lista.getModo() === 'lista') {
-            if (window.Promo && typeof window.Promo.construir === 'function') {
-              window.Promo.construir();
-            }
-            if (typeof window.Lista.pintarTodo === 'function') {
-              window.Lista.pintarTodo(null);
-            }
-          }
         })
         .catch(function (err) {
           console.warn('[Core] No se pudo refrescar catálogo:', err.message);
