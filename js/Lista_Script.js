@@ -23,8 +23,9 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  disco, sin red), badge .badgeNuevo/.badgeUsado,
                  título a 2 líneas y slot precio/fecha ("A
                  consultar" si no hay). Datos horneados en el
-                 catálogo. La búsqueda sigue SIEMPRE en lista (y
-                 fija el carril en la página visible).
+                 catálogo. La búsqueda filtra DENTRO de cada chip
+                 (R173): con término, cada página muestra solo sus
+                 items que concuerdan.
                  · La PRECARGA del primer post (PostFull) solo corre
                  en la página VISIBLE: la cuota no paga por páginas
                  que nadie mira.
@@ -54,12 +55,20 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.32
+VERSIÓN:         2.33
+CAMBIOS:         R173: la búsqueda es POR CHIP — el término vive
+                 como ESTADO de Lista y postsDeChip lo aplica en
+                 cada página: cada chip muestra solo SUS items que
+                 concuerdan, y el filtro sobrevive al cambio de
+                 chip y a todo repintado de fondo (asentado,
+                 catálogo, ciudad, orden). Mueren
+                 postsDeBusqueda/pintarBusqueda (cruzaba todos los
+                 chips y se anulaba al cambiar) y el fijo del
+                 carril. R171: los filtros de posts comparan contra
+                 la MATRIZ DE ESTADOS (SISTEMA.estadosPost —
+                 Constantes.gs), nunca contra estados a mano.
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
-                 R171: los filtros de posts comparan contra la
-                 MATRIZ DE ESTADOS (SISTEMA.estadosPost —
-                 Constantes.gs), nunca contra estados a mano.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
                  Global_Script.html (postBackend),
                  Core_Swipe_Script.html (window.SwipeChips · carril),
@@ -83,6 +92,17 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
        hoja). Lo fija el sheet de ordenamiento vía 'orden:change'.
        Es de SESIÓN: al recargar vuelve al recomendado. */
     var ordenActual = 'recomendado';
+
+    /* BÚSQUEDA ACTIVA (R173): la palabra del campo buscar como
+       ESTADO de Lista, normalizada (minúscula, sin acentos).
+       '' = sin búsqueda. postsDeChip la aplica en CADA chip:
+       cada página muestra solo SUS items que concuerdan y el
+       filtro sobrevive a cambios de chip y repintados de fondo. */
+    var busquedaActual = '';
+
+    /* Aviso secundario del límite de 40 chars: viaja en
+       'buscar:change' y solo viste la página visible. */
+    var limiteBusqueda = false;
 
     function delegado(nombre, fallback) {
       return function () {
@@ -513,58 +533,45 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
           if (ciudades.indexOf(ciudad) === -1) return false;
         }
 
+        /* R173 · CON TÉRMINO, el filtro vive DENTRO del chip:
+           solo pasan SUS items cuyo texto concuerda. */
+        if (busquedaActual &&
+            textoDePost(p).indexOf(busquedaActual) === -1) return false;
+
         return true;
       });
     }
 
     /* ============================================================
-       Filtro · ciudad + búsqueda cross-chip
+       TEXTO BUSCABLE de un post (R173): los mismos campos que
+       cruzaba la búsqueda de antes (botón, título, id, grupos,
+       partner con su marca y eslogan) — normalizado una vez y
+       aplicado DENTRO de cada chip por postsDeChip.
        ============================================================ */
-    function postsDeBusqueda(termino) {
-      var t = normalizar(termino);
-      if (!t) return [];
-
-      if (ciudadPendiente()) return [];
-
-      var ciudad = ciudadActiva();
-      var posts  = (window.TABLAS && window.TABLAS.posts) || [];
+    function textoDePost(p) {
       var grupos = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
-      var excluidos = _estadosPost().excluidos;
-
-      return posts.filter(function (p) {
-        if (!p || !p.id) return false;
-        if (excluidos.indexOf(p.estado) !== -1) return false;
-
-        if (ciudad) {
-          var ciudades = p.idCiudad || [];
-          if (ciudades.indexOf(ciudad) === -1) return false;
-        }
-
-        var gruposTexto = '';
-        (p.idGrupo || []).forEach(function (idG) {
-          for (var i = 0; i < grupos.length; i++) {
-            if (grupos[i].idGrupo === idG) {
-              gruposTexto += ' ' + (grupos[i].titulo || '');
-              break;
-            }
+      var gruposTexto = '';
+      (p.idGrupo || []).forEach(function (idG) {
+        for (var i = 0; i < grupos.length; i++) {
+          if (grupos[i].idGrupo === idG) {
+            gruposTexto += ' ' + (grupos[i].titulo || '');
+            break;
           }
-        });
-
-        var partner = buscarPartner(p.idPartner) || {};
-        var pj = partner.partnerJson || {};
-
-        var campos = normalizar(
-          (p.boton    || '') + ' ' +
-          (p.titulo   || '') + ' ' +
-          (p.id       || '') + ' ' +
-          gruposTexto + ' ' +
-          (partner.nombre || '') + ' ' +
-          (partner.marca  || '') + ' ' +
-          (pj.esloganPartner || '')
-        );
-
-        return campos.indexOf(t) !== -1;
+        }
       });
+
+      var partner = buscarPartner(p.idPartner) || {};
+      var pj = partner.partnerJson || {};
+
+      return normalizar(
+        (p.boton    || '') + ' ' +
+        (p.titulo   || '') + ' ' +
+        (p.id       || '') + ' ' +
+        gruposTexto + ' ' +
+        (partner.nombre || '') + ' ' +
+        (partner.marca  || '') + ' ' +
+        (pj.esloganPartner || '')
+      );
     }
 
     function actualizarAvisoBusqueda(mostrar, enLimite) {
@@ -799,11 +806,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
 
     function pintar(idChip, conRespiro) {
       chipActivoActual = idChip;
-      pintarLista(postsDeChip(idChip), false, false, idChip, conRespiro);
-    }
-
-    function pintarBusqueda(termino, enLimite) {
-      pintarLista(postsDeBusqueda(termino), true, enLimite, chipVisible());
+      pintarLista(postsDeChip(idChip), !!busquedaActual, limiteBusqueda,
+                  idChip, conRespiro);
     }
 
     /* ============================================================
@@ -831,7 +835,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       for (var i = 0; i < chips.length; i++) {
         var idChip = chips[i].getAttribute('data-chip');
         if (!idChip) continue;
-        if (pintarLista(postsDeChip(idChip), false, false, idChip, false)) {
+        if (pintarLista(postsDeChip(idChip), !!busquedaActual,
+                        limiteBusqueda, idChip, false)) {
           cambio = true;
         }
       }
@@ -863,27 +868,22 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     });
 
     document.addEventListener('buscar:change', function (e) {
-      var termino  = e.detail && e.detail.termino;
-      var enLimite = e.detail && e.detail.enLimite;
+      /* R173 · la palabra es ESTADO: vive aquí y postsDeChip la
+         aplica en cada chip. Se repinta la TIRA COMPLETA — todas
+         las páginas nacen con SU filtro y el carril ya no se
+         fija: cambiar de chip con la búsqueda puesta muestra el
+         filtro de ESE chip. */
+      busquedaActual = normalizar(
+        String((e.detail && e.detail.termino) || '').trim());
+      limiteBusqueda = !!(e.detail && e.detail.enLimite) && !!busquedaActual;
 
-      /* con búsqueda el carril se FIJA en la página visible */
-      var c = document.getElementById('listaWrap');
-      if (c) c.classList.toggle('fijo', !!(termino && termino.trim()));
-
-      if (termino && termino.trim()) {
-        pintarBusqueda(termino, enLimite);
-      } else {
-        pintar(chipActivoActual || chipVisible(), null);
-      }
+      pintarTodo();
     });
 
     document.addEventListener('ciudad:change', function () {
-      var input = document.getElementById('buscarInput');
-      if (input && input.value.trim()) {
-        pintarBusqueda(input.value.trim(), false);
-      } else {
-        pintarTodo(null);   /* ciudad nueva: tira completa + respiro */
-      }
+      /* R173 · el término es estado: si está activo, cada página
+         repinta con SU filtro; si no, tira completa. + respiro. */
+      pintarTodo(null);   /* ciudad nueva: tira completa + respiro */
     });
 
     /* ORDEN:change · el sheet de ordenamiento fijó otro orden:
@@ -891,17 +891,12 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     document.addEventListener('orden:change', function (e) {
       ordenActual = (e.detail && e.detail.orden) || 'recomendado';
 
-      var input = document.getElementById('buscarInput');
-      if (input && input.value.trim()) {
-        pintarBusqueda(input.value.trim(), false);
-      } else {
-        pintarTodo(null);   /* orden nuevo: tira completa + respiro */
-      }
+      /* R173 · el término es estado: pintarTodo lo respeta. */
+      pintarTodo(null);   /* orden nuevo: tira completa + respiro */
     });
 
     return {
       pintar:         pintar,
-      pintarBusqueda: pintarBusqueda,
       pintarTodo:     pintarTodo,
 
       /* Puertas clásicas del detalle — viven en window.ListaDetalle */

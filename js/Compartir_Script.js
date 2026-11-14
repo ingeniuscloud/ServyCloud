@@ -9,8 +9,8 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  (2) LISTA FILTRADA — el TEXTO "Compartir lista
                  filtrada" sobre la lista (Lista_Script decide su
                  visibilidad con los items) comparte el filtro
-                 visible: término de búsqueda O chip activo, más
-                 la ciudad.
+                 visible: término de búsqueda, chip activo o ambos
+                 (R173), más la ciudad.
                  RECEPTOR · R171: la carga por enlace de UN POST ya
                  NO activa modo compartido — la app carga NORMAL y
                  el ad de esa carga es EL DEL POST (OpenAd.adDePost,
@@ -18,8 +18,20 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.8.1
-CAMBIOS:         R172: CORRECCIÓN — veredictoEntrante quedó sin
+VERSIÓN:         2.9.1
+CAMBIOS:         R174: el cambio de CHIP ya NO limpia el modo
+                 compartido (orden del dueño: mientras la palabra
+                 esté en el campo, cada chip muestra SUS items que
+                 concuerdan — solo el campo vacío quita el filtro).
+                 La auto-limpieza queda SOLO en ciudad:change
+                 (R108). Pareja con Chips_CSS: los chips vuelven a
+                 verse en el modo compartido.
+                 R173: receptor de lista — el enlace trae chip Y
+                 palabra y se aplican AMBOS: la búsqueda es por
+                 chip (Lista), así que aterrizar sin el chip del
+                 emisor mostraba otro chip distinto, o vacío. El
+                 token NO cambia.
+                 R172: CORRECCIÓN — veredictoEntrante quedó sin
                  exportar en el return del módulo (falla R171): el
                  veredicto siempre resolvía null y el open ad de
                  PROMO montaba primero en toda carga de post
@@ -586,9 +598,9 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       var termino = String(datos.q || '').trim().slice(0, 40);
       var chip = String(datos.g || '').trim();
 
-      /* El enlace puede venir por término de búsqueda (de
-         siempre) o por CHIP sin término (compartir en modo
-         chip). Sin ninguno de los dos no hay lista que abrir. */
+      /* El enlace puede venir por término de búsqueda, por CHIP
+         sin término, o por AMBOS (R173: la vista del emisor es
+         chip + palabra). Sin ninguno no hay lista que abrir. */
       if (!termino && !chip) { aplicando = false; return; }
 
       /* La lista filtrada depende de la ciudad: si la ciudad del
@@ -613,12 +625,23 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       activarModo(termino);
 
       var aplicarFiltro = function () {
+        /* R173 · CHIP + PALABRA JUNTOS: la búsqueda es por chip
+           (Lista), así que la vista del emisor es chip + término.
+           Se selecciona el chip del enlace Y se aplica la palabra:
+           el receptor aterriza en la MISMA lista filtrada que se
+           compartió. */
+        if (chip &&
+            window.Chips && typeof window.Chips.seleccionar === 'function') {
+          window.Chips.seleccionar(chip);
+        }
+
         if (termino) {
           var input = document.getElementById('buscarInput');
           if (input) input.value = termino;
 
-          /* Mismo carril que el buscador: Lista repinta con el
-             filtro (y avisa "sin resultados" si ya no hay). */
+          /* Mismo carril que el buscador: Lista repinta TODAS las
+             páginas con el filtro por chip (y avisa "sin
+             resultados" en la visible si ya no hay). */
           document.dispatchEvent(new CustomEvent('buscar:change', {
             detail: { termino: termino, enLimite: false }
           }));
@@ -637,13 +660,6 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
               }));
             }
           }, 0);
-        } else if (chip) {
-          /* Lista compartida POR CHIP: se selecciona el chip del
-             enlace (Lista repinta con su filtro). El campo queda
-             limpio: el filtro real es el chip. */
-          if (window.Chips && typeof window.Chips.seleccionar === 'function') {
-            window.Chips.seleccionar(chip);
-          }
         }
 
         aplicando = false;
@@ -707,14 +723,14 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       }));
     }
 
-    /* Si el receptor cambia de ciudad o de chip, el compartido se
-       limpia automáticamente (decisión del dueño). Durante la
-       recepción, los eventos que dispara la propia apertura no
-       cuentan (aplicando). */
-    document.addEventListener('chips:change', function () {
-      if (modoCompartido && !aplicando) limpiar();
-    });
-
+    /* R174 · el compartido SOLO se limpia con la CIUDAD (R108,
+       decisión del dueño): el CAMBIO DE CHIP ya no toca nada.
+       Mientras la palabra siga en el campo, cada chip muestra
+       SUS items que concuerdan (postsDeChip de Lista repinta
+       con el término) y el filtro muere únicamente cuando el
+       campo queda vacío (la X de salida → Compartir.limpiar).
+       Durante la recepción, los eventos que dispara la propia
+       apertura siguen sin contar (aplicando). */
     document.addEventListener('ciudad:change', function () {
       if (modoCompartido && !aplicando) limpiar();
     });

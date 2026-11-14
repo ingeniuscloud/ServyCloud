@@ -87,10 +87,18 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    por el propio carril al deslizar). La memoria
                    L2 (SeccionImagen) guarda cada foto: se baja UNA
                    vez y repinta desde disco sin red.
-                 · CON BÚSQUEDA ACTIVA el carril se fija (clase
-                   .fijo): los resultados viven en la página
-                   visible hasta limpiar la búsqueda.
-VERSIÓN:         3.6
+                 · CON BÚSQUEDA ACTIVA (R173) el carril viaja
+                   NORMAL: el filtro vive en cada chip (Lista),
+                   todas las páginas nacen filtradas y cambiar de
+                   chip muestra el filtro de ESE chip.
+VERSIÓN:         3.7
+CAMBIOS:         R173: el click del RATÓN vuelve — la captura del
+                 puntero solo se toma cuando el gesto ya es
+                 horizontal (capturar en el pointerdown desviaba
+                 el click del PC al carril y los posts no abrían
+                 en escritorio). Muere el fijo con búsqueda:
+                 todas las páginas nacen filtradas (Lista).
+                 Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -495,7 +503,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     function _alPresionar(e) {
       if (_drag) return;
       var c = carril();
-      if (!c || c.hidden || c.classList.contains('fijo')) return;
+      if (!c || c.hidden) return;
 
       /* la luz nace y muere en el chip real; si la tira va a
          oscuras (re-agarre tras un apagón), el silencio visual
@@ -511,7 +519,13 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         ultimo: null
       };
       c.classList.add('arrastrando');
-      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+
+      /* R173 · SIN CAPTURA AQUÍ: capturar en el pointerdown
+         desviaba el click del PC al carril (pointerup y click
+         apuntaban al carril, nunca al item) y los posts no
+         abrían en escritorio. La captura nace SOLO cuando el
+         gesto ya es horizontal (_alArrastrar): un click limpio
+         jamás la toca. */
     }
 
     function _alArrastrar(e) {
@@ -525,6 +539,13 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
         if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         if (Math.abs(dx) <= Math.abs(dy)) { _soltarEjeY(e); return; }
         _drag.eje = 'x';
+
+        /* R173 · la captura nace AQUÍ (gesto horizontal real):
+           los eventos siguen llegando aunque la mano salga del
+           carril — y un click del ratón jamás llega a capturarse. */
+        var cc = carril();
+        if (cc) { try { cc.setPointerCapture(e.pointerId); } catch (_) {} }
+
         _apagonLuzYa();   /* el swipe COMIENZA: la luz muere ya, sin despedida */
       }
       if (_drag.eje !== 'x') return;

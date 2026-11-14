@@ -9,7 +9,10 @@ RESPONSABILIDAD: CSS núcleo. Dueño de variables, tipografía maestra
                  lienzo, de la notificación flotante centralizada
                  (.notificacionFlotante, cristal 0.40) y del CARRIL
                  de páginas del área de items (.carril).
-VERSIÓN:         2.26
+VERSIÓN:         2.27
+CAMBIOS:         R173: muere .carril.fijo — con búsqueda el carril
+                 viaja NORMAL (el filtro vive en cada chip, todas
+                 las páginas nacen filtradas).
 DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -562,8 +565,9 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
        decide eje con los primeros píxeles; mientras arrastra
        (.arrastrando) el imán queda DORMIDO y al soltar UNA
        animación lleva el carril a su página.
-     · CON BÚSQUEDA ACTIVA el carril se FIJA (.fijo): los
-       resultados viven en la página visible.
+     · CON BÚSQUEDA ACTIVA (R173) el carril viaja normal: el
+       filtro vive en cada chip (Lista) y las páginas nacen
+       filtradas.
      · ASENTAMIENTO: al reposo el carril avisa 'carril:asentado'
        y despierta el imán dormido; Lista repinta solo lo
        VENCIDO (las páginas nacen pintadas).
@@ -588,10 +592,6 @@ DEPENDENCIAS:    Ninguna (es la base de todos los CSS de la app)
     scroll-snap-type: none;
     scroll-behavior: auto;
     cursor: grabbing;
-  }
-  .carril.fijo {
-    overflow-x: hidden;
-    scroll-snap-type: none;
   }
   .carril-pagina {
     flex: 0 0 100%;

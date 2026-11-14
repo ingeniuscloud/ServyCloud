@@ -10,8 +10,15 @@ RESPONSABILIDAD: CSS de la pantalla principal: fila de cabecera
                  chips (reparten TODO el ancho según cuántos
                  estén activos en la BD), fila de promos y
                  envoltorios de filtros.
-VERSIÓN:         2.13
-CAMBIOS:         R171: MUEREN las reglas del modo compartido-post
+VERSIÓN:         2.14
+CAMBIOS:         R174: los CHIPS vuelven a verse y responder en el
+                 modo compartido (orden del dueño: mientras la
+                 palabra siga en el campo, cada chip muestra SUS
+                 items que concuerdan — muere la regla que escondía
+                 .filtros-fila-dos en body.modo-compartido; la
+                 ciudad y el ordenar siguen fuera y la X de salida
+                 queda fija). Pareja con Compartir 2.9.1.
+                 R171: MUEREN las reglas del modo compartido-post
                  (cápsula del detalle sustituyendo al par
                  volver/título) — el modo murió con el Open Ad del
                  post compartido; la cápsula .compartida queda
@@ -432,15 +439,17 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      ESTADO · compartida (recepción de una LISTA compartida)
      R171 · SOLO LISTA: el modo compartido-post murió con el Open
      Ad del post compartido. Campo desplegado y BLOQUEADO
-     (readOnly + pointer-events none): chips, ciudad y filtro
-     fuera; la X queda FIJA y libera la vista (Compartir.limpiar).
-     Dentro del post el header vuelve al par volver/título (reglas
-     de abajo). R65 · en compartida el campo recobra el BLANCO
-     (es el header de esa vista). El MENÚ GLOBAL siempre visible
-     (decisión R108 del dueño): sin regla de apagón — nunca
-     existió para la lista.
+     (readOnly + pointer-events none): ciudad y ordenar fuera; la
+     X queda FIJA y libera la vista (Compartir.limpiar). R174 ·
+     orden del dueño: los CHIPS vuelven a VERSE y a responder —
+     mientras la palabra siga en el campo, cada chip muestra SUS
+     items que concuerdan y el filtro solo se quita cuando el
+     campo queda vacío. Dentro del post el header vuelve al par
+     volver/título (reglas de abajo). R65 · en compartida el
+     campo recobra el BLANCO (es el header de esa vista). El MENÚ
+     GLOBAL siempre visible (decisión R108 del dueño): sin regla
+     de apagón — nunca existió para la lista.
      ============================================================ */
-  body.modo-compartido .filtros-fila-dos { display: none !important; }
 
   .filtros-fila.compartida .btn-ordenar { display: none; }
 

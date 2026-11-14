@@ -28,7 +28,10 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  móvil (is-mobile).
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas / ciudad pendiente / lienzo.
-VERSIÓN:         1.44.0
+VERSIÓN:         1.45.0
+CAMBIOS:         R173: el repintado de fondo del catálogo ya no
+                 consulta el campo buscar — el término es ESTADO
+                 de Lista y pintarTodo lo respeta en cada chip.
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
@@ -331,27 +334,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
             if (window.Promo && typeof window.Promo.construir === 'function') {
               window.Promo.construir();
             }
-            if (typeof window.Lista.pintar === 'function') {
-              /* mismo carril que Lista en ciudad:change /
-                 orden:change: el campo buscar manda. Sin esto, un
-                 repintado de fondo (catálogo L2 distinto) borraba
-                 el filtro de la palabra — el receptor de un enlace
-                 de lista compartida veía el campo con la palabra y
-                 la lista COMPLETA. */
-              var inputBuscar = document.getElementById('buscarInput');
-              var terminoVivo = inputBuscar
-                ? String(inputBuscar.value || '').trim()
-                : '';
-
-              if (terminoVivo &&
-                  typeof window.Lista.pintarBusqueda === 'function') {
-                window.Lista.pintarBusqueda(terminoVivo, false);
-              } else {
-                /* R161 · las páginas NACEN PINTADAS: el catálogo
-                   nuevo repinta la TIRA COMPLETA (pintarTodo),
-                   no solo la página visible. */
-                window.Lista.pintarTodo(null);
-              }
+            if (typeof window.Lista.pintarTodo === 'function') {
+              /* R173 · el término de búsqueda es ESTADO de Lista:
+                 pintarTodo repinta la TIRA COMPLETA y postsDeChip
+                 aplica el filtro en cada chip. Un repintado de
+                 fondo (catálogo L2 distinto) jamás devuelve la
+                 lista general mientras la palabra está — ni el
+                 receptor de una lista compartida la pierde. */
+              window.Lista.pintarTodo(null);
             }
           }
         })
