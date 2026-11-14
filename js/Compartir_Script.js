@@ -18,8 +18,15 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.8
-CAMBIOS:         R171: MUERE el modo compartido-post (cápsula,
+VERSIÓN:         2.8.1
+CAMBIOS:         R172: CORRECCIÓN — veredictoEntrante quedó sin
+                 exportar en el return del módulo (falla R171): el
+                 veredicto siempre resolvía null y el open ad de
+                 PROMO montaba primero en toda carga de post
+                 compartido (a los segundos el ad del post lo
+                 relevaba). Exportado → el veredicto resuelve al
+                 instante y el promo NUNCA monta en carga de post.
+                 R171: MUERE el modo compartido-post (cápsula,
                  CANCELAR, título en el input, apertura automática
                  y aviso amable del receptor — orden del dueño).
                  recibirPost solo le pasa el id al OpenAd
@@ -717,11 +724,12 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
        ============================================================ */
     return {
       pintar:         pintar,
-      hayEntrante:    hayEntrante,
-      recibir:        recibir,
-      urlDePost:      urlDePost,
-      limpiar:        limpiar,
-      estaCompartido: function () { return !!modoCompartido; }
+      hayEntrante:       hayEntrante,
+      veredictoEntrante: veredictoEntrante,
+      recibir:           recibir,
+      urlDePost:         urlDePost,
+      limpiar:           limpiar,
+      estaCompartido:    function () { return !!modoCompartido; }
     };
 
   })();
