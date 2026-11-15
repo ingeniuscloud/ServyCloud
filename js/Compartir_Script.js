@@ -18,8 +18,24 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.9.4
-CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: del
+VERSIÓN:         2.9.5
+CAMBIOS:         R181: EL CHIP DEL ENLACE CON DOBLE PUERTA NATIVA
+                 (prueba del dueño en su teléfono: la ciudad
+                 aplica y el chip no — «el chip que se muestra es
+                 el que aparece en el local del teléfono… debe
+                 prevalecer el chip y la ciudad del compartir
+                 sobre el local guardado»). El chip sigue
+                 sembrándose en app_vista (puerta del nacimiento:
+                 Chips.pintar lo NACE activo) y AHORA además pasa
+                 por la puerta del TAP (Chips.seleccionar — la
+                 MISMA del dedo del dueño): si los chips ya están
+                 pintados en cualquier timing de la carga, el
+                 carril nace o viaja al chip del enlace por el
+                 ciclo de siempre; si aún no nacieron, es no-op y
+                 manda app_vista. Ciudad primero, chip después
+                 (R180 intacto). LA PALABRA SIGUE DORMIDA. Cero
+                 cuotas.
+                 R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: del
                  enlace compartido despiertan CIUDAD y CHIP.
                  recibirLista vuelve (reducido): puerta SÍNCRONA
                  que Core llama cuando el veredicto es 'lista',
@@ -588,7 +604,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
     }
 
     /* ============================================================
-       R180 · RECEPTOR DE LISTA (despierto parcial, orden del
+       R181 · RECEPTOR DE LISTA (despierto parcial, orden del
        dueño): del enlace SOLO despiertan CIUDAD y CHIP — la
        palabra de búsqueda sigue dormida (no se toca el campo).
        Es la puerta SÍNCRONA que Core llama en el arranque cuando
@@ -599,12 +615,16 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
                   el ciclo de siempre; su resetearVista escribe el
                   chip de servicio y ATRÁS llega el chip del
                   enlace).
-       · chip   → app_vista en localStorage (validado contra
-                  SISTEMA.chips): Chips.pintar lo NACE activo y el
-                  carril monta sus páginas con ese chip — la lista
-                  sale filtrada en la ÚNICA pintada del ciclo
-                  normal. Sin buscar:change, sin repintados, cero
-                  llamadas GAS nuevas.
+       · chip   → DOBLE PUERTA NATIVA (R181): (1) app_vista en
+                  localStorage (validado contra SISTEMA.chips) —
+                  Chips.pintar lo NACE activo cuando el lienzo
+                  nazca; (2) Chips.seleccionar — el TAP del dueño:
+                  si los chips ya están pintados, el carril nace o
+                  viaja a ese chip por el camino de siempre; si no
+                  nacieron, no-op. El carril monta sus páginas con
+                  ese chip — la lista sale filtrada en la ÚNICA
+                  pintada del ciclo normal. Sin buscar:change, sin
+                  repintados, cero llamadas GAS nuevas.
        Enlace legacy ?d= (ya no se emiten): dormido (R179).
        ============================================================ */
     function aplicarDatosLista(datos) {
@@ -641,6 +661,21 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
               localStorage.setItem('app_vista',
                 JSON.stringify({ idChip: chip }));
             } catch (_) {}
+
+            /* R181 · PUERTA 2 · EL TAP DEL DUEÑO: si los chips ya
+               están pintados (cualquier timing), Chips.seleccionar
+               es la MISMA llamada del dedo sobre un chip: clase
+               activo + memoria + chips:change — el carril nace o
+               viaja al chip del enlace por el ciclo de siempre.
+               Si aún no nacieron, no-op (false): manda app_vista
+               y Chips.pintar lo nace activo. */
+            try {
+              if (window.Chips &&
+                  typeof window.Chips.seleccionar === 'function') {
+                window.Chips.seleccionar(chip);
+              }
+            } catch (_) {}
+
             break;
           }
         }
