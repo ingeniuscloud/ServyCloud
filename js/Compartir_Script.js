@@ -18,8 +18,32 @@ RESPONSABILIDAD: Compartir por enlace. Dos emisores:
                  del ad). El modo compartido es SOLO de LISTA.
                  veredictoEntrante() le dice al OpenAd qué trae la
                  carga ANTES de montar el promo.
-VERSIÓN:         2.9.5
-CAMBIOS:         R181: EL CHIP DEL ENLACE CON DOBLE PUERTA NATIVA
+VERSIÓN:         2.9.6
+CAMBIOS:         R183: LA PALABRA DEL ENLACE DESPIERTA (orden del
+                 dueño: «incorporar el valor del campo buscar que
+                 viene en el enlace y aplicarlo al listado tal cual
+                 como se aplica la ciudad y el chip»). En
+                 aplicarDatosLista, DESPUÉS de ciudad y chip, la
+                 palabra (q del token) toma SU camino nativo —
+                 buscar:change, la MISMA puerta del teclado: Lista
+                 fija busquedaActual + limiteBusqueda (normalización
+                 incluida) y su pintarTodo es no-op ahí (el lienzo
+                 aún no nace). Lo VISIBLE — el término en el campo
+                 y la X encendida (.con-texto, como al teclear) — lo
+                 escribe Compartir.pintar cuando el input nace con
+                 el lienzo (el campo vive DENTRO del template del
+                 lienzo: antes no existe). La ÚNICA pintada del
+                 ciclo (carril:asentado) monta las páginas con SU
+                 filtro: chip + ciudad + PALABRA. enLimite =
+                 longitud 40 (el emisor recorta al límite: el
+                 receptor nace con el MISMO aviso que vio el
+                 emisor). Sin palabra en el enlace ('-'): ni estado
+                 ni campo — carga normal de siempre. La X sale por
+                 el camino normal (la app NO está en modo
+                 compartido): borra, emite vacío y la lista vuelve a
+                 la tira completa. Prioridad intacta: enlace →
+                 local → primer chip. Cero cuotas.
+                 R181: EL CHIP DEL ENLACE CON DOBLE PUERTA NATIVA
                  (prueba del dueño en su teléfono: la ciudad
                  aplica y el chip no — «el chip que se muestra es
                  el que aparece en el local del teléfono… debe
@@ -331,6 +355,7 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
        ============================================================ */
     var modoCompartido = null;   /* 'post' | 'lista' | null */
     var aplicando      = false;  /* guarda durante la recepción */
+    var palabraEnlace  = null;   /* R183 · término del enlace de lista */
     var btn            = null;
 
     function haptic(v) {
@@ -472,6 +497,29 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
       window.__compartirBound = '1';
 
       btn.addEventListener('click', compartirLista);
+
+      /* R183 · LA PALABRA DEL ENLACE EN SU CAMPO: el input vive
+         DENTRO del template del lienzo — no existe hasta
+         inyectarLienzo, que es QUIEN llama esta pintar
+         (arrancarComponentes). Aquí el campo ya nació y Buscar
+         (pintar justo antes en la misma fila de arranque) ya lo
+         amarró: se escribe el término y se enciende la X
+         (.con-texto), EXACTAMENTE como queda al teclearlo. El
+         ESTADO (busquedaActual) ya lo sembró aplicarDatosLista
+         ANTES del nacimiento con buscar:change — por eso la
+         única pintada del carril ya salió filtrada y aquí solo
+         falta lo visible. palabraEnlace SOLO trae valor cuando
+         la carga entró por un enlace de lista: en la carga
+         normal vale null y esto no se ejecuta. */
+      if (palabraEnlace) {
+        try {
+          var inputEnlace = document.getElementById('buscarInput');
+          if (inputEnlace) inputEnlace.value = palabraEnlace;
+
+          var capsulaEnlace = document.getElementById('buscarFila');
+          if (capsulaEnlace) capsulaEnlace.classList.add('con-texto');
+        } catch (_) {}
+      }
     }
 
     /* ============================================================
@@ -679,6 +727,41 @@ DEPENDENCIAS:    Index.html (estructura .filtros-wrap, SISTEMA,
             break;
           }
         }
+      }
+
+      /* R183 · LA PALABRA DEL ENLACE DESPIERTA (orden del dueño:
+         «incorporar el valor del campo buscar que viene en el
+         enlace y aplicarlo al listado tal cual como se aplica la
+         ciudad y el chip»). Va AL FINAL: ciudad y chip ya
+         sembrados no tocan el campo. EL ESTADO AQUÍ: se emite
+         buscar:change — la puerta NATIVA que Lista escucha, la
+         MISMA del teclado del dueño: fija busquedaActual +
+         limiteBusqueda (normalización incluida) y su pintarTodo
+         es no-op aquí (el lienzo aún no nace: sin contenedor no
+         pinta nada). La ÚNICA pintada del ciclo (carril:asentado)
+         monta las páginas con SU filtro: chip + ciudad + palabra.
+         LO VISIBLE (el término en el campo + la X encendida) lo
+         escribe Compartir.pintar cuando el input nazca con el
+         lienzo — el campo vive DENTRO del template del lienzo y
+         aquí todavía no existe (palabraEnlace). enLimite =
+         longitud 40: el emisor recorta el término al límite — el
+         receptor nace con el MISMO aviso que vio el emisor. Sin
+         palabra en el enlace ('-'): ni estado ni campo — carga
+         normal de siempre. La X del campo sale por el camino
+         normal (la app NO está en modo compartido): borra, emite
+         vacío y la lista vuelve a la tira completa. */
+      var palabra = String(datos.q || '').trim();
+      if (palabra) {
+        palabraEnlace = palabra;
+
+        try {
+          document.dispatchEvent(new CustomEvent('buscar:change', {
+            detail: {
+              termino:  palabra,
+              enLimite: palabra.length >= 40
+            }
+          }));
+        } catch (_) {}
       }
     }
 
