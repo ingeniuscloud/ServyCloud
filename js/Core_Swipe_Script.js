@@ -91,14 +91,19 @@ RESPONSABILIDAD: window.SwipeChips — el desplazamiento lateral del
                    NORMAL: el filtro vive en cada chip (Lista),
                    todas las páginas nacen filtradas y cambiar de
                    chip muestra el filtro de ESE chip.
-VERSIÓN:         3.7
-CAMBIOS:         R173: el click del RATÓN vuelve — la captura del
-                 puntero solo se toma cuando el gesto ya es
-                 horizontal (capturar en el pointerdown desviaba
-                 el click del PC al carril y los posts no abrían
-                 en escritorio). Muere el fijo con búsqueda:
-                 todas las páginas nacen filtradas (Lista).
-                 Historial: bitácora/versiones.
+VERSIÓN:         3.8
+CAMBIOS:         R182: el NACIMIENTO no adopta una página corta —
+                 el estacionamiento de nacer puede no pegar (el
+                 lienzo acaba de inyectarse y el layout aún vuela)
+                 y el primer asentamiento leía la página física
+                 equivocada y la ADOPTABA (Chips.seleccionar +
+                 app_vista): el chip del enlace compartido moría al
+                 nacer y aterrizaba el del local. Ahora el chip
+                 DECIDIDO al nacer (_chipAvisado) manda: si la
+                 página física no es la suya, el asentamiento se
+                 re-estaciona en él sin animación antes de encender
+                 luz o avisar. Pulso y mano intactos. Historial:
+                 bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
                  Chips_Script.html (window.Chips),
                  Seccion_Imagen_Script.html (window.SeccionImagen.poblarConL2),
@@ -264,6 +269,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
       _chipLuz = activo;
       _chipAvisado = activo;
       _luzFija = null;
+      _reparques = 0;   /* R182 · el nacimiento estrena su tope */
 
       var idx = indiceDe(activo);
       if (idx > 0) irAPagina(idx, false);
@@ -336,6 +342,7 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
     var _timerAsentar = null;
     var _chipAvisado = null;
     var _avisandoLlegada = false;
+    var _reparques = 0;   /* R182 · intentos del re-estacionamiento de nacer */
 
     function _agendaAsentar() {
       if (_timerAsentar) clearTimeout(_timerAsentar);
@@ -365,6 +372,45 @@ DEPENDENCIAS:    Core_CSS.html (.carril, .carril-pagina, .carril-items),
 
       var i = indiceActivo();
       if (i < 0) return;
+
+      /* R182 · EL NACIMIENTO NO ADOPTA UNA PÁGINA CORTA: el
+         estacionamiento de nacer puede no pegar — el carril
+         recién montado aún no acepta scroll (la escritura se
+         grafapea a 0 y el teléfono la aplica tarde) — y una
+         lectura temprana dejaría el carril en otra página. El
+         chip DECIDIDO al nacer (_chipAvisado) manda: si la
+         página física no es la suya, se re-estaciona en ella SIN
+         animación y SE VERIFICA; si el scroll aún no aterrizó,
+         el reposo lo vuelve a intentar (tope de 5, el ritmo de
+         siempre). El chip del enlace compartido (o del local
+         guardado) ya no lo pisa el arranque. Pulso y mano
+         intactos: su luz fija (_luzFija) y su aterrizaje
+         (_fueMano) se deciden antes de este punto. */
+      if (!_luzFija && _chipAvisado) {
+        var fisico = paginas()[i] ? paginas()[i].getAttribute('data-chip') : null;
+        if (fisico && fisico !== _chipAvisado) {
+          var idxDecidido = indiceDe(_chipAvisado);
+          if (idxDecidido >= 0) {
+            irAPagina(idxDecidido, false);
+            if (indiceActivo() === idxDecidido) {
+              i = idxDecidido;   /* aterrizó: el reposo sigue normal */
+            } else if (_reparques < 5) {
+              /* el scroll aún vuela (el carril recién montado la
+                 aplica tarde): el reposo AVISA igual — la FIRMA
+                 pinta las páginas y, con contenido real, el scroll
+                 aterriza — y el reposo siguiente vuelve a
+                 intentar el estacionamiento decidido. */
+              _reparques++;
+              document.dispatchEvent(new CustomEvent('carril:asentado', {
+                detail: { idChip: _chipAvisado }
+              }));
+              _agendaAsentar();
+              return;
+            }
+            /* sin aterrizaje tras el tope: flujo de siempre */
+          }
+        }
+      }
 
       /* el destino DECIDIDO manda sobre cualquier lectura tardía
          del teléfono: la luz termina donde se decidió, una vez */
