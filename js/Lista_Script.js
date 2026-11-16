@@ -55,7 +55,7 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.34
+VERSIÓN:         2.35
 CAMBIOS:         R173: la búsqueda es POR CHIP — el término vive
                  como ESTADO de Lista y postsDeChip lo aplica en
                  cada página: cada chip muestra solo SUS items que
@@ -718,6 +718,13 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
         html +=     '<span class="subtitulo">' + escapeHtml(titulo) + '</span>';
         html +=   '</span>';
         html +=   '<span class="pie">';
+        /* EL NOMBRE DEL PARTNER acompaña al título (debajo de él,
+           en el pie de la card) — la voz gris de la maestra
+           .textoSecundario del Core. Es el NOMBRE, no otra cosa:
+           el campo MARCA murió, el nombre del partner permanece. */
+        if (nombreP) {
+          html +=   '<span class="partner-nombre textoSecundario">' + escapeHtml(nombreP) + '</span>';
+        }
         html +=     '<span class="ver-detalles">Ver publicación' +
                     '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
         html +=   '</span>';

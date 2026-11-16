@@ -14,7 +14,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  .carril-items.en-grilla),
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.21
+VERSIÓN:         2.22
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
@@ -404,9 +404,10 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     display: block;
   }
 
-  /* Fila del partner (R58) · la ÚNICA fila bajo el título:
-   avatar + nombre a la izquierda y "Ver publicación →" a la
-   derecha — mismo verbo de invitación, nuevo texto del dueño.
+  /* Fila del pie · la ÚNICA fila bajo el título: EL NOMBRE DEL
+   PARTNER a la izquierda (voz gris de la maestra .textoSecundario
+   del Core — el campo MARCA murió, el nombre permanece) y "Ver
+   publicación →" a la derecha — mismo verbo de invitación.
    NARANJA OFICIAL #f97316 (R59): el dueño lo pidió del color
    de la app; la flecha hereda por currentColor. Peso NORMAL
    (R56) intacto. */
@@ -415,6 +416,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     align-items: center;
     gap: 10px;
     min-width: 0;
+  }
+  .lista-item .partner-nombre {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .lista-item .ver-detalles {
     flex: 0 0 auto;
@@ -590,8 +597,8 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
   /* Espejo del item real: avatar circular de 52×52 a
-   la izquierda + barras del título y el "Ver publicación"
-   a la derecha. */
+   la izquierda + barras del título, el NOMBRE DEL PARTNER y el
+   "Ver publicación" a la derecha. */
   .lista-skeleton-pie {
     display: flex;
     align-items: center;
