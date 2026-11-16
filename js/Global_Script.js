@@ -18,8 +18,8 @@ RESPONSABILIDAD: Helpers globales. postBackend usa window.URL_EXEC.
                  Pantalla de error de red si catalogo falla del todo.
                  Helpers de WhatsApp (limpiarTelefono, abrirWhatsapp),
                  aplicarPlaceholders y ventanaVigente
-VERSIÓN:         1.18.0
-CAMBIOS:         R146: puntero touch simulado para PC — el círculo que viste Global_CSS nace SOLO donde hay puntero fino real, sigue al mouse 1:1 con translate3d y se oculta al salir de la ventana. El teléfono jamás ejecuta nada de esto. Historial: bitácora/versiones.
+VERSIÓN:         1.19.0
+CAMBIOS:         R189: el cuerpo de la llamada nace EN CADA INTENTO — el token se lee de window.TOKEN_SESION al disparar la llamada, no al invocar postBackend. El auto-saneo R26 (sesión nueva por datos) viaja así con el token FRESCO y se cura a la primera: antes el cuerpo quedaba congelado con el token del arranque y los 3 intentos del guardia morían con el MISMO token inválido — la pantalla «Algo salió mal» era segura ante la primera sesión vencida del día, aunque el servidor estuviera sano. Y la PRIMERA sesión de cada carga de página abre el guardia anti-loop en cero (el contador de sessionStorage sobrevive al cierre de la app y quedaba pegado de episodios pasados); las sesiones del auto-saneo no lo tocan. R146: puntero touch simulado para PC — el círculo que viste Global_CSS nace SOLO donde hay puntero fino real, sigue al mouse 1:1 con translate3d y se oculta al salir de la ventana. El teléfono jamás ejecuta nada de esto. Historial: bitácora/versiones.
 DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
 ════════════════════════════════════════════════════════════════════*/
 
@@ -75,6 +75,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
      vuelo: las llamadas concurrentes comparten la promesa.
      ============================================================ */
   var _promesaSesion = null;
+  var _sesionDeEstaPagina = false;   /* R189: el guardia abre episodio nuevo UNA vez por página */
 
   function _pedirSesion() {
     var url = window.URL_EXEC;
@@ -101,7 +102,21 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
         return res.data;
       })
       .then(function (data) {
-        if (data && data.token) window.TOKEN_SESION = data.token;
+        if (data && data.token) {
+          window.TOKEN_SESION = data.token;
+          /* R189 · guardia en cero UNA VEZ POR PÁGINA: el contador
+             de sessionStorage sobrevive al cierre de la app y podía
+             arrastrar episodios pasados ya curados (la pantalla
+             «Algo salió mal» salía instantánea al reabrir). La
+             PRIMERA sesión de esta página abre un episodio NUEVO
+             del guardia; las sesiones del auto-saneo NO lo tocan
+             — el anti-loop sigue contando sus fracasos mientras
+             esta página viva. */
+          if (!_sesionDeEstaPagina) {
+            _limpiarContadorToken();
+            _sesionDeEstaPagina = true;
+          }
+        }
         if (data && data.sistema && !window.SISTEMA) {
           window.SISTEMA = data.sistema;
           aplicarColorPrimario();   /* R140: el color oficial viaja con el sistema */
@@ -331,29 +346,43 @@ DEPENDENCIAS:    Index.html (SISTEMA, TOKEN_SESION, URL_EXEC)
        de error: el usuario ya tiene contenido pintado. */
     var mudo = !!(opciones && opciones.mudo);
 
-    var body = Object.assign({
-      token:         window.TOKEN_SESION || '',
-      dispositivoId: getDeviceId(),
-      accion:        accion
-    }, params || {});
-
-    /* GA4 (R12): identidad estable del contenedor (solo para
-       analítica). Si no hay envoltorio, undefined no viaja. */
-    try {
-      if (window.Puente && typeof window.Puente.getDispositivo === 'function') {
-        body.idPuente = window.Puente.getDispositivo() || undefined;
-      }
-    } catch (_) {}
-
     var url = window.URL_EXEC || window.location.href;
     var esIdempotente = ACCIONES_IDEMPOTENTES[accion] === true;
     var maxIntentos = esIdempotente ? MAX_REINTENTOS : 1;
+
+    /* R189 · EL CUERPO NACE EN CADA INTENTO: el token se lee de
+       window.TOKEN_SESION al momento de disparar la llamada, NO
+       cuando postBackend fue invocado. Así el reintento tras la
+       sesión nueva (R26) viaja con el token FRESCO y el
+       auto-saneo de una sesión vencida se cura a la primera.
+       Antes el cuerpo quedaba congelado con el token del
+       arranque: el reintento re-enviaba el token viejo, los 3
+       intentos del guardia morían con el MISMO token inválido
+       y la pantalla «Algo salió mal» salía aunque el servidor
+       estuviera perfectamente sano. */
+    function _cuerpoLlamada() {
+      var body = Object.assign({
+        token:         window.TOKEN_SESION || '',
+        dispositivoId: getDeviceId(),
+        accion:        accion
+      }, params || {});
+
+      /* GA4 (R12): identidad estable del contenedor (solo para
+         analítica). Si no hay envoltorio, undefined no viaja. */
+      try {
+        if (window.Puente && typeof window.Puente.getDispositivo === 'function') {
+          body.idPuente = window.Puente.getDispositivo() || undefined;
+        }
+      } catch (_) {}
+
+      return body;
+    }
 
     function intentar(n) {
       return _fetchConTimeout(url, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(body)
+        body:    JSON.stringify(_cuerpoLlamada())
       }, TIMEOUT_MS)
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP_' + r.status);
