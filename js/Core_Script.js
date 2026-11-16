@@ -15,6 +15,12 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  · window.Analitica — Capa 1 GA4: eventos blancos,
                  con puente se retransmite y sin él van directos a
                  gtag de la página.
+                 · window.Vistas — LA CAJITA DE AHORRO: contador de
+                 vistas en el teléfono (1 por post por sesión,
+                 papelitos en localStorage con su fecha) y envío
+                 por lote al GAS (al juntar 5, al abrir la app o
+                 al irse a segundo plano — nunca al cierre); la
+                 pizarra del backend vive en 04 Pizarra.gs.
                  · DATOS: cargarTablas (L2 primero, backend
                  después, stale-while-revalidate), la VIDA del post
                  en el teléfono (_postExpiraVivo_: la ventana
@@ -29,7 +35,7 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas (post abre su ad; lista aplica ciudad
                  y chip del enlace) / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.2
+VERSIÓN:         1.45.3
 CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: el
                  veredicto 'lista' llama Compartir.recibirLista()
                  ANTES del chequeo de ciudad pendiente — ciudad y
@@ -80,6 +86,12 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  · window.Analitica — Capa 1 GA4: eventos blancos,
                  con puente se retransmite y sin él van directos a
                  gtag de la página.
+                 · window.Vistas — LA CAJITA DE AHORRO: contador de
+                 vistas en el teléfono (1 por post por sesión,
+                 papelitos en localStorage con su fecha) y envío
+                 por lote al GAS (al juntar 5, al abrir la app o
+                 al irse a segundo plano — nunca al cierre); la
+                 pizarra del backend vive en 04 Pizarra.gs.
                  · DATOS: cargarTablas (L2 primero, backend
                  después, stale-while-revalidate), la VIDA del post
                  en el teléfono (_postExpiraVivo_: la ventana
@@ -94,7 +106,7 @@ RESPONSABILIDAD: El NÚCLEO de la página: coordinador y ciclo de
                  · ARRANQUE: sesión → estado del puente → entradas
                  compartidas (post abre su ad; lista aplica ciudad
                  y chip del enlace) / ciudad pendiente / lienzo.
-VERSIÓN:         1.45.2
+VERSIÓN:         1.45.3
 CAMBIOS:         R180: ORDEN DEL DUEÑO — EL VERDADERO FILTRO: el
                  veredicto 'lista' llama Compartir.recibirLista()
                  ANTES del chequeo de ciudad pendiente — ciudad y
@@ -862,5 +874,137 @@ DEPENDENCIAS:    Global_Script.html (postBackend, asegurarSesion,
 
     document.addEventListener('visibilitychange', onVisibilityChange);
 
+  })();
+
+  /* ============================================================
+     VISTAS · LA CAJITA DE AHORRO
+     Contador de vistas en el TELÉFONO, nunca en el servidor en
+     vivo: 1 vista por post por sesión (papelito con su fecha),
+     papelitos en localStorage — disco: sobreviven al cierre,
+     offline incluido — y envío POR LOTE al juntar 5, al abrir
+     la app o al irse a segundo plano. NUNCA al cierre. En el
+     GAS, la pizarra (04 Pizarra.gs) acumula en Script
+     Properties y la consolidación nocturna (3am) baja el total
+     a la columna VISTA de la hoja Post. El detalle de
+     fecha/hora/sesión lo cubre GOOGLE ANALYTICS (el diario):
+     el Sheet no duplica lo que GA ya hace.
+     ============================================================ */
+  window.Vistas = (function () {
+
+    var KEY_PAPELITOS = 'vistas_papelitos';
+    var KEY_SESION    = 'vistas_sesion';
+    var LOTE_PAPELITOS = 5;    /* al juntar 5, sale el lote */
+    var enviando       = false;
+
+    /* ---- papelitos en el disco ------------------------------ */
+    function leerPapelitos() {
+      try {
+        var crudo = localStorage.getItem(KEY_PAPELITOS);
+        var arr = crudo ? JSON.parse(crudo) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function guardarPapelitos(arr) {
+      try {
+        localStorage.setItem(KEY_PAPELITOS, JSON.stringify(arr));
+      } catch (_) { /* sin espacio: la vista se pierde, la app sigue */ }
+    }
+
+    /* ---- sesión: 1 vista por post por sesión ----------------- */
+    function yaContada(idPost) {
+      try {
+        var arr = JSON.parse(sessionStorage.getItem(KEY_SESION) || '[]');
+        return Array.isArray(arr) && arr.indexOf(idPost) !== -1;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function marcarSesion(idPost) {
+      try {
+        var arr = JSON.parse(sessionStorage.getItem(KEY_SESION) || '[]');
+        if (Array.isArray(arr) && arr.indexOf(idPost) === -1) {
+          arr.push(idPost);
+          if (arr.length > 500) arr = arr.slice(-500);   /* tope defensivo */
+          sessionStorage.setItem(KEY_SESION, JSON.stringify(arr));
+        }
+      } catch (_) { /* modo privado: la vista se cuenta igual */ }
+    }
+
+    /* ---- envío del lote -------------------------------------- */
+    function enviar() {
+      if (enviando) return;
+      var papelitos = leerPapelitos();
+      if (!papelitos.length) return;
+      if (typeof window.postBackend !== 'function') return;
+
+      var lote = [];
+      for (var i = 0; i < papelitos.length; i++) {
+        if (papelitos[i] && papelitos[i].p) lote.push(papelitos[i].p);
+      }
+      if (!lote.length) return;
+
+      enviando = true;
+      postBackend('vista', { lote: lote })
+        .then(function (r) {
+          enviando = false;
+          if (r && r.ok) {
+            /* fuera SOLO los papelitos que viajaron en ESTE
+               lote — los anotados mientras volaba siguen. */
+            var enviados = {};
+            for (var j = 0; j < lote.length; j++) enviados[lote[j]] = true;
+            guardarPapelitos(leerPapelitos().filter(function (p) {
+              return !(p && enviados[p.p]);
+            }));
+          }
+        })
+        .catch(function () {
+          enviando = false;   /* los papelitos quedan: reintenta al abrir o al irse a segundo plano */
+        });
+    }
+
+    /* ---- anotar una vista ------------------------------------ */
+    function anotar(idPost) {
+      var id = String(idPost || '').trim();
+      if (!id) return;
+      if (yaContada(id)) return;
+
+      marcarSesion(id);
+
+      var papelitos = leerPapelitos();
+      papelitos.push({
+        p: id,
+        f: new Date().toISOString()   /* el papelito lleva su fecha */
+      });
+      guardarPapelitos(papelitos);
+
+      if (papelitos.length >= LOTE_PAPELITOS) enviar();
+    }
+
+    /* ---- arranque + segundo plano ---------------------------- */
+    /* Anclado a la entrada y al uso, NUNCA al cierre: el
+       arranque drena los papelitos pendientes — de una sesión
+       anterior o de un teléfono que estuvo offline — y el pase
+       a segundo plano drena lo acumulado hasta ese momento. */
+    function arranque() {
+      enviar();
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') enviar();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', arranque);
+    } else {
+      arranque();
+    }
+
+    return {
+      anotar: anotar,
+      enviar: enviar
+    };
   })();
 

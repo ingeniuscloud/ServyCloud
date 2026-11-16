@@ -14,7 +14,7 @@ RESPONSABILIDAD: CSS del menú lista: botón volver, título de
                  .carril-items.en-grilla),
                  botón "Compartir lista" alineado a la derecha,
                  avisos y skeletons de lista y detalle.
-VERSIÓN:         2.20
+VERSIÓN:         2.21
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
@@ -365,12 +365,13 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   }
 
   /* ============================================================
-     AVATAR DEL ITEM (R113) · CÍRCULO PERFECTO de 52×52 px
+     AVATAR DEL ITEM · CÍRCULO PERFECTO de 52×52 px
      (44×44 en ≤360px), centrado verticalmente en el item —
-     nunca se estira con el alto de la fila. SOLO la INICIAL
-     DEL TÍTULO — sin imagen, el avatar nunca lleva foto.
-     LETRA con la tipografía de la maestra .tituloPost (las
-     mismas variables del Core) y el COLOR OFICIAL del post
+     nunca se estira con el alto de la fila. Con datos en
+     AVATAR va la IMAGEN del partner dentro del círculo (cover,
+     bordes redondos); sin datos, la INICIAL DEL NOMBRE del
+     partner. LETRA con la tipografía de la maestra .tituloPost
+     (las mismas variables del Core) y el COLOR OFICIAL del post
      (--post-color); fondo colorClaro de siempre (--post-claro).
      ============================================================ */
   .lista-item .item-avatar {
@@ -393,23 +394,14 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     justify-content: center;
   }
 
-  .lista-item .marca {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: var(--size-enlaces);
-    font-weight: var(--weight-enlaces);
-    /* R155 · textoSecundario: el partner acompaña con la voz
-       gris del sistema (antes textoPrimario competía con el
-       título). Misma letra y peso de siempre. */
-    color: var(--color-textoSecundario);
-    min-width: 0;
-  }
-  .lista-item .marca .marca-texto {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: inherit;
+  /* La imagen del avatar llena el círculo (regla del avatar:
+     con datos en AVATAR, foto; sin datos, la inicial). */
+  .lista-item .item-avatar .item-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
   }
 
   /* Fila del partner (R58) · la ÚNICA fila bajo el título:
@@ -597,9 +589,9 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
   .lista-skeleton-line.long   { width: 90%; }
   .lista-skeleton-line.ver    { width: 110px; flex: 0 0 auto; }
 
-  /* Espejo del item real (R113): avatar circular de 52×52 a
-   la izquierda + barras del título, la marca y el "Ver
-   publicación" a la derecha. */
+  /* Espejo del item real: avatar circular de 52×52 a
+   la izquierda + barras del título y el "Ver publicación"
+   a la derecha. */
   .lista-skeleton-pie {
     display: flex;
     align-items: center;
@@ -656,8 +648,6 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     .lista-item { padding: 12px 14px; }
     .lista-item .estrella-glifo { width: 14px; height: 14px; }
     .lista-item .estrella-num { font-size: var(--size-cita); }
-    /* R155 · la marca ya NO achica en móvil: viste
-       --size-enlaces en todo ancho (el override 12px murió). */
     .lista-item .ver-detalles { font-size: 12px; }
     .lista-item .ver-glifo { width: 13px; height: 13px; }
     .lista-item .item-avatar { width: 44px; height: 44px; }
@@ -684,7 +674,7 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
      calendario) / "A consultar" — UNA SOLA LETRA para todo el
      slot (maestra .subtitulo, ajuste del dueño: sin distorsión)
      pintada en el COLOR OFICIAL CENTRALIZADO --color-primario.
-     Sin likes ni marca: la grilla invita con el precio.
+     Sin likes: la grilla invita con el precio.
      ============================================================ */
   .carril-items.en-grilla {
     display: grid;

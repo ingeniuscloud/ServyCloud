@@ -10,7 +10,7 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.15.0
+VERSIÓN:         2.15.1
 CAMBIOS:         R142: la venta del post entra al lienzo — con precioVenta y/o fechaEvento en la BD, el dato sale DEBAJO del título con la MISMA tipografía del slot de la grilla (maestra .subtitulo + --color-primario): precio formato ML (moneda menor + centavos superíndice) y fecha es-VE 12h con su calendario. Solo con datos reales: sin precio y sin fecha el bloque NO nace (el «A consultar» es de la card, no del lienzo). Fuente: meta fresca del detalle, respaldo la fila horneada del catálogo (R140). Gemelo GAS sincronizado. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
@@ -611,10 +611,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (!post) return '';
       var pj   = post.postJson || {};
       var meta = pj.meta || {};
-      var desc = pj.descripcion || {};
       var imagenes = Array.isArray(meta.imagenes) ? meta.imagenes : [];
-      var titulo   = String(desc.tituloPost || '').trim();
-      var markdown = String(desc.markdown  || '').trim();
+      var titulo   = String(meta.tituloPost || '').trim();
+      var markdown = String(meta.markdown  || '').trim();
       var html = '';
       
       var hero = _buildHero(imagenes);
@@ -656,9 +655,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var partner = buscarPartner(post.idPartner);
       if (!partner) return '';
       var pj = partner.partnerJson || {};
-      var nombre = String(partner.nombre || partner.marca || '').trim();
+      var nombre = String(partner.nombre || '').trim();
       var eslogan = String(pj.esloganPartner || '').trim();
-      var inicial = nombre ? nombre.charAt(0).toUpperCase() : 'P';
+      var avatar = String(partner.avatar || '').trim();
 
       var meta = (post.postJson || {}).meta || {};
       var colorArr = meta.color || [];
@@ -669,7 +668,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
          del producto queda debajo del CTA, justo antes del partner. */
       var html = '<div class="mk-partner-row" id="lienzoPartnerFila" style="--post-color:' + escapeHtml(colorOficial) + '; --post-pastel:' + escapeHtml(colorPastel) + ';">';
       html +=   '<div class="mk-partner-avatar">';
-      html +=     '<span class="mk-partner-initial">' + escapeHtml(inicial) + '</span>';
+      /* AVATAR: con datos, la imagen dentro del círculo; sin
+         datos, la inicial del NOMBRE del partner. */
+      if (avatar) {
+        html +=     '<img class="mk-partner-img" src="' + escapeHtml(avatar) + '" alt="" />';
+      } else {
+        var inicial = nombre ? nombre.charAt(0).toUpperCase() : 'P';
+        html +=     '<span class="mk-partner-initial">' + escapeHtml(inicial) + '</span>';
+      }
       html +=     '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>';
       html +=   '</div>';
       html +=   '<div class="mk-partner-info">';
@@ -763,7 +769,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       ids.forEach(function (id) {
         var p = buscarPost(id);
         if (!p) return;
-        var nombre  = p.boton || p.titulo || p.id;
+        var nombre  = p.titulo || p.id;
         var inicial = (nombre.charAt(0) || '?').toUpperCase();
         var color   = p.colorOficial || '#475569';
         var claro   = p.colorClaro   || '#f1f5f9';
@@ -911,8 +917,8 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
     function abrirSheetDesc() {
       if (!postActivo) return;
       var root = _construirDescSheet(); if (!root) return;
-      var pj = postActivo.postJson || {}; var desc = pj.descripcion || {};
-      var titulo = String(desc.tituloPost || '').trim(); var markdown = String(desc.markdown || '').trim();
+      var pj = postActivo.postJson || {}; var meta = pj.meta || {};
+      var titulo = String(meta.tituloPost || '').trim(); var markdown = String(meta.markdown || '').trim();
       if (!markdown) return;
       var content = root.querySelector('#postDescSheetContent');
       var html = ''; if (titulo) html += '<h2 class="tituloPost" style="margin-bottom:16px;">' + escapeHtml(titulo) + '</h2>';
@@ -1154,7 +1160,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
         window.Pregunta.enganchar(track);
         if (postActivo.preguntas && typeof window.Pregunta.poner === 'function') {
           var partnerQ = buscarPartner(postActivo.idPartner);
-          var nombreQ  = partnerQ ? String(partnerQ.nombre || partnerQ.marca || '').trim() : '';
+          var nombreQ  = partnerQ ? String(partnerQ.nombre || '').trim() : '';
           window.Pregunta.poner(postActivo.id, postActivo.preguntas, nombreQ);
         } else {
           window.Pregunta.cargar(postActivo.id);

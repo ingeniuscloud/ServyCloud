@@ -4,7 +4,7 @@ ARCHIVO:         Reserva_OTP_Script.html
 ESPEJO GITHUB:   github/js/Reserva_OTP_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.ReservaOTP: solicitar/reenviar código por correo, cooldown, verificación del código y sus mensajes bajo el campo correspondiente.
-VERSIÓN:         1.4
+VERSIÓN:         1.5
 CAMBIOS:         R132: «Código incorrecto» se auto-oculta a los 3.2s (el MISMO tiempo que vivía el banner que este slot reemplazó); se limpia igual al escribir o reintentar; expirado/agotados mueren con el reset.
 DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
                  Reserva_Valida_Script.html (window.ReservaValida),
@@ -147,9 +147,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend, limpiarTelefono),
         }
 
         var numero = '';
-        if (partner && partner.partnerJson && partner.partnerJson.whatsapp) {
+        if (partner && partner.partnerJson && partner.partnerJson.telefonoWhatsapp) {
           numero = (typeof window.limpiarTelefono === 'function')
-            ? window.limpiarTelefono(partner.partnerJson.whatsapp)
+            ? window.limpiarTelefono(partner.partnerJson.telefonoWhatsapp)
             : '';
         }
 

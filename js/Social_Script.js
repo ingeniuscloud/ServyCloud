@@ -13,7 +13,7 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  con el enlace del post que arma Compartir (enlace
                  corto ?s= codificado, R124). Key localStorage:
                  post_likes.
-VERSIÓN:         2.5
+VERSIÓN:         2.6
 CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
@@ -57,13 +57,13 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        ============================================================ */
     function generarTextoCompartir(post, urlEnlace) {
       var pj = post.postJson || {};
-      var desc = pj.descripcion || {};
+      var meta = pj.meta || {};
       var compartir = (pj.compartir && typeof pj.compartir === 'object') ? pj.compartir : {};
 
       var url = String(urlEnlace || '').trim();
 
       var mensajeBD = String(compartir.mensajeWhatsapp || '').trim();
-      var titulo    = String(desc.tituloPost || post.titulo || '').trim();
+      var titulo    = String(meta.tituloPost || post.titulo || '').trim();
 
       return {
         titulo: titulo,

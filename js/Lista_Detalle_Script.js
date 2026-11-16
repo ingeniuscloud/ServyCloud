@@ -29,7 +29,7 @@ RESPONSABILIDAD: window.ListaDetalle — la vida del DETALLE abierto
                  · Los cierres corren por sus propios receptores de
                  chips:change, ciudad:change, orden:change,
                  post:solicitar, #btnVolver y popstate.
-VERSIÓN:         1.0
+VERSIÓN:         1.1
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
@@ -220,6 +220,14 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       /* Skeleton del detalle antes del fade. Si PostFull ya tiene
          el detalle (por la precarga), se reemplaza casi al toque. */
       mostrarSkeletonDetalle();
+
+      /* VISTA · el post se abre: el papelito entra a la cajita
+         (window.Vistas — 1 vista por post por sesión; el lote
+         sale al juntar 5, al abrir la app o al irse a segundo
+         plano; la pizarra del GAS baja el total a la hoja Post). */
+      if (window.Vistas && typeof window.Vistas.anotar === 'function') {
+        window.Vistas.anotar(idPost);
+      }
 
       lista.classList.add('fade-out');
 

@@ -54,7 +54,7 @@ RESPONSABILIDAD: Marquesina de titulares destacados. Vive fuera
                  original para que la vuelta no cambie de color).
                  El encabezado "Promos cerca de ti" + "Toca para
                  conocer más" se muestra/oculta junto con el slot.
-VERSIÓN:         2.5.0
+VERSIÓN:         2.5.1
 CAMBIOS:         R171: construir compara el estado del post contra
                  la MATRIZ DE ESTADOS (SISTEMA.estadosPost —
                  Constantes.gs) en vez del estado a mano. Historial:
@@ -350,10 +350,9 @@ DEPENDENCIAS:    Index.html (SISTEMA.promo, SISTEMA.badges, #promoSlot,
     }
 
     function tituloPostDe(post) {
-      var pj = (post && post.postJson && post.postJson.descripcion) || {};
-      var t = String(pj.tituloPost || '').trim();
+      var meta = (post && post.postJson && post.postJson.meta) || {};
+      var t = String(meta.tituloPost || '').trim();
       if (!t) t = String((post && post.titulo) || '').trim();
-      if (!t) t = String((post && post.boton) || '').trim();
       return t;
     }
 

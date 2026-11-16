@@ -8,7 +8,7 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.7.0
+VERSIÓN:         1.7.1
 CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
@@ -70,7 +70,7 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
     }
 
     function htmlPlanEstudios(post) {
-      var pj = (post && post.postJson && post.postJson.descripcion) || {};
+      var pj = (post && post.postJson && post.postJson.meta) || {};
       var lineas = extraerPlanEstudios(pj.markdown);
       if (!lineas.length) return '';
 
@@ -167,9 +167,9 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       }
 
       var numeroInternacional = '';
-      if (partner && partner.partnerJson && partner.partnerJson.whatsapp) {
+      if (partner && partner.partnerJson && partner.partnerJson.telefonoWhatsapp) {
         numeroInternacional = (typeof window.limpiarTelefono === 'function')
-          ? window.limpiarTelefono(partner.partnerJson.whatsapp)
+          ? window.limpiarTelefono(partner.partnerJson.telefonoWhatsapp)
           : '';
       }
 

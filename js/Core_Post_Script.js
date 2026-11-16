@@ -26,7 +26,7 @@ RESPONSABILIDAD: window.CorePost — la vida del POST ABIERTO.
                  AMBOS modos, antes del corte de WhatsApp.
                  · El pintado inicial (área neutra + CTA) corre con
                  el evento 'app-lista', al inyectarse el lienzo.
-VERSIÓN:         1.1
+VERSIÓN:         1.2
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
                  R171: actualizarTextoCTA compara contra la MATRIZ
@@ -35,7 +35,6 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
                  Index.html (TABLAS), Core_CSS.html,
                  Iconos.html (pintarGlifos no se usa aquí)
 ════════════════════════════════════════════════════════════════════*/
-
   window.CorePost = (function () {
     var postActivoGlobal = null;
 
@@ -50,12 +49,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
     }
 
     /* Título del post para los placeholders · la MISMA fuente que
-       la duda ya usaba: descripcion.tituloPost del postJson, con
+       la duda ya usaba: meta.tituloPost del postJson, con
        post.titulo de miga. */
     function tituloDelPost(post) {
       var pj = (post && post.postJson) || {};
-      var desc = pj.descripcion || {};
-      return String(desc.tituloPost || (post && post.titulo) || '').trim();
+      var meta = pj.meta || {};
+      return String(meta.tituloPost || (post && post.titulo) || '').trim();
     }
 
     function buscarPartner(idPartner) {
@@ -82,7 +81,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
 
       var partner = buscarPartner(postActivoGlobal.idPartner);
       var numero = partner && partner.partnerJson
-        ? partner.partnerJson.whatsapp
+        ? partner.partnerJson.telefonoWhatsapp
         : '';
 
       return abrirWhatsapp(numero, mensaje);
@@ -248,7 +247,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend, abrirWhatsapp),
 
       var partner = buscarPartner(post.idPartner);
       var numero = partner && partner.partnerJson
-        ? partner.partnerJson.whatsapp
+        ? partner.partnerJson.telefonoWhatsapp
         : '';
       if (!numero) return;
 

@@ -9,7 +9,7 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.9.0
+VERSIÓN:         2.9.1
 CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con movimiento del CTA del lienzo (.secciones-track .cta-reservar.mk-cta-button), del cross-sell (.mk-cross-card), de In Company (.cross-incompany) y del bloque asesor (.bloque-asesor), y el :active de solo cursor del handle del sheet (.mk-sheet-handle-area). El feedback de toque sin movimiento y el layout intactos. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
@@ -262,6 +262,12 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 22px;
   }
   .mk-partner-initial { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+  /* La imagen del avatar llena el círculo (regla del avatar: con
+     datos en AVATAR, foto; sin datos, la inicial). */
+  .mk-partner-avatar .mk-partner-img {
+    width: 100%; height: 100%; border-radius: 50%;
+    object-fit: cover; display: block;
+  }
   .mk-partner-verified-badge { position: absolute; bottom: -4px; right: -4px; width: 24px; height: 24px; background: #ffffff; border-radius: 50%; box-shadow: 0 1px 3px rgba(15,23,42,0.15); z-index: 2; display: flex; align-items: center; justify-content: center; color: #f97316; }
   .mk-partner-verified-badge svg { width: 19px; height: 19px; display: block; }
   .mk-partner-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }

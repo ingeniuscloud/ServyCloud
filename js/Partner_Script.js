@@ -4,7 +4,7 @@ ARCHIVO:         Partner_Script.html
 ESPEJO GITHUB:   github/js/Partner_Script.js (subir a GitHub Pages; editar en GAS y pegar el contenido)
 PROYECTO:        INGeniusCloud | ServyCloud
 RESPONSABILIDAD: Módulo window.Partner. LIENZO propio del partner
-VERSIÓN:         1.3
+VERSIÓN:         1.4
 CAMBIOS:         R171: postsDelPartner compara contra la MATRIZ DE
                  ESTADOS (SISTEMA.estadosPost — Constantes.gs) en
                  vez de estados a mano. Gemelo GAS sincronizado.
@@ -83,7 +83,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
 
     function nombrePartner() {
       if (partnerActivo && partnerActivo.nombre) return String(partnerActivo.nombre).trim();
-      if (partnerActivo && partnerActivo.marca) return String(partnerActivo.marca).trim();
       return 'el partner';
     }
 
@@ -100,8 +99,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
     }
 
     function tituloPostOrigen() {
-      if (postOrigen && postOrigen.postJson && postOrigen.postJson.descripcion) {
-        var t = String(postOrigen.postJson.descripcion.tituloPost || '').trim();
+      if (postOrigen && postOrigen.postJson && postOrigen.postJson.meta) {
+        var t = String(postOrigen.postJson.meta.tituloPost || '').trim();
         if (t) return t;
       }
       if (postOrigen && postOrigen.titulo) return String(postOrigen.titulo).trim();
@@ -186,15 +185,21 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
 
     function buildIdentidad() {
       var nombre = nombrePartner();
-      var inicial = (nombre.charAt(0) || 'P').toUpperCase();
+      var avatar = partnerActivo ? String(partnerActivo.avatar || '').trim() : '';
       var pj = partnerActivo && partnerActivo.partnerJson ? partnerActivo.partnerJson : {};
       var eslogan = String(pj.esloganPartner || '').trim();
 
       var html = '<div class="pf-identidad">';
-      html +=   '<div class="mk-partner-avatar">' +
-                  '<span class="mk-partner-initial">' + escapeHtml(inicial) + '</span>' +
-                  '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>' +
-                '</div>';
+      html +=   '<div class="mk-partner-avatar">';
+      /* AVATAR: con datos, la imagen dentro del círculo; sin
+         datos, la inicial del NOMBRE del partner. */
+      if (avatar) {
+        html +=   '<img class="mk-partner-img" src="' + escapeHtml(avatar) + '" alt="" />';
+      } else {
+        html +=   '<span class="mk-partner-initial">' + escapeHtml((nombre.charAt(0) || 'P').toUpperCase()) + '</span>';
+      }
+      html +=   '<span class="mk-partner-verified-badge" data-glifo="badgeCheck" aria-label="Verificado"></span>';
+      html +=   '</div>';
       html +=   '<div class="mk-partner-info">';
       /* R88: .subtitulo (18px/300) con el color del post. */
       html +=     '<div class="subtitulo" style="color: var(--post-color) !important;">' + escapeHtml(nombre) + '</div>';
@@ -262,10 +267,14 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
 
     function buildWhatsapp() {
       var pj = partnerActivo && partnerActivo.partnerJson ? partnerActivo.partnerJson : {};
-      var numero = String(pj.whatsapp || '').trim();
+      var numero = String(pj.telefonoWhatsapp || '').trim();
       if (!numero) return '';
 
-      var textoBoton = String(pj.textoBotonWhatsapp || 'Enviar mensaje').trim();
+      /* Texto del botón · constante general del sistema
+         (03 Constantes.gs → window.SISTEMA). */
+      var textoBoton = String(
+        (window.SISTEMA && window.SISTEMA.textoBotonWhatsappPartner) || 'Enviar mensaje'
+      ).trim();
       var tituloPost = tituloPostOrigen();
 
       var mensaje = tituloPost
@@ -285,9 +294,10 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS, .secciones-wrap),
 
     /* Tarjeta del partner · EXACTAMENTE la misma del cross-sell
        del post (.mk-cross-card con banner tintado + avatar blanco
-       e inicial pastel + nombre .textoPrimario). */
+       e inicial pastel + nombre .textoPrimario). El nombre de la
+       card es el tituloPost del post. */
     function celdaCard(p) {
-      var nombre  = p.boton || p.titulo || p.id;
+      var nombre  = p.titulo || p.id;
       var inicial = (nombre.charAt(0) || '?').toUpperCase();
       var color   = p.colorOficial || '#475569';
       var claro   = p.colorClaro   || '#f1f5f9';

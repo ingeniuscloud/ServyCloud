@@ -55,7 +55,7 @@ RESPONSABILIDAD: window.Lista — la fábrica de la vidriera de items
                  puertas clásicas (abrirDetalle, cerrarDetalle,
                  partner, seleccionar, getModo, getPostActivo)
                  delegan ahí.
-VERSIÓN:         2.33
+VERSIÓN:         2.34
 CAMBIOS:         R173: la búsqueda es POR CHIP — el término vive
                  como ESTADO de Lista y postsDeChip lo aplica en
                  cada página: cada chip muestra solo SUS items que
@@ -286,8 +286,8 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
        falla, cae a la inicial del título. Sin memoria
        disponible: URL directa de siempre. Badge y título a 2
        líneas con altura fija (los slots quedan alineados entre
-       cards). Sin likes, sin marca y sin "Ver publicación": la
-       grilla invita con el precio. */
+       cards). Sin likes ni "Ver publicación": la grilla invita
+       con el precio. */
     function montarTarjetaGrilla(post) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -298,7 +298,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
         typeof window.SeccionImagen.poblarConL2 === 'function');
 
       var badge   = badgeDePost(post);
-      var titulo  = post.titulo || post.boton || post.id;
+      var titulo  = post.titulo || post.id;
       var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
 
       var html = '<span class="grilla-foto" aria-hidden="true">';
@@ -364,7 +364,7 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     }
 
     function tituloDe(post) {
-      return String((post && (post.titulo || post.boton || post.id)) || '');
+      return String((post && (post.titulo || post.id)) || '');
     }
 
     function compararTexto(a, b) {
@@ -412,13 +412,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       }
 
       return arr;   /* recomendado · el orden de la hoja */
-    }
-
-    function marcaDePartner(partner) {
-      if (!partner) return '';
-      var marca = String(partner.marca || '').trim();
-      if (marca) return marca;
-      return String(partner.nombre || '').trim();
     }
 
     /* B6 · R10: escapado HTML para el contenido que viene de la
@@ -479,7 +472,6 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
           var p = lista[i];
           f += '|' + p.id +
             ':' + String(p.titulo || '') +
-            ':' + String(p.boton || '') +
             ':' + (Number(p.like) || 0) +
             ':' + (Number(p.comparte) || 0) +
             ':' + String(p.precioVenta || '') +
@@ -543,10 +535,9 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
     }
 
     /* ============================================================
-       TEXTO BUSCABLE de un post (R173): los mismos campos que
-       cruzaba la búsqueda de antes (botón, título, id, grupos,
-       partner con su marca y eslogan) — normalizado una vez y
-       aplicado DENTRO de cada chip por postsDeChip.
+       TEXTO BUSCABLE de un post: título, id, grupos y partner
+       con su nombre y eslogan — normalizado una vez y aplicado
+       DENTRO de cada chip por postsDeChip.
        ============================================================ */
     function textoDePost(p) {
       var grupos = (window.SISTEMA && window.SISTEMA.grupoJson) || [];
@@ -564,12 +555,10 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       var pj = partner.partnerJson || {};
 
       return normalizar(
-        (p.boton    || '') + ' ' +
         (p.titulo   || '') + ' ' +
         (p.id       || '') + ' ' +
         gruposTexto + ' ' +
         (partner.nombre || '') + ' ' +
-        (partner.marca  || '') + ' ' +
         (pj.esloganPartner || '')
       );
     }
@@ -689,24 +678,26 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
       var frag = document.createDocumentFragment();
 
       /* Construye el botón de UN post (anatomía LIMPIA: fila del
-         título + fila del partner — sin subtítulo ni divisoria ni
+         título + fila del pie — sin subtítulo ni divisoria ni
          check verde; la división la pinta el CSS con la línea
          tenue entre items). */
       function montarItem(post) {
         var partner = buscarPartner(post.idPartner);
 
-        var titulo  = post.titulo || post.boton || post.id;
+        var titulo  = post.titulo || post.id;
         var color   = post.colorOficial || '#475569';
         var claro   = post.colorClaro || '#f1f5f9';
         var like    = Number(post.like) || 0;
-        var marca   = marcaDePartner(partner);
+        var avatar  = partner ? String(partner.avatar || '').trim() : '';
+        var nombreP = (partner && partner.nombre) ? String(partner.nombre).trim() : '';
 
         /* AVATAR DEL ITEM: CÍRCULO PERFECTO (el CSS lo centra y
-           le da 52×52), SOLO la INICIAL DEL TÍTULO — sin imagen
-           (el avatar nunca lleva foto). La letra lleva la
+           le da 52×52). Regla del avatar: con datos en AVATAR va
+           la IMAGEN del partner dentro del círculo; sin datos,
+           la INICIAL DEL NOMBRE del partner. La letra lleva la
            tipografía .tituloPost y el colorOficial del post;
            fondo colorClaro de siempre. */
-        var inicial = String(titulo).charAt(0).toUpperCase() || 'S';
+        var inicial = nombreP ? nombreP.charAt(0).toUpperCase() : 'S';
 
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -718,18 +709,15 @@ DEPENDENCIAS:    Index.html (SISTEMA, TABLAS),
 
         var html = '';
         html += '<span class="item-avatar" aria-hidden="true">' +
-                escapeHtml(inicial) +
+                (avatar
+                  ? '<img class="item-avatar-img" src="' + escapeHtml(avatar) + '" alt="" />'
+                  : escapeHtml(inicial)) +
                 '</span>';
         html += '<span class="body">';
         html +=   '<span class="fila-titulo">';
         html +=     '<span class="subtitulo">' + escapeHtml(titulo) + '</span>';
         html +=   '</span>';
         html +=   '<span class="pie">';
-        if (marca) {
-          html +=   '<span class="marca">' +
-                    '<span class="marca-texto">' + escapeHtml(marca) + '</span>' +
-                    '</span>';
-        }
         html +=     '<span class="ver-detalles">Ver publicación' +
                     '<span class="ver-glifo" data-glifo="flechaVer" aria-hidden="true"></span></span>';
         html +=   '</span>';
