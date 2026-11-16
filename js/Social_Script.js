@@ -13,8 +13,21 @@ RESPONSABILIDAD: Módulo window.Social. Pinta los botones sociales
                  con el enlace del post que arma Compartir (enlace
                  corto ?s= codificado, R124). Key localStorage:
                  post_likes.
-VERSIÓN:         2.6
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         2.7
+CAMBIOS:         R188: el mensaje de WhatsApp sale con los
+                 placeholders de la meta resueltos
+                 (_placeholdersMeta_, gemelo del mecanismo R187):
+                 [precioVenta], [monedaVenta] y cualquier campo
+                 plano de la MISMA meta → su valor, AL COMPARTIR.
+                 El texto sigue saliendo COMPLETO de la BD (R109
+                 intacto): el dueño escribe "Usado:
+                 [precioVenta][monedaVenta]" en
+                 compartir.mensajeWhatsapp y el post viaja con su
+                 precio real — un cambio de precio en la BD se
+                 ve sin tocar código. Campo vacío = el
+                 placeholder desaparece (nunca texto crudo) y un
+                 corchete que no es campo queda intacto.
+                 Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
                  Index.html (SISTEMA, TABLAS), Iconos.html
                  (pintarGlifos), Lista_Script.html (window.Lista:
@@ -54,7 +67,30 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
        Solo se le pega el enlace al final. Si el post no trae
        mensaje en la BD, sale el enlace pelado: el texto lo
        escribe el dueño en la BD, nunca el código.
+       R188 · el texto del dueño puede llevar placeholders de la
+       meta ("Usado: [precioVenta][monedaVenta]") y se resuelven
+       AL COMPARTIR con la meta de ESE post (gemelo del
+       mecanismo R187: texto plano para WhatsApp, sin escapado
+       HTML — encodeURIComponent lo protege al viajar).
        ============================================================ */
+    function _placeholdersMeta_(texto, meta) {
+      var t = String(texto == null ? '' : texto);
+      if (!t || !meta || typeof meta !== 'object') return t;
+      var claves = [];
+      for (var k in meta) {
+        if (!Object.prototype.hasOwnProperty.call(meta, k)) continue;
+        var v = meta[k];
+        if (typeof v === 'string' || typeof v === 'number') claves.push(k);
+      }
+      if (!claves.length) return t;
+      var re = new RegExp('\\[(' + claves.map(function (c) {
+        return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }).join('|') + ')\\](?!\\()', 'g');
+      return t.replace(re, function (_, campo) {
+        return String(meta[campo]).trim();
+      });
+    }
+
     function generarTextoCompartir(post, urlEnlace) {
       var pj = post.postJson || {};
       var meta = pj.meta || {};
@@ -65,10 +101,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend, getDeviceId),
       var mensajeBD = String(compartir.mensajeWhatsapp || '').trim();
       var titulo    = String(meta.tituloPost || post.titulo || '').trim();
 
+      /* R188: placeholders de la meta → valor de ESE campo en la
+         MISMA meta del post (p. ej. "Usado: [precioVenta]
+         [monedaVenta]" → "Usado: 45,00$"). Sustitución AL
+         COMPARTIR, nunca horneada: cambias el precio en la BD y
+         el mensaje sigue al precio real. Campo vacío = el
+         placeholder desaparece; un corchete ajeno queda intacto. */
+      var mensaje = _placeholdersMeta_(mensajeBD, meta);
+
       return {
         titulo: titulo,
-        texto:  mensajeBD
-          ? mensajeBD + (url ? '\n' + url : '')
+        texto:  mensaje
+          ? mensaje + (url ? '\n' + url : '')
           : url
       };
     }
