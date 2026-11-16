@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.15.2
-CAMBIOS:         R142: la venta del post entra al lienzo — con precioVenta y/o fechaEvento en la BD, el dato sale DEBAJO del título con la MISMA tipografía del slot de la grilla (maestra .subtitulo + --color-primario): precio formato ML (moneda menor + centavos superíndice) y fecha es-VE 12h con su calendario. Solo con datos reales: sin precio y sin fecha el bloque NO nace (el «A consultar» es de la card, no del lienzo). Fuente: meta fresca del detalle, respaldo la fila horneada del catálogo (R140). Gemelo GAS sincronizado. Historial: bitácora/versiones.
+VERSIÓN:         2.16
+CAMBIOS:         R187: los placeholders de la meta en el markdown se sustituyen por su valor al pintar la descripción completa (_renderMarkdown recibe la meta del post): [precioVenta], [monedaVenta] y cualquier campo plano de la MISMA meta → su valor real. Sustitución AL PINTAR, nunca horneada — un cambio de precio en la BD se ve en cada apertura. Campo vacío = el placeholder desaparece (nunca texto crudo) y un corchete que no es campo queda intacto. El [valor bcv] (R92) sigue su propio carril. Gemelo GAS sincronizado. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -207,7 +207,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       });
     }
 
-    function _renderMarkdown(md) {
+    function _renderMarkdown(md, fuente) {
       var texto = String(md || '').trim();
       if (!texto) return '';
       /* R93 · CITA CON LLAMADO (^) — configuración tipográfica del
@@ -234,6 +234,35 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
          viejo). Si no hay tasa servida, desaparece — nunca se
          pinta el texto crudo. */
       try { if (/\[valor bcv\]/i.test(html)) html = html.replace(/\[valor bcv\]/gi, _htmlTasaBCV()); } catch (e) {}
+      /* R187 · PLACEHOLDERS DE LA META: "[campo]" del markdown se
+         sustituye por el valor de ESE campo en la MISMA meta del
+         post (p. ej. "Por solo [precioVenta][monedaVenta]" →
+         "Por solo 350,00$"). Al PINTAR, nunca horneada: el precio
+         nuevo de la BD se ve en cada apertura. Solo campos planos
+         con datos; campo vacío = el placeholder desaparece (misma
+         regla del [valor bcv]: nunca texto crudo); un corchete
+         que no es campo de la meta queda intacto. Los valores van
+         escapados: el HTML ya viene parseado. */
+      try {
+        if (fuente && typeof fuente === 'object') {
+          var clavesMeta = [];
+          for (var claveMeta in fuente) {
+            if (!Object.prototype.hasOwnProperty.call(fuente, claveMeta)) continue;
+            var valorMeta = fuente[claveMeta];
+            if (typeof valorMeta === 'string' || typeof valorMeta === 'number') {
+              clavesMeta.push(claveMeta);
+            }
+          }
+          if (clavesMeta.length) {
+            var reMeta = new RegExp('\\[(' + clavesMeta.map(function (c) {
+              return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }).join('|') + ')\\](?!\\()', 'g');
+            html = html.replace(reMeta, function (_, campo) {
+              return escapeHtml(String(fuente[campo]).trim());
+            });
+          }
+        }
+      } catch (e) {}
       return html;
     }
 
@@ -932,7 +961,7 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (!markdown) return;
       var content = root.querySelector('#postDescSheetContent');
       var html = ''; if (titulo) html += '<h2 class="tituloPost" style="margin-bottom:16px;">' + escapeHtml(titulo) + '</h2>';
-      html += '<div class="textoPrimario">' + _renderMarkdown(markdown) + '</div>';
+      html += '<div class="textoPrimario">' + _renderMarkdown(markdown, meta) + '</div>';
       content.innerHTML = html;
 
       /* R92: colores del post + tablas vestidas también en el

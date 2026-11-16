@@ -8,8 +8,8 @@ RESPONSABILIDAD: Vista de confirmación. Tres modos: cargando / error / éxito.
                  cupo se activa al pagar en oficina.
                  Título del post leído de seccionPresentacion.titulo
                  (con fallback a post.titulo del índice liviano).
-VERSIÓN:         1.7.1
-CAMBIOS:         R131: sin cambios de código — solo simplificación del encabezado (el historial de rondas previas vive en la bitácora y en versiones/).
+VERSIÓN:         1.8
+CAMBIOS:         R187: el Plan de Estudios sale del markdown con los placeholders de la meta ya resueltos (_placeholdersMeta_ ANTES de la extracción: [precioVenta], [monedaVenta] y cualquier campo plano de la misma meta → su valor; campo vacío = el placeholder desaparece; el escapado sigue en el pintor, R114 intacto). Historial: bitácora/versiones.
 DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
                  Global_Script.html (window.limpiarTelefono),
                  Index.html (TABLAS), Reserva_CSS.html (clases
@@ -69,9 +69,37 @@ DEPENDENCIAS:    Reserva_Sheet_Script.html (window.Sheet),
       return salida;
     }
 
+    /* R187 · PLACEHOLDERS DE LA META — versión de aquí: sobre el
+       texto CRUDO del markdown (el escapado lo hace el pintor
+       más abajo). "[campo]" → valor de ESE campo en la MISMA
+       meta del post (p. ej. "Pago único: Por solo
+       [precioVenta][monedaVenta]"); campo vacío = el placeholder
+       desaparece (nunca texto crudo) y un corchete que no es
+       campo de la meta queda intacto. */
+    function _placeholdersMeta_(texto, meta) {
+      var t = String(texto == null ? '' : texto);
+      if (!t || !meta || typeof meta !== 'object') return t;
+      var claves = [];
+      for (var k in meta) {
+        if (!Object.prototype.hasOwnProperty.call(meta, k)) continue;
+        var v = meta[k];
+        if (typeof v === 'string' || typeof v === 'number') claves.push(k);
+      }
+      if (!claves.length) return t;
+      var re = new RegExp('\\[(' + claves.map(function (c) {
+        return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }).join('|') + ')\\](?!\\()', 'g');
+      return t.replace(re, function (_, campo) {
+        return String(meta[campo]).trim();
+      });
+    }
+
     function htmlPlanEstudios(post) {
       var pj = (post && post.postJson && post.postJson.meta) || {};
-      var lineas = extraerPlanEstudios(pj.markdown);
+      /* R187: el plan sale del markdown con los placeholders de
+         la meta ya resueltos (p. ej. "Pago único: Por solo
+         [precioVenta][monedaVenta]" muestra el precio real). */
+      var lineas = extraerPlanEstudios(_placeholdersMeta_(pj.markdown, pj));
       if (!lineas.length) return '';
 
       var items = '';
