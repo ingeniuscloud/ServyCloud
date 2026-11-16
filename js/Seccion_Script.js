@@ -10,7 +10,7 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.15.1
+VERSIÓN:         2.15.2
 CAMBIOS:         R142: la venta del post entra al lienzo — con precioVenta y/o fechaEvento en la BD, el dato sale DEBAJO del título con la MISMA tipografía del slot de la grilla (maestra .subtitulo + --color-primario): precio formato ML (moneda menor + centavos superíndice) y fecha es-VE 12h con su calendario. Solo con datos reales: sin precio y sin fecha el bloque NO nace (el «A consultar» es de la card, no del lienzo). Fuente: meta fresca del detalle, respaldo la fila horneada del catálogo (R140). Gemelo GAS sincronizado. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
@@ -612,7 +612,14 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var pj   = post.postJson || {};
       var meta = pj.meta || {};
       var imagenes = Array.isArray(meta.imagenes) ? meta.imagenes : [];
-      var titulo   = String(meta.tituloPost || '').trim();
+      /* R186 · el título del lienzo es el MISMO que pinta la card
+         de la grilla para ese post (el horneado del índice:
+         meta.tituloPost || id). Si el postJson servido no trae
+         meta.tituloPost — memoria vieja del teléfono, caché del
+         servidor o celda sin mudar — el lienzo NO queda mudo:
+         cae al mismo título que ya se ve en la lista. Con datos
+         sanos ambos son el mismo texto. */
+      var titulo   = String(meta.tituloPost || post.titulo || '').trim();
       var markdown = String(meta.markdown  || '').trim();
       var html = '';
       
@@ -918,7 +925,10 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       if (!postActivo) return;
       var root = _construirDescSheet(); if (!root) return;
       var pj = postActivo.postJson || {}; var meta = pj.meta || {};
-      var titulo = String(meta.tituloPost || '').trim(); var markdown = String(meta.markdown || '').trim();
+      /* R186 · mismo respaldo del lienzo: el título del sheet de
+         la descripción completa es el mismo que ya se pintó
+         arriba en el lienzo. */
+      var titulo = String(meta.tituloPost || postActivo.titulo || '').trim(); var markdown = String(meta.markdown || '').trim();
       if (!markdown) return;
       var content = root.querySelector('#postDescSheetContent');
       var html = ''; if (titulo) html += '<h2 class="tituloPost" style="margin-bottom:16px;">' + escapeHtml(titulo) + '</h2>';

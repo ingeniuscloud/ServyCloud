@@ -21,7 +21,7 @@ RESPONSABILIDAD: La memoria del teléfono. Guarda y devuelve el
                  revalidación muda avisa por el evento
                  'post:actualizado' y anotarPregunta cosecha las
                  preguntas recién publicadas.
-VERSIÓN:         1.0
+VERSIÓN:         1.1
 ENCABEZADOS:     Solo describen lo que funciona HOY. El historial
                  de rondas vive en la bitácora y en versiones/.
 DEPENDENCIAS:    Global_Script.html (postBackend),
@@ -74,7 +74,12 @@ DEPENDENCIAS:    Global_Script.html (postBackend),
     var K_POST      = 'sv_l2_post_';
     var MAX_POSTS   = 30;
     var TTL_MS      = 7 * 24 * 60 * 60 * 1000;
-    var ENV_VERSION = 3;   /* el catálogo viaja en su shape sin imagen */
+    /* v4 (R186): el shape vigente lleva tituloPost y markdown
+       DENTRO de meta. Subir el número PURGA al primer _valido
+       cualquier L2 vieja (catálogo y detalles) — el teléfono
+       vuelve a pedir todo fresco en vez de servir posts sin
+       título. */
+    var ENV_VERSION = 4;
 
     function _valido(env, requiereSecciones) {
       if (!env || env.v !== ENV_VERSION) return false;
