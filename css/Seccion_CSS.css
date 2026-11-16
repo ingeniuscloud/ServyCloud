@@ -9,8 +9,8 @@ RESPONSABILIDAD: Estilos del lienzo del post: hero con carrusel,
                  los puntos del carrusel y la infraestructura de
                  sheets .mk-sheet-* (leída por el sheet de
                  descripción y por Pregunta).
-VERSIÓN:         2.9.1
-CAMBIOS:         R145: barrido de efectos de click que no aplican en teléfono (app 100% teléfono, orden del dueño) — fuera los :active con movimiento del CTA del lienzo (.secciones-track .cta-reservar.mk-cta-button), del cross-sell (.mk-cross-card), de In Company (.cross-incompany) y del bloque asesor (.bloque-asesor), y el :active de solo cursor del handle del sheet (.mk-sheet-handle-area). El feedback de toque sin movimiento y el layout intactos. Historial: bitácora/versiones.
+VERSIÓN:         2.10
+CAMBIOS:         R190: estado del badge en el LIENZO (píldora a la derecha del precio, R190 de Seccion_Script): .lv-badge entra a la fila del precio como inline-block alineado al medio con 10px de aire, y el compuesto .lv-badge.badgeNuevo repinta el VERDE #16a34a de la grilla (R148 de Lista_CSS) sobre esta superficie — la maestra .badgeNuevo del Core sigue naranja para Ciudad y Ordenar; .badgeUsado queda tal cual la maestra. Historial: bitácora/versiones.
 DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
                  Pregunta_CSS.html (reutiliza .mk-sheet-*)
 ════════════════════════════════════════════════════════════════════*/
@@ -465,3 +465,20 @@ DEPENDENCIAS:    Core_CSS.html (variables y clases maestras),
     color: var(--color-primario, #EA580C);
   }
   .lienzo-venta .lv-fecha-glifo svg { width: 100%; height: 100%; display: block; }
+
+  /* ============================================================
+     R190 · BADGE DEL LIENZO · a la derecha del precio
+     La PÍLDORA COMPLETA vive en las maestras .badgeNuevo/
+     .badgeUsado del Core (igual que en la grilla); aquí queda
+     SOLO el estado de ESTA superficie: la píldora entra a la
+     fila del precio como inline-block alineada al medio (el
+     superíndice del centavo, que es vertical-align, no se
+     toca) con 10px de aire tras el precio, y el compuesto
+     .lv-badge.badgeNuevo repinta el VERDE #16a34a de la grilla
+     (R148 de Lista_CSS) — mismo trato que .grilla-badge.
+     badgeNuevo: el naranja de la maestra no sale del Core (las
+     píldoras «Activo» de Ciudad y Ordenar no se enteran).
+     «Usado» queda tal cual la maestra blanca.
+     ============================================================ */
+  .lienzo-venta .lv-badge { display: inline-block; vertical-align: middle; margin-left: 10px; }
+  .lienzo-venta .lv-badge.badgeNuevo { background: #16a34a !important; }

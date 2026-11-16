@@ -10,8 +10,8 @@ RESPONSABILIDAD: Módulo window.Secciones. Pinta el lienzo del post:
                  partner, ubicación, Q&A, publicaciones relacionadas
                  (sección pintada), In Company y bloque asesor.
                  La sección Q&A la aporta window.Pregunta.
-VERSIÓN:         2.16
-CAMBIOS:         R187: los placeholders de la meta en el markdown se sustituyen por su valor al pintar la descripción completa (_renderMarkdown recibe la meta del post): [precioVenta], [monedaVenta] y cualquier campo plano de la MISMA meta → su valor real. Sustitución AL PINTAR, nunca horneada — un cambio de precio en la BD se ve en cada apertura. Campo vacío = el placeholder desaparece (nunca texto crudo) y un corchete que no es campo queda intacto. El [valor bcv] (R92) sigue su propio carril. Gemelo GAS sincronizado. Historial: bitácora/versiones.
+VERSIÓN:         2.17
+CAMBIOS:         R190: el badge Nuevo/Usado de la grilla entra al LIENZO: buildVentaLienzo pinta la píldora (BADGEJSON vía promo.idBadge) a la derecha del precio con el MISMO contrato de la card — apagado o sin idBadge → sin píldora; título «Usado» → blanca .badgeUsado; cualquier otro → .badgeNuevo (el verde de esta superficie lo pinta Seccion_CSS). Vive en la fila del precio: solo nace CON precio, así que solo Venta lo muestra. Helper autocontenido (Seccion no depende de Lista). Sin backend: la fila del catálogo ya trae promo.idBadge en post:change. Historial: bitácora/versiones.
 DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                  (SISTEMA, TABLAS), Iconos.html (pintarGlifos),
                  Seccion_Imagen_Script.html, Pregunta_Script.html
@@ -604,6 +604,23 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       return txt;
     }
 
+    /* R190 · BADGE DEL LIENZO: mismo contrato del overlay de la
+       grilla (badgeDePost de Lista, replicado aquí por la regla
+       «Seccion no depende de Lista»): post.promo.idBadge buscado
+       en SISTEMA.badges. Apagado o sin idBadge → sin píldora. */
+    function badgeDePostLienzo(post) {
+      var id = post && post.promo ? String(post.promo.idBadge || '').trim() : '';
+      if (!id) return null;
+      var badges = (window.SISTEMA && window.SISTEMA.badges) || [];
+      for (var i = 0; i < badges.length; i++) {
+        if (badges[i] && badges[i].idBadge === id) {
+          if (badges[i].estado === false) return null;
+          return badges[i];
+        }
+      }
+      return null;
+    }
+
     function buildVentaLienzo(post) {
       /* La meta del detalle manda (fresca); la fila del catálogo
          horneada (R140) es el respaldo natural — el dato sale
@@ -615,6 +632,9 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
       var fecha  = textoFechaEvento(meta.fechaEvento) || textoFechaEvento(post && post.fechaEvento);
       if (!precio && !fecha) return '';
       var moneda = String(meta.monedaVenta || (post && post.monedaVenta) || '$');
+      /* R190 · la píldora acompaña SOLO al precio (venta): un post
+         de solo fecha (evento) no la lleva. */
+      var badgeLienzo = badgeDePostLienzo(post);
       var html = '<div class="lienzo-venta">';
       if (precio) {
         html += '<div class="lv-precio subtitulo">' +
@@ -622,6 +642,18 @@ DEPENDENCIAS:    Global_Script.html (postBackend), Core_Script.html
                   '<span class="precio-entero">' + escapeHtml(precio.entero) + '</span>';
         if (precio.centavos) {
           html += '<span class="precio-centavos">' + escapeHtml(precio.centavos) + '</span>';
+        }
+        if (badgeLienzo && badgeLienzo.titulo) {
+          /* R190 · la clase la elige el título de la BD (BADGEJSON),
+             mismo criterio de la card: «Usado» viste la blanca
+             .badgeUsado; cualquier otro título (Nuevo, Popular,
+             Promoción…) viste .badgeNuevo — el VERDE de la grilla
+             lo repinta Seccion_CSS sobre esta superficie. El texto
+             SIEMPRE es el que llega de la BD. */
+          var claseLienzo = String(badgeLienzo.titulo).trim().toLowerCase() === 'usado'
+            ? 'badgeUsado'
+            : 'badgeNuevo';
+          html += '<span class="lv-badge ' + claseLienzo + '">' + escapeHtml(badgeLienzo.titulo) + '</span>';
         }
         html += '</div>';
       }
